@@ -1,0 +1,822 @@
+function doppler_arterias_uterinas_fetal_growth() {
+	var UtaL = $('#FGRvsSGA_UtALeftDoppler').val();
+	var UtaR = $('#FGRvsSGA_UtARightDoppler').val();
+	var semanas = $('#FGRvsSGA_GA_weeks').val();
+	var dias = $('#FGRvsSGA_GA_days').val();
+
+	var resultado = "";
+	var percentil = "";
+
+	if (((UtaL <= 0.1) || (UtaL > 10)) || (UtaL == "")) {
+		alert("Left Uterine Artery out of range");
+	} else if (((UtaR <= 0.1) || (UtaR > 10)) || (UtaR == "")) {
+		alert("Right Uterine Artery out of range");
+	} else if (((semanas > 44) || (semanas < 11)) || (semanas == "")) {
+		alert("Weeks out of rannge");
+	} else if (dias > 7) {
+		alert("Days out of range");
+	} else {
+
+		var Utam = (Number(UtaL) + Number(UtaR)) / 2;
+		var Utamlog = Math.log(Utam);
+		var Utazs = (Utamlog - ((1.39 - (0.012 * (Number(semanas * 7) + Number(dias)))) + (1.98E-5 * ((Number(semanas * 7) + Number(dias)) * (Number(semanas * 7) + Number(dias)))))) / (0.272 - (0.000259 * (Number(semanas * 7) + Number(dias))));
+
+		if (Utazs >= 2.6) {
+			percentil = ">99";
+		} else if ((Utazs < 2.6) && (Utazs >= 2.18)) {
+			percentil = "99";
+		} else if ((Utazs < 2.18) && (Utazs >= 1.97)) {
+			percentil = "98";
+		} else if ((Utazs < 1.97) && (Utazs >= 1.81)) {
+			percentil = "97";
+		} else if ((Utazs < 1.81) && (Utazs > 1.645)) {
+			percentil = "96";
+		} else if ((Utazs <= 1.645) && (Utazs >= 1.6)) {
+			percentil = "95";
+		} else if ((Utazs < 1.6) && (Utazs >= 1.52)) {
+			percentil = "94";
+		} else if ((Utazs < 1.52) && (Utazs >= 1.45)) {
+			percentil = "93";
+		} else if ((Utazs < 1.45) && (Utazs >= 1.38)) {
+			percentil = "92";
+		} else if ((Utazs < 1.38) && (Utazs >= 1.31)) {
+			percentil = "91";
+		} else if ((Utazs < 1.31) && (Utazs >= 1.26)) {
+			percentil = "90";
+		} else if ((Utazs < 1.26) && (Utazs >= 1.2)) {
+			percentil = "89";
+		} else if ((Utazs < 1.2) && (Utazs >= 1.17)) {
+			percentil = "88";
+		} else if ((Utazs < 1.17) && (Utazs >= 1.1)) {
+			percentil = "87";
+		} else if ((Utazs < 1.1) && (Utazs >= 1.07)) {
+			percentil = "86";
+		} else if ((Utazs < 1.07) && (Utazs >= 1.02)) {
+			percentil = "85";
+		} else if ((Utazs < 1.02) && (Utazs >= 0.98)) {
+			percentil = "84";
+		} else if ((Utazs < 0.98) && (Utazs >= 0.94)) {
+			percentil = "83";
+		} else if ((Utazs < 0.94) && (Utazs >= 0.9)) {
+			percentil = "82";
+		} else if ((Utazs < 0.9) && (Utazs >= 0.86)) {
+			percentil = "81";
+		} else if ((Utazs < 0.86) && (Utazs >= 0.84)) {
+			percentil = "80";
+		} else if ((Utazs < 0.84) && (Utazs >= 0.79)) {
+			percentil = "79";
+		} else if ((Utazs < 0.79) && (Utazs >= 0.76)) {
+			percentil = "78";
+		} else if ((Utazs < 0.76) && (Utazs >= 0.72)) {
+			percentil = "77";
+		} else if ((Utazs < 0.72) && (Utazs >= 0.69)) {
+			percentil = "76";
+		} else if ((Utazs < 0.69) && (Utazs >= 0.67)) {
+			percentil = "75";
+		} else if ((Utazs < 0.67) && (Utazs >= 0.63)) {
+			percentil = "74";
+		} else if ((Utazs < 0.63) && (Utazs >= 0.61)) {
+			percentil = "73";
+		} else if ((Utazs < 0.61) && (Utazs >= 0.57)) {
+			percentil = "72";
+		} else if ((Utazs < 0.57) && (Utazs >= 0.54)) {
+			percentil = "71";
+		} else if ((Utazs < 0.54) && (Utazs >= 0.51)) {
+			percentil = "70";
+		} else if ((Utazs < 0.51) && (Utazs >= 0.48)) {
+			percentil = "69";
+		} else if ((Utazs < 0.48) && (Utazs >= 0.46)) {
+			percentil = "68";
+		} else if ((Utazs < 0.46) && (Utazs >= 0.43)) {
+			percentil = "67";
+		} else if ((Utazs < 0.43) && (Utazs >= 0.4)) {
+			percentil = "66";
+		} else if ((Utazs < 0.4) && (Utazs >= 0.37)) {
+			percentil = "65";
+		} else if ((Utazs < 0.37) && (Utazs >= 0.34)) {
+			percentil = "64";
+		} else if ((Utazs < 0.34) && (Utazs >= 0.32)) {
+			percentil = "63";
+		} else if ((Utazs < 0.32) && (Utazs >= 0.3)) {
+			percentil = "62";
+		} else if ((Utazs < 0.3) && (Utazs >= 0.27)) {
+			percentil = "61";
+		} else if ((Utazs < 0.27) && (Utazs >= 0.24)) {
+			percentil = "60";
+		} else if ((Utazs < 0.24) && (Utazs >= 0.22)) {
+			percentil = "59";
+		} else if ((Utazs < 0.22) && (Utazs >= 0.19)) {
+			percentil = "58";
+		} else if ((Utazs < 0.19) && (Utazs >= 0.17)) {
+			percentil = "57";
+		} else if ((Utazs < 0.17) && (Utazs >= 0.14)) {
+			percentil = "56";
+		} else if ((Utazs < 0.14) && (Utazs >= 0.12)) {
+			percentil = "55";
+		} else if ((Utazs < 0.12) && (Utazs >= 0.09)) {
+			percentil = "54";
+		} else if ((Utazs < 0.09) && (Utazs >= 0.07)) {
+			percentil = "53";
+		} else if ((Utazs < 0.07) && (Utazs >= 0.05)) {
+			percentil = "52";
+		} else if ((Utazs < 0.05) && (Utazs >= 0.03)) {
+			percentil = "51";
+		} else if ((Utazs < 0.03) && (Utazs >= -0.01)) {
+			percentil = "50";
+		} else if ((Utazs < -0.01) && (Utazs >= -0.035)) {
+			percentil = "49";
+		} else if ((Utazs < -0.035) && (Utazs >= -0.06)) {
+			percentil = "48";
+		} else if ((Utazs < -0.06) && (Utazs >= -0.08)) {
+			percentil = "47";
+		} else if ((Utazs < -0.08) && (Utazs >= -0.11)) {
+			percentil = "46";
+		} else if ((Utazs < -0.11) && (Utazs >= -0.13)) {
+			percentil = "45";
+		} else if ((Utazs < -0.13) && (Utazs >= -0.16)) {
+			percentil = "44";
+		} else if ((Utazs < -0.16) && (Utazs >= -0.185)) {
+			percentil = "43";
+		} else if ((Utazs < -0.185) && (Utazs >= -0.21)) {
+			percentil = "42";
+		} else if ((Utazs < -0.21) && (Utazs >= -0.24)) {
+			percentil = "41";
+		} else if ((Utazs < -0.24) && (Utazs >= -0.26)) {
+			percentil = "40";
+		} else if ((Utazs < -0.26) && (Utazs >= -0.28)) {
+			percentil = "39";
+		} else if ((Utazs < -0.28) && (Utazs >= -0.31)) {
+			percentil = "38";
+		} else if ((Utazs < -0.31) && (Utazs >= -0.34)) {
+			percentil = "37";
+		} else if ((Utazs < -0.34) && (Utazs >= -0.36)) {
+			percentil = "36";
+		} else if ((Utazs < -0.36) && (Utazs >= -0.4)) {
+			percentil = "35";
+		} else if ((Utazs < -0.4) && (Utazs >= -0.43)) {
+			percentil = "34";
+		} else if ((Utazs < -0.43) && (Utazs >= -0.45)) {
+			percentil = "33";
+		} else if ((Utazs < -0.45) && (Utazs >= -0.48)) {
+			percentil = "32";
+		} else if ((Utazs < -0.48) && (Utazs >= -0.5)) {
+			percentil = "31";
+		} else if ((Utazs < -0.5) && (Utazs >= -0.54)) {
+			percentil = "30";
+		} else if ((Utazs < -0.54) && (Utazs >= -0.565)) {
+			percentil = "29";
+		} else if ((Utazs < -0.565) && (Utazs >= -0.585)) {
+			percentil = "28";
+		} else if ((Utazs < -0.585) && (Utazs >= -0.62)) {
+			percentil = "27";
+		} else if ((Utazs < -0.62) && (Utazs >= -0.65)) {
+			percentil = "26";
+		} else if ((Utazs < -0.65) && (Utazs >= -0.69)) {
+			percentil = "25";
+		} else if ((Utazs < -0.69) && (Utazs >= -0.73)) {
+			percentil = "24";
+		} else if ((Utazs < -0.73) && (Utazs >= -0.75)) {
+			percentil = "23";
+		} else if ((Utazs < -0.75) && (Utazs >= -0.79)) {
+			percentil = "22";
+		} else if ((Utazs < -0.79) && (Utazs >= -0.83)) {
+			percentil = "21";
+		} else if ((Utazs < -0.83) && (Utazs >= -0.85)) {
+			percentil = "20";
+		} else if ((Utazs < -0.85) && (Utazs >= -0.89)) {
+			percentil = "19";
+		} else if ((Utazs < -0.89) && (Utazs >= -0.93)) {
+			percentil = "18";
+		} else if ((Utazs < -0.93) && (Utazs >= -0.97)) {
+			percentil = "17";
+		} else if ((Utazs < -0.97) && (Utazs >= -1.01)) {
+			percentil = "16";
+		} else if ((Utazs < -1.01) && (Utazs >= -1.04)) {
+			percentil = "15";
+		} else if ((Utazs < -1.04) && (Utazs >= -1.1)) {
+			percentil = "14";
+		} else if ((Utazs < -1.1) && (Utazs >= -1.14)) {
+			percentil = "13";
+		} else if ((Utazs < -1.14) && (Utazs >= -1.2)) {
+			percentil = "12";
+		} else if ((Utazs < -1.2) && (Utazs >= -1.25)) {
+			percentil = "11";
+		} else if ((Utazs < -1.25) && (Utazs >= -1.31)) {
+			percentil = "10";
+		} else if ((Utazs < -1.31) && (Utazs >= -1.37)) {
+			percentil = "9";
+		} else if ((Utazs < -1.37) && (Utazs >= -1.43)) {
+			percentil = "8";
+		} else if ((Utazs < -1.43) && (Utazs >= -1.51)) {
+			percentil = "7";
+		} else if ((Utazs < -1.51) && (Utazs >= -1.6)) {
+			percentil = "6";
+		} else if ((Utazs < -1.6) && (Utazs >= -1.645)) {
+			percentil = "5";
+		} else if ((Utazs < -1.645) && (Utazs >= -1.81)) {
+			percentil = "4";
+		} else if ((Utazs < -1.81) && (Utazs >= -1.97)) {
+			percentil = "3";
+		} else if ((Utazs < -1.97) && (Utazs >= -2.18)) {
+			percentil = "2";
+		} else if ((Utazs < -2.18) && (Utazs >= -2.6)) {
+			percentil = "1";
+		} else if (Utazs < -2.6) {
+			percentil = "<1";
+		}
+
+		if (Utazs > 1.645) {
+			resultado = "Pathological";
+		} else if (Utazs <= 1.645) {
+			resultado = "Normal";
+		}
+
+		if (percentil=="<1") {
+			percentil = "1";
+		}
+
+		if (percentil==">99") {
+			percentil = "99";
+		}
+
+		$('#fetalGrowth_meanUtA_percentile').text("Mean Ut. A (Percentile: " + percentil+")");
+	}
+}
+
+function doppler_ratio_cerebroplacentario_fetal_growth() {
+	var ACMIP = $('#FGRvsSGA_MCADopplerMCAPI').val();
+	var UAIP = $('#FGRvsSGA_UADopplerPI').val();
+	var semanas = $('#FGRvsSGA_GA_weeks').val();
+	var dias = $('#FGRvsSGA_GA_days').val();
+
+	var resultado = "";
+	var percentil = "";
+
+	if (((ACMIP <= 0.1) || (ACMIP > 10)) || (ACMIP == undefined)) {
+		alert("Pulsatility index for cerebral media artery out of range");
+	} else if (((UAIP <= 0.1) || (UAIP > 10)) || (UAIP == undefined)) {
+		alert("Pulsatility index for umbilical artery out of range");
+	} else if (((semanas > 44) || (semanas < 20)) || (semanas == undefined)) {
+		alert("Weeks out of range");
+	} else if (dias > 7) {
+		alert("Days out of range");
+	} else {
+		var CPR = ACMIP / UAIP;
+		var zs = (CPR - ((-4.0636 + (0.383 * (Number(semanas) + Number(dias / 7)))) - (0.0059 * ((Number(semanas) + Number(dias / 7)) * (Number(semanas) + Number(dias / 7)))))) / ((-0.9664 + (0.09027 * (Number(semanas) + Number(dias / 7)))) - (0.0014 * ((Number(semanas) + Number(dias / 7)) * (Number(semanas) + Number(dias / 7)))));
+		if (zs >= 2.6) {
+			percentil = ">99";
+		} else if ((zs < 2.6) && (zs >= 2.18)) {
+			percentil = "99";
+		} else if ((zs < 2.18) && (zs >= 1.97)) {
+			percentil = "98";
+		} else if ((zs < 1.97) && (zs >= 1.81)) {
+			percentil = "97";
+		} else if ((zs < 1.81) && (zs > 1.645)) {
+			percentil = "96";
+		} else if ((zs <= 1.645) && (zs >= 1.6)) {
+			percentil = "95";
+		} else if ((zs < 1.6) && (zs >= 1.52)) {
+			percentil = "94";
+		} else if ((zs < 1.52) && (zs >= 1.45)) {
+			percentil = "93";
+		} else if ((zs < 1.45) && (zs >= 1.38)) {
+			percentil = "92";
+		} else if ((zs < 1.38) && (zs >= 1.31)) {
+			percentil = "91";
+		} else if ((zs < 1.31) && (zs >= 1.26)) {
+			percentil = "90";
+		} else if ((zs < 1.26) && (zs >= 1.2)) {
+			percentil = "89";
+		} else if ((zs < 1.2) && (zs >= 1.17)) {
+			percentil = "88";
+		} else if ((zs < 1.17) && (zs >= 1.1)) {
+			percentil = "87";
+		} else if ((zs < 1.1) && (zs >= 1.07)) {
+			percentil = "86";
+		} else if ((zs < 1.07) && (zs >= 1.02)) {
+			percentil = "85";
+		} else if ((zs < 1.02) && (zs >= 0.98)) {
+			percentil = "84";
+		} else if ((zs < 0.98) && (zs >= 0.94)) {
+			percentil = "83";
+		} else if ((zs < 0.94) && (zs >= 0.9)) {
+			percentil = "82";
+		} else if ((zs < 0.9) && (zs >= 0.86)) {
+			percentil = "81";
+		} else if ((zs < 0.86) && (zs >= 0.84)) {
+			percentil = "80";
+		} else if ((zs < 0.84) && (zs >= 0.79)) {
+			percentil = "79";
+		} else if ((zs < 0.79) && (zs >= 0.76)) {
+			percentil = "78";
+		} else if ((zs < 0.76) && (zs >= 0.72)) {
+			percentil = "77";
+		} else if ((zs < 0.72) && (zs >= 0.69)) {
+			percentil = "76";
+		} else if ((zs < 0.69) && (zs >= 0.67)) {
+			percentil = "75";
+		} else if ((zs < 0.67) && (zs >= 0.63)) {
+			percentil = "74";
+		} else if ((zs < 0.63) && (zs >= 0.61)) {
+			percentil = "73";
+		} else if ((zs < 0.61) && (zs >= 0.57)) {
+			percentil = "72";
+		} else if ((zs < 0.57) && (zs >= 0.54)) {
+			percentil = "71";
+		} else if ((zs < 0.54) && (zs >= 0.51)) {
+			percentil = "70";
+		} else if ((zs < 0.51) && (zs >= 0.48)) {
+			percentil = "69";
+		} else if ((zs < 0.48) && (zs >= 0.46)) {
+			percentil = "68";
+		} else if ((zs < 0.46) && (zs >= 0.43)) {
+			percentil = "67";
+		} else if ((zs < 0.43) && (zs >= 0.4)) {
+			percentil = "66";
+		} else if ((zs < 0.4) && (zs >= 0.37)) {
+			percentil = "65";
+		} else if ((zs < 0.37) && (zs >= 0.34)) {
+			percentil = "64";
+		} else if ((zs < 0.34) && (zs >= 0.32)) {
+			percentil = "63";
+		} else if ((zs < 0.32) && (zs >= 0.3)) {
+			percentil = "62";
+		} else if ((zs < 0.3) && (zs >= 0.27)) {
+			percentil = "61";
+		} else if ((zs < 0.27) && (zs >= 0.24)) {
+			percentil = "60";
+		} else if ((zs < 0.24) && (zs >= 0.22)) {
+			percentil = "59";
+		} else if ((zs < 0.22) && (zs >= 0.19)) {
+			percentil = "58";
+		} else if ((zs < 0.19) && (zs >= 0.17)) {
+			percentil = "57";
+		} else if ((zs < 0.17) && (zs >= 0.14)) {
+			percentil = "56";
+		} else if ((zs < 0.14) && (zs >= 0.12)) {
+			percentil = "55";
+		} else if ((zs < 0.12) && (zs >= 0.09)) {
+			percentil = "54";
+		} else if ((zs < 0.09) && (zs >= 0.07)) {
+			percentil = "53";
+		} else if ((zs < 0.07) && (zs >= 0.05)) {
+			percentil = "52";
+		} else if ((zs < 0.05) && (zs >= 0.03)) {
+			percentil = "51";
+		} else if ((zs < 0.03) && (zs >= -0.01)) {
+			percentil = "50";
+		} else if ((zs < -0.01) && (zs >= -0.035)) {
+			percentil = "49";
+		} else if ((zs < -0.035) && (zs >= -0.06)) {
+			percentil = "48";
+		} else if ((zs < -0.06) && (zs >= -0.08)) {
+			percentil = "47";
+		} else if ((zs < -0.08) && (zs >= -0.11)) {
+			percentil = "46";
+		} else if ((zs < -0.11) && (zs >= -0.13)) {
+			percentil = "45";
+		} else if ((zs < -0.13) && (zs >= -0.16)) {
+			percentil = "44";
+		} else if ((zs < -0.16) && (zs >= -0.185)) {
+			percentil = "43";
+		} else if ((zs < -0.185) && (zs >= -0.21)) {
+			percentil = "42";
+		} else if ((zs < -0.21) && (zs >= -0.24)) {
+			percentil = "41";
+		} else if ((zs < -0.24) && (zs >= -0.26)) {
+			percentil = "40";
+		} else if ((zs < -0.26) && (zs >= -0.28)) {
+			percentil = "39";
+		} else if ((zs < -0.28) && (zs >= -0.31)) {
+			percentil = "38";
+		} else if ((zs < -0.31) && (zs >= -0.34)) {
+			percentil = "37";
+		} else if ((zs < -0.34) && (zs >= -0.36)) {
+			percentil = "36";
+		} else if ((zs < -0.36) && (zs >= -0.4)) {
+			percentil = "35";
+		} else if ((zs < -0.4) && (zs >= -0.43)) {
+			percentil = "34";
+		} else if ((zs < -0.43) && (zs >= -0.45)) {
+			percentil = "33";
+		} else if ((zs < -0.45) && (zs >= -0.48)) {
+			percentil = "32";
+		} else if ((zs < -0.48) && (zs >= -0.5)) {
+			percentil = "31";
+		} else if ((zs < -0.5) && (zs >= -0.54)) {
+			percentil = "30";
+		} else if ((zs < -0.54) && (zs >= -0.565)) {
+			percentil = "29";
+		} else if ((zs < -0.565) && (zs >= -0.585)) {
+			percentil = "28";
+		} else if ((zs < -0.585) && (zs >= -0.62)) {
+			percentil = "27";
+		} else if ((zs < -0.62) && (zs >= -0.65)) {
+			percentil = "26";
+		} else if ((zs - 0.65) && (zs >= -0.69)) {
+			percentil = "25";
+		} else if ((zs < -0.69) && (zs >= -0.73)) {
+			percentil = "24";
+		} else if ((zs < -0.73) && (zs >= -0.75)) {
+			percentil = "23";
+		} else if ((zs < -0.75) && (zs >= -0.79)) {
+			percentil = "22";
+		} else if ((zs < -0.79) && (zs >= -0.83)) {
+			percentil = "21";
+		} else if ((zs < -0.83) && (zs >= -0.85)) {
+			percentil = "20";
+		} else if ((zs < -0.85) && (zs >= -0.89)) {
+			percentil = "19";
+		} else if ((zs < -0.89) && (zs >= -0.93)) {
+			percentil = "18";
+		} else if ((zs < -0.93) && (zs >= -0.97)) {
+			percentil = "17";
+		} else if ((zs < -0.97) && (zs >= -1.01)) {
+			percentil = "16";
+		} else if ((zs < -1.01) && (zs >= -1.04)) {
+			percentil = "15";
+		} else if ((zs < -1.04) && (zs >= -1.1)) {
+			percentil = "14";
+		} else if ((zs < -1.1) && (zs >= -1.14)) {
+			percentil = "13";
+		} else if ((zs < -1.14) && (zs >= -1.2)) {
+			percentil = "12";
+		} else if ((zs < -1.2) && (zs >= -1.25)) {
+			percentil = "11";
+		} else if ((zs < -1.25) && (zs >= -1.31)) {
+			percentil = "10";
+		} else if ((zs < -1.31) && (zs >= -1.37)) {
+			percentil = "9";
+		} else if ((zs < -1.37) && (zs >= -1.43)) {
+			percentil = "8";
+		} else if ((zs < -1.43) && (zs >= -1.51)) {
+			percentil = "7";
+		} else if ((zs < -1.51) && (zs >= -1.6)) {
+			percentil = "6";
+		} else if ((zs < -1.6) && (zs >= -1.645)) {
+			percentil = "5";
+		} else if ((zs < -1.645) && (zs >= -1.81)) {
+			percentil = "4";
+		} else if ((zs < -1.81) && (zs >= -1.97)) {
+			percentil = "3";
+		} else if ((zs < -1.97) && (zs >= -2.18)) {
+			percentil = "2";
+		} else if ((zs < -2.18) && (zs >= -2.6)) {
+			percentil = "1";
+		} else if (zs < -2.6) {
+			percentil = "<1";
+		}
+	}
+	if (zs < -1.645) {
+		resultado = "Pathological";
+	} else if (zs >= -1.645) {
+		resultado = "Normal";
+	}
+
+	if (percentil=="<1") {
+		percentil = "1";
+	}
+
+	if (percentil==">99") {
+		percentil = "99";
+	}
+
+	$("#Fetal_growth_CPR_percentile").text("CPR (Percentile: "+percentil+")");
+}
+
+// FG: tercer panel
+function doppler_ductus_venoso_fetal_growth() {
+	var IP = $('#FGRvsSGA_DVPI').val();
+	var semanas = $('#FGRvsSGA_GA_weeks').val();
+	var dias = $('#FGRvsSGA_GA_days').val();
+
+	var resultado = "";
+	var percentil = "";
+
+	if (((IP <= 0.1) || (IP > 10)) || (IP == "")) {
+		alert("DV Pulsatility index out of range");
+	} else if (((semanas > 44) || (semanas < 20)) || (semanas == "")) {
+		alert("Weeks out of range");
+	} else if (dias > 7) {
+		alert("Days out of range");
+	} else {
+
+		DVzs = (IP - (0.903 + (-0.0116 * (Number(semanas) + Number(dias / 7))))) / 0.1483;
+
+		if (DVzs >= 2.6) {
+			percentil = ">99";
+		} else if ((DVzs < 2.6) && (DVzs >= 2.18)) {
+			percentil = "99";
+		} else if ((DVzs < 2.18) && (DVzs >= 1.97)) {
+			percentil = "98";
+		} else if ((DVzs < 1.97) && (DVzs >= 1.81)) {
+			percentil = "97";
+		} else if ((DVzs < 1.81) && (DVzs > 1.645)) {
+			percentil = "96";
+		} else if ((DVzs <= 1.645) && (DVzs >= 1.6)) {
+			percentil = "95";
+		} else if ((DVzs < 1.6) && (DVzs >= 1.52)) {
+			percentil = "94";
+		} else if ((DVzs < 1.52) && (DVzs >= 1.45)) {
+			percentil = "93";
+		} else if ((DVzs < 1.45) && (DVzs >= 1.38)) {
+			percentil = "92";
+		} else if ((DVzs < 1.38) && (DVzs >= 1.31)) {
+			percentil = "91";
+		} else if ((DVzs < 1.31) && (DVzs >= 1.26)) {
+			percentil = "90";
+		} else if ((DVzs < 1.26) && (DVzs >= 1.2)) {
+			percentil = "89";
+		} else if ((DVzs < 1.2) && (DVzs >= 1.17)) {
+			percentil = "88";
+		} else if ((DVzs < 1.17) && (DVzs >= 1.1)) {
+			percentil = "87";
+		} else if ((DVzs < 1.1) && (DVzs >= 1.07)) {
+			percentil = "86";
+		} else if ((DVzs < 1.07) && (DVzs >= 1.02)) {
+			percentil = "85";
+		} else if ((DVzs < 1.02) && (DVzs >= 0.98)) {
+			percentil = "84";
+		} else if ((DVzs < 0.98) && (DVzs >= 0.94)) {
+			percentil = "83";
+		} else if ((DVzs < 0.94) && (DVzs >= 0.9)) {
+			percentil = "82";
+		} else if ((DVzs < 0.9) && (DVzs >= 0.86)) {
+			percentil = "81";
+		} else if ((DVzs < 0.86) && (DVzs >= 0.84)) {
+			percentil = "80";
+		} else if ((DVzs < 0.84) && (DVzs >= 0.79)) {
+			percentil = "79";
+		} else if ((DVzs < 0.79) && (DVzs >= 0.76)) {
+			percentil = "78";
+		} else if ((DVzs < 0.76) && (DVzs >= 0.72)) {
+			percentil = "77";
+		} else if ((DVzs < 0.72) && (DVzs >= 0.69)) {
+			percentil = "76";
+		} else if ((DVzs < 0.69) && (DVzs >= 0.67)) {
+			percentil = "75";
+		} else if ((DVzs < 0.67) && (DVzs >= 0.63)) {
+			percentil = "74";
+		} else if ((DVzs < 0.63) && (DVzs >= 0.61)) {
+			percentil = "73";
+		} else if ((DVzs < 0.61) && (DVzs >= 0.57)) {
+			percentil = "72";
+		} else if ((DVzs < 0.57) && (DVzs >= 0.54)) {
+			percentil = "71";
+		} else if ((DVzs < 0.54) && (DVzs >= 0.51)) {
+			percentil = "70";
+		} else if ((DVzs < 0.51) && (DVzs >= 0.48)) {
+			percentil = "69";
+		} else if ((DVzs < 0.48) && (DVzs >= 0.46)) {
+			percentil = "68";
+		} else if ((DVzs < 0.46) && (DVzs >= 0.43)) {
+			percentil = "67";
+		} else if ((DVzs < 0.43) && (DVzs >= 0.4)) {
+			percentil = "66";
+		} else if ((DVzs < 0.4) && (DVzs >= 0.37)) {
+			percentil = "65";
+		} else if ((DVzs < 0.37) && (DVzs >= 0.34)) {
+			percentil = "64";
+		} else if ((DVzs < 0.34) && (DVzs >= 0.32)) {
+			percentil = "63";
+		} else if ((DVzs < 0.32) && (DVzs >= 0.3)) {
+			percentil = "62";
+		} else if ((DVzs < 0.3) && (DVzs >= 0.27)) {
+			percentil = "61";
+		} else if ((DVzs < 0.27) && (DVzs >= 0.24)) {
+			percentil = "60";
+		} else if ((DVzs < 0.24) && (DVzs >= 0.22)) {
+			percentil = "59";
+		} else if ((DVzs < 0.22) && (DVzs >= 0.19)) {
+			percentil = "58";
+		} else if ((DVzs < 0.19) && (DVzs >= 0.17)) {
+			percentil = "57";
+		} else if ((DVzs < 0.17) && (DVzs >= 0.14)) {
+			percentil = "56";
+		} else if ((DVzs < 0.14) && (DVzs >= 0.12)) {
+			percentil = "55";
+		} else if ((DVzs < 0.12) && (DVzs >= 0.09)) {
+			percentil = "54";
+		} else if ((DVzs < 0.09) && (DVzs >= 0.07)) {
+			percentil = "53";
+		} else if ((DVzs < 0.07) && (DVzs >= 0.05)) {
+			percentil = "52";
+		} else if ((DVzs < 0.05) && (DVzs >= 0.03)) {
+			percentil = "51";
+		} else if ((DVzs < 0.03) && (DVzs >= -0.01)) {
+			percentil = "50";
+		} else if ((DVzs < -0.01) && (DVzs >= -0.035)) {
+			percentil = "49";
+		} else if ((DVzs < -0.035) && (DVzs >= -0.06)) {
+			percentil = "48";
+		} else if ((DVzs < -0.06) && (DVzs >= -0.08)) {
+			percentil = "47";
+		} else if ((DVzs < -0.08) && (DVzs >= -0.11)) {
+			percentil = "46";
+		} else if ((DVzs < -0.11) && (DVzs >= -0.13)) {
+			percentil = "45";
+		} else if ((DVzs < -0.13) && (DVzs >= -0.16)) {
+			percentil = "44";
+		} else if ((DVzs < -0.16) && (DVzs >= -0.185)) {
+			percentil = "43";
+		} else if ((DVzs < -0.185) && (DVzs >= -0.21)) {
+			percentil = "42";
+		} else if ((DVzs < -0.21) && (DVzs >= -0.24)) {
+			percentil = "41";
+		} else if ((DVzs < -0.24) && (DVzs >= -0.26)) {
+			percentil = "40";
+		} else if ((DVzs < -0.26) && (DVzs >= -0.28)) {
+			percentil = "39";
+		} else if ((DVzs < -0.28) && (DVzs >= -0.31)) {
+			percentil = "38";
+		} else if ((DVzs < -0.31) && (DVzs >= -0.34)) {
+			percentil = "37";
+		} else if ((DVzs < -0.34) && (DVzs >= -0.36)) {
+			percentil = "36";
+		} else if ((DVzs < -0.36) && (DVzs >= -0.4)) {
+			percentil = "35";
+		} else if ((DVzs < -0.4) && (DVzs >= -0.43)) {
+			percentil = "34";
+		} else if ((DVzs < -0.43) && (DVzs >= -0.45)) {
+			percentil = "33";
+		} else if ((DVzs < -0.45) && (DVzs >= -0.48)) {
+			percentil = "32";
+		} else if ((DVzs < -0.48) && (DVzs >= -0.5)) {
+			percentil = "31";
+		} else if ((DVzs < -0.5) && (DVzs >= -0.54)) {
+			percentil = "30";
+		} else if ((DVzs < -0.54) && (DVzs >= -0.565)) {
+			percentil = "29";
+		} else if ((DVzs < -0.565) && (DVzs >= -0.585)) {
+			percentil = "28";
+		} else if ((DVzs < -0.585) && (DVzs >= -0.62)) {
+			percentil = "27";
+		} else if ((DVzs < -0.62) && (DVzs >= -0.65)) {
+			percentil = "26";
+		} else if ((DVzs < -0.65) && (DVzs >= -0.69)) {
+			percentil = "25";
+		} else if ((DVzs < -0.69) && (DVzs >= -0.73)) {
+			percentil = "24";
+		} else if ((DVzs < -0.73) && (DVzs >= -0.75)) {
+			percentil = "23";
+		} else if ((DVzs < -0.75) && (DVzs >= -0.79)) {
+			percentil = "22";
+		} else if ((DVzs < -0.79) && (DVzs >= -0.83)) {
+			percentil = "21";
+		} else if ((DVzs < -0.83) && (DVzs >= -0.85)) {
+			percentil = "20";
+		} else if ((DVzs < -0.85) && (DVzs >= -0.89)) {
+			percentil = "19";
+		} else if ((DVzs < -0.89) && (DVzs >= -0.93)) {
+			percentil = "18";
+		} else if ((DVzs < -0.93) && (DVzs >= -0.97)) {
+			percentil = "17";
+		} else if ((DVzs < -0.97) && (DVzs >= -1.01)) {
+			percentil = "16";
+		} else if ((DVzs < -1.01) && (DVzs >= -1.04)) {
+			percentil = "15";
+		} else if ((DVzs < -1.04) && (DVzs >= -1.1)) {
+			percentil = "14";
+		} else if ((DVzs < -1.1) && (DVzs >= -1.14)) {
+			percentil = "13";
+		} else if ((DVzs < -1.14) && (DVzs >= -1.2)) {
+			percentil = "12";
+		} else if ((DVzs < -1.2) && (DVzs >= -1.25)) {
+			percentil = "11";
+		} else if ((DVzs < -1.25) && (DVzs >= -1.31)) {
+			percentil = "10";
+		} else if ((DVzs < -1.31) && (DVzs >= -1.37)) {
+			percentil = "9";
+		} else if ((DVzs < -1.37) && (DVzs >= -1.43)) {
+			percentil = "8";
+		} else if ((DVzs < -1.43) && (DVzs >= -1.51)) {
+			percentil = "7";
+		} else if ((DVzs < -1.51) && (DVzs >= -1.6)) {
+			percentil = "6";
+		} else if ((DVzs < -1.6) && (DVzs >= -1.645)) {
+			percentil = "5";
+		} else if ((DVzs < -1.645) && (DVzs >= -1.81)) {
+			percentil = "4";
+		} else if ((DVzs < -1.81) && (DVzs >= -1.97)) {
+			percentil = "3";
+		} else if ((DVzs < -1.97) && (DVzs >= -2.18)) {
+			percentil = "2";
+		} else if ((DVzs < -2.18) && (DVzs >= -2.6)) {
+			percentil = "1";
+		} else if (DVzs < -2.6) {
+			percentil = "<1";
+		}
+
+		if (DVzs > 1.645) {
+			resultado = "Pathological";
+		} else if (DVzs <= 1.645) {
+			resultado = "Normal";
+		}
+		/*$('#percentilDDV').val(percentil);
+		$('#resultadoDDV').val(resultado);
+		$('#percentilDDV').val(percentil);*/
+		$('#FGRvsSGA_DVPI_percentage').text("Percentile: " + percentil);
+	}
+}
+
+function evaluarSGAvsFGR() {
+
+	var UADopplerPI = get_UADopplerPI()
+	var MCADopplerMCAPI = get_MCADopplerMCAPI()
+	var CPRPercentile = get_CPRPercentile()
+	var DVPIPercentile = get_DVPIPercentile()
+	var valorGA = get_GA()
+
+	var UADiastolicFlow = $('#select_diastolic_flow :selected').text()
+	var DVAtrialFlow = $('#FGR_vs_SGA_select_atrial_flow :selected').text()
+
+	$("#Note_fetalGrowth1").text('')
+	$("#Note_fetalGrowth").text('')
+
+	hide_panels_below_ctg()
+	hide_panels_all_ctg()
+	clearResults()
+
+	if (UADiastolicFlow == 'Reverse' && (DVAtrialFlow == 'Not-available' || DVAtrialFlow == 'Present')) {
+		// CTG 1 - DONE
+		console.info('c1')
+		panel_CTG()
+		return
+	}
+
+	if (UADiastolicFlow == "Absent" && valorGA >= 30 && valorGA < 34
+	 	&& DVAtrialFlow == "Present" && DVPIPercentile > 95) {
+
+		setResultText('Stage 3 *', 'Delivery +')
+		$('#persistentText').show()
+		$('#steroidsText').show()
+
+		console.info('r8')
+		return
+	}
+
+	if ((UADiastolicFlow == "Absent" || UADopplerPI > 95) && (DVAtrialFlow == "Present" && DVPIPercentile > 95)) {
+
+		if (valorGA >= 30) {
+			setResultText('Stage 3 *', 'Delivery +')
+			$('#persistentText').show()
+			$('#steroidsText').show()
+
+			if (UADiastolicFlow == "Absent") {
+				console.info('r8')
+			} else if (UADopplerPI > 95) {
+				console.info('r13')
+			}
+
+			return
+		}
+
+		if (UADiastolicFlow == "Absent") {
+			// CTG 2 - DONE
+			console.info('c1')
+			panel_CTG()
+			return
+		}
+
+		if (UADopplerPI > 95) {
+			// CTG 4 --> CTG panel variant 1 - DONE
+			console.info('c3')
+			panel_CTG_variant1()
+			return
+		}
+	}
+
+	if (UADiastolicFlow == "Absent" && (DVAtrialFlow == "Not-available" || DVPIPercentile < 95)) {
+		// CTG 3 - DONE
+		console.info('c1')
+		panel_CTG()
+		return
+	}
+
+	if (UADopplerPI > 95 && (DVPIPercentile < 95 || DVAtrialFlow == "Not-available")) {
+		// CTG 5 --> CTG panel variant 1 - DONE
+		console.info('c3')
+		panel_CTG_variant1()
+		return
+	}
+
+	if ((MCADopplerMCAPI < 5 || CPRPercentile < 5) && (DVPIPercentile < 95 || DVAtrialFlow == 'Not-available')) {
+		// CTG - 7 --> CTG panel variant 3 - DONE
+		panel_CTG_variant3()
+		console.info('c5')
+		return
+	}
+
+	if ((MCADopplerMCAPI < 5 || CPRPercentile < 5) && DVPIPercentile > 95) {
+		if (valorGA >= 34) {
+			setResultText('Stage 3', 'Delivery after 30')
+			console.info('r19')
+			return
+		}
+
+		// CTG - 6 --> CTG panel variant 2 - DONE
+		panel_CTG('variant2')
+		console.info('c4')
+		return
+	}
+}

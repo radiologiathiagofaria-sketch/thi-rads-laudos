@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THI-RADS - Login</title>
+    <style>
+        /* Variáveis de tema */
+        :root {
+            --bg: linear-gradient(135deg, #1e3c72, #2a5298);
+            --box-bg: white;
+            --text-color: #1e3c72;
+            --subtext-color: #555;
+            --input-bg: white;
+            --input-border: #ddd;
+            --input-focus: #2a5298;
+            --btn-bg: #1e3c72;
+            --btn-hover: #2a5298;
+            --erro-color: red;
+            --toggle-color: white;
+            /* cores da barra */
+            --bar-bg: #ffffff;
+            --bar-text: #1e3c72;
+            --bar-subtext: #555;
+        }
+
+        body.dark-mode {
+            --bg: linear-gradient(135deg, #0f1a2e, #152b44);
+            --box-bg: #1e2a3a;
+            --text-color: #e0e0e0;
+            --subtext-color: #b0b0b0;
+            --input-bg: #2a3547;
+            --input-border: #3a4a5a;
+            --input-focus: #5b8cbf;
+            --btn-bg: #3a5f8a;
+            --btn-hover: #4f7ab5;
+            --erro-color: #ff6b6b;
+            --toggle-color: #ffd700;
+            /* barra escura */
+            --bar-bg: #1e2a3a;
+            --bar-text: #e0e6f0;
+            --bar-subtext: #b0b8c8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding-top: 60px;
+            transition: background 0.4s;
+            position: relative;
+        }
+
+        /* Barra de logo fixa (texto) */
+        .top-logo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: var(--bar-bg);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: background 0.4s;
+            gap: 6px;
+        }
+        .logo-texto {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--bar-text);
+            letter-spacing: 2px;
+            transition: color 0.4s;
+        }
+        .logo-sub {
+            font-size: 0.9em;
+            font-weight: 400;
+            color: var(--bar-subtext);
+            margin-left: 4px;
+            transition: color 0.4s;
+            white-space: nowrap;
+        }
+
+        /* Botão de tema */
+        .theme-toggle {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: var(--box-bg);
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            font-size: 22px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            transition: background 0.3s, color 0.3s;
+            z-index: 1000;
+        }
+        .theme-toggle:hover {
+            opacity: 0.9;
+        }
+
+        .login-box {
+            background: var(--box-bg);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 350px;
+            text-align: center;
+            transition: background 0.4s, color 0.4s;
+            color: var(--text-color);
+            margin-top: 20px;
+        }
+
+        .login-box h1 {
+            color: var(--text-color);
+            margin-bottom: 5px;
+            font-size: 28px;
+        }
+
+        .login-box h2 {
+            color: var(--subtext-color);
+            font-weight: normal;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 10px 0;
+            border: 2px solid var(--input-border);
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            background: var(--input-bg);
+            color: var(--text-color);
+            transition: border 0.3s, background 0.3s, color 0.3s;
+        }
+
+        .login-box input:focus {
+            border-color: var(--input-focus);
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 12px;
+            background: var(--btn-bg);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        .login-box button:hover {
+            background: var(--btn-hover);
+        }
+
+        .erro {
+            color: var(--erro-color);
+            font-size: 14px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra de logo (texto) -->
+    <header class="top-logo">
+        <span class="logo-texto">THI-RADS</span>
+        <span class="logo-sub">Laudos Estruturados</span>
+    </header>
+
+    <!-- Botão de alternar tema -->
+    <button class="theme-toggle" id="themeBtn" onclick="alternarTema()" title="Alternar tema">🌙</button>
+
+    <div class="login-box">
+        <h1>THI-RADS</h1>
+        <h2>Laudos Estruturados em Ultrassonografia</h2>
+        
+        <input type="text" id="usuario" placeholder="Usuário" autocomplete="off">
+        <input type="password" id="senha" placeholder="Senha">
+        <button onclick="fazerLogin()">Entrar</button>
+        
+        <p id="mensagemErro" class="erro"></p>
+    </div>
+
+    <script>
+        // ========== GERENCIAMENTO DE TEMA ==========
+        const body = document.body;
+        const themeBtn = document.getElementById("themeBtn");
+
+        if (localStorage.getItem("tema") === "dark") {
+            body.classList.add("dark-mode");
+            themeBtn.textContent = "☀️";
+        } else {
+            themeBtn.textContent = "🌙";
+        }
+
+        function alternarTema() {
+            body.classList.toggle("dark-mode");
+            if (body.classList.contains("dark-mode")) {
+                localStorage.setItem("tema", "dark");
+                themeBtn.textContent = "☀️";
+            } else {
+                localStorage.setItem("tema", "light");
+                themeBtn.textContent = "🌙";
+            }
+        }
+
+        // ========== LOGIN ==========
+        function fazerLogin() {
+            var usuario = document.getElementById("usuario").value;
+            var senha = document.getElementById("senha").value;
+            var msgErro = document.getElementById("mensagemErro");
+
+            if (usuario === "residentesanta" && senha === "2026") {
+                window.location.href = "selecao.html";
+            } else {
+                msgErro.textContent = "Usuário ou senha incorretos.";
+                document.getElementById("senha").value = "";
+            }
+        }
+
+        document.getElementById("senha").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                fazerLogin();
+            }
+        });
+    </script>
+</body>
+</html>

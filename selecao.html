@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THI-RADS - Selecione o Exame</title>
+    <style>
+        /* Variáveis de tema */
+        :root {
+            --bg: #f0f2f5;
+            --card-bg: white;
+            --text-color: #1e3c72;
+            --subtext-color: #555;
+            --border-color: #e0e0e0;
+            --shadow: 0 8px 20px rgba(0,0,0,0.1);
+            --card-hover-shadow: 0 12px 30px rgba(0,0,0,0.2);
+            --btn-bg: #1e3c72;
+            --btn-text: white;
+            --toggle-bg: #1e3c72;
+            --toggle-color: white;
+            /* barra */
+            --bar-bg: #ffffff;
+            --bar-text: #1e3c72;
+            --bar-subtext: #555;
+        }
+
+        body.dark-mode {
+            --bg: #1a1f2b;
+            --card-bg: #2a3040;
+            --text-color: #e0e6f0;
+            --subtext-color: #b0b8c8;
+            --border-color: #3a4355;
+            --shadow: 0 8px 20px rgba(0,0,0,0.4);
+            --card-hover-shadow: 0 12px 30px rgba(0,0,0,0.6);
+            --btn-bg: #3a5f8a;
+            --toggle-bg: #3a5f8a;
+            --toggle-color: #ffd700;
+            /* barra escura */
+            --bar-bg: #1e2a3a;
+            --bar-text: #e0e6f0;
+            --bar-subtext: #b0b8c8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.4s;
+            padding: 20px;
+            padding-top: 80px;
+        }
+
+        /* Barra de logo fixa (texto) */
+        .top-logo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: var(--bar-bg);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: background 0.4s;
+            gap: 6px;
+        }
+        .logo-texto {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--bar-text);
+            letter-spacing: 2px;
+            transition: color 0.4s;
+        }
+        .logo-sub {
+            font-size: 0.9em;
+            font-weight: 400;
+            color: var(--bar-subtext);
+            margin-left: 4px;
+            transition: color 0.4s;
+            white-space: nowrap;
+        }
+
+        /* Header com botões */
+        .top-bar {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .icon-btn {
+            background: var(--card-bg);
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            transition: all 0.3s;
+        }
+
+        .icon-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.2em;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            transition: color 0.4s;
+        }
+
+        .subtitulo {
+            color: var(--subtext-color);
+            font-size: 1.1em;
+            margin-bottom: 50px;
+            transition: color 0.4s;
+        }
+
+        .cards {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 40px 30px;
+            width: 280px;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s, box-shadow 0.3s, background 0.4s;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--card-hover-shadow);
+        }
+
+        .card-icone {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            color: var(--text-color);
+            font-size: 1.4em;
+            margin-bottom: 10px;
+            transition: color 0.4s;
+        }
+
+        .card p {
+            color: var(--subtext-color);
+            font-size: 0.95em;
+            transition: color 0.4s;
+        }
+
+        .logout-btn {
+            background: none;
+            border: 2px solid var(--btn-bg);
+            color: var(--btn-bg);
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 40px;
+            transition: background 0.3s, color 0.3s;
+            display: inline-block;
+        }
+
+        .logout-btn:hover {
+            background: var(--btn-bg);
+            color: var(--btn-text);
+        }
+
+        @media (max-width: 600px) {
+            .cards { flex-direction: column; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra de logo (texto) -->
+    <header class="top-logo">
+        <span class="logo-texto">THI-RADS</span>
+        <span class="logo-sub">Laudos Estruturados</span>
+    </header>
+
+    <!-- Botões no canto superior direito -->
+    <div class="top-bar">
+        <button class="icon-btn" id="themeBtn" onclick="alternarTema()" title="Alternar tema">🌙</button>
+        <button class="icon-btn" onclick="logout()" title="Sair">🚪</button>
+    </div>
+
+    <div class="container">
+        <h1>Selecione o Modelo de Laudo</h1>
+        <p class="subtitulo">Escolha uma das máscaras estruturadas abaixo para começar</p>
+        
+        <div class="cards">
+            <div class="card" onclick="selecionar('santa_marcelina')">
+                <div class="card-icone">🏥</div>
+                <h2>Máscaras Santa Marcelina</h2>
+            </div>
+
+            <div class="card" onclick="selecionar('thirads')">
+                <div class="card-icone">🩺</div>
+                <h2>Máscaras Estruturadas THI-RADS</h2>
+            </div>
+        </div>
+
+        <button class="logout-btn" onclick="logout()">Sair do sistema</button>
+    </div>
+
+    <script>
+        // ========== GERENCIAMENTO DE TEMA ==========
+        const body = document.body;
+        const themeBtn = document.getElementById("themeBtn");
+
+        if (localStorage.getItem("tema") === "dark") {
+            body.classList.add("dark-mode");
+            themeBtn.textContent = "☀️";
+        } else {
+            themeBtn.textContent = "🌙";
+        }
+
+        function alternarTema() {
+            body.classList.toggle("dark-mode");
+            if (body.classList.contains("dark-mode")) {
+                localStorage.setItem("tema", "dark");
+                themeBtn.textContent = "☀️";
+            } else {
+                localStorage.setItem("tema", "light");
+                themeBtn.textContent = "🌙";
+            }
+        }
+
+        function selecionar(modelo) {
+            if (modelo === 'santa_marcelina') {
+                window.location.href = 'laudo-santa-marcelina.html';
+            } else if (modelo === 'thirads') {
+                window.location.href = 'laudo-thirads.html';
+            }
+        }
+
+        function logout() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

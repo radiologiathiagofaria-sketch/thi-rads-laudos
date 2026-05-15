@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Extrair Conteúdos</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        textarea { width: 100%; height: 400px; font-size: 12px; }
+        button { padding: 10px 20px; margin: 10px 0; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <h1>Gerar JSON das Máscaras</h1>
+    <p>Cole todo o conteúdo do arquivo <b>MscarasUltrassom.html</b> na caixa abaixo e clique em "Extrair".</p>
+    <textarea id="htmlInput" placeholder="Cole aqui o HTML do arquivo MscarasUltrassom.html..."></textarea>
+    <br>
+    <button onclick="extrair()">Extrair JSON</button>
+
+    <h2>JSON gerado:</h2>
+    <textarea id="jsonOutput" readonly></textarea>
+    <br>
+    <button onclick="copiarJSON()">📋 Copiar JSON</button>
+    <p id="msg"></p>
+
+    <script>
+        const exames = [
+            { id: "h.669epejqnv56", nome: "Renal PS" },
+            { id: "h.tpdnp6kulj3v", nome: "Renal Agenda" },
+            { id: "h.7x3gs123pqyu", nome: "Cálculo em trânsito" },
+            { id: "h.t963cqwp2752", nome: "Nefrolitíase" },
+            { id: "h.gbngb9fb740x", nome: "Cisto (Renal)" },
+            { id: "h.45ed5qn22f11", nome: "Abdome Completo" },
+            { id: "h.uvyyl2do881p", nome: "Abdome Normal" },
+            { id: "h.eor0tt9y7jar", nome: "Abdome Superior" },
+            { id: "h.8aijnus5ps81", nome: "Normal (Superficiais)" },
+            { id: "h.3giulokapxow", nome: "Cisto sebáceo ou epidermóide" },
+            { id: "h.4q7vy8blc7sc", nome: "Abscesso (Partes Superficiais)" },
+            { id: "h.2h6co3ityagl", nome: "Celulite e Edema" },
+            { id: "h.ntwn3dl1y2oc", nome: "Coxo-Femoral - Derrame" },
+            { id: "h.ask0q06v1ats", nome: "Linfonodomegalia" },
+            { id: "h.d50bk51ii6jo", nome: "Parede Abdominal" },
+            { id: "h.xpashcs4buk4", nome: "Parotidite (Superficial)" },
+            { id: "h.qavo5hwhf4vg", nome: "Região Axilar" },
+            { id: "h.t1inawfzac5i", nome: "Região Inguinal" },
+            { id: "h.pggcpfit9580", nome: "Transvaginal - Agenda" },
+            { id: "h.pmap1yu6xl5u", nome: "Transvaginal - PS Normal" },
+            { id: "h.s83y3xjjasbi", nome: "Colo Uterino" },
+            { id: "h.yl3mwdt1yseq", nome: "Mioma" },
+            { id: "h.wdsdfmejnk5d", nome: "Abscesso (Transvaginal)" },
+            { id: "h.xkbes6g959q0", nome: "Cisto Hemorrágico" },
+            { id: "h.dcrd6jewd6lr", nome: "Cisto Ovariano" },
+            { id: "h.2xew9nxflom", nome: "Coágulos" },
+            { id: "h.bu1b6sx24cnp", nome: "DIU" },
+            { id: "h.7e0dfnswlw41", nome: "Histerectomia (Transvaginal)" },
+            { id: "h.fhhltluskjce", nome: "Ectópica / Hemorrágico Roto" },
+            { id: "h.qx41015bmf6z", nome: "Bolsa Escrotal - PS" },
+            { id: "h.dt2y319qy7tj", nome: "Bolsa Escrotal (Agenda)" },
+            { id: "h.tvlb3lct8o3t", nome: "Obstétrico - Sem Doppler" },
+            { id: "h.ea5u0w3p9m71", nome: "Obstétrico - Com Doppler" },
+            { id: "h.23484nvmx701", nome: "Pélvica - Histerectomia" },
+            { id: "h.vp5i9xwa2itg", nome: "Pélvica Normal" },
+            { id: "h.gnh04fadim38", nome: "Pênis" },
+            { id: "h.3rx06o444zn9", nome: "Próstata Completo" },
+            { id: "h.c80jn7165gu0", nome: "Próstata Transretal" },
+            { id: "h.katu37y09itn", nome: "Tireoide Normal" },
+            { id: "h.vol3czssxlx", nome: "Cisto Tireoide" },
+            { id: "h.df8mwh32780m", nome: "Tireoide Heterogênea" },
+            { id: "h.jftfkai3ufhx", nome: "Nódulo Tireoide" },
+            { id: "h.51nzcl4gb8b0", nome: "Tireoide com Doppler" },
+            { id: "h.y3qx8xx2s3o3", nome: "Transfontanela" },
+            { id: "h.u3d3dhsw2cf8", nome: "Cervical - Linfonodo Habitual" },
+            { id: "h.328qfgpzwwry", nome: "Cervical - Linfonodo Não-Habitual" },
+            { id: "h.m92i3uxvp7le", nome: "Cervical - Parotidite" },
+            { id: "h.u54s83vrhkow", nome: "Cervical - Tireoide com Medidas" },
+            { id: "h.jzce3prjadzv", nome: "Cervical - Tireoide sem Medidas" },
+            { id: "h.w30rplweww9g", nome: "Mamas Normal" },
+            { id: "h.i5rfm6z2upeb", nome: "Agenda - BIRADS" },
+            { id: "h.ol1wgtnjd1tu", nome: "Mama Masculina" },
+            { id: "h.v66sv8nk3xfr", nome: "Mastite / Abscesso" },
+            { id: "h.ieh2hs3g0w8d", nome: "Mamas PS Normal" },
+            { id: "h.n447mtt6lqzi", nome: "Tórax" }
+        ];
+
+        function extrair() {
+            const htmlStr = document.getElementById('htmlInput').value;
+            if (!htmlStr.trim()) {
+                alert('Cole o HTML do arquivo MscarasUltrassom.html primeiro!');
+                return;
+            }
+            // Cria um DOM temporário
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlStr, 'text/html');
+
+            const resultado = exames.map(({id, nome}) => {
+                const el = doc.getElementById(id);
+                if (!el) return { nome, conteudo: '<p>Seção não encontrada</p>' };
+                let html = el.innerHTML;
+                // Limpeza: remove spans, mantendo o texto interno e tags como p, h1, table
+                html = html.replace(/<span[^>]*>/g, '').replace(/<\/span>/g, '');
+                html = html.replace(/<p [^>]*>/g, '<p>');
+                html = html.replace(/<h1 [^>]*>/g, '<h1>');
+                html = html.replace(/<table [^>]*>/g, '<table>');
+                html = html.replace(/<td [^>]*>/g, '<td>');
+                html = html.replace(/<tr [^>]*>/g, '<tr>');
+                return { nome, conteudo: html };
+            });
+
+            const jsonStr = JSON.stringify(resultado, null, 2);
+            document.getElementById('jsonOutput').value = jsonStr;
+            document.getElementById('msg').textContent = '';
+        }
+
+        function copiarJSON() {
+            const jsonOutput = document.getElementById('jsonOutput');
+            jsonOutput.select();
+            document.execCommand('copy');
+            document.getElementById('msg').textContent = 'JSON copiado!';
+        }
+    </script>
+</body>
+</html>

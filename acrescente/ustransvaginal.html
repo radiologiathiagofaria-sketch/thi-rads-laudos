@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THI-RADS — Transvaginal Premium</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#1a56db;--blue-dark:#1140a6;--blue-light:#e8f0fe;--blue-mid:#dbeafe;
+  --surface:#f4f6fb;--border:#e2e6ef;--border-strong:#c8cfe0;
+  --text:#1a1f2e;--text-2:#4b5570;--text-3:#8892a4;
+  --white:#ffffff;--green:#059669;--red:#dc2626;--radius:8px;--radius-lg:12px;
+}
+body.dark{
+  --blue:#4d86f5;--blue-dark:#3a6fd4;--blue-light:#1e2d4a;--blue-mid:#1e2d4a;
+  --surface:#141820;--border:#2a2f3d;--border-strong:#3a4155;
+  --text:#e2e6f0;--text-2:#9aa3b8;--text-3:#5d6680;
+  --white:#1e2230;--green:#34d399;--red:#f87171;
+}
+body.dark .laudo-doc{color:#e2e6f0;}
+body.dark .laudo-panel{background:#1e2230;border-left-color:var(--border);}
+body.dark .laudo-body{background:#1e2230;}
+body.dark .laudo-header{background:#1e2230;border-bottom-color:var(--border);}
+@media print{ body.dark .laudo-doc, body.dark .laudo-doc *{color:#111 !important;} }
+.btn-dark{margin-left:auto;}
+body.dark .btn-dark{background:#2a2f3d;border-color:#3a4155;color:#e2e6f0;}
+body.dark .btn-dark:hover{background:#343a4d;color:#fff;}
+body.dark .dim-input,body.dark .ff select,body.dark .ff input[type=text], body.dark .ff input[type=date]{background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .radio-mark{background:var(--white);}
+body.dark .check-box{background:var(--white);}
+body.dark .sub-opts{background:#1a2040;border-bottom-color:#2a3460;}
+body.dark .sub-opt-label{background:var(--white);color:var(--text-2);}
+body.dark .lesao-card{background:#141820;border-color:var(--border);}
+body.dark .toolbar{background:var(--white);border-bottom-color:var(--border);}
+body.dark .sidebar{background:var(--white);border-right-color:var(--border);}
+body.dark .sidebar-hd{border-bottom-color:var(--border);}
+body.dark .block{background:var(--white);border-color:var(--border);}
+body.dark .block-title{background:var(--white);border-bottom-color:var(--border);}
+body.dark .radio-opt:hover{background:#1e2d4a;}
+body.dark .radio-opt.selected{background:#1e2d4a;}
+body.dark .check-row{background:#1a1f2e;}
+body.dark .check-row:hover{background:#1e2d4a;}
+body.dark .check-row.selected{background:#1e2d4a;}
+body.dark .btn-add-lesao{background:var(--white);color:var(--text-2);border-color:var(--border-strong);}
+body.dark .sel-tag{background:var(--white);color:var(--text);border-color:var(--border-strong);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',system-ui,sans-serif;font-size:13px;background:var(--surface);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+.toolbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:10px;height:54px;flex-shrink:0;}
+.logo{display:flex;align-items:baseline;gap:6px;margin-right:12px;}
+.logo-name{font-size:18px;font-weight:700;color:var(--blue);letter-spacing:-.5px;}
+.logo-sub{font-size:11px;color:var(--text-3);font-weight:500;letter-spacing:.3px; text-transform: uppercase;}
+.tb-sep{width:1px;height:20px;background:var(--border);margin:0 4px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid var(--border);font-weight:600;transition:all .15s;background:var(--white);color:var(--text-2);}
+.btn:hover{background:var(--surface);border-color:var(--border-strong);color:var(--text);}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue);}
+.btn-primary:hover{background:var(--blue-dark);border-color:var(--blue-dark);color:#fff;}
+.btn-danger{background:#fff5f5;color:var(--red);border-color:#fecaca;}
+body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
+.btn-danger:hover{background:#fee2e2;border-color:#fca5a5;}
+.btn svg{width:14px;height:14px;flex-shrink:0;}
+.body{display:flex;flex:1;overflow:hidden;}
+.sidebar{width:160px;background:var(--white);border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;}
+.sidebar-hd{padding:12px 14px 10px;border-bottom:1px solid var(--border);}
+.sidebar-tipo{font-size:9px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;}
+.sidebar-titulo{font-size:12px;font-weight:600;color:var(--text);}
+.nav-group{padding:8px 0;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:12px;color:var(--text-2);cursor:pointer;transition:all .15s;border-left:3px solid transparent;}
+.nav-item:hover{background:var(--blue-light);color:var(--blue);}
+.nav-item.active{background:var(--blue-light);color:var(--blue);border-left-color:var(--blue);font-weight:600;}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.3;flex-shrink:0;}
+.nav-item.active .nav-dot{opacity:1;}
+.panel{width:500px;flex-shrink:0;overflow-y:auto;padding:16px 16px 24px;background:var(--surface);}
+.sec-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.sec-title::before{content:'';display:block;width:4px;height:16px;background:var(--blue);border-radius:2px;}
+.block{margin-bottom:12px;background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.02);}
+.block-title{font-size:10.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;padding:10px 14px 8px;border-bottom:1px solid var(--border);background:var(--white);}
+.radio-opt{display:flex;align-items:flex-start;gap:0;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;position:relative;}
+.radio-opt:last-child{border-bottom:none;}
+.radio-opt:hover{background:#f5f8ff;}
+.radio-opt.selected{background:var(--blue-light);}
+.radio-label{display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;font-size:12.5px;color:var(--text-2);line-height:1.4;cursor:pointer;}
+.radio-opt.selected .radio-label{color:var(--blue);font-weight:600;}
+.radio-mark{width:16px;height:16px;border-radius:50%;border:2px solid var(--border-strong);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .2s;background:var(--white);}
+.radio-opt:hover .radio-mark{border-color:var(--blue);}
+.radio-opt.selected .radio-mark{border-color:var(--blue);background:var(--blue);}
+.radio-mark::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff;opacity:0;transition:opacity .2s; transform: scale(0.5);}
+.radio-opt.selected .radio-mark::after{opacity:1; transform: scale(1);}
+.check-row{display:flex;align-items:center;gap:0;border-bottom:1px solid var(--border);cursor:pointer;background:#fafbff;}
+.check-row:last-child{border-bottom:none;}
+.check-row:hover{background:#f0f5ff;}
+.check-row.selected{background:#e6eeff;}
+.check-label{display:flex;align-items:center;gap:10px;width:100%;padding:9px 14px 9px 32px;font-size:12px;color:var(--text-2);cursor:pointer;}
+.check-row.selected .check-label{color:var(--blue);font-weight:600;}
+.check-box{width:16px;height:16px;border-radius:4px;border:2px solid var(--border-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.check-row:hover .check-box{border-color:var(--blue);}
+.check-row.selected .check-box{border-color:var(--blue);background:var(--blue);}
+.check-box svg{display:none;width:10px;height:10px;}
+.check-row.selected .check-box svg{display:block;}
+.sel-tag{font-size:11.5px;border:1px solid var(--border-strong);border-radius:6px;padding:3px 8px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);margin-left:6px;cursor:pointer;}
+.dim-rows{padding:10px 14px;display:flex;flex-direction:column;gap:8px;}
+.dim-row{display:flex;align-items:center;gap:10px;}
+.dim-lbl{flex:1;font-size:12px;color:var(--text-2);font-weight:500;}
+.dim-input{width:65px;padding:6px 8px;border:1px solid var(--border-strong);border-radius:6px;font-size:12.5px;font-family:'DM Sans',sans-serif;text-align:center;color:var(--text);background:var(--white);transition:all .15s;}
+.dim-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,.1);}
+.dim-unit{font-size:12px;color:var(--text-3); font-weight:500;}
+.lesoes-wrap{padding:10px 14px;display:flex;flex-direction:column;gap:8px;}
+.btn-add-lesao{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:600;transition:all .15s;border:1.5px dashed var(--border-strong);background:var(--white);color:var(--text-2);width:100%;justify-content:center;}
+.btn-add-lesao:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-light);}
+.lesao-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;}
+.lesao-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.lesao-hd-title{font-size:10.5px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.5px;}
+.btn-rem{display:inline-flex;align-items:center;gap:3px;padding:4px 8px;border-radius:4px;font-size:10px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:600;border:1px solid #fecaca;background:#fff5f5;color:var(--red);transition:all .15s;}
+.btn-rem:hover{background:#fee2e2;}
+.ff-grid{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
+.ff{display:flex;flex-direction:column;gap:3px;}
+.ff label{font-size:9px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.ff select,.ff input[type=text], .ff input[type=date]{font-size:11.5px;padding:5px 8px;border:1px solid var(--border-strong);border-radius:6px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);}
+.ff select:focus,.ff input:focus{outline:none;border-color:var(--blue);}
+.ff input[type=text]{width:60px;text-align:center;}
+.laudo-panel{flex:1;min-width:0;background:var(--white);display:flex;flex-direction:column;border-left:1px solid var(--border);}
+.laudo-header{padding:10px 20px;border-bottom:1px solid var(--border);background:var(--white);display:flex;align-items:center; justify-content: space-between;}
+.laudo-header-title{font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;}
+.laudo-body{flex:1;overflow-y:auto;padding:30px 40px;}
+.laudo-doc{font-family:Helvetica,Arial,sans-serif;font-size:10pt;line-height:1.6;color:#111;max-width:750px;}
+.doc-titulo{text-align:center;font-weight:700;font-size:10pt;margin-bottom:18px;text-transform:uppercase;letter-spacing:.5px;}
+.doc-label{font-weight:700;font-size:10pt;}
+.doc-p{margin-bottom:8px;font-size:10pt; text-align: justify;}
+.doc-secao{margin-bottom:16px;}
+.text-area{width:100%;height:80px;border:1px solid var(--border-strong);border-radius:6px;padding:10px;font-family:'DM Sans',sans-serif;font-size:12.5px;background:var(--white);color:var(--text);resize:vertical;}
+.text-area:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,.1);}
+.toggle-switch{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--text-2);cursor:pointer;}
+.conclusao-lista { margin: 0; padding: 0; list-style: none; }
+.conclusao-lista li { margin: 0; padding: 0; line-height: 1.4; text-align: justify; }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="logo" style="cursor:pointer" onclick="window.location.href='../laudo-thirads.html'"><span class="logo-name">THI-RADS</span><span class="logo-sub">Pelvic Flow</span></div>
+  <button class="btn" onclick="window.location.href='../laudo-thirads.html'"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 2L4 8l6 6"/></svg>Voltar</button>
+  <div class="tb-sep"></div>
+  <button class="btn" onclick="copiar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>Copiar Laudo</button>
+  <button class="btn btn-primary" onclick="imprimir()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6V2h8v4M4 12H2V7h12v5h-2M4 9h8M4 12v2h8v-2"/></svg>Imprimir</button>
+  <button class="btn btn-dark" id="btn-dark-toggle" onclick="toggleDark()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Escuro</button>
+  <button class="btn btn-danger" onclick="reiniciar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 8a6 6 0 1 0 1.5-3.9M2 4v4h4"/></svg>Limpar</button>
+</div>
+
+<div class="body">
+  <div class="sidebar">
+    <div class="sidebar-hd"><div class="sidebar-tipo">Transvaginal</div><div class="sidebar-titulo">Menu Rápido</div></div>
+    <div class="nav-group">
+      <div class="nav-item" id="nav-clinico" onclick="showSection('clinico')"><span class="nav-dot"></span>Dados Clínicos</div>
+      <div class="nav-item" id="nav-utero" onclick="showSection('utero')"><span class="nav-dot"></span>Útero</div>
+      <div class="nav-item" id="nav-endometrio" onclick="showSection('endometrio')"><span class="nav-dot"></span>Endométrio</div>
+      <div class="nav-item" id="nav-ovD" onclick="showSection('ovD')"><span class="nav-dot"></span>Ovário Direito</div>
+      <div class="nav-item" id="nav-ovE" onclick="showSection('ovE')"><span class="nav-dot"></span>Ovário Esquerdo</div>
+      <div class="nav-item" id="nav-liquido" onclick="showSection('liquido')"><span class="nav-dot"></span>Líquido Livre</div>
+      <div class="nav-item" id="nav-anexos" onclick="showSection('anexos')"><span class="nav-dot"></span>Região Anexial</div>
+    </div>
+  </div>
+
+  <div class="panel" id="main-panel"></div>
+
+  <div class="laudo-panel">
+    <div class="laudo-header">
+      <span class="laudo-header-title">Pré-visualização do Laudo</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="laudo-defensivo" onchange="updateLaudo()" style="accent-color: var(--blue); width: 14px; height: 14px;"> Laudo Defensivo
+      </label>
+    </div>
+    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc"></div></div>
+  </div>
+</div>
+
+<script>
+// ESTADO GLOBAL (incluindo indicação clínica opcional)
+const estado = {
+  clinico: { status: 'fertil', gesta: '0', dum: 'nao', dumData: '', dumTempo: '', dumUnidade: 'dias', indicacao: '' },
+  utero: { sit: 'habitual', formato: 'piriforme', flexao: 'anteversoflexão', contornos: 'regulares', dA: '', dB: '', dC: '', eco: 'homogenea', nodulos: [], adenomiose: false, adenoSinais: [], colo: 'habitual', cistoColoMed: '' },
+  endometrio: { carac: 'integralmente', aspecto: 'habitual', esp: '', liq: false, diu: 'nao', diuPos: '', polipo: 'nao', polMed: '', polLoc: 'fúndico' },
+  ovD: { sit: 'habitual', loc: 'tópico', dA: '', dB: '', dC: '', lesoes: [], multiFolMed: '' },
+  ovE: { sit: 'habitual', loc: 'tópico', dA: '', dB: '', dC: '', lesoes: [], multiFolMed: '' },
+  liquido: { sit: 'ausente', qtd: 'discreta', aspecto: 'anecoico', local: 'cavidade pélvica' },
+  anexos: { varizes: false, varizesCal: '', hidros: false, hidrosCal: '', pios: false, piosCal: '', abscesso: false, abscessoLado: 'direita', abscessoA: '', abscessoB: '', abscessoC: '', teratoma: false, teratomaLado: 'direita', teratomaA: '', teratomaB: '', teratomaC: '', textoLiv: '' }
+};
+
+let secaoAtual = 'clinico';
+let lesId = 0;
+let opFinal = [];
+
+function showSection(sec){ secaoAtual=sec; document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); document.getElementById('nav-'+sec).classList.add('active'); renderPanel(sec); updateLaudo(); }
+
+function rOpt(id, label, checked, onclickAction, extra=''){
+  return `<div class="radio-opt ${checked?'selected':''}" onclick="${onclickAction}"><label class="radio-label"><span class="radio-mark"></span>${label}${extra}</label></div>`;
+}
+function cBox(id, label, checked, onchangeAction, indent=true){
+  return `<div class="check-row ${checked?'selected':''}" onclick="document.getElementById('${id}').click()"><input type="checkbox" id="${id}" ${checked?'checked':''} onchange="${onchangeAction};event.stopPropagation();updateLaudo()"><label class="check-label" ${indent?'style="padding-left:34px;"':''}><span class="check-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.8"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg></span>${label}</label></div>`;
+}
+function dInp(id, label, val, oninputAction, unit='cm'){
+  return `<div class="dim-row"><span class="dim-lbl">${label}</span><input class="dim-input" type="text" value="${val}" placeholder="—" oninput="${oninputAction}"><span class="dim-unit">${unit}</span></div>`;
+}
+function sTag(opts, val, onchangeAction, w=""){
+  return `<select class="sel-tag" style="${w}" onchange="${onchangeAction}; updateLaudo()" onclick="event.stopPropagation()">${opts.map(o=>`<option value="${o.v}" ${val===o.v?'selected':''}>${o.l}</option>`).join('')}</select>`;
+}
+
+function renderPanel(sec){
+  const p = document.getElementById('main-panel');
+  const titles = {clinico:'Dados Clínicos & DUM', utero:'Avaliação do Útero', endometrio:'Endométrio', ovD:'Ovário Direito', ovE:'Ovário Esquerdo', liquido:'Líquido Livre', anexos:'Região Anexial & Outros'};
+  let h = `<div class="sec-title">${titles[sec]}</div>`;
+  if(sec==='clinico') h+=renderClinico();
+  else if(sec==='utero') h+=renderUtero();
+  else if(sec==='endometrio') h+=renderEndometrio();
+  else if(sec==='ovD' || sec==='ovE') h+=renderOvario(sec);
+  else if(sec==='liquido') h+=renderLiquido();
+  else if(sec==='anexos') h+=renderAnexos();
+  p.innerHTML = h;
+}
+
+function renderClinico(){
+  const e=estado.clinico;
+  const gestOpts = [{v:'0',l:'Gesta 0'},{v:'1-2',l:'Gesta 1-2'},{v:'3',l:'Gesta 3'},{v:'4+',l:'Gesta 4+'}];
+  let h = `
+  <div class="block"><div class="block-title">Status Hormonal</div>
+    ${rOpt('st-f', 'Idade fértil ' + sTag(gestOpts, e.gesta, "estado.clinico.gesta=this.value"), e.status==='fertil', "estado.clinico.status='fertil';renderPanel('clinico');updateLaudo()")}
+    ${rOpt('st-m', 'Paciente menopausada', e.status==='menopausa', "estado.clinico.status='menopausa';renderPanel('clinico');updateLaudo()")}
+  </div>
+  <div class="block"><div class="block-title">DUM (Data da Última Menstruação)</div>
+    ${rOpt('dum-n', 'Não citar', e.dum==='nao', "estado.clinico.dum='nao';renderPanel('clinico');updateLaudo()")}
+    ${rOpt('dum-d', 'Data precisa', e.dum==='data', "estado.clinico.dum='data';renderPanel('clinico');updateLaudo()")}
+    ${rOpt('dum-e', 'Tempo estimado', e.dum==='estimado', "estado.clinico.dum='estimado';renderPanel('clinico');updateLaudo()")}
+  `;
+  if(e.dum==='data'){
+    h+= `<div style="padding:10px 14px; background:#fafbff; border-top:1px solid var(--border);"><div class="ff"><label>Selecione a Data</label><input type="date" value="${e.dumData}" style="width:130px" onchange="estado.clinico.dumData=this.value;updateLaudo()"></div></div>`;
+  } else if(e.dum==='estimado'){
+    h+= `<div style="padding:10px 14px; background:#fafbff; border-top:1px solid var(--border); display:flex; gap:10px; align-items:flex-end;">
+      <div class="ff"><label>Tempo</label><input type="text" style="width:70px" value="${e.dumTempo}" oninput="estado.clinico.dumTempo=this.value;updateLaudo()" placeholder="Ex: 15"></div>
+      <div class="ff"><label>Unidade</label><select style="width:100px" onchange="estado.clinico.dumUnidade=this.value;updateLaudo()">
+        <option value="dias" ${e.dumUnidade==='dias'?'selected':''}>dias</option>
+        <option value="semanas" ${e.dumUnidade==='semanas'?'selected':''}>semanas</option>
+        <option value="meses" ${e.dumUnidade==='meses'?'selected':''}>meses</option>
+        <option value="anos" ${e.dumUnidade==='anos'?'selected':''}>anos</option>
+      </select></div>
+    </div>`;
+  }
+  h+= `</div>
+  <div class="block"><div class="block-title">Indicação Clínica (opcional)</div>
+    <div style="padding:10px 14px;"><textarea class="text-area" placeholder="Ex.: dor pélvica, sangramento, seguimento de cisto..." oninput="estado.clinico.indicacao=this.value;updateLaudo()" style="height:60px;">${e.indicacao}</textarea></div>
+  </div>`;
+  return h;
+}
+
+function renderUtero(){
+  const e=estado.utero;
+  let h = `
+  <div class="block"><div class="block-title">Situação</div>
+    ${rOpt('ut-h', 'Habitual', e.sit==='habitual', "estado.utero.sit='habitual';renderPanel('utero');updateLaudo()")}
+    ${rOpt('ut-a', 'Aumentado', e.sit==='aumentado', "estado.utero.sit='aumentado';renderPanel('utero');updateLaudo()")}
+    ${rOpt('ut-hp', 'Histerectomia parcial', e.sit==='hist_parcial', "estado.utero.sit='hist_parcial';renderPanel('utero');updateLaudo()")}
+    ${rOpt('ut-ht', 'Histerectomia total', e.sit==='hist_total', "estado.utero.sit='hist_total';renderPanel('utero');updateLaudo()")}
+  </div>`;
+  if(e.sit!=='hist_total'){
+    h+= `<div class="block"><div class="block-title">Morfologia</div>
+      <div style="padding:12px 14px; display:flex; gap:10px;">
+        <div class="ff" style="flex:1"><label>Formato</label><select onchange="estado.utero.formato=this.value;updateLaudo()"><option ${e.formato==='piriforme'?'selected':''}>piriforme</option><option ${e.formato==='globoso'?'selected':''}>globoso</option><option ${e.formato==='alongado'?'selected':''}>alongado</option></select></div>
+        <div class="ff" style="flex:1"><label>Flexão</label><select onchange="estado.utero.flexao=this.value;updateLaudo()"><option ${e.flexao==='anteversoflexão'?'selected':''}>anteversoflexão</option><option ${e.flexao==='médioversoflexão'?'selected':''}>médioversoflexão</option><option ${e.flexao==='retroversoflexão'?'selected':''}>retroversoflexão</option></select></div>
+        <div class="ff" style="flex:1"><label>Contornos</label><select onchange="estado.utero.contornos=this.value;updateLaudo()"><option ${e.contornos==='regulares'?'selected':''}>regulares</option><option ${e.contornos==='lobulados'?'selected':''}>lobulados</option></select></div>
+      </div>
+    </div>
+    <div class="block"><div class="block-title">Dimensões (Útero/Remanescente)</div><div class="dim-rows">
+      ${dInp('ut-da', 'Longitudinal', e.dA, "estado.utero.dA=this.value;updateLaudo()")}
+      ${dInp('ut-db', 'Anteroposterior', e.dB, "estado.utero.dB=this.value;updateLaudo()")}
+      ${dInp('ut-dc', 'Transverso', e.dC, "estado.utero.dC=this.value;updateLaudo()")}
+    </div></div>
+    <div class="block"><div class="block-title">Miométrio</div>
+      ${rOpt('mio-h', 'Homogêneo', e.eco==='homogenea', "estado.utero.eco='homogenea';renderPanel('utero');updateLaudo()")}
+      ${rOpt('mio-he', 'Heterogêneo (sem lesões)', e.eco==='heterogenea', "estado.utero.eco='heterogenea';renderPanel('utero');updateLaudo()")}
+      ${rOpt('mio-n', 'Nódulos Miometriais', e.eco==='nodulos', "estado.utero.eco='nodulos';renderPanel('utero');updateLaudo()")}
+    </div>`;
+    if(e.eco==='nodulos'){
+      h+=`<div class="block"><div class="block-title">Lista de Miomas</div><div class="lesoes-wrap"><div id="ut-nods">${renderNodulosUtero()}</div><button class="btn-add-lesao" onclick="addNoduloUtero()">+ Adicionar Nódulo</button></div></div>`;
+    }
+    h+= `<div class="block"><div class="block-title">Adenomiose</div>
+      ${rOpt('ade-n', 'Ausente', !e.adenomiose, "estado.utero.adenomiose=false;renderPanel('utero');updateLaudo()")}
+      ${rOpt('ade-s', 'Presente', e.adenomiose, "estado.utero.adenomiose=true;renderPanel('utero');updateLaudo()")}
+      ${e.adenomiose?`<div style="padding:12px 14px; display:flex; flex-direction:column; gap:8px; background:#fafbff; border-top:1px solid var(--border);">
+        <span style="font-size:11px; font-weight:600; color:var(--text-3); text-transform:uppercase;">Critérios MUSA:</span>
+        ${['artefato acústico em leque','assimetria de paredes','cistos miometriais','cistos subendometriais','ilhas hiperecoicas','linhas/botões ecogênicos','perda da definição da zona juncional','vascularização translesional'].map((s,i)=>`<label style="font-size:12.5px;color:var(--text-2);display:flex;align-items:center;gap:8px;cursor:pointer;"><input type="checkbox" style="width:14px;height:14px;" ${e.adenoSinais.includes(s)?'checked':''} onchange="togAdeno('${s}',this.checked)"> ${s === 'artefato acústico em leque' ? 'artefato acústico "em leque"' : s}</label>`).join('')}
+      </div>`:''}
+    </div>
+    <div class="block"><div class="block-title">Colo Uterino</div>
+      ${rOpt('colo-h', 'Habitual', e.colo==='habitual', "estado.utero.colo='habitual';renderPanel('utero');updateLaudo()")}
+      ${rOpt('colo-c', 'Cistos de Naboth / Retenção', e.colo==='cistos', "estado.utero.colo='cistos';renderPanel('utero');updateLaudo()")}
+      ${e.colo==='cistos'?`<div class="dim-rows">${dInp('cist-colo','Maior medindo até',e.cistoColoMed,"estado.utero.cistoColoMed=this.value;updateLaudo()")}</div>`:''}
+    </div>`;
+  }
+  return h;
+}
+
+function renderEndometrio(){
+  const e=estado.endometrio;
+  return `
+  <div class="block"><div class="block-title">Caracterização</div>
+    <div style="padding:12px 14px;"><select class="sel-tag" style="width:100%;margin:0;font-size:12.5px;" onchange="estado.endometrio.carac=this.value;renderPanel('endometrio');updateLaudo()">
+      <option value="integralmente" ${e.carac==='integralmente'?'selected':''}>Caracterizado integralmente</option>
+      <option value="parcialmente" ${e.carac==='parcialmente'?'selected':''}>Caracterizado parcialmente</option>
+      <option value="nao" ${e.carac==='nao'?'selected':''}>Não caracterizado</option>
+    </select></div>
+  </div>
+  ${e.carac!=='nao'?`
+  <div class="block"><div class="block-title">Aspecto e Espessura</div>
+    <div style="padding:12px 14px;"><select class="sel-tag" style="width:100%;margin:0;font-size:12.5px;" onchange="estado.endometrio.aspecto=this.value;updateLaudo()">
+      <option value="habitual" ${e.aspecto==='habitual'?'selected':''}>Regular e homogêneo (Habitual)</option>
+      <option value="laminar" ${e.aspecto==='laminar'?'selected':''}>Aspecto laminar</option>
+      <option value="trilaminar" ${e.aspecto==='trilaminar'?'selected':''}>Aspecto trilaminar</option>
+      <option value="secretor" ${e.aspecto==='secretor'?'selected':''}>Aspecto secretor</option>
+      <option value="heterogeneo" ${e.aspecto==='heterogeneo'?'selected':''}>Heterogêneo (com áreas císticas)</option>
+      <option value="espessado" ${e.aspecto==='espessado'?'selected':''}>Espessado</option>
+    </select></div>
+    <div class="dim-rows" style="border-top:1px solid var(--border);">${dInp('endo-esp', 'Espessura Endometrial', e.esp, "estado.endometrio.esp=this.value;updateLaudo()", 'mm')}</div>
+    ${cBox('endo-liq', 'Lâmina líquida (separando folhetos)', e.liq, "estado.endometrio.liq=this.checked", false)}
+  </div>
+  <div class="block"><div class="block-title">Dispositivo Intrauterino (DIU)</div>
+    ${rOpt('diu-n', 'Ausente', e.diu==='nao', "estado.endometrio.diu='nao';renderPanel('endometrio');updateLaudo()")}
+    ${rOpt('diu-normo', 'Normoposicionado', e.diu==='normo', "estado.endometrio.diu='normo';renderPanel('endometrio');updateLaudo()")}
+    ${rOpt('diu-baixo', 'Em inserção baixa', e.diu==='baixo', "estado.endometrio.diu='baixo';renderPanel('endometrio');updateLaudo()")}
+    ${rOpt('diu-desl', 'Deslocado / Intramural', e.diu==='deslocado', "estado.endometrio.diu='deslocado';renderPanel('endometrio');updateLaudo()")}
+  </div>
+  <div class="block"><div class="block-title">Pólipos</div>
+    ${rOpt('pol-n', 'Sem evidências de pólipos', e.polipo==='nao', "estado.endometrio.polipo='nao';renderPanel('endometrio');updateLaudo()")}
+    ${rOpt('pol-e', 'Pólipo Endometrial', e.polipo==='endometrial', "estado.endometrio.polipo='endometrial';renderPanel('endometrio');updateLaudo()")}
+    ${rOpt('pol-c', 'Pólipo Endocervical', e.polipo==='endocervical', "estado.endometrio.polipo='endocervical';renderPanel('endometrio');updateLaudo()")}
+    ${e.polipo!=='nao'?`<div class="dim-rows" style="border-top:1px solid var(--border);">${dInp('pol-med', 'Medidas (ex: 1.0 x 0.8 x 0.5)', e.polMed, "estado.endometrio.polMed=this.value;updateLaudo()", 'cm')}</div>`:''}
+  </div>`:''}`;
+}
+
+function renderOvario(l){
+  const e=estado[l];
+  const sideLabel = l==='ovD'?'Direito':'Esquerdo';
+  let h = `
+  <div class="block"><div class="block-title">Situação (${sideLabel})</div>
+    ${rOpt(`o${l}-h`, 'Habitual', e.sit==='habitual', `estado['${l}'].sit='habitual';renderPanel('${l}');updateLaudo()`)}
+    ${rOpt(`o${l}-a`, 'Aumentado', e.sit==='aumentado', `estado['${l}'].sit='aumentado';renderPanel('${l}');updateLaudo()`)}
+    ${rOpt(`o${l}-mf`, 'Padrão multifolicular', e.sit==='multifolicular', `estado['${l}'].sit='multifolicular';renderPanel('${l}');updateLaudo()`)}
+    ${rOpt(`o${l}-pc`, 'Aspecto policístico (>20 folículos)', e.sit==='policistico', `estado['${l}'].sit='policistico';renderPanel('${l}');updateLaudo()`)}
+    ${rOpt(`o${l}-nc`, 'Não visualizado / Não caracterizado', e.sit==='naocarac', `estado['${l}'].sit='naocarac';renderPanel('${l}');updateLaudo()`)}
+  </div>`;
+  if(e.sit!=='naocarac'){
+    h+= `<div class="block"><div class="block-title">Dimensões</div><div class="dim-rows">
+      ${dInp(`o${l}-da`, 'Longitudinal', e.dA, `estado['${l}'].dA=this.value;updateLaudo()`)}
+      ${dInp(`o${l}-db`, 'Anteroposterior', e.dB, `estado['${l}'].dB=this.value;updateLaudo()`)}
+      ${dInp(`o${l}-dc`, 'Transverso', e.dC, `estado['${l}'].dC=this.value;updateLaudo()`)}
+    </div></div>`;
+    if(e.sit==='multifolicular') h+= `<div class="block"><div class="block-title">Folículos</div><div class="dim-rows">${dInp(`o${l}-mfm`, 'Medindo até', e.multiFolMed, `estado['${l}'].multiFolMed=this.value;updateLaudo()`, 'cm')}</div></div>`;
+    h+= `<div class="block"><div class="block-title">Lesões Adicionais</div><div class="lesoes-wrap"><div id="${l}-lesoes">${renderLesoesOvario(l)}</div><button class="btn-add-lesao" onclick="addLesaoOvario('${l}')">+ Adicionar Achado Ovariano</button></div></div>`;
+  }
+  return h;
+}
+
+function renderLiquido(){
+  const e=estado.liquido;
+  return `
+  <div class="block"><div class="block-title">Situação</div>
+    ${rOpt('l-a', 'Ausente', e.sit==='ausente', "estado.liquido.sit='ausente';renderPanel('liquido');updateLaudo()")}
+    ${rOpt('l-p', 'Presente', e.sit==='presente', "estado.liquido.sit='presente';renderPanel('liquido');updateLaudo()")}
+  </div>
+  ${e.sit==='presente'?`
+  <div class="block"><div class="block-title">Quantidade</div>
+    <div style="padding:12px 14px;"><select class="sel-tag" style="width:100%;margin:0;" onchange="estado.liquido.qtd=this.value;updateLaudo()">
+      <option ${e.qtd==='discreta'?'selected':''}>discreta</option><option ${e.qtd==='pequena'?'selected':''}>pequena</option><option ${e.qtd==='moderada'?'selected':''}>moderada</option><option ${e.qtd==='acentuada'?'selected':''}>acentuada</option>
+    </select></div>
+  </div>
+  <div class="block"><div class="block-title">Aspecto</div>
+    <div style="padding:12px 14px;"><select class="sel-tag" style="width:100%;margin:0;" onchange="estado.liquido.aspecto=this.value;updateLaudo()">
+      <option ${e.aspecto==='anecoico'?'selected':''}>anecoico</option><option ${e.aspecto==='espesso'?'selected':''}>espesso</option>
+    </select></div>
+  </div>
+  <div class="block"><div class="block-title">Localização</div>
+    <div style="padding:12px 14px;"><select class="sel-tag" style="width:100%;margin:0;" onchange="estado.liquido.local=this.value;updateLaudo()">
+      <option value="cavidade pélvica" ${e.local==='cavidade pélvica'?'selected':''}>cavidade pélvica</option><option value="fundo de saco (Douglas)" ${e.local==='fundo de saco (Douglas)'?'selected':''}>fundo de saco (Douglas)</option><option value="região anexial direita" ${e.local==='região anexial direita'?'selected':''}>região anexial direita</option><option value="região anexial esquerda" ${e.local==='região anexial esquerda'?'selected':''}>região anexial esquerda</option>
+    </select></div>
+  </div>`:''}`;
+}
+
+function renderAnexos(){
+  const e=estado.anexos;
+  return `
+  <div class="block"><div class="block-title">Patologias Anexiais Extras</div>
+    ${cBox('an-v', 'Varizes Pélvicas', e.varizes, "estado.anexos.varizes=this.checked;renderPanel('anexos')", false)}
+    ${e.varizes?`<div class="dim-rows" style="background:#fafbff;">${dInp('an-vc', 'Calibre de até', e.varizesCal, "estado.anexos.varizesCal=this.value;updateLaudo()", 'cm')}</div>`:''}
+    ${cBox('an-h', 'Hidrossalpinge', e.hidros, "estado.anexos.hidros=this.checked;renderPanel('anexos')", false)}
+    ${cBox('an-p', 'Hemato / Piossalpinge', e.pios, "estado.anexos.pios=this.checked;renderPanel('anexos')", false)}
+    ${cBox('an-a', 'Abscesso Tubo-Ovariano', e.abscesso, "estado.anexos.abscesso=this.checked;renderPanel('anexos')", false)}
+    ${e.abscesso?`<div class="dim-rows" style="background:#fafbff;">${dInp('an-am', 'Medidas (ex: 4.0 x 3.0 x 2.0)', e.abscessoA, "estado.anexos.abscessoA=this.value;updateLaudo()", 'cm')}</div>`:''}
+  </div>
+  <div class="block"><div class="block-title">Achados Adicionais (Texto Livre)</div>
+    <div style="padding:12px 14px;"><textarea class="text-area" placeholder="Digite observações adicionais..." oninput="estado.anexos.textoLiv=this.value;updateLaudo()">${e.textoLiv}</textarea></div>
+  </div>`;
+}
+
+// Função auxiliar para limpar e validar números (vírgula -> ponto, remove múltiplas vírgulas)
+function sanitizeNumber(val){
+  if(!val) return '';
+  let str = val.toString().replace(/,/g, '.'); // vírgula para ponto
+  // remove tudo que não for dígito, ponto ou sinal de menos
+  str = str.replace(/[^0-9.-]/g, '');
+  // se houver mais de um ponto, mantém só o primeiro
+  let parts = str.split('.');
+  if(parts.length > 2) str = parts[0] + '.' + parts.slice(1).join('');
+  // se terminar com ponto, remove
+  if(str.endsWith('.')) str = str.slice(0, -1);
+  return str;
+}
+
+function vMed(a,b,c){
+  let aN = parseFloat(sanitizeNumber(a));
+  let bN = parseFloat(sanitizeNumber(b));
+  let cN = parseFloat(sanitizeNumber(c));
+  if(!isNaN(aN) && !isNaN(bN) && !isNaN(cN)){
+    let vol = aN * bN * cN * 0.523;
+    return vol.toFixed(1).replace('.', ',');
+  }
+  return '';
+}
+function mStr(a,b,c){
+  const vals = [a,b,c].filter(v => v && v.trim() !== '');
+  if(vals.length === 3){
+    let clean = vals.map(v => sanitizeNumber(v).replace('.', ','));
+    return ` medindo cerca de ${clean.join(' x ')} cm`;
+  }
+  if(vals.length === 1){
+    let clean = sanitizeNumber(vals[0]).replace('.', ',');
+    return ` medindo ${clean} cm`;
+  }
+  return '';
+}
+
+// NÓDULOS MIOMETRIAIS
+function togAdeno(val, checked){ if(checked) { estado.utero.adenoSinais.push(val); } else { estado.utero.adenoSinais=estado.utero.adenoSinais.filter(v=>v!==val); } updateLaudo(); }
+function addNoduloUtero(){ estado.utero.nodulos.push({id:++lesId, eco:'hipoecogênico', parede:'parede anterior', segmento:'corporal', classif:'intramural', figo:'- -', dA:'', dB:'', dC:''}); renderPanel('utero'); updateLaudo(); }
+function remNoduloUtero(id){ estado.utero.nodulos=estado.utero.nodulos.filter(n=>n.id!==id); renderPanel('utero'); updateLaudo(); }
+function updNod(id,f,v){ estado.utero.nodulos.find(n=>n.id===id)[f]=v; updateLaudo(); }
+function renderNodulosUtero(){
+  return estado.utero.nodulos.map(n=>`
+  <div class="lesao-card"><div class="lesao-hd"><span class="lesao-hd-title">Mioma ${n.id}</span><button class="btn-rem" onclick="remNoduloUtero(${n.id})">✕ remover</button></div>
+  <div class="ff-grid">
+    <div class="ff" style="flex:1"><label>Ecogenicidade</label><select onchange="updNod(${n.id},'eco',this.value)"><option ${n.eco==='hipoecogênico'?'selected':''}>hipoecogênico</option><option ${n.eco==='isoecogênico'?'selected':''}>isoecogênico</option><option ${n.eco==='hiperecogênico'?'selected':''}>hiperecogênico</option></select></div>
+    <div class="ff" style="flex:1"><label>Parede</label><select onchange="updNod(${n.id},'parede',this.value)"><option value="parede anterior" ${n.parede==='parede anterior'?'selected':''}>anterior</option><option value="parede posterior" ${n.parede==='parede posterior'?'selected':''}>posterior</option><option value="região fúndica" ${n.parede==='região fúndica'?'selected':''}>fúndica</option><option value="parede lateral direita" ${n.parede==='parede lateral direita'?'selected':''}>lateral dir</option><option value="parede lateral esquerda" ${n.parede==='parede lateral esquerda'?'selected':''}>lateral esq</option></select></div>
+    <div class="ff" style="flex:1"><label>Segmento</label><select onchange="updNod(${n.id},'segmento',this.value)"><option value="corporal" ${n.segmento==='corporal'?'selected':''}>corporal</option><option value="ístmico" ${n.segmento==='ístmico'?'selected':''}>ístmico</option><option value="cervical" ${n.segmento==='cervical'?'selected':''}>cervical</option></select></div>
+  </div>
+  <div class="ff-grid" style="margin-top:4px;">
+    <div class="ff" style="flex:1.2"><label>Classif. Anatômica</label><select onchange="updNod(${n.id},'classif',this.value)"><option ${n.classif==='intramural'?'selected':''}>intramural</option><option ${n.classif==='subseroso'?'selected':''}>subseroso</option><option ${n.classif==='submucoso'?'selected':''}>submucoso</option><option ${n.classif==='pediculado'?'selected':''}>pediculado</option></select></div>
+    <div class="ff" style="flex:0.8"><label>FIGO</label><select onchange="updNod(${n.id},'figo',this.value)"><option value="- -">Nenhum</option>${['0','1','2','3','4','5','6','7','8','2-5'].map(f=>`<option value="${f}" ${n.figo===f?'selected':''}>FIGO ${f}</option>`).join('')}</select></div>
+  </div>
+  <div class="ff-grid" style="margin-top:4px;">${['dA','dB','dC'].map((d,i)=>`<div class="ff"><label>D${i+1} (cm)</label><input type="text" style="width:55px" value="${n[d]}" oninput="updNod(${n.id},'${d}',this.value)"></div>`).join('')}</div></div>
+  `).join('');
+}
+
+// LESÕES OVARIANAS
+function addLesaoOvario(l){ estado[l].lesoes.push({id:++lesId, tipo:'cisto_simples', dA:'', dB:'', dC:''}); renderPanel(l); updateLaudo(); }
+function remLesaoOvario(l, id){ estado[l].lesoes=estado[l].lesoes.filter(n=>n.id!==id); renderPanel(l); updateLaudo(); }
+function updLesO(l, id, f, v){ estado[l].lesoes.find(n=>n.id===id)[f]=v; updateLaudo(); }
+function renderLesoesOvario(l){
+  return estado[l].lesoes.map(n=>`
+  <div class="lesao-card"><div class="lesao-hd"><span class="lesao-hd-title">Achado ${n.id}</span><button class="btn-rem" onclick="remLesaoOvario('${l}',${n.id})">✕ remover</button></div>
+  <div class="ff-grid">
+    <div class="ff" style="width:100%"><label>Diagnóstico Ecográfico</label><select onchange="updLesO('${l}',${n.id},'tipo',this.value)">
+      <option value="cisto_simples" ${n.tipo==='cisto_simples'?'selected':''}>Cisto Simples</option>
+      <option value="cisto_hemo" ${n.tipo==='cisto_hemo'?'selected':''}>Cisto Hemorrágico</option>
+      <option value="dermoide" ${n.tipo==='dermoide'?'selected':''}>Teratoma Cístico Maduro</option>
+      <option value="endometrioma" ${n.tipo==='endometrioma'?'selected':''}>Endometrioma</option>
+      <option value="foliculo_dom" ${n.tipo==='foliculo_dom'?'selected':''}>Folículo Dominante</option>
+      <option value="corpo_luteo" ${n.tipo==='corpo_luteo'?'selected':''}>Corpo Lúteo</option>
+    </select></div>
+  </div>
+  <div class="ff-grid" style="margin-top:4px;">${['dA','dB','dC'].map((d,i)=>`<div class="ff"><label>D${i+1} (cm)</label><input type="text" style="width:55px" value="${n[d]}" oninput="updLesO('${l}',${n.id},'${d}',this.value)"></div>`).join('')}</div></div>
+  `).join('');
+}
+
+// LAUDO PRINCIPAL
+function updateLaudo(){
+  const cl = estado.clinico, u = estado.utero, en = estado.endometrio, oD = estado.ovD, oE = estado.ovE, liq = estado.liquido, an = estado.anexos;
+  const isDefensivo = document.getElementById('laudo-defensivo').checked;
+  opFinal = [];
+
+  // Indicação Clínica
+  let indicacaoHtml = '';
+  if(cl.indicacao && cl.indicacao.trim() !== ''){
+    indicacaoHtml = `<div class="doc-p"><span class="doc-label">Indicação clínica:</span> ${cl.indicacao}</div>`;
+  }
+
+  let refU = cl.status==='menopausa' ? 70 : (cl.gesta==='0'?90 : (cl.gesta==='1-2'?140 : (cl.gesta==='3'?160 : 180)));
+
+  let fUtero='', fEndo='', fOvD='', fOvE='', fLiq='', fAnx='';
+
+  // DUM
+  let fClin = '';
+  if(cl.dum==='data') {
+    let dStr = cl.dumData ? cl.dumData.split('-').reverse().join('/') : 'DD/MM/AAAA';
+    fClin = `D.U.M.: ${dStr}`;
+  } else if(cl.dum==='estimado') {
+    fClin = `D.U.M.: há ${cl.dumTempo||'_'} ${cl.dumUnidade}`;
+  }
+
+  // ÚTERO
+  if(u.sit==='hist_total'){ fUtero='Útero não caracterizado (status pós-cirúrgico).'; opFinal.push('Status pós-histerectomia total.'); }
+  else {
+    let volU = vMed(u.dA, u.dB, u.dC);
+    let dsU = mStr(u.dA, u.dB, u.dC) + (volU ? `, com volume de ${volU} cm³ (normal até ${refU},0 cm³)` : ' medindo cerca de _ x _ x _ cm, com volume de _ cm³');
+    if(u.sit==='hist_parcial'){ fUtero=`Sinais de histerectomia parcial, com colo uterino remanescente de aspecto habitual${dsU}.`; opFinal.push('Status pós-histerectomia parcial.'); }
+    else {
+      let uSit = u.sit==='aumentado' ? 'aumentadas' : 'habituais';
+      fUtero = `Útero ${u.formato}, em ${u.flexao}, com dimensões ${uSit},${dsU}.`;
+      if(u.sit==='aumentado') opFinal.push('Útero de dimensões aumentadas.');
+
+      if(u.eco==='homogenea' && !u.adenomiose) fUtero += `\nApresenta contornos ${u.contornos} e ecotextura miometrial homogênea.`;
+      else if(u.eco==='heterogenea' && !u.adenomiose) { fUtero += `\nApresenta contornos ${u.contornos} e ecotextura miometrial heterogênea, sem lesões focais visíveis.`; opFinal.push('Útero com ecotextura miometrial heterogênea.'); }
+      else if(u.eco==='nodulos' && !u.adenomiose) {
+        if(u.nodulos.length===0) {
+          fUtero += `\nApresenta contornos ${u.contornos} e ecotextura miometrial heterogênea.`;
+        } else {
+          let hasFigo = false;
+          let nstrs = u.nodulos.map(n=>{
+            let v = vMed(n.dA, n.dB, n.dC);
+            let pMed = mStr(n.dA, n.dB, n.dC) + (v ? ` (volume de ${v} cm³)` : '');
+            let fStr = n.figo !== '- -' ? ` (FIGO ${n.figo})` : '';
+            if(n.figo !== '- -') hasFigo = true;
+            return `nódulo miometrial ${n.eco} localizado na ${n.parede} do segmento ${n.segmento}, de componente predominantemente ${n.classif}${fStr}${pMed}`;
+          });
+          
+          if(u.nodulos.length === 1) {
+            fUtero += `\nApresenta contornos ${u.contornos} e ecotextura miometrial heterogênea à custa de ${nstrs[0]}.`;
+          } else {
+            fUtero += `\nApresenta contornos ${u.contornos} e ecotextura miometrial heterogênea à custa de nódulos miometrais assim dispostos:<br>` + nstrs.map(ns => `— ${ns}`).join('<br>');
+          }
+          opFinal.push(`Útero com nódulo miometrial mais comumente relacionado a leiomioma${hasFigo?' (classificação FIGO inclusa no corpo do relatório)':''}.`);
+        }
+      }
+      
+      if(u.adenomiose) {
+        let listSinais = u.adenoSinais.map(s => s === 'artefato acústico em leque' ? 'artefato acústico "em leque"' : s);
+        fUtero += `\nApresenta contornos ${u.contornos} e ecotextura miometrial difusamente heterogênea, notando-se: ${listSinais.length?listSinais.join(', '):'sinais de adenomiose'}.`;
+        opFinal.push('Alteração ecotextural miometrial com aspecto que pode estar relacionado a adenomiose.');
+      }
+
+      if(u.colo==='habitual') fUtero += `\nColo uterino e canal endocervical de aspecto habitual.`;
+      else { fUtero += `\nColo uterino e canal endocervical de aspecto habitual, com presença de cistos de retenção${u.cistoColoMed?` medindo até ${u.cistoColoMed} cm`:''}.`; opFinal.push('Cistos de retenção no colo uterino.'); }
+    }
+  }
+
+  // ENDOMÉTRIO
+  if(en.carac==='nao' || u.sit==='hist_total') fEndo = u.sit==='hist_total'?'':'Endométrio não caracterizado.';
+  else {
+    let car = en.carac==='integralmente' ? '' : 'parcialmente caracterizado, ';
+    if(en.aspecto==='espessado'){ fEndo=`Endométrio ${car}espessado${en.esp?`, com espessura de ${en.esp} mm`:''}.`; opFinal.push('Espessamento endometrial homogêneo/heterogêneo, de etiologia a esclarecer. A histeroscopia pode trazer maiores subsídios diagnósticos.'); }
+    else if(en.aspecto==='heterogeneo'){ fEndo=`Endométrio ${car}de aspecto heterogêneo, apresentando pequenas áreas císticas anecogênicas de permeio${en.esp?`, com espessura de ${en.esp} mm`:''}.`; opFinal.push('Endométrio de aspecto heterogêneo (com áreas císticas).'); }
+    else {
+      let asp = en.aspecto==='habitual' ? 'regular e homogêneo' : `de aspecto ${en.aspecto}`;
+      fEndo=`Endométrio ${car}${asp}${en.esp?`, com espessura de ${en.esp} mm`:''}.`;
+    }
+    if(en.liq) { fEndo+='\nPresença de discreta quantidade de líquido anecoide, que separa os folhetos endometriais, podendo corresponder a conteúdo fluido e/ou hemático.'; opFinal.push('Achados sugestivos de mucometra/hemometra.'); }
+    
+    if(en.diu==='normo'){ fEndo+='\nCavidade uterina ocupada por DIU, com seu extremo inferior da haste central acima do orifício cervical interno, com suas hastes transversais simétricas e abertas no sentido látero-lateral, sem alterações de rotação.'; opFinal.push('DIU tópico.'); }
+    else if(en.diu==='baixo'){ fEndo+='\nCavidade uterina IBM ocupada por DIU, com seu extremo inferior da haste central abaixo do orifício cervical interno, com suas hastes transversais parcialmente abertas.'; opFinal.push('DIU em posição baixa na cavidade uterina.'); }
+    else if(en.diu==='deslocado'){ fEndo+='\nDispositivo intra-uterino (DIU) com trajeto intramural.'; opFinal.push('DIU com trajeto intramural.'); }
+
+    if(en.polipo==='endometrial'){ fEndo+=`\nPresença de imagem polipoide hiperecoica no segmento endometrial${en.polMed?` medindo ${en.polMed} cm`:''}.`; opFinal.push('Lesão polipoide endometrial.'); }
+    else if(en.polipo==='endocervical'){ fEndo+=`\nPresença de imagem polipoide hiperecoica fixa no canal endocervical, delimitada por fina lâmina líquida anecoica${en.polMed?` medindo ${en.polMed} cm`:''}.`; opFinal.push('Imagem sugestiva de pólipo endocervical.'); }
+  }
+
+  // OVÁRIOS (lógica original mantida, apenas removido Doppler)
+  const renderO = (l) => {
+    let st = estado[l];
+    let nmeLower = l==='ovD'?'direito':'esquerdo';
+    let nmeUpper = l==='ovD'?'Ovário direito':'Ovário esquerdo';
+    
+    if(st.sit==='naocarac'){ 
+      return `Ovário ${nmeLower} não caracterizado no presente estudo (interposição gasosa de alças intestinais?).`; 
+    }
+    
+    let temMedida = (st.dA && st.dA.trim() !== '') || (st.dB && st.dB.trim() !== '') || (st.dC && st.dC.trim() !== '');
+    
+    if(!temMedida) {
+      let bs = `Ovário ${nmeLower} em topografia, morfologia, contornos, dimensões e ecotextura normais.`;
+      
+      if(st.lesoes.length > 0){
+        st.lesoes.forEach(ls => {
+          let m = mStr(ls.dA,ls.dB,ls.dC);
+          if(ls.tipo==='cisto_simples'){ bs+=`\nPresença de imagem cística com conteúdo anecoico e contornos regulares${m}.`; opFinal.push(`Cisto de aspecto simples no ${nmeLower}.`); }
+          if(ls.tipo==='cisto_hemo'){ bs+=`\nPresença de imagem cística de contornos regulares, contendo septações finas e líquido com debris (podendo corresponder a conteúdo hemático)${m}.`; opFinal.push(`Imagem com aspecto compatível com cisto hemorrágico no ${nmeLower}.`); }
+          if(ls.tipo==='dermoide'){ bs+=`\nPresença de formação intraovariana de contornos regulares, com conteúdo heterogêneo contendo focos hiperecogênicos com sombra acústica posterior e nódulo mural ecogênico${m}.`; opFinal.push(`Achados ultrassonográficos sugestivos de teratoma cístico maduro (cisto dermoide) no ${nmeLower}.`); }
+          if(ls.tipo==='endometrioma'){ bs+=`\nPresença de imagem cística intraovariana, unilocular, com conteúdo finamente ecogênico e homogêneo (padrão vidro fosco), paredes regulares, sem septações espessas ou componentes sólidos${m}.`; opFinal.push(`Imagem com aspecto ultrassonográfico compatível com endometrioma no ${nmeLower}.`); }
+          if(ls.tipo==='foliculo_dom'){ bs+=`\nPresença de folículo dominante${m}.`; }
+          if(ls.tipo==='corpo_luteo'){ bs+=`\nPresença de corpo lúteo${m}.`; }
+        });
+      }
+      return bs;
+    }
+    
+    let vo = vMed(st.dA,st.dB,st.dC);
+    if(st.sit==='aumentado') opFinal.push(`${nmeUpper} com volume aumentado.`);
+
+    let bs = `Ovário ${nmeLower} em topografia, morfologia, contornos normais.\n`;
+    
+    if(st.sit==='multifolicular'){
+      bs += `Parênquima com ecotextura homogênea, com presença de várias imagens císticas de aspecto simples${st.multiFolMed?` medindo até ${st.multiFolMed} cm`:''}.\n`;
+      opFinal.push(`Ovário com padrão multifolicular.`);
+    } else if(st.sit==='policistico'){
+      bs += `Nota-se a presença de múltiplos folículos antrais, medindo entre 2,0 e 9,0 mm, e em número maior ou igual a 20. Não se observa cistos, corpo lúteo ou folículos dominantes.\n`;
+      opFinal.push(`Ovário com aspecto policístico.`);
+    } else {
+      bs += `Parênquima com ecotextura habitual.\n`;
+    }
+
+    let dStr = [st.dA||'—', st.dB||'—', st.dC||'—'].join(' x ');
+    bs += `Medidas do ovário: ${dStr} cm ( volume: ${vo||'—'} cm³ ).`;
+
+    if(st.lesoes.length>0){
+      st.lesoes.forEach(ls => {
+        let m = mStr(ls.dA,ls.dB,ls.dC);
+        if(ls.tipo==='cisto_simples'){ bs+=`\nPresença de imagem cística com conteúdo anecoico e contornos regulares${m}.`; opFinal.push(`Cisto de aspecto simples no ${nmeLower}.`); }
+        if(ls.tipo==='cisto_hemo'){ bs+=`\nPresença de imagem cística de contornos regulares, contendo septações finas e líquido com debris (podendo corresponder a conteúdo hemático)${m}.`; opFinal.push(`Imagem com aspecto compatível com cisto hemorrágico no ${nmeLower}.`); }
+        if(ls.tipo==='dermoide'){ bs+=`\nPresença de formação intraovariana de contornos regulares, com conteúdo heterogêneo contendo focos hiperecogênicos com sombra acústica posterior e nódulo mural ecogênico${m}.`; opFinal.push(`Achados ultrassonográficos sugestivos de teratoma cístico maduro (cisto dermoide) no ${nmeLower}.`); }
+        if(ls.tipo==='endometrioma'){ bs+=`\nPresença de imagem cística intraovariana, unilocular, com conteúdo finamente ecogênico e homogêneo (padrão vidro fosco), paredes regulares, sem septações espessas ou componentes sólidos${m}.`; opFinal.push(`Imagem com aspecto ultrassonográfico compatível com endometrioma no ${nmeLower}.`); }
+        if(ls.tipo==='foliculo_dom'){ bs+=`\nPresença de folículo dominante${m}.`; }
+        if(ls.tipo==='corpo_luteo'){ bs+=`\nPresença de corpo lúteo${m}.`; }
+      });
+    }
+    return bs;
+  }
+  fOvD = renderO('ovD'); fOvE = renderO('ovE');
+
+  // LÍQUIDO
+  if(liq.sit==='ausente') fLiq='Ausência de líquido livre na cavidade pélvica.';
+  else { fLiq=`Presença de ${liq.qtd} quantidade de líquido livre ${liq.aspecto} em ${liq.local}.`; opFinal.push(`Presença de líquido livre na cavidade pélvica.`); }
+
+  // ANEXOS
+  if(an.varizes){ fAnx+=`Dilatação e tortuosidade dos vasos pélvicos bilateralmente${an.varizesCal?`, com calibre de até ${an.varizesCal} cm`:''}.\n`; opFinal.push('Varizes pélvicas.'); }
+  if(an.hidros){ fAnx+=`Formação tubuliforme com conteúdo anecoico na região anexial, sugestivo de hidrossalpinge.\n`; opFinal.push('Hidrossalpinge.'); }
+  if(an.pios){ fAnx+=`Formação tubuliforme com conteúdo hipoecoico na região anexial.\n`; opFinal.push('Tuba uterina com conteúdo espesso, podendo corresponder a hemato/piossalpinge na dependência de correlação clínico-laboratorial.'); }
+  if(an.abscesso){ fAnx+=`Formação expansiva heterogênea na região anexial, de paredes espessas e conteúdo predominantemente hipoecogênico${an.abscessoA?` medindo ${mStr(an.abscessoA,an.abscessoB,an.abscessoC).replace(' medindo cerca de ','')}`:''}.\n`; opFinal.push('Formação expansiva na região anexial. Considerar a possibilidade de abscesso tubo-ovariano na dependência de correlação clínico-laboratorial.'); }
+  if(an.textoLiv) fAnx += `Achados adicionais: ${an.textoLiv}\n`;
+
+  // CONCLUSÃO (ex- "Opinião do relatório")
+  let oTxt = '';
+  const uniqueOp = [...new Set(opFinal)]; 
+
+  if(uniqueOp.length===0) {
+    oTxt = '<ul class="conclusao-lista"><li>Estudo ecográfico sem evidentes anormalidades apreciáveis ao método.</li></ul>';
+  } else {
+    if(isDefensivo) {
+      oTxt = '<span style="line-height:1.2;">Estudo ecográfico com achados que podem corresponder a:</span><br>' + 
+             '<ul class="conclusao-lista" style="margin-top:2px; margin-bottom:4px;">' + uniqueOp.map(item => `<li>${item}</li>`).join('') + '</ul>' +
+             '<span style="line-height:1.2;">Demais estruturas sem evidentes anormalidades apreciáveis ao método.</span>';
+    } else {
+      oTxt = '<ul class="conclusao-lista" style="margin-bottom:4px;">' + uniqueOp.map(item => `<li>${item}</li>`).join('') + '</ul>' +
+             '<span style="line-height:1.2;">Demais estruturas sem evidentes anormalidades apreciáveis ao método.</span>';
+    }
+  }
+
+  let h = `
+    <div class="doc-titulo">ULTRASSONOGRAFIA PÉLVICA TRANSVAGINAL</div>
+    <div class="doc-secao"><span class="doc-label">TÉCNICA:</span><div class="doc-p">Exame realizado em aparelho dinâmico com transdutor endocavitário por via transvaginal.</div></div>
+    ${indicacaoHtml}
+    <div class="doc-secao"><span class="doc-label">ANÁLISE:</span>
+      ${fClin ? `<div class="doc-p">${fClin}</div>`:''}
+      <div class="doc-p">${fUtero.replace(/\n/g,'<br>')}</div>
+      <div class="doc-p">${fEndo.replace(/\n/g,'<br>')}</div>
+      <div class="doc-p">${fOvD.replace(/\n/g,'<br>')}</div>
+      <div class="doc-p">${fOvE.replace(/\n/g,'<br>')}</div>
+      <div class="doc-p">${fLiq}</div>
+      ${fAnx ? `<div class="doc-p">${fAnx.replace(/\n/g,'<br>')}</div>`:''}
+    </div>
+    <div class="doc-secao" style="margin-bottom:0;"><span class="doc-label">CONCLUSÃO:</span><div style="margin-top:4px;">${oTxt}</div></div>
+  `;
+  document.getElementById('laudo-doc').innerHTML = h;
+}
+
+// Funções utilitárias
+function toggleDark(){ const d=document.body.classList.toggle('dark'); localStorage.setItem('darkT',d?'1':'0'); }
+if(localStorage.getItem('darkT')==='1') toggleDark();
+function copiar(){ navigator.clipboard.writeText(document.getElementById('laudo-doc').innerText).then(()=>alert('Copiado!')).catch(()=>alert('Use Ctrl+A, Ctrl+C')); }
+function imprimir(){ const h=document.getElementById('laudo-doc').innerHTML; const w=window.open('','_blank'); w.document.write(`<html><head><style>body{font-family:Arial;font-size:10pt;color:#000;line-height:1.6} .doc-titulo{text-align:center;font-weight:bold;margin-bottom:15px} .doc-label{font-weight:bold} .doc-p{margin-bottom:10px;text-align:justify} .conclusao-lista { margin: 0; padding: 0; list-style: none; } .conclusao-lista li { margin: 0; padding: 0; line-height: 1.4; text-align: justify; }</style></head><body>${h}</body></html>`); w.document.close(); w.print(); }
+function reiniciar(){ window.location.reload(); }
+
+showSection('clinico');
+</script>
+</body>
+</html>

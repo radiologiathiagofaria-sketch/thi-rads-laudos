@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THI-RADS - Máscaras Estruturadas</title>
+    <style>
+        :root {
+            --bg: #0a0f1e;
+            --card-bg: rgba(255,255,255,0.06);
+            --card-border: rgba(255,255,255,0.1);
+            --text-color: #e0e6f0;
+            --subtext-color: #b0b8c8;
+            --search-bg: rgba(255,255,255,0.08);
+            --search-border: rgba(255,255,255,0.15);
+            --glow: #4fc3f7;
+            --accent: #29b6f6;
+            --bar-bg: rgba(10,15,30,0.8);
+            --bar-text: #e0e6f0;
+            --bar-subtext: #b0b8c8;
+            --categoria-bg: rgba(79,195,247,0.1);
+            --categoria-text: #4fc3f7;
+        }
+        body.light-mode {
+            --bg: #f0f4f8;
+            --card-bg: rgba(255,255,255,0.7);
+            --card-border: rgba(0,0,0,0.1);
+            --text-color: #1a2a3a;
+            --subtext-color: #4a5568;
+            --search-bg: white;
+            --search-border: #cbd5e0;
+            --glow: #0288d1;
+            --accent: #0277bd;
+            --bar-bg: rgba(255,255,255,0.8);
+            --bar-text: #1a2a3a;
+            --bar-subtext: #4a5568;
+            --categoria-bg: rgba(2,136,209,0.08);
+            --categoria-text: #0288d1;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            background-image: 
+                radial-gradient(ellipse at 20% 50%, rgba(79,195,247,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(2,136,209,0.06) 0%, transparent 50%);
+            min-height: 100vh;
+            transition: background 0.5s, color 0.5s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            padding-top: 110px;
+            color: var(--text-color);
+        }
+
+        .top-logo {
+            position: fixed; top: 0; left: 0; width: 100%; height: 60px;
+            background: var(--bar-bg); backdrop-filter: blur(15px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            display: flex; justify-content: center; align-items: center; z-index: 1000;
+            gap: 6px; transition: background 0.5s;
+            border-bottom: 1px solid var(--card-border);
+        }
+        .logo-texto { font-size: 1.8em; font-weight: 700; color: var(--bar-text); letter-spacing: 2px; transition: color 0.5s; }
+        .logo-sub { font-size: 0.85em; font-weight: 400; color: var(--bar-subtext); margin-left: 4px; transition: color 0.5s; white-space: nowrap; }
+
+        .top-bar {
+            position: fixed; top: 80px; right: 20px; display: flex; gap: 12px; z-index: 1001;
+        }
+        .icon-btn {
+            background: var(--card-bg); backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border); border-radius: 50%;
+            width: 45px; height: 45px; font-size: 20px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-color); transition: all 0.3s;
+        }
+        .icon-btn:hover { background: var(--accent); color: white; border-color: var(--accent); transform: scale(1.08); }
+
+        .container { max-width: 1300px; width: 100%; }
+
+        h1 {
+            text-align: center; font-size: 2.5em; font-weight: 700;
+            background: linear-gradient(135deg, var(--glow), var(--accent));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; margin-bottom: 5px;
+        }
+        .subtitulo { text-align: center; color: var(--subtext-color); font-size: 1.1em; margin-bottom: 35px; }
+
+        .search-wrapper { display: flex; justify-content: center; margin-bottom: 45px; }
+        .search-input {
+            width: 100%; max-width: 550px; padding: 14px 24px;
+            font-size: 1.05em; border: 2px solid var(--search-border);
+            border-radius: 40px; background: var(--search-bg);
+            backdrop-filter: blur(10px); color: var(--text-color); outline: none;
+            transition: all 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .search-input:focus { border-color: var(--glow); box-shadow: 0 0 20px rgba(79,195,247,0.3); }
+        .search-input::placeholder { color: var(--subtext-color); opacity: 0.7; }
+
+        /* Categorias */
+        .categoria-secao { margin-bottom: 40px; }
+        .categoria-titulo {
+            font-size: 1.4em; font-weight: 700;
+            color: var(--categoria-text);
+            background: var(--categoria-bg);
+            padding: 8px 20px; border-radius: 30px;
+            display: inline-block; margin-bottom: 20px;
+            border: 1px solid var(--glow);
+            letter-spacing: 1px;
+        }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 25px;
+            justify-items: center;
+        }
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px; padding: 35px 20px;
+            width: 100%; cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+            text-align: center;
+            position: relative; overflow: hidden;
+            color: var(--text-color);
+        }
+        .card::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle at 50% 0%, var(--glow), transparent 70%);
+            opacity: 0; transition: opacity 0.4s;
+        }
+        .card:hover::before { opacity: 0.08; }
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: var(--glow);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 30px rgba(79,195,247,0.2);
+        }
+        .card-icone {
+            font-size: 3.5em; margin-bottom: 15px;
+            position: relative; z-index: 1;
+            filter: drop-shadow(0 0 8px rgba(79,195,247,0.5));
+        }
+        .card h3 {
+            font-size: 1.1em; font-weight: 600; margin: 0;
+            position: relative; z-index: 1;
+        }
+        .hidden { display: none; }
+
+        .logout-btn {
+            background: none; border: 2px solid var(--accent); color: var(--accent);
+            padding: 10px 24px; border-radius: 30px; cursor: pointer; font-weight: 600;
+            margin-top: 30px; transition: all 0.3s; display: inline-block;
+        }
+        .logout-btn:hover { background: var(--accent); color: white; }
+
+        @media (max-width: 600px) {
+            .cards-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 1.8em; }
+        }
+    </style>
+</head>
+<body>
+    <header class="top-logo">
+        <span class="logo-texto">THI-RADS</span>
+        <span class="logo-sub">Máscaras Estruturadas</span>
+    </header>
+    <div class="top-bar">
+        <button class="icon-btn" id="themeBtn" onclick="alternarTema()" title="Alternar tema">☀️</button>
+        <button class="icon-btn" onclick="window.location.href='selecao.html'" title="Voltar">🔙</button>
+        <button class="icon-btn" onclick="window.location.href='index.html'" title="Sair">🚪</button>
+    </div>
+
+    <div class="container">
+        <h1>THI-RADS</h1>
+        <p class="subtitulo">Laudos Estruturados em Ultrassonografia</p>
+
+        <div class="search-wrapper">
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar exame..." oninput="filtrarCards()">
+        </div>
+
+        <div id="categoriasContainer">
+            <!-- Categorias geradas dinamicamente -->
+        </div>
+
+        <div style="text-align:center;">
+            <button class="logout-btn" onclick="window.location.href='selecao.html'">⬅ Voltar para seleção</button>
+        </div>
+    </div>
+
+    <script>
+        // Categorias com ícones e exames
+        const categorias = [
+            {
+                nome: "Abdome",
+                exames: [
+                    { nome: "ABDOME SUPERIOR", icone: "🫁" },
+                    { nome: "ABDOME TOTAL", icone: "🔬" },
+                    { nome: "PAREDE ABDOMINAL", icone: "📐" }
+                ]
+            },
+            {
+                nome: "Aparelho Urinário",
+                exames: [
+                    { nome: "APARELHO URINÁRIO", icone: "💧" }
+                ]
+            },
+            {
+                nome: "Obstétrico",
+                exames: [
+                    { nome: "OBSTÉTRICO 1 TRIMESTRE", icone: "🤰" },
+                    { nome: "OBSTÉTRICO 2/3 TRIMESTRE", icone: "👶" },
+                    { nome: "OBSTÉTRICO COM DOPPLER", icone: "💓" }
+                ]
+            },
+            {
+                nome: "Pélvico / Ginecológico",
+                exames: [
+                    { nome: "PÉLVICO ABDOMINAL", icone: "🩻" },
+                    { nome: "TRANSVAGINAL", icone: "🌺" }
+                ]
+            },
+            {
+                nome: "Bolsa Escrotal",
+                exames: [
+                    { nome: "BOLSA ESCROTAL", icone: "🔵" },
+                    { nome: "BOLSA ESCROTAL COM DOPPLER", icone: "⚡" }
+                ]
+            },
+            {
+                nome: "Vascular",
+                exames: [
+                    { nome: "CARÓTIDAS", icone: "❤️" },
+                    { nome: "TVP MEMBROS INF", icone: "🦿" }
+                ]
+            },
+            {
+                nome: "Cervical / Linfonodos",
+                exames: [
+                    { nome: "CERVICAL", icone: "🧬" },
+                    { nome: "CERVICAL LINFONODOS", icone: "🦠" }
+                ]
+            },
+            {
+                nome: "Glândulas",
+                exames: [
+                    { nome: "TIREOIDE", icone: "🦋" },
+                    { nome: "GLÂNDULAS SALIVARES", icone: "💠" }
+                ]
+            },
+            {
+                nome: "Mamas",
+                exames: [
+                    { nome: "MAMAS", icone: "🌸" },
+                    { nome: "MAMAS E AXILAS", icone: "🎀" }
+                ]
+            },
+            {
+                nome: "Partes Moles",
+                exames: [
+                    { nome: "PARTES MOLES", icone: "🦵" }
+                ]
+            }
+        ];
+
+        const container = document.getElementById("categoriasContainer");
+
+        function criarCategorias() {
+            container.innerHTML = "";
+            categorias.forEach(categoria => {
+                const secao = document.createElement("div");
+                secao.className = "categoria-secao";
+                secao.innerHTML = `<div class="categoria-titulo">${categoria.nome}</div>`;
+
+                const grid = document.createElement("div");
+                grid.className = "cards-grid";
+
+                categoria.exames.forEach(exame => {
+                    const card = document.createElement("div");
+                    card.className = "card";
+                    card.setAttribute("data-exame", exame.nome);
+                    card.innerHTML = `
+                        <div class="card-icone">${exame.icone}</div>
+                        <h3>${exame.nome}</h3>
+                    `;
+                    card.onclick = () => abrirLaudo(exame.nome);
+                    grid.appendChild(card);
+                });
+
+                secao.appendChild(grid);
+                container.appendChild(secao);
+            });
+        }
+
+        function abrirLaudo(exame) {
+            if (exame === 'OBSTÉTRICO 1 TRIMESTRE') {
+                window.location.href = 'app-obstetrico.html?modo=inicial';
+            } else if (exame === 'OBSTÉTRICO 2/3 TRIMESTRE') {
+                window.location.href = 'app-obstetrico.html?modo=sem-doppler';
+            } else if (exame === 'OBSTÉTRICO COM DOPPLER') {
+                window.location.href = 'app-obstetrico.html?modo=doppler';
+            } else if (exame === 'ABDOME TOTAL') {
+                window.location.href = 'acrescente/abdome-total_elite (2).html';
+            } else if (exame === 'ABDOME SUPERIOR') {
+                window.location.href = 'acrescente/abdome_superior_elite.html';
+            } else if (exame === 'TRANSVAGINAL') {
+                window.location.href = 'acrescente/ustransvaginal.html';
+            } else {
+                alert('O módulo para "' + exame + '" está em desenvolvimento e estará disponível em breve!');
+            }
+        }
+
+        function filtrarCards() {
+            const termo = document.getElementById("searchInput").value.toLowerCase().trim();
+            const secoes = document.querySelectorAll(".categoria-secao");
+            secoes.forEach(secao => {
+                const cards = secao.querySelectorAll(".card");
+                let algumVisivel = false;
+                cards.forEach(card => {
+                    const nomeExame = card.getAttribute("data-exame").toLowerCase();
+                    if (nomeExame.includes(termo)) {
+                        card.classList.remove("hidden");
+                        algumVisivel = true;
+                    } else {
+                        card.classList.add("hidden");
+                    }
+                });
+                secao.classList.toggle("hidden", !algumVisivel);
+            });
+        }
+
+        // Tema (padrão escuro)
+        const body = document.body;
+        const themeBtn = document.getElementById("themeBtn");
+        const temaSalvo = localStorage.getItem("tema-thirads") || "dark";
+        if (temaSalvo === "light") {
+            body.classList.add("light-mode");
+            themeBtn.textContent = "🌙";
+        } else {
+            themeBtn.textContent = "☀️";
+        }
+        function alternarTema() {
+            body.classList.toggle("light-mode");
+            if (body.classList.contains("light-mode")) {
+                localStorage.setItem("tema-thirads", "light");
+                themeBtn.textContent = "🌙";
+            } else {
+                localStorage.setItem("tema-thirads", "dark");
+                themeBtn.textContent = "☀️";
+            }
+        }
+
+        criarCategorias();
+    </script>
+</body>
+</html>

@@ -1,0 +1,2433 @@
+APARELHO URINÁRIO
+
+MÁSCARA PADRÃO (LAUDO NORMAL):
+ULTRASSONOGRAFIA DO APARELHO URINÁRIO
+
+TÉCNICA:
+Exame realizado em aparelho dinâmico com transdutor convexo por via abdominal.
+
+ANÁLISE:
+Rins em topografia habitual, com dimensões usuais e contornos regulares. Parênquima com espessura preservada e diferenciação corticomedular mantida. Não há evidências de cálculos calicinais. Ausência de hidronefrose.
+
+Bexiga com distensão adequada, apresentando contornos regulares, parede com espessura normal e conteúdo homogêneo.
+
+OPINIÃO DO RELATÓRIO:
+Estudo ecográfico sem evidentes anormalidades apreciáveis ao método.
+
+<script>
+    document.title = "Laudário | US Aparelho Urinário";
+    var nomeExame = "US Aparelho Urinário";
+</script>
+<div class="d-flex gap-0 align-items-stretch" style="height: calc(100vh - 54px);">
+    <div class="nav nav-pills pt-2 pb-4" id="pillsLaudoAutomatico" role="tablist" aria-orientation="vertical" style="width: 240px; height:auto; overflow-y: auto;">
+        <div class="nav-link nav-link-laudo fs--1 pb-1 px-0">
+            <div class="fs--2 opacity-75">Ultrassonografia</div>
+            <div class="fs-0 bold">Aparelho Urinário</div>
+        </div>
+        <button class="nav-link nav-link-laudo fs--1 py-1" id="tabDadosPaciente" data-bs-toggle="pill" data-bs-target="#contentDadosPaciente" type="button" role="tab" aria-controls="contentDadosPaciente" aria-selected="false">Dados do Paciente</button>
+        <button class="nav-link nav-link-laudo fs--1 py-1" id="tabTecnica" data-bs-toggle="pill" data-bs-target="#contentTecnica" type="button" role="tab" aria-controls="contentTecnica" aria-selected="false">Técnica</button>
+        <button class="nav-link nav-link-laudo fs--1 py-1 active" id="tabRins" data-bs-toggle="pill" data-bs-target="#contentRins" type="button" role="tab" aria-controls="contentRins" aria-selected="false">Rins e Ureteres</button>
+        <button class="nav-link nav-link-laudo fs--1 py-1" id="tabBexiga" data-bs-toggle="pill" data-bs-target="#contentBexiga" type="button" role="tab" aria-controls="contentBexiga" aria-selected="false">Bexiga</button>
+        <button class="nav-link nav-link-laudo fs--1 py-1" id="tabAchados" data-bs-toggle="pill" data-bs-target="#contentAchados" type="button" role="tab" aria-controls="contentAchados" aria-selected="false">Achados Adicionais</button>
+    </div>
+    <div class="tab-content overflow-y px-1 bg-white" id="tabsLaudoAutomatico" style="overflow-x:hidden; width: 100%; -webkit-box-shadow: -4px 0px 5px 0px rgba(0,0,0,0.05); -moz-box-shadow: -4px 0px 5px 0px rgba(0,0,0,0.05); box-shadow: -4px 0px 5px 0px rgba(0,0,0,0.05);">
+        <div class="tab-pane show" id="contentDadosPaciente" role="tabpanel" aria-labelledby="tabDadosPaciente">
+            <div class="p-2">
+    <h4 class="title-laudo px-2 pt-1">Dados do Paciente</h4>
+    <h5 class="bold px-2 pb-1 pt-1">Dados do paciente</h5>
+    <div class="row px-2 pb-2 mb-2">
+        <label class="option-border">
+            <span>
+                <span style="width: 150px; display: inline-block;">nome completo:</span>
+                <input class="form-control-small" id="inputPacNome" type="text" value="" style="width:calc(100% - 200px); text-transform:uppercase;" />
+            </span>
+        </label>
+        <label class="option-border">
+            <span>
+                <span style="width:150px; display:inline-block;">data de nascimento:</span>
+                <input class="form-control-small" id="inputPacDN" type="text" value="" style="width:calc(100% - 200px)" />
+            </span>
+        </label>
+        <label class="option-border">
+            <span>
+                <span style="width: 150px; display: inline-block;">sexo:</span>
+                <select class="form-select-small" id="selectPacSexo" style="width:calc(100% - 200px); display:inline-block;">
+                    <option value="O" selected>não informar</option>
+                    <option value="M">masculino</option>
+                    <option value="F">feminino</option>
+                </select>
+            </span>
+        </label>
+        <label class="option-border">
+            <span>
+                <span style="width: 150px; display: inline-block;">convênio:</span>
+                <input class="form-control-small" id="inputPacConvenio" type="text" value="" style="width:calc(100% - 200px); text-transform:uppercase;" />
+            </span>
+        </label>
+        <label class="option-border">
+            <span>
+                <span style="width: 150px; display: inline-block;">médico solicitante:</span>
+                <input class="form-control-small" id="inputPacMedicoSolicitante" type="text" value="" style="width:calc(100% - 200px); text-transform:uppercase;" />
+            </span>
+        </label>
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkPacProximoExame" type="checkbox" />
+                </div>
+                próximo exame também será deste paciente
+            </span>
+        </label>
+    </div>
+</div>
+<script>
+    $('#inputPacDN').mask('00/00/0000');
+
+    $('#checkPacProximoExame').change(function() {
+        if ($(this).is(':checked')) {
+            localStorage.setItem('laudario-pacienteNome', $('#inputPacNome').val());
+            localStorage.setItem('laudario-pacienteDN', $('#inputPacDN').val());
+            localStorage.setItem('laudario-pacienteSexo', $('#selectPacSexo').val());
+            localStorage.setItem('laudario-pacienteConvenio', $('#inputPacConvenio').val());
+            localStorage.setItem('laudario-pacienteMedicoSolicitante', $('#inputPacMedicoSolicitante').val());
+        } else {
+            localStorage.removeItem('laudario-pacienteNome');
+            localStorage.removeItem('laudario-pacienteDN');
+            localStorage.removeItem('laudario-pacienteSexo');
+            localStorage.removeItem('laudario-pacienteConvenio');
+            localStorage.removeItem('laudario-pacienteMedicoSolicitante');
+        }
+    });
+
+    if (localStorage.getItem('laudario-pacienteNome')) {
+        $('#inputPacNome').val(localStorage.getItem('laudario-pacienteNome'));
+        $('#inputPacDN').val(localStorage.getItem('laudario-pacienteDN'));
+        $('#selectPacSexo').val(localStorage.getItem('laudario-pacienteSexo'));
+        $('#inputPacConvenio').val(localStorage.getItem('laudario-pacienteConvenio'));
+        $('#inputPacMedicoSolicitante').val(localStorage.getItem('laudario-pacienteMedicoSolicitante'));
+        $('#checkPacProximoExame').prop('checked', true);
+    }
+</script>        </div>
+        <div class="tab-pane" id="contentTecnica" role="tabpanel" aria-labelledby="tabTecnica">
+            <div class="p-2">
+    <h4 class="title-laudo px-2 pt-1">Técnica</h4>
+        <h5 class="bold px-2 pb-1 pt-1">Aparelho</h5>
+<div class="row px-2 pb-2 mb-2 border-bottom rgAparelho">
+    <label class="option-border option-checked">
+        <span class="form-label">
+            <div class="box-container">
+                <input class="form-check-input" id="checkApaMod0" type="radio" name="checkAparelho[]" value="nc" onclick="setarAparelho(0);" />
+            </div>
+            não citar
+        </span>
+    </label>
+    <div class="row" id="div-aparelhos">
+
+    </div>
+</div>
+<h5 class="bold px-2 pb-1 pt-1">Sonda</h5>
+<div class="row px-2 pb-2 mb-2 border-bottom rgSonda">
+    <label class="option-border">
+        <span class="form-label">
+            <div class="box-container">
+                <input class="form-check-input" id="checkApaSonNC" type="radio" value="nc" name="checkSonda[]" />
+            </div>
+            não citar
+        </span>
+    </label>
+    <label class="option-border option-checked">
+        <span class="form-label">
+            <div class="box-container">
+                <input class="form-check-input" id="checkApaSonCon" type="radio" checked name="checkSonda[]" value="convexa" />
+            </div>
+            sonda convexa via abdominal
+        </span>
+    </label>
+</div>
+<script>
+    radioGroup('rgAparelho');
+    radioGroup('rgSonda');
+    
+    for (var i = 0; i < aparelhos.length; i++) {
+        $('#div-aparelhos').append(`
+            <label class="option-border">
+                <span class="form-label">
+                    <div class="box-container">
+                        <input class="form-check-input" id="checkApaMod${aparelhos[i].id}" type="radio" name="checkAparelho[]" value="${aparelhos[i].id}" aria-marca="${aparelhos[i].marca}" aria-modelo="${aparelhos[i].modelo}" onclick="setarAparelho(${aparelhos[i].id}, '${aparelhos[i].marca}', '${aparelhos[i].modelo}');" />
+                    </div>
+                    ${aparelhos[i].local} (${aparelhos[i].marca} ${aparelhos[i].modelo})
+                </span>
+            </label>
+        `);
+    }
+
+    function setarAparelho(id, marca, modelo) {
+        if (id == 0) {
+            localStorage.removeItem('laudario-aparelho');
+            localStorage.removeItem('laudario-aparelhoTexto');
+            $('#topAparelho').attr('title', 'Aparelho não configurado!');
+        } else {
+            localStorage.setItem('laudario-aparelho', id);
+            localStorage.setItem('laudario-aparelhoTexto', marca + " " + modelo);
+            $('#topAparelho').attr('title', marca + " " + modelo);
+        }
+    }
+
+    if (!localStorage.getItem('laudario-aparelho') || aparelhos.length == 0) {
+        $('#checkApaMod0').prop('checked', true);
+    } else {
+        var id = localStorage.getItem('laudario-aparelho');
+        if ($('#checkApaMod' + id).length > 0) {
+            //$('#checkApaMod' + id).prop('checked', true);
+            $('#checkApaMod' + id).click();
+        } else {
+            $('#checkApaMod0').prop('checked', true);
+        }
+    }
+
+    $('input[id*="checkApa"').on('change', function() {
+        setTimeout(function() {
+            montarLaudo(CKEDITOR.instances['editor']);
+        }, 10);
+    });
+    $('input[type="text"]').on('change, keyup', function() {
+        montarLaudo(CKEDITOR.instances['editor']);
+    });
+
+    function laudoAparelho() {
+        const formulario = {
+            aparelho: $('input[name="checkAparelho[]"]:checked').val(),
+            sonda: $('input[name="checkSonda[]"]:checked').val(),
+        };
+
+        let relatorio = "";
+        if (formulario.aparelho !== "nc" || formulario.sonda !== "nc") {
+            relatorio += "Exame realizado em aparelho dinâmico";
+            if (formulario.aparelho !== "nc" && formulario.sonda !== "nc") {
+                relatorio += ` marca ${$('input[name="checkAparelho[]"]:checked').attr('aria-marca')}, modelo ${$('input[name="checkAparelho[]"]:checked').attr('aria-modelo')}, com transdutor convexo por via abdominal.<br><br>`;
+            } else if (formulario.aparelho !== "nc" && formulario.sonda == "nc") {
+                relatorio += ` marca ${$('input[name="checkAparelho[]"]:checked').attr('aria-marca')}, modelo ${$('input[name="checkAparelho[]"]:checked').attr('aria-modelo')}.<br><br>`;
+            } else if (formulario.aparelho == "nc" && formulario.sonda !== "nc") {
+                relatorio += ` com transdutor convexo por via abdominal.<br><br>`;
+            }
+        }
+
+        return relatorio;
+    }
+
+    if (json.citarSonda == true) {
+        $('#checkApaSonCon').click();
+    }
+</script>    <h5 class="bold px-2 pb-1 pt-1">Indicações mais comuns</h5>
+<div class="row px-2 pb-2 mb-2 border-bottom rgIndicacoes">
+    <label class="option-border option-checked">
+        <span class="form-label">
+            <div class="box-container">
+                <input class="form-check-input" id="checkIndNC" type="radio" checked name="checkIndicacoes[]" />
+            </div>
+            não citar
+        </span>
+    </label>
+    <label class="option-border">
+        <span class="form-label">
+            <div class="box-container">
+                <input class="form-check-input" id="checkInd1" type="radio" name="checkIndicacoes[]" />
+            </div>
+            dor abdominal
+        </span>
+    </label>
+    <label class="option-border">
+        <span class="form-label">
+            <div class="box-container">
+                <input class="form-check-input" id="checkInd2" type="radio" name="checkIndicacoes[]" />
+            </div>
+            colecistite
+        </span>
+    </label>
+    <label class="option-border">
+        <span class="form-label">
+            <div class="box-container">
+                <input class="form-check-input" id="checkInd3" type="radio" name="checkIndicacoes[]" />
+            </div>
+            colelitíase
+        </span>
+    </label>
+    <label class="option-border">
+        <span class="form-label">
+            <div class="box-container">
+                <input class="form-check-input" id="checkIndOutros" type="radio" name="checkIndicacoes[]" />
+            </div>
+            outra indicação:
+            <input class="form-control-small" id="inputIndOutros" type="text" value="" disabled style="width:calc(100% - 200px)" />
+        </span>
+    </label>
+</div>
+<script>
+    radioGroup('rgIndicacoes');
+
+    function checkCamposIndicacao() {
+        var arrayCheckboxes = [
+            '#checkIndOutros',
+        ];
+        var arrayCampos = [
+            ['#inputIndOutros'],
+        ];
+        for (var i = 0; i < arrayCheckboxes.length; i++) {
+            var campos = arrayCampos[i];
+            for (var k = 0; k < campos.length; k++) {
+                if ($(arrayCheckboxes[i]).is(':checked')) {
+                    $(campos[k]).attr('disabled', false);
+                } else {
+                    $(campos[k]).attr('disabled', true);
+                }
+            }
+        }
+    }
+
+    $('input[id*="checkInd"], input[id*="checkSon"').on('change', function() {
+        setTimeout(function() {
+            checkCamposIndicacao();
+            montarLaudo(CKEDITOR.instances['editor']);
+        }, 10);
+    });
+    $('input[type="text"]').on('change, keyup', function() {
+        montarLaudo(CKEDITOR.instances['editor']);
+    });
+
+    function laudoIndicacao() {
+        const formulario = {
+            indnc: $('#checkIndNC').is(':checked'),
+            dorAbdominal: $('#checkInd1').is(':checked'),
+            colecistite: $('#checkInd2').is(':checked'),
+            colelitiase: $('#checkInd3').is(':checked'),
+            outros: $('#checkIndOutros').is(':checked'),
+        };
+
+        let relatorio = "";
+        if (formulario.indnc == true) {
+            relatorio += "";
+        }
+        if (formulario.indnc == false && formulario.sondanc == false) {
+            relatorio += "<br><br>";
+        }
+        if (formulario.indnc == false) {
+            relatorio += "<b>INDICAÇÃO:</b><br>";
+            if (formulario.dorAbdominal) {
+                relatorio += "Dor abdominal.";
+            } else if (formulario.colecistite) {
+                relatorio += 'Suspeita de colecistite.';
+            } else if (formulario.colelitiase) {
+                relatorio += 'Suspeita de colelitíase.';
+            } else if (formulario.outros) {
+                relatorio += $('#inputIndOutros').val();
+            }
+        }
+        if (formulario.indnc == false) {
+            relatorio += "<br><br>";
+        }
+
+        return relatorio;
+    }
+</script>    <h5 class="bold px-2 pb-1 pt-1">Limitações mais comuns</h5>
+<div class="row px-2 pb-2 mb-2 rgLimitacoes">
+    <label class="option-border">
+        <span class="form-label">
+            <div class="box-container">
+                <input class="form-check-input" id="checkLimMet" type="checkbox" name="checkIndicacoes[]" />
+            </div>
+            meteorismo intestinal
+        </span>
+    </label>
+    <label class="option-border">
+        <span class="form-label">
+            <div class="box-container">
+                <input class="form-check-input" id="checkLimBio" type="checkbox" name="checkIndicacoes[]" />
+            </div>
+            biotipo (obesidade)
+        </span>
+    </label>
+    <label class="option-border">
+        <span class="form-label">
+            <div class="box-container">
+                <input class="form-check-input" id="checkLimPos" type="checkbox" name="checkIndicacoes[]" />
+            </div>
+            limitações de posicionamento
+        </span>
+    </label>
+</div>
+<script>
+    checkGroup('rgLimitacoes');
+
+    $('input[id*="checkLim"]').on('change', function() {
+        setTimeout(function() {
+            montarLaudo(CKEDITOR.instances['editor']);
+        }, 10);
+    });
+
+    var limitacoes = [];
+
+    function laudoLimitacoes() {
+        limitacoes = [];
+        const meteorismo = $('#checkLimMet').is(':checked');
+        const biotipo = $('#checkLimBio').is(':checked');
+        const posicionamento = $('#checkLimPos').is(':checked');
+
+        if (meteorismo) {
+            limitacoes.push('por distensão gasosa intestinal');
+        }
+        if (biotipo) {
+            limitacoes.push('pela atenuação do feixe acústico inerente ao biotipo');
+        }
+        if (posicionamento) {
+            limitacoes.push('devido restrições de posicionamento e cooperação');
+        }
+
+        let frase = laudoAparelho();
+        if (limitacoes.length > 0) {
+            if (frase == "") {
+                frase = "Exame limitado parcialmente ";
+            } else {
+                frase = frase.slice(0,-9) + ", limitado parcialmente ";
+            }
+            if (limitacoes.length == 1) {
+                frase += limitacoes[0];
+            } else if (limitacoes.length == 2) {
+                frase += limitacoes[0] + " e " + limitacoes[1];
+            } else {
+                frase += limitacoes[0] + ", " + limitacoes[1] + " e " + limitacoes[2];
+            }
+            frase += ".<br><br>";
+        }
+
+        return frase;
+    }
+</script></div>        </div>
+        <div class="tab-pane show active" id="contentRins" role="tabpanel" aria-labelledby="tabRins">
+            <div class="p-2">
+    <h4 class="title-laudo px-2 pt-1">Rins e Ureteres</h4>
+    <h5 class="bold px-2 pb-1 pt-1">Situação</h5>
+    <div class="row px-2 pb-2 mb-2 border-bottom rgRinsSituacao">
+        <label class="option-border option-checked">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkRinsSitHab" type="radio" checked value="habitual" name="checkRinsSituacao[]" />
+                </div>
+                habituais
+            </span>
+        </label>
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkRinsSitEct" type="radio" value="ectopico" name="checkRinsSituacao[]" />
+                </div>
+                ectópico
+                <select class="form-select-small" id="inputRinsSitEct" disabled>
+                    <option value="direita">à direita</option>
+                    <option value="esquerda">à esquerda</option>
+                </select>
+                , localizado
+                <select class="form-select-small" id="inputRinsSitEctLoc" disabled>
+                    <option value="fossa">em fossa ilíaca</option>
+                    <option value="pelve">na pelve</option>
+                </select>
+            </span>
+        </label>
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkRinsSitFer" type="radio" value="ferradura" name="checkRinsSituacao[]" />
+                </div>
+                em ferradura
+            </span>
+        </label>
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkRinsSitDrp" type="radio" value="drpad" name="checkRinsSituacao[]" />
+                </div>
+                doença renal policística autossômica dominante
+            </span>
+            <span class="form-label">
+                <label>maior cisto localizado em</label>
+                <select class="form-select-small" id="inputRinsSitDrpLoc1" disabled>
+                    <option value="superior">terço superior</option>
+                    <option value="medio">terço médio</option>
+                    <option value="inferior">terço inferior</option>
+                </select>
+                <select class="form-select-small" id="inputRinsSitDrpLoc2" disabled>
+                    <option value="direito">do rim direito</option>
+                    <option value="esquerdo">do rim esquerdo</option>
+                </select>
+            </span>
+            <span class="form-label">
+                <label for="checkRinsSitDrp">medindo</label>
+                <input class="form-control-small" id="inputRinsSitDrpMed" type="number" value="" disabled />
+                <label for="checkRinsSitDrp">cm</label>
+            </span>
+        </label>
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkRinsSitInc" type="radio" value="incipiente" name="checkRinsSituacao[]" />
+                </div>
+                insuficiência renal incipiente
+                <select class="form-select-small" id="inputRinsSitInc" disabled>
+                    <option value="direita">à direita</option>
+                    <option value="esquerda">à esquerda</option>
+                    <option value="bilateral">bilateral</option>
+                </select>
+            </span>
+        </label>
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkRinsSitAgu" type="radio" value="aguda" name="checkRinsSituacao[]" />
+                </div>
+                nefropatia aguda
+                <select class="form-select-small" id="inputRinsSitAgu" disabled>
+                    <option value="direita">à direita</option>
+                    <option value="esquerda">à esquerda</option>
+                    <option value="bilateral">bilateral</option>
+                </select>
+            </span>
+        </label>
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkRinsSitCro" type="radio" value="cronica" name="checkRinsSituacao[]" />
+                </div>
+                nefropatia crônica
+                <select class="form-select-small" id="inputRinsSitCro" disabled>
+                    <option value="direita">à direita</option>
+                    <option value="esquerda">à esquerda</option>
+                    <option value="bilateral">bilateral</option>
+                </select>
+            </span>
+        </label>
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkRinsSitDir" type="checkbox" />
+                </div>
+                nefrectomia à direita
+            </span>
+        </label>
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkRinsSitEsq" type="checkbox" />
+                </div>
+                nefrectomia à esquerda
+            </span>
+        </label>
+    </div>
+    <h5 class="bold px-2 pb-1 pt-1">Rim direito</h5>
+    <div class="row px-2 pb-2 mb-2 border-bottom">
+        <label class="option-border">
+            <span>
+                <label>medidas:</label>
+                <input class="form-control-small" id="inputRinsDimDL" type="number" />
+                <label>x</label>
+                <input class="form-control-small" id="inputRinsDimDAP" type="number" />
+                <label>x</label>
+                <input class="form-control-small" id="inputRinsDimDT" type="number" />
+                <label>cm (<span id="spanVolD">0,0 cm³</span>)</label>
+            </span>
+        </label>
+        <label class="option-border">
+            <span>
+                <label for="checkRinsDimDP" style="width: 90px;">parênquima:</label>
+                <input class="form-control-small" id="inputRinsDimDP" type="number" />
+                <label for="checkRinsDimDP">cm</label>
+            </span>
+        </label>
+    </div>
+    <h5 class="bold px-2 pb-1 pt-1">Rim esquerdo</h5>
+    <div class="row px-2 pb-2 mb-2 border-bottom">
+        <label class="option-border">
+            <span>
+                <label>medidas:</label>
+                <input class="form-control-small" id="inputRinsDimEL" type="number" />
+                <label>x</label>
+                <input class="form-control-small" id="inputRinsDimEAP" type="number" />
+                <label>x</label>
+                <input class="form-control-small" id="inputRinsDimET" type="number" />
+                <label>cm (<span id="spanVolE">0,0 cm³</span>)</label>
+            </span>
+        </label>
+        <label class="option-border">
+            <span>
+                <label>parênquima:</label>
+                <input class="form-control-small" id="inputRinsDimEP" type="number" />
+                <label>cm</label>
+            </span>
+        </label>
+    </div>
+        <h5 class="bold px-2 pb-1 pt-1">Cálculos</h5>
+    <div class="row px-2 pb-2 mb-2 border-bottom rgRinsCalculos">
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkRinsCal1" type="checkbox" />
+                </div>
+                cálculo 1:
+                <input class="form-control-small" id="inputRinsCal1Med" type="number" disabled />
+                <label for="checkRinsCal1">cm, </label>
+                <select class="form-select-small" id="inputRinsCal1Loc" disabled>
+                    <option value="calicinalsuperior">terço superior</option>
+                    <option value="calicinalmedio">terço médio</option>
+                    <option value="calicinalinferior">terço inferior</option>
+                    <option value="jup">junção ureteropiélica</option>
+                    <option value="juv">junção ureterovesical</option>
+                    <option value="ureterproximal">ureter proximal</option>
+                    <option value="uretermedio">ureter médio</option>
+                    <option value="ureterdistal">ureter distal</option>
+                </select>
+                <select class="form-select-small" id="inputRinsCal1Rim" disabled>
+                    <option value="direita">rim direito</option>
+                    <option value="esquerda">rim esquerdo</option>
+                </select>
+            </span>
+        </label>
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkRinsCal2" type="checkbox" />
+                </div>
+                cálculo 2:
+                <input class="form-control-small" id="inputRinsCal2Med" type="number" disabled />
+                <label for="checkRinsCal2">cm, </label>
+                <select class="form-select-small" id="inputRinsCal2Loc" disabled>
+                    <option value="calicinalsuperior">terço superior</option>
+                    <option value="calicinalmedio">terço médio</option>
+                    <option value="calicinalinferior">terço inferior</option>
+                    <option value="jup">junção ureteropiélica</option>
+                    <option value="juv">junção ureterovesical</option>
+                    <option value="ureterproximal">ureter proximal</option>
+                    <option value="uretermedio">ureter médio</option>
+                    <option value="ureterdistal">ureter distal</option>
+                </select>
+                <select class="form-select-small" id="inputRinsCal2Rim" disabled>
+                    <option value="direita">rim direito</option>
+                    <option value="esquerda">rim esquerdo</option>
+                </select>
+            </span>
+        </label>
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkRinsCal3" type="checkbox" />
+                </div>
+                cálculo 3:
+                <input class="form-control-small" id="inputRinsCal3Med" type="number" disabled />
+                <label for="checkRinsCal3">cm, </label>
+                <select class="form-select-small" id="inputRinsCal3Loc" disabled>
+                    <option value="calicinalsuperior">terço superior</option>
+                    <option value="calicinalmedio">terço médio</option>
+                    <option value="calicinalinferior">terço inferior</option>
+                    <option value="jup">junção ureteropiélica</option>
+                    <option value="juv">junção ureterovesical</option>
+                    <option value="ureterproximal">ureter proximal</option>
+                    <option value="uretermedio">ureter médio</option>
+                    <option value="ureterdistal">ureter distal</option>
+                </select>
+                <select class="form-select-small" id="inputRinsCal3Rim" disabled>
+                    <option value="direita">rim direito</option>
+                    <option value="esquerda">rim esquerdo</option>
+                </select>
+            </span>
+        </label>
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkRinsCal4" type="checkbox" />
+                </div>
+                cálculo 4:
+                <input class="form-control-small" id="inputRinsCal4Med" type="number" disabled />
+                <label for="checkRinsCal4">cm, </label>
+                <select class="form-select-small" id="inputRinsCal4Loc" disabled>
+                    <option value="calicinalsuperior">terço superior</option>
+                    <option value="calicinalmedio">terço médio</option>
+                    <option value="calicinalinferior">terço inferior</option>
+                    <option value="jup">junção ureteropiélica</option>
+                    <option value="juv">junção ureterovesical</option>
+                    <option value="ureterproximal">ureter proximal</option>
+                    <option value="uretermedio">ureter médio</option>
+                    <option value="ureterdistal">ureter distal</option>
+                </select>
+                <select class="form-select-small" id="inputRinsCal4Rim" disabled>
+                    <option value="direita">rim direito</option>
+                    <option value="esquerda">rim esquerdo</option>
+                </select>
+            </span>
+        </label>
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkRinsCalMul" type="checkbox" />
+                </div>
+                vários bilaterais, o maior medindo
+                <input class="form-control-small" id="inputRinsCalMulMed" type="number" disabled />
+                <label for="checkRinsCalMul">cm</label>
+            </span>
+            <span class="form-label">
+                <label for="checkRinsCalMul">localizado em</label>
+                <select class="form-select-small" id="inputRinsCalMulLoc" disabled>
+                    <option value="calicinalsuperior">terço superior</option>
+                    <option value="calicinalmedio">terço médio</option>
+                    <option value="calicinalinferior">terço inferior</option>
+                    <option value="jup">junção ureteropiélica</option>
+                    <option value="juv">junção ureterovesical</option>
+                    <option value="ureterproximal">ureter proximal</option>
+                    <option value="uretermedio">ureter médio</option>
+                    <option value="ureterdistal">ureter distal</option>
+                </select>
+                <select class="form-select-small" id="inputRinsCalMulRim" disabled>
+                    <option value="direita">rim direito</option>
+                    <option value="esquerda">rim esquerdo</option>
+                </select>
+            </span>
+        </label>
+    </div>
+    <h5 class="bold px-2 pb-1 pt-1">Cistos</h5>
+    <div class="row px-2 pb-2 mb-2 border-bottom">
+        <div id="div-rins-cistos">
+
+        </div>
+        <div>
+            <button class="btn btn-sm btn-primary" id="botaoCistoRenal" onclick="$('#modalCistoRenal').modal('show');"><i class="fa fa-fw fa-plus"></i> Adicionar cisto</button>
+        </div>
+    </div>
+    <h5 class="bold px-2 pb-1 pt-1">Nódulos</h5>
+    <div class="row px-2 pb-2 mb-2 border-bottom">
+        <div id="div-rins-nodulos">
+
+        </div>
+        <div>
+            <button class="btn btn-sm btn-primary" id="botaoNoduloRenal" onclick="$('#modalNoduloRenal').modal('show');"><i class="fa fa-fw fa-plus"></i> Adicionar nódulo</button>
+        </div>
+    </div>
+    <h5 class="bold px-2 pb-1 pt-1">Dilatação à direita</h5>
+    <div class="row px-2 pb-2 mb-2 border-bottom rgRinsDilDir">
+        <label class="option-border option-checked">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkRinsDilDAus" type="radio" checked value="ausente" name="checkRinsDilatacaoD[]" />
+                </div>
+                ausente
+            </span>
+        </label>
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkRinsDilDPre" type="radio" value="presente" name="checkRinsDilatacaoD[]" />
+                </div>
+                dilatação pielocalicial
+                <select class="form-select-small" id="inputRinsDilDPre" disabled>
+                    <option value="discreta">discreta</option>
+                    <option value="moderada">moderada</option>
+                    <option value="acentuada">acentuada</option>
+                </select>
+            </span>
+            <span class="form-label subitem">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkRinsDilDUre" type="checkbox" disabled />
+                </div>
+                <label for="checkRinsDilDUre">dilatação ureteral</label>
+            </span>
+        </label>
+    </div>
+    <h5 class="bold px-2 pb-1 pt-1">Dilatação à esquerda</h5>
+    <div class="row px-2 pb-2 mb-2 rgRinsDilEsq">
+        <label class="option-border option-checked">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkRinsDilEAus" type="radio" checked value="ausente" name="checkRinsDilatacaoE[]" />
+                </div>
+                ausente
+            </span>
+        </label>
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkRinsDilEPre" type="radio" value="presente" name="checkRinsDilatacaoE[]" />
+                </div>
+                dilatação pielocalicial
+                <select class="form-select-small" id="inputRinsDilEPre" disabled>
+                    <option value="discreta">discreta</option>
+                    <option value="moderada">moderada</option>
+                    <option value="acentuada">acentuada</option>
+                </select>
+            </span>
+            <span class="form-label subitem">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkRinsDilEUre" type="checkbox" disabled />
+                </div>
+                <label for="checkRinsDilEUre">dilatação ureteral</label>
+            </span>
+        </label>
+    </div>
+</div>
+<div class="modal fade" id="modalCistoRenal" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" aria-labelledby="modalCistoRenalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content border-0">
+            <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
+                <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="bg-light rounded-top-lg py-3 ps-4 pe-6">
+                    <h4 class="mb-1" id="modalCistoRenalLabel">Adicionar cisto renal</h4>
+                    <p class="fs--2 mb-0">Preencha os campos abaixo para adicionar um cisto.</p>
+                </div>
+                <div class="px-4 py-3">
+                    <div class="alert alert-danger collapse" role="alert" id="alertaCistoRenal"></div>
+                    <div class="row gx-3 mb-3 border-bottom">
+                        <div class="col-12">
+                            <h5 class="bold px-0 pb-1 pt-1">Tipo de adição</h5>
+                            <div class="row px-0 pb-2 mb-2">
+                                <span class="form-label">
+                                    <div class="box-container">
+                                        <input class="form-check-input" id="checkCisRenTipUni" type="radio" checked value="unico" name="checkCistoRenalTipo[]" />
+                                    </div>
+                                    <label for="checkCisRenTipUni">descrever cistos separadamente</label>
+                                </span>
+                                <span class="form-label">
+                                    <div class="box-container">
+                                        <input class="form-check-input" id="checkCisRenTipMul" type="radio" value="multiplos" name="checkCistoRenalTipo[]" />
+                                    </div>
+                                    <label for="checkCisRenTipMul">descrever o maior entre múltiplos cistos</label>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row gx-3 mb-3 border-bottom">
+                        <div class="col-4">
+                            <h5 class="bold px-0 pb-1 pt-1">Composição</h5>
+                            <div class="row px-0 pb-2 mb-2">
+                                <span class="form-label">
+                                    <div class="box-container">
+                                        <input class="form-check-input" id="checkCisRenComSim" type="radio" checked value="simples" name="checkCistoRenalComposicao[]" />
+                                    </div>
+                                    <label for="checkCisRenComSim">simples</label>
+                                </span>
+                                <span class="form-label">
+                                    <div class="box-container">
+                                        <input class="form-check-input" id="checkCisRenComCom" type="radio" value="complexo" name="checkCistoRenalComposicao[]" />
+                                    </div>
+                                    <label for="checkCisRenComCom">complexo</label>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <h5 class="bold px-0 pb-1 pt-1">Topografia</h5>
+                            <div class="row px-0 pb-2 mb-2">
+                                <span class="form-label">
+                                    <div class="box-container">
+                                        <input class="form-check-input" id="checkCisRenTopCor" type="radio" checked value="cortex" name="checkCistoRenalTopografia[]" />
+                                    </div>
+                                    <label for="checkCisRenTopCor">córtex</label>
+                                </span>
+                                <span class="form-label">
+                                    <div class="box-container">
+                                        <input class="form-check-input" id="checkCisRenTopSei" type="radio" value="seio" name="checkCistoRenalTopografia[]" />
+                                    </div>
+                                    <label for="checkCisRenTopSei">seio renal</label>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <h5 class="bold px-0 pb-1 pt-1">Lateralidade</h5>
+                            <div class="row px-0 pb-2 mb-2">
+                                <span class="form-label">
+                                    <div class="box-container">
+                                        <input class="form-check-input" id="checkCisRenLatDir" type="radio" checked value="direita" name="checkCistoRenalLateralidade[]" />
+                                    </div>
+                                    <label for="checkCisRenLatDir">direita</label>
+                                </span>
+                                <span class="form-label">
+                                    <div class="box-container">
+                                        <input class="form-check-input" id="checkCisRenLatEsq" type="radio" value="esquerda" name="checkCistoRenalLateralidade[]" />
+                                    </div>
+                                    <label for="checkCisRenLatEsq">esquerda</label>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row gx-3 mb-0">
+                        <div class="col-6">
+                            <h5 class="bold px-0 pb-1 pt-1">Localização</h5>
+                            <div class="row px-0 pb-2 mb-2">
+                                <div>
+                                    <select class="form-select-small" id="inputCisRenLoc">
+                                        <option value="superior" selected>terço superior</option>
+                                        <option value="medio">terço médio</option>
+                                        <option value="inferior">terço inferior</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h5 class="bold px-0 pb-1 pt-1">Dimensões</h5>
+                            <div class="row px-0 pb-2 mb-2">
+                                <div class="col-4 px-0">
+                                    <input class="form-control-small d-inline-block" id="inputCisRenMed1" type="number" style="width:65%;" />
+                                    <span class="fs--1">&nbsp;x</span>
+                                </div>
+                                <div class="col-4 px-0">
+                                    <input class="form-control-small d-inline-block" id="inputCisRenMed2" type="number" style="width:65%;" />
+                                    <span class="fs--1">&nbsp;x</span>
+                                </div>
+                                <div class="col-4 px-0">
+                                    <input class="form-control-small d-inline-block" id="inputCisRenMed3" type="number" style="width:65%;" />
+                                    <span class="fs--1">cm</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" onclick="adicionarCistoRenal();">Adicionar cisto</button>
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function adicionarCistoRenal() {
+        const formulario = {
+            tipo: $('input[name="checkCistoRenalTipo[]"]:checked').val(),
+            composicao: $('input[name="checkCistoRenalComposicao[]"]:checked').val(),
+            topografia: $('input[name="checkCistoRenalTopografia[]"]:checked').val(),
+            localizacao: $('#inputCisRenLoc option:checked').text(),
+            lateralidade: $('input[name="checkCistoRenalLateralidade[]"]:checked').val(),
+            medida1: tratarFloatModal('CisRenMed1'),
+            medida2: tratarFloatModal('CisRenMed2'),
+            medida3: tratarFloatModal('CisRenMed3'),
+        };
+
+        if (formulario.medida1 == null) {
+            $('#alertaCistoRenal').html('Necessário incluir ao menos 1 medida.').show();
+            $('#inputCistoRenalMedida1').focus();
+            return false;
+        }
+
+        lesoesRenais.push({
+            id: uuidv4(),
+            lesao: "cisto",
+            tipo: formulario.tipo,
+            composicao: formulario.composicao,
+            topografia: formulario.topografia,
+            localizacao: formulario.localizacao,
+            lateralidade: formulario.lateralidade,
+            medida1: formulario.medida1,
+            medida2: formulario.medida2,
+            medida3: formulario.medida3,
+        });
+        listarCistosRenais();
+
+        $('#modalCistoRenal').modal('hide');
+    }
+
+    function listarCistosRenais() {
+        $('#div-rins-cistos').html('');
+        for (var i = 0; i < lesoesRenais.length; i++) {
+            var texto = '';
+            if (lesoesRenais[i].lesao == 'cisto') {
+                if (lesoesRenais[i].tipo == 'unico') {
+                    var topografia = (lesoesRenais[i].topografia == 'seio' ? 'do seio renal' : 'cortical');
+                    if (lesoesRenais[i].medida2 == null && lesoesRenais[i].medida3 == null) {
+                        texto = `cisto ${lesoesRenais[i].composicao} em ${lesoesRenais[i].localizacao} ${topografia} à ${lesoesRenais[i].lateralidade}, medindo cerca de ${lesoesRenais[i].medida1} cm`;
+                    } else if (lesoesRenais[i].medida3 == null) {
+                        texto = `cisto ${lesoesRenais[i].composicao} em ${lesoesRenais[i].localizacao} ${topografia} à ${lesoesRenais[i].lateralidade}, medindo cerca de ${lesoesRenais[i].medida1} x ${lesoesRenais[i].medida2} cm`;
+                    } else {
+                        texto = `cisto ${lesoesRenais[i].composicao} em ${lesoesRenais[i].localizacao} ${topografia} à ${lesoesRenais[i].lateralidade}, medindo cerca de ${lesoesRenais[i].medida1} x ${lesoesRenais[i].medida2} x ${lesoesRenais[i].medida3} cm`;
+                    }
+                } else {
+                    var topografia = (lesoesRenais[i].topografia == 'seio' ? 'em seio renal' : 'corticais');
+                    if (lesoesRenais[i].medida2 == null && lesoesRenais[i].medida3 == null) {
+                        texto = `múltiplos cistos ${lesoesRenais[i].composicao} ${topografia}, o maior localizado no ${lesoesRenais[i].localizacao} à ${lesoesRenais[i].lateralidade}, medindo cerca de ${lesoesRenais[i].medida1} cm`;
+                    } else if (lesoesRenais[i].medida3 == null) {
+                        texto = `múltiplos cistos ${lesoesRenais[i].composicao} ${topografia}, o miaor localizado no ${lesoesRenais[i].localizacao} à ${lesoesRenais[i].lateralidade}, medindo cerca de ${lesoesRenais[i].medida1} x ${lesoesRenais[i].medida2} cm`;
+                    } else {
+                        texto = `múltiplos cistos ${lesoesRenais[i].composicao} ${localizacao}, o maior localizado no ${lesoesRenais[i].localizacao} à ${lesoesRenais[i].lateralidade}, medindo cerca de ${lesoesRenais[i].medida1} x ${lesoesRenais[i].medida2} x ${lesoesRenais[i].medida3} cm`;
+                    }
+                }
+                $('#div-rins-cistos').append('<div class="lesao-focal rounded fs--2 mb-1 px-2 py-1">' + texto + `<div class="lesao-focal-lixeira" onclick="deletarCistoRenal('${lesoesRenais[i].id}');"><i class="fa-fw fa-solid fa-close"></i></div></div>`);
+            }
+        }
+        montarLaudo(CKEDITOR.instances['editor']);
+    }
+
+    function deletarCistoRenal(id) {
+        lesoesRenais = lesoesRenais.filter(function(item) {
+            return item.id !== id
+        })
+        listarCistosRenais();
+    }
+</script><div class="modal fade" id="modalNoduloRenal" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" aria-labelledby="modalNoduloRenalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content border-0">
+            <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
+                <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="bg-light rounded-top-lg py-3 ps-4 pe-6">
+                    <h4 class="mb-1" id="modalNoduloRenalLabel">Adicionar nódulo renal</h4>
+                    <p class="fs--2 mb-0">Preencha os campos abaixo para adicionar um nódulo.</p>
+                </div>
+                <div class="px-4 py-3">
+                    <div class="alert alert-danger collapse" role="alert" id="alertaNoduloRenal"></div>
+                    <div class="row gx-3 mb-3 border-bottom">
+                        <div class="col-12">
+                            <h5 class="bold px-0 pb-1 pt-1">Tipo de adição</h5>
+                            <div class="row px-0 pb-2 mb-2">
+                                <span class="form-label">
+                                    <div class="box-container">
+                                        <input class="form-check-input" id="checkNodRenTipUni" type="radio" checked value="unico" name="checkNoduloRenalTipo[]" />
+                                    </div>
+                                    <label for="checkNodRenTipUni">descrever nódulos separadamente</label>
+                                </span>
+                                <span class="form-label">
+                                    <div class="box-container">
+                                        <input class="form-check-input" id="checkNodRenTipMul" type="radio" value="multiplos" name="checkNoduloRenalTipo[]" />
+                                    </div>
+                                    <label for="checkNodRenTipMul">descrever o maior entre múltiplos nódulos</label>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row gx-3 mb-3 border-bottom">
+                        <div class="col-6">
+                            <h5 class="bold px-0 pb-1 pt-1">Composição</h5>
+                            <div class="row px-0 pb-2 mb-2">
+                                <span class="form-label">
+                                    <div class="box-container">
+                                        <input class="form-check-input" id="checkNodRenComSol" type="radio" checked value="solido" name="checkNoduloRenalComposicao[]" />
+                                    </div>
+                                    <label for="checkNodRenComSol">sólido</label>
+                                </span>
+                                <span class="form-label">
+                                    <div class="box-container">
+                                        <input class="form-check-input" id="checkNodRenComSC" type="radio" value="solidocistico" name="checkNoduloRenalComposicao[]" />
+                                    </div>
+                                    <label for="checkNodRenComSC">sólido-cístico</label>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h5 class="bold px-0 pb-1 pt-1">Ecogenicidade</h5>
+                            <div class="row px-0 pb-2 mb-2">
+                                <span class="form-label">
+                                    <div class="box-container">
+                                        <input class="form-check-input" id="checkNodRenEcoHipo" type="radio" checked value="hipoecoico" name="checkNoduloRenalEcogenicidade[]" />
+                                    </div>
+                                    <label for="checkNodRenEcoHipo">hipoecoico</label>
+                                </span>
+                                <span class="form-label">
+                                    <div class="box-container">
+                                        <input class="form-check-input" id="checkNodRenEcoIso" type="radio" value="isoecoico" name="checkNoduloRenalEcogenicidade[]" />
+                                    </div>
+                                    <label for="checkNodRenEcoIso">isoecoico</label>
+                                </span>
+                                <span class="form-label">
+                                    <div class="box-container">
+                                        <input class="form-check-input" id="checkNodRenEcoHiper" type="radio" value="hiperecoico" name="checkNoduloRenalEcogenicidade[]" />
+                                    </div>
+                                    <label for="checkNodRenEcoHiper">hiperecoico</label>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row gx-3 mb-3 border-bottom">
+                        <div class="col-6">
+                            <h5 class="bold px-0 pb-1 pt-1">Contornos</h5>
+                            <div class="row px-0 pb-2 mb-2">
+                                <span class="form-label">
+                                    <div class="box-container">
+                                        <input class="form-check-input" id="checkNodRenConReg" type="radio" checked value="regulares" name="checkNoduloRenalContornos[]" />
+                                    </div>
+                                    <label for="checkNodRenConReg">regulares</label>
+                                </span>
+                                <span class="form-label">
+                                    <div class="box-container">
+                                        <input class="form-check-input" id="checkNodRenConIrr" type="radio" value="irregulares" name="checkNoduloRenalContornos[]" />
+                                    </div>
+                                    <label for="checkNodRenConIrr">irregulares</label>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h5 class="bold px-0 pb-1 pt-1">Lateralidade</h5>
+                            <div class="row px-0 pb-2 mb-2">
+                                <span class="form-label">
+                                    <div class="box-container">
+                                        <input class="form-check-input" id="checkNodRenLatDir" type="radio" checked value="direita" name="checkNoduloRenalLateralidade[]" />
+                                    </div>
+                                    <label for="checkNodRenLatDir">direita</label>
+                                </span>
+                                <span class="form-label">
+                                    <div class="box-container">
+                                        <input class="form-check-input" id="checkNodRenLatEsq" type="radio" value="esquerda" name="checkNoduloRenalLateralidade[]" />
+                                    </div>
+                                    <label for="checkNodRenLatEsq">esquerda</label>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row gx-3 mb-0">
+                        <div class="col-6">
+                            <h5 class="bold px-0 pb-1 pt-1">Localização</h5>
+                            <div class="row px-0 pb-2 mb-2">
+                                <div>
+                                    <select class="form-select-small" id="inputNodRenLoc">
+                                        <option value="superior" selected>terço superior</option>
+                                        <option value="medio">terço médio</option>
+                                        <option value="inferior">terço inferior</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h5 class="bold px-0 pb-1 pt-1">Dimensões</h5>
+                            <div class="row px-0 pb-2 mb-2">
+                                <div class="col-4">
+                                    <input class="form-control-small d-inline-block" id="inputNodRenMed1" type="number" style="width:65%;" />
+                                    <span class="fs--1">x</span>
+                                </div>
+                                <div class="col-4">
+                                    <input class="form-control-small d-inline-block" id="inputNodRenMed2" type="number" style="width:65%;" />
+                                    <span class="fs--1">x</span>
+                                </div>
+                                <div class="col-4">
+                                    <input class="form-control-small d-inline-block" id="inputNodRenMed3" type="number" style="width:65%;" />
+                                    <span class="fs--1">cm</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" onclick="adicionarNoduloRenal();">Adicionar nódulo</button>
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function adicionarNoduloRenal() {
+        const formulario = {
+            tipo: $('input[name="checkNoduloRenalTipo[]"]:checked').val(),
+            composicao: $('input[name="checkNoduloRenalComposicao[]"]:checked').val(),
+            ecogenicidade: $('input[name="checkNoduloRenalEcogenicidade[]"]:checked').val(),
+            contornos: $('input[name="checkNoduloRenalContornos[]"]:checked').val(),
+            localizacao: $('#inputNodRenLoc option:checked').text(),
+            lateralidade: $('input[name="checkNoduloRenalLateralidade[]"]:checked').val(),
+            medida1: tratarFloatModal('NodRenMed1'),
+            medida2: tratarFloatModal('NodRenMed2'),
+            medida3: tratarFloatModal('NodRenMed3'),
+        };
+
+        if (formulario.medida1 == null) {
+            $('#alertaNoduloRenal').html('Necessário incluir ao menos 1 medida.').show();
+            $('#inputNoduloRenalMedida1').focus();
+            return false;
+        }
+
+        lesoesRenais.push({
+            id: uuidv4(),
+            lesao: "nodulo",
+            tipo: formulario.tipo,
+            composicao: (formulario.composicao == 'solido' ? 'sólido' : 'sólido-cístico'),
+            ecogenicidade: formulario.ecogenicidade,
+            contornos: formulario.contornos,
+            localizacao: formulario.localizacao,
+            lateralidade: formulario.lateralidade,
+            medida1: formulario.medida1,
+            medida2: formulario.medida2,
+            medida3: formulario.medida3,
+        });
+
+        listarNodulosRenais();
+
+        $('#modalNoduloRenal').modal('hide');
+    }
+
+    function listarNodulosRenais() {
+        $('#div-rins-nodulos').html('');
+        for (var i = 0; i < lesoesRenais.length; i++) {
+            var texto = '';
+            if (lesoesRenais[i].lesao == 'nodulo') {
+                if (lesoesRenais[i].tipo == 'unico') {
+                    if (lesoesRenais[i].medida2 == null && lesoesRenais[i].medida3 == null) {
+                        texto = `nódulo ${lesoesRenais[i].composicao}, ${lesoesRenais[i].ecogenicidade}, de contornos ${lesoesRenais[i].contornos}, localizado no ${lesoesRenais[i].localizacao} à ${lesoesRenais[i].lateralidade}, medindo cerca de ${lesoesRenais[i].medida1} cm`;
+                    } else if (lesoesRenais[i].medida3 == null) {
+                        texto = `nódulo ${lesoesRenais[i].composicao}, ${lesoesRenais[i].ecogenicidade}, de contornos ${lesoesRenais[i].contornos}, localizado no ${lesoesRenais[i].localizacao} à ${lesoesRenais[i].lateralidade}, medindo cerca de ${lesoesRenais[i].medida1} x ${lesoesRenais[i].medida2} cm`;
+                    } else {
+                        texto = `nódulo ${lesoesRenais[i].composicao}, ${lesoesRenais[i].ecogenicidade}, de contornos ${lesoesRenais[i].contornos}, localizado no ${lesoesRenais[i].localizacao} à ${lesoesRenais[i].lateralidade}, medindo cerca de ${lesoesRenais[i].medida1} x ${lesoesRenais[i].medida2} x ${lesoesRenais[i].medida3} cm`;
+                    }
+                } else {
+                    if (lesoesRenais[i].medida2 == null && lesoesRenais[i].medida3 == null) {
+                        texto = `múltiplos nódulos, sendo o maior ${lesoesRenais[i].composicao}, ${lesoesRenais[i].ecogenicidade}, de contornos ${lesoesRenais[i].contornos} à ${lesoesRenais[i].lateralidade}, localizado no ${lesoesRenais[i].localizacao}, medindo cerca de ${lesoesRenais[i].medida1} cm`;
+                    } else if (lesoesRenais[i].medida3 == null) {
+                        texto = `múltiplos nódulos, sendo o maior ${lesoesRenais[i].composicao}, ${lesoesRenais[i].ecogenicidade}, de contornos ${lesoesRenais[i].contornos} à ${lesoesRenais[i].lateralidade}, localizado no ${lesoesRenais[i].localizacao}, medindo cerca de ${lesoesRenais[i].medida1} x ${lesoesRenais[i].medida2} cm`;
+                    } else {
+                        texto = `múltiplos nódulos, sendo o maior ${lesoesRenais[i].composicao}, ${lesoesRenais[i].ecogenicidade}, de contornos ${lesoesRenais[i].contornos} à ${lesoesRenais[i].lateralidade}, localizado no ${lesoesRenais[i].localizacao}, medindo cerca de ${lesoesRenais[i].medida1} x ${lesoesRenais[i].medida2} x ${lesoesRenais[i].medida3} cm`;
+                    }
+                }
+                $('#div-rins-nodulos').append('<div class="lesao-focal rounded fs--2 mb-1 px-2 py-1">' + texto + `<div class="lesao-focal-lixeira" onclick="deletarNoduloRenal('${lesoesRenais[i].id}');"><i class="fa-fw fa-solid fa-close"></i></div></div>`);
+            }
+        }
+        montarLaudo(CKEDITOR.instances['editor']);
+    }
+
+    function deletarNoduloRenal(id) {
+        lesoesRenais = lesoesRenais.filter(function(item) {
+            return item.id !== id
+        })
+        listarNodulosRenais();
+    }
+</script><script>
+    radioGroup('rgRinsSituacao');
+    checkGroup('rgRinsCalculos');
+    radioGroup('rgRinsDilDir');
+    radioGroup('rgRinsDilEsq');
+
+    var volRimD = 0;
+    $('#inputRinsDimDL, #inputRinsDimDAP, #inputRinsDimDT').on('keyup, blur', function() {
+        volRimD = parseFloat($('#inputRinsDimDL').val()) * parseFloat($('#inputRinsDimDAP').val()) * parseFloat($('#inputRinsDimDT').val()) * 0.52;
+        if (isNaN(volRimD)) {
+            $('#spanVolD').html("0,0 cm³");
+        } else {
+            $('#spanVolD').html(volRimD.toLocaleString('pt-BR', {
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 1
+            }) + " cm³");
+        }
+    });
+
+    var volRimE = 0;
+    $('#inputRinsDimEL, #inputRinsDimEAP, #inputRinsDimET').on('keyup, blur', function() {
+        volRimE = parseFloat($('#inputRinsDimEL').val()) * parseFloat($('#inputRinsDimEAP').val()) * parseFloat($('#inputRinsDimET').val()) * 0.52;
+        if (isNaN(volRimE)) {
+            $('#spanVolE').html("0,0 cm³");
+        } else {
+            $('#spanVolE').html(volRimE.toLocaleString('pt-BR', {
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 1
+            }) + " cm³");
+        }
+    });
+
+    /*if ('aparelhoUrinario' == 'aparelhoUrinario') {
+        if (json.rinsLong == true) {
+            $('#checkRinsDimDL').prop('checked', true);
+            $('#inputRinsDimDL, #inputRinsDimEL').attr('disabled', false);
+        }
+
+        if (json.rins4Med == true || !json.rins4Med) {
+            $('#checkRinsDimDL, #checkRinsDimDAP, #checkRinsDimDT, #checkRinsDimDP').prop('checked', true);
+            $('#inputRinsDimDL, #inputRinsDimEL, #inputRinsDimDAP, #inputRinsDimEAP, #inputRinsDimDT, #inputRinsDimET, #inputRinsDimDP, #inputRinsDimEP').attr('disabled', false);
+        }
+    }*/
+
+    var modalCistoRenal = document.getElementById('modalCistoRenal')
+    modalCistoRenal.addEventListener('show.bs.modal', function(event) {
+        $('#alertaCistoRenal').hide();
+        $('#checkCisRenTipUni').click();
+        $('#checkCisRenComSim').click();
+        $('#checkCisRenParLis').click();
+        $('#inputCisRenLoc').val('superior');
+        $('#inputCisRenMed1, #inputCisRenMed2, #inputCisRenMed3').val('');
+    });
+
+    var modalNoduloRenal = document.getElementById('modalNoduloRenal')
+    modalNoduloRenal.addEventListener('show.bs.modal', function(event) {
+        $('#alertaNoduloRenal').hide();
+        $('#checkNodRenTipUni').click();
+        $('#checkNodRenComSim').click();
+        $('#checkNodRenParLis').click();
+        $('#inputNodRenLoc').val('superior');
+        $('#inputNodRenMed1, #inputNodRenMed2, #inputNodRenMed3').val('');
+    });
+
+    function checkCamposRins() {
+        var arrayCheckboxes = [
+            '#checkRinsSitEct',
+            '#checkRinsSitDrp',
+            '#checkRinsSitInc',
+            '#checkRinsSitAgu',
+            '#checkRinsSitCro',
+            '#checkRinsDilDPre',
+            '#checkRinsDilEPre',
+            '#checkRinsCal1',
+            '#checkRinsCal2',
+            '#checkRinsCal3',
+            '#checkRinsCal4',
+            '#checkRinsCalMul'
+        ];
+        var arrayCampos = [
+            ['#inputRinsSitEct', '#inputRinsSitEctLoc'],
+            ['#inputRinsSitDrpLoc1', '#inputRinsSitDrpLoc2', '#inputRinsSitDrpMed'],
+            ['#inputRinsSitInc'],
+            ['#inputRinsSitAgu'],
+            ['#inputRinsSitCro'],
+            ['#inputRinsDilDPre'],
+            ['#inputRinsDilEPre'],
+            ['#inputRinsCal1Med', '#inputRinsCal1Loc', '#inputRinsCal1Rim'],
+            ['#inputRinsCal2Med', '#inputRinsCal2Loc', '#inputRinsCal2Rim'],
+            ['#inputRinsCal3Med', '#inputRinsCal3Loc', '#inputRinsCal3Rim'],
+            ['#inputRinsCal4Med', '#inputRinsCal4Loc', '#inputRinsCal4Rim'],
+            ['#inputRinsCalMulMed', '#inputRinsCalMulLoc', '#inputRinsCalMulRim'],
+        ];
+        for (var i = 0; i < arrayCheckboxes.length; i++) {
+            var campos = arrayCampos[i];
+            for (var k = 0; k < campos.length; k++) {
+                if ($(arrayCheckboxes[i]).is(':checked')) {
+                    $(campos[k]).attr('disabled', false);
+                } else {
+                    $(campos[k]).attr('disabled', true);
+                }
+            }
+        }
+    }
+
+    $('input[id*="checkRins"]').on('change', function() {
+        setTimeout(function() {
+            checkCamposRins();
+            montarLaudo(CKEDITOR.instances['editor']);
+        }, 10);
+    });
+    $('input[type="number"]').on('blur', function() {
+        $(this).val(parseFloat($(this).val()).toFixed(1));
+        montarLaudo(CKEDITOR.instances['editor']);
+    }).on('change, keyup', function() {
+        montarLaudo(CKEDITOR.instances['editor']);
+    });
+    $('select').on('change', function() {
+        montarLaudo(CKEDITOR.instances['editor']);
+    });
+
+    $('#checkRinsSitDir').on('click', function() {
+        if ($(this).is(':checked')) {
+            $('#checkRinsSitEsq').prop('checked', false);
+        }
+    });
+    $('#checkRinsSitEsq').on('click', function() {
+        if ($(this).is(':checked')) {
+            $('#checkRinsSitDir').prop('checked', false);
+        }
+    });
+
+    var lesoesRenais = [];
+    var hdLesoesRenais = [];
+
+    function laudoRins() {
+        hdLesoesRenais = [];
+        lesoesRenais = lesoesRenais.filter(function(item) {
+            return item.lesao !== "calculo"
+        })
+        lesoesRenais = lesoesRenais.filter(function(item) {
+            return item.lesao !== "calculos"
+        })
+        const formulario = {
+            situacao: $('input[name="checkRinsSituacao[]"]:checked').val(),
+            nefrectomiaDireita: $('#checkRinsSitDir').is(':checked'),
+            nefrectomiaEsquerda: $('#checkRinsSitEsq').is(':checked'),
+            dilatacaoDireita: $('input[name="checkRinsDilatacaoD[]"]:checked').val(),
+            dilatacaoEsquerda: $('input[name="checkRinsDilatacaoE[]"]:checked').val(),
+            ureteralDireita: $('#checkRinsDilDUre').is(':checked'),
+            ureteralEsquerda: $('#checkRinsDilEUre').is(':checked'),
+        };
+
+        if ($('#checkRinsCal1').is(':checked') || $('#checkRinsCal2').is(':checked') || $('#checkRinsCal3').is(':checked') || $('#checkRinsCal4').is(':checked')) {
+            $('#checkRinsCalMul').attr('disabled', true);
+        } else {
+            $('#checkRinsCalMul').attr('disabled', false);
+        }
+
+        if ($('#checkRinsCalMul').is(':checked')) {
+            $('#checkRinsCal1, #checkRinsCal2, #checkRinsCal3, #checkRinsCal4').attr('disabled', true);
+        } else {
+            $('#checkRinsCal1, #checkRinsCal2, #checkRinsCal3, #checkRinsCal4').attr('disabled', false);
+        }
+
+        if (formulario.dilatacaoDireita == 'presente') {
+            $('#checkRinsDilDUre').attr('disabled', false);
+        } else {
+            $('#checkRinsDilDUre').attr('disabled', true);
+        }
+        if (formulario.dilatacaoEsquerda == 'presente') {
+            $('#checkRinsDilEUre').attr('disabled', false);
+        } else {
+            $('#checkRinsDilEUre').attr('disabled', true);
+        }
+
+        let relatorio = "";
+
+        var textoAchados = "Não há evidências de cálculos calicinais.";
+        var textoLesoes = "";
+        if ($('#checkRinsCal1').is(':checked')) {
+            lesoesRenais.push({
+                lesao: "calculo",
+                medida: tratarFloat('RinsCal1Med'),
+                localizacao: $('#inputRinsCal1Loc option:selected').text(),
+                rim: $('#inputRinsCal1Rim').val()
+            });
+        }
+        if ($('#checkRinsCal2').is(':checked')) {
+            lesoesRenais.push({
+                lesao: "calculo",
+                medida: tratarFloat('RinsCal2Med'),
+                localizacao: $('#inputRinsCal2Loc option:selected').text(),
+                rim: $('#inputRinsCal2Rim').val()
+            });
+        }
+        if ($('#checkRinsCal3').is(':checked')) {
+            lesoesRenais.push({
+                lesao: "calculo",
+                medida: tratarFloat('RinsCal3Med'),
+                localizacao: $('#inputRinsCal3Loc option:selected').text(),
+                rim: $('#inputRinsCal3Rim').val()
+            });
+        }
+        if ($('#checkRinsCal4').is(':checked')) {
+            lesoesRenais.push({
+                lesao: "calculo",
+                medida: tratarFloat('RinsCal4Med'),
+                localizacao: $('#inputRinsCal4Loc option:selected').text(),
+                rim: $('#inputRinsCal4Rim').val()
+            });
+        }
+        if ($('#checkRinsCalMul').is(':checked')) {
+            lesoesRenais.push({
+                lesao: "calculos",
+                medida: tratarFloat('RinsCalMulMed'),
+                localizacao: $('#inputRinsCalMulLoc option:selected').text(),
+                rim: $('#inputRinsCalMulRim').val()
+            });
+        }
+        lesoesRenais.sort(function(a, b) {
+            return (a['lesao'] > b['lesao']) ? 1 : ((a['lesao'] < b['lesao']) ? -1 : 0);
+        });
+
+        var obstrutivoDireita = false;
+        var obstrutivoEsquerda = false;
+        var calculos = 0;
+        var cistosRenais = 0;
+        var nodulosRenais = 0;
+        for (var i = 0; i < lesoesRenais.length; i++) {
+            if (lesoesRenais[i].lesao == "calculo") {
+                calculos += 1;
+            }
+            if (lesoesRenais[i].lesao == "calculos") {
+                calculos = 1;
+            }
+            if (lesoesRenais[i].lesao == "cisto") {
+                cistosRenais += 1;
+            }
+            if (lesoesRenais[i].lesao == "nodulo") {
+                nodulosRenais += 1;
+            }
+        }
+        if (lesoesRenais.length > 0) {
+            var item = "";
+            if (calculos == 1) {
+                textoAchados = "Nota-se ";
+            } else if (calculos > 1) {
+                textoAchados = "Presença de cálculos, assim caracterizados:";
+                item += "<br>- ";
+            }
+            var cistoDireita = false;
+            var cistoEsquerda = false;
+            var noduloDireita = false;
+            var noduloEsquerda = false;
+            for (var i = 0; i < lesoesRenais.length; i++) {
+                if (lesoesRenais[i].lesao == "calculo") {
+                    if (lesoesRenais[i].localizacao == "terço superior" ||
+                        lesoesRenais[i].localizacao == "terço médio" ||
+                        lesoesRenais[i].localizacao == "terço inferior") {
+                        textoAchados += `${item}cálculo não obstrutivo em ${lesoesRenais[i].localizacao} à ${lesoesRenais[i].rim}, medindo ${lesoesRenais[i].medida} cm;`;
+                        hdLesoesRenais.push(`Nefrolitíase não obstrutiva à ${lesoesRenais[i].rim}.`);
+                    } else {
+                        textoAchados += `${item}cálculo obstrutivo em ${lesoesRenais[i].localizacao} à ${lesoesRenais[i].rim} medindo ${lesoesRenais[i].medida} cm`;
+                        if (lesoesRenais[i].rim == "direita" && formulario.dilatacaoDireita == "presente") {
+                            textoAchados += `, associado a ${$('#inputRinsDilDPre').val()} dilatação do sistema coletor a montante;`;
+                            obstrutivoDireita = true;
+                            hdLesoesRenais.push(`Cálculo obstrutivo em ${lesoesRenais[i].localizacao} à ${lesoesRenais[i].rim}, associado a ${$('#inputRinsDilDPre').val()} dilatação do sistema coletor a montante.`);
+                        } else if (lesoesRenais[i].rim == "esquerda" && formulario.dilatacaoEsquerda == "presente") {
+                            textoAchados += `, associado a ${$('#inputRinsDilEPre').val()} dilatação do sistema coletor a montante;`;
+                            obstrutivoEsquerda = true;
+                            hdLesoesRenais.push(`Cálculo obstrutivo em ${lesoesRenais[i].localizacao} à ${lesoesRenais[i].rim}, associado a ${$('#inputRinsDilDPre').val()} dilatação do sistema coletor a montante.`);
+                        } else {
+                            textoAchados += ";";
+                            hdLesoesRenais.push(`Cálculo obstrutivo em ${lesoesRenais[i].localizacao} à ${lesoesRenais[i].rim}.`);
+                        }
+                    }
+                }
+                if (lesoesRenais[i].lesao == "calculos") {
+                    if (lesoesRenais[i].localizacao == "terço superior" ||
+                        lesoesRenais[i].localizacao == "terço médio" ||
+                        lesoesRenais[i].localizacao == "terço inferior") {
+                        textoAchados += `${item}múltiplos cálculos não obstrutivos, o maior localizado em ${lesoesRenais[i].localizacao} à ${lesoesRenais[i].rim}, medindo ${lesoesRenais[i].medida} cm;`;
+                        hdLesoesRenais.push(`Nefrolitíase não obstrutiva bilateral.`);
+                    } else {
+                        textoAchados += `${item}múltiplos cálculos, sendo o maior obstrutivo, localizado em ${lesoesRenais[i].localizacao} à ${lesoesRenais[i].rim} medindo ${lesoesRenais[i].medida} cm`;
+                        if (lesoesRenais[i].rim == "direita" && formulario.dilatacaoDireita == "presente") {
+                            textoAchados += `, associado a ${$('#inputRinsDilDPre').val()} dilatação do sistema coletor a montante;`;
+                            obstrutivoDireita = true;
+                            hdLesoesRenais.push(`Múltiplos cálculos, o maior obstrutivo, localizado em ${lesoesRenais[i].localizacao} à ${lesoesRenais[i].rim}, associado a ${$('#inputRinsDilDPre').val()} dilatação do sistema coletor a montante.`);
+                        } else if (lesoesRenais[i].rim == "esquerda" && formulario.dilatacaoEsquerda == "presente") {
+                            textoAchados += `, associado a ${$('#inputRinsDilEPre').val()} dilatação do sistema coletor a montante;`;
+                            obstrutivoEsquerda = true;
+                            hdLesoesRenais.push(`Múltiplos cálculos, o maior obstrutivo, localizado em ${lesoesRenais[i].localizacao} à ${lesoesRenais[i].rim}, associado a ${$('#inputRinsDilDPre').val()} dilatação do sistema coletor a montante.`);
+                        } else {
+                            textoAchados += ";";
+                            hdLesoesRenais.push(`Múltiplos cálculos, o maior obstrutivo, localizado em ${lesoesRenais[i].localizacao} à ${lesoesRenais[i].rim}.`);
+                        }
+                    }
+                }
+                if (lesoesRenais[i].lesao == "cisto") {
+                    if (lesoesRenais[i].lateralidade == 'direita') {
+                        cistoDireita = true;
+                    }
+                    if (lesoesRenais[i].lateralidade == 'esquerda') {
+                        cistoEsquerda = true;
+                    }
+                    var medidas = `${lesoesRenais[i].medida1}`;
+                    if (lesoesRenais[i].medida2 !== null) {
+                        medidas += ` x ${lesoesRenais[i].medida2}`;
+                    }
+                    if (lesoesRenais[i].medida3 !== null) {
+                        medidas += ` x ${lesoesRenais[i].medida3}`;
+                    }
+                    if (medidas == 'null') {
+                        medidas = '_';
+                    }
+                    medidas += ` cm`;
+                    var composicaoCisto = lesoesRenais[i].composicao;
+                    if (lesoesRenais[i].tipo == 'multiplos') {
+                        var topografia = (lesoesRenais[i].topografia == 'seio' ? 'em seio renal' : 'corticais');
+                        textoLesoes += `<br>- múltiplos cistos ${lesoesRenais[i].composicao} ${topografia}, o maior localizado no ${lesoesRenais[i].localizacao} à ${lesoesRenais[i].lateralidade}, medindo cerca de ${medidas};`;
+                        (cistoDireita == true && cistoEsquerda == true ? hdLesoesRenais.push('Múltiplos cistos renais bilaterais.') : null);
+                        (cistoDireita == true && cistoEsquerda == false ? hdLesoesRenais.push('Múltiplos cistos renais à direita.') : null);
+                        (cistoDireita == false && cistoEsquerda == true ? hdLesoesRenais.push('Múltiplos cistos renais à esquerda.') : null);
+                    } else {
+                        var topografia = (lesoesRenais[i].topografia == 'seio' ? 'do seio renal' : 'cortical');
+                        textoLesoes += `<br>- cisto ${lesoesRenais[i].composicao} em ${lesoesRenais[i].localizacao} ${topografia} à ${lesoesRenais[i].lateralidade}, medindo cerca de ${medidas};`;
+                        if (cistosRenais == 1) {
+                            (cistoDireita == true && cistoEsquerda == false ? hdLesoesRenais.push('Cisto renal à direita.') : null);
+                            (cistoDireita == false && cistoEsquerda == true ? hdLesoesRenais.push('Cisto renal à esquerda.') : null);
+                        } else {
+                            (cistoDireita == true && cistoEsquerda == true ? hdLesoesRenais.push('Cistos renais bilaterais.') : null);
+                            (cistoDireita == true && cistoEsquerda == false ? hdLesoesRenais.push('Cistos renais à direita.') : null);
+                            (cistoDireita == false && cistoEsquerda == true ? hdLesoesRenais.push('Cistos renais à esquerda.') : null);
+                            if (hdLesoesRenais.includes('Cistos renais bilaterais.')) {
+                                hdLesoesRenais = hdLesoesRenais.filter(function(item) {
+                                    return item !== "Cistos renais à direita.";
+                                })
+                                hdLesoesRenais = hdLesoesRenais.filter(function(item) {
+                                    return item !== "Cistos renais à esquerda.";
+                                })
+                            }
+                        }
+                    }
+                }
+                if (lesoesRenais[i].lesao == "nodulo") {
+                    var hdComplemento = " " + "Sugere-se, a critério clínico, prosseguimento da investigação com tomografia computadorizada ou ressonância magnética com contraste.";
+                    if (lesoesRenais[i].lateralidade == 'direita') {
+                        noduloDireita = true;
+                    }
+                    if (lesoesRenais[i].lateralidade == 'esquerda') {
+                        noduloEsquerda = true;
+                    }
+                    var medidas = `${lesoesRenais[i].medida1}`;
+                    if (lesoesRenais[i].medida2 !== null) {
+                        medidas += ` x ${lesoesRenais[i].medida2}`;
+                    }
+                    if (lesoesRenais[i].medida3 !== null) {
+                        medidas += ` x ${lesoesRenais[i].medida3}`;
+                    }
+                    if (medidas == 'null') {
+                        medidas = '_';
+                    }
+                    medidas += ` cm`;
+                    var composicaoNodulo = lesoesRenais[i].composicao;
+                    if (lesoesRenais[i].tipo == 'multiplos') {
+                        textoLesoes += `<br>- múltiplos nódulos ${lesoesRenais[i].composicao} de contornos ${lesoesRenais[i].contornos}, o maior localizado no ${lesoesRenais[i].localizacao} à ${lesoesRenais[i].lateralidade}, medindo cerca de ${medidas};`;
+                        (noduloDireita == true && noduloEsquerda == true ? hdLesoesRenais.push(`Múltiplos nódulos renais ${lesoesRenais[i].composicao}s bilaterais.` + hdComplemento) : null);
+                        (noduloDireita == true && noduloEsquerda == false ? hdLesoesRenais.push(`Múltiplos nódulos renais ${lesoesRenais[i].composicao}s em rim direito.` + hdComplemento) : null);
+                        (noduloDireita == false && noduloEsquerda == true ? hdLesoesRenais.push(`Múltiplos nódulos renais ${lesoesRenais[i].composicao}s em rim esquerdo.` + hdComplemento) : null);
+                    } else {
+                        var topografia = (lesoesRenais[i].topografia == 'seio' ? 'do seio renal' : 'cortical');
+                        textoLesoes += `<br>- nódulo ${lesoesRenais[i].composicao} de contornos ${lesoesRenais[i].contornos} em ${lesoesRenais[i].localizacao} à ${lesoesRenais[i].lateralidade}, medindo cerca de ${medidas};`;
+                        if (nodulosRenais == 1) {
+                            (noduloDireita == true && noduloEsquerda == false ? hdLesoesRenais.push(`Nódulo renal ${lesoesRenais[i].composicao} em rim direito.` + hdComplemento) : null);
+                            (noduloDireita == false && noduloEsquerda == true ? hdLesoesRenais.push(`Nódulo renal ${lesoesRenais[i].composicao} em rim esquerdo.` + hdComplemento) : null);
+                        } else {
+                            (noduloDireita == true && noduloEsquerda == true ? hdLesoesRenais.push(`Nódulos renais ${lesoesRenais[i].composicao}s bilaterais.` + hdComplemento) : null);
+                            (noduloDireita == true && noduloEsquerda == false ? hdLesoesRenais.push(`Nódulos renais ${lesoesRenais[i].composicao}s em rim direito.` + hdComplemento) : null);
+                            (noduloDireita == false && noduloEsquerda == true ? hdLesoesRenais.push(`Nódulos renais ${lesoesRenais[i].composicao}s em rim esquerdo.` + hdComplemento) : null);
+                            if (hdLesoesRenais.includes(`Nódulos renais ${lesoesRenais[i].composicao}s bilaterais.` + hdComplemento)) {
+                                hdLesoesRenais = hdLesoesRenais.filter(function(item) {
+                                    return item !== `Nódulos renais ${lesoesRenais[i].composicao}s em rim direito.` + hdComplemento;
+                                })
+                                hdLesoesRenais = hdLesoesRenais.filter(function(item) {
+                                    return item !== `Nódulos renais ${lesoesRenais[i].composicao}s em rim esquerdo.` + hdComplemento;
+                                })
+                            }
+                        }
+                    }
+                }
+            }
+            textoAchados = textoAchados.slice(0, -1) + ".";
+            if (calculos == 0) {
+                textoAchados = "Não há evidências de cálculos calicinais.";
+            } else if (calculos > 1) {
+                textoAchados += "<br>";
+            }
+            if (textoLesoes !== "") {
+                textoLesoes = textoLesoes.slice(0, -1) + ".";
+            }
+            if (cistosRenais + nodulosRenais == 1) {
+                textoLesoes = " " + capitalizeFirstLetter(textoLesoes.slice(6));
+            } else if (cistosRenais + nodulosRenais > 1) {
+                textoLesoes = " " + "Presença de achados assim caracterizados:" + textoLesoes + "<br>";
+            }
+        }
+
+        var hidronefrose = "Ausência de hidronefrose.";
+        var rins = "Rins";
+        var nefrectomia = "";
+        $('#inputRinsSitEct option[value="direita"], #inputRinsSitEct option[value="esquerda"]').show();
+        $('#inputRinsSitDrpLoc2 option[value="direito"], #inputRinsSitDrpLoc2 option[value="esquerdo"]').show();
+        $('#checkRinsDilDAus, #checkRinsDilDPre, #checkRinsDilEPre').attr('disabled', false);
+        $('#inputRinsSitInc option[value="direita"], #inputRinsSitAgu option[value="direita"], #inputRinsSitCro option[value="direita"], #inputRinsSitInc option[value="esquerda"], #inputRinsSitAgu option[value="esquerda"], #inputRinsSitCro option[value="esquerda"], #inputRinsSitInc option[value="bilateral"], #inputRinsSitAgu option[value="bilateral"], #inputRinsSitCro option[value="bilateral"]').show();
+        $('#inputRinsCalUniRim option[value="direito"], #inputRinsCalUniRim option[value="esquerdo"]').show();
+        $('#inputRinsCalMulRim option[value="direito"], #inputRinsCalMulRim option[value="esquerdo"]').show();
+        $('#botaoCistoRenal').attr('disabled', false);
+        $('#div-rins-cistos').show();
+        $('#checkRinsSitDir, #checkRinsSitEsq').attr('disabled', false);
+        $('#inputRinsDimDL, #inputRinsDimDAP, #inputRinsDimDT, #inputRinsDimDP').attr('disabled', false);
+        $('#inputRinsDimEL, #inputRinsDimEAP, #inputRinsDimET, #inputRinsDimEP').attr('disabled', false);
+        if (formulario.nefrectomiaDireita == true) {
+            rins = "Rim esquerdo";
+            nefrectomia = "Rim direito não caracterizado (status pós-operatório).";
+            $('#inputRinsSitEct option[value="direita"], #inputRinsSitDrpLoc2 option[value="direito"]').hide();
+            $('#inputRinsSitInc option[value="direita"], #inputRinsSitAgu option[value="direita"], #inputRinsSitCro option[value="direita"], #inputRinsSitInc option[value="bilateral"], #inputRinsSitAgu option[value="bilateral"], #inputRinsSitCro option[value="bilateral"]').hide();
+            $('#inputRinsCalUniRim option[value="direito"], #inputRinsCalMulRim option[value="direito"]').hide();
+            $('#inputRinsCalUniRim, #inputRinsCalMulRim').val('esquerdo');
+            $('#inputRinsSitEct').val('esquerda');
+            $('#inputRinsSitDrpLoc2').val('esquerdo');
+            $('#inputRinsSitInc').val('esquerda');
+            $('#inputRinsSitAgu').val('esquerda');
+            $('#inputRinsSitCro').val('esquerda');
+            $('#inputRinsDimDL, #inputRinsDimDAP, #inputRinsDimDT, #inputRinsDimDP').attr('disabled', true);
+            $('#checkRinsDilDAus').prop('checked', true);
+            $('#checkRinsDilDAus, #checkRinsDilDPre').attr('disabled', true);
+        }
+        if (formulario.nefrectomiaEsquerda == true) {
+            rins = "Rim direito";
+            nefrectomia = "Rim esquerdo não caracterizado (status pós-operatório).";
+            $('#inputRinsSitEct option[value="esquerda"], #inputRinsSitDrpLoc2 option[value="esquerdo"]').hide();
+            $('#inputRinsSitInc option[value="esquerda"], #inputRinsSitAgu option[value="esquerda"], #inputRinsSitCro option[value="esquerda"], #inputRinsSitInc option[value="bilateral"], #inputRinsSitAgu option[value="bilateral"], #inputRinsSitCro option[value="bilateral"]').hide();
+            $('#inputRinsSitEct').val('direita');
+            $('#inputRinsSitDrpLoc2').val('direito');
+            $('#inputRinsSitInc').val('direita');
+            $('#inputRinsSitAgu').val('direita');
+            $('#inputRinsSitCro').val('direita');
+            $('#inputRinsDimEL, #inputRinsDimEAP, #inputRinsDimET, #inputRinsDimEP').attr('disabled', true);
+            $('#checkRinsDilEAus').prop('checked', true);
+            $('#checkRinsDilEAus, #checkRinsDilEPre').attr('disabled', true);
+        }
+        if (formulario.situacao === "habitual") {
+            relatorio += `${rins} em topografia habitual, com dimensões usuais e contornos regulares. Parênquima com espessura preservada e diferenciação corticomedular mantida.` + textoLesoes;
+        } else if (formulario.situacao === "ectopico") {
+            if (formulario.nefrectomiaDireita == true || formulario.nefrectomiaEsquerda == true) {
+                if ($('#inputRinsSitEct').val() == 'direita') {
+                    relatorio += `Rim direito localizado ${($('#inputRinsSitEctLoc').val() == 'fossa' ? 'em fossa ilíaca direita' : 'na pelve')}, com dimensões usuais e contornos regulares. Parênquima com espessura preservada e diferenciação corticomedular mantida.` + textoLesoes;
+                    hd.push('Rim direito ectópico.');
+                } else {
+                    relatorio += `Rim esquerdo localizado ${($('#inputRinsSitEctLoc').val() == 'fossa' ? 'em fossa ilíaca esquerda' : 'na pelve')}, com dimensões usuais e contornos regulares. Parênquima com espessura preservada e diferenciação corticomedular mantida.` + textoLesoes;
+                    hd.push('Rim esquerdo ectópico.');
+                }
+            } else {
+                if ($('#inputRinsSitEct').val() == 'direita') {
+                    relatorio += `Rim direito localizado ${($('#inputRinsSitEctLoc').val() == 'fossa' ? 'em fossa ilíaca direita' : 'na pelve')}. Rim esquerdo em topografia habitual. ${rins} com dimensões usuais e contornos regulares. Parênquima com espessura preservada e diferenciação corticomedular mantida.` + textoLesoes;
+                    hd.push('Rim direito ectópico.');
+                } else {
+                    relatorio += `Rim esquerdo localizado ${($('#inputRinsSitEctLoc').val() == 'fossa' ? 'em fossa ilíaca esquerda' : 'na pelve')}. Rim direito em topografia habitual. ${rins} com dimensões usuais e contornos regulares. Parênquima com espessura preservada e diferenciação corticomedular mantida.` + textoLesoes;
+                    hd.push('Rim esquerdo ectópico.');
+                }
+            }
+
+        } else if (formulario.situacao === "ferradura") {
+            $('#checkRinsSitDir, #checkRinsSitEsq').attr('disabled', true);
+            relatorio += `${rins} apresentando desvio anterior do seu eixo de rotação assim como fusão de seus polos inferiores em topografia de linha média, anteriormente à aorta abdominal. Parênquima com espessura preservada e diferenciação corticomedular mantida.` + textoLesoes;
+            hd.push('Rins em ferradura.');
+        } else if (formulario.situacao === "drpad") {
+            $('#botaoCistoRenal').attr('disabled', true);
+            $('#div-rins-cistos').hide();
+            var localizacao = $('#inputRinsSitDrpLoc1 option:selected').text() + " " + $('#inputRinsSitDrpLoc2 option:selected').text();
+            if (formulario.nefrectomiaDireita == true || formulario.nefrectomiaEsquerda == true) {
+                relatorio += `${rins} em topografia habitual, com dimensões aumentadas e contornos lobulados. Presença de alteração ecotextural caracterizada por distorção arquitetural difusa à custa de múltiplos cistos dispersos por todo o parênquima renal, predominantemente corticais, o maior localizado no ${localizacao}, medindo cerca de ${tratarFloat('RinsSitDrpMed')} cm.`;
+            } else {
+                relatorio += `${rins} em topografia habitual, com dimensões aumentadas e contornos lobulados. Presença de alteração ecotextural caracterizada por distorção arquitetural difusa à custa de múltiplos cistos dispersos por todo o parênquima renal bilateralmente, predominantemente corticais, o maior localizado no ${localizacao}, medindo cerca de ${tratarFloat('RinsSitDrpMed')} cm.`;
+            }
+            hd.push('Achados ecográficos compatíveis com doença renal policística autossômica dominante.');
+        } else if (formulario.situacao === "incipiente") {
+            if (formulario.nefrectomiaDireita == true || formulario.nefrectomiaEsquerda == true) {
+                if ($('#inputRinsSitInc').val() == 'direita') {
+                    relatorio += `${rins} em topografia habitual, com dimensões habituais e contornos lobulados. Parênquima com espessura discretamente reduzida e diferenciação corticomedular mantida.` + textoLesoes;
+                    hd.push('Achados ecográficos sugestivos de insuficiência renal incipiente à direita.');
+                } else if ($('#inputRinsSitInc').val() == 'esquerda') {
+                    relatorio += `${rins} em topografia habitual, com dimensões habituais e contornos lobulados. Parênquima com espessura discretamente reduzida e diferenciação corticomedular mantida.` + textoLesoes;
+                    hd.push('Achados ecográficos sugestivos de insuficiência renal incipiente à esquerda.');
+                } else {
+                    relatorio += `${rins} em topografia habitual, com dimensões habituais e contornos lobulados. Parênquima com espessura discretamente reduzida e diferenciação corticomedular mantida.` + textoLesoes;
+                    hd.push('Achados ecográficos sugestivos de insuficiência renal incipiente bilateral.');
+                }
+            } else {
+                if ($('#inputRinsSitInc').val() == 'direita') {
+                    relatorio += `${rins} em topografia habitual, com dimensões habituais e contornos lobulados. Parênquima com espessura discretamente reduzida e diferenciação corticomedular mantida.` + textoLesoes;
+                    hd.push('Achados ecográficos sugestivos de insuficiência renal incipiente à direita.');
+                } else if ($('#inputRinsSitInc').val() == 'esquerda') {
+                    relatorio += `${rins} em topografia habitual, com dimensões habituais e contornos lobulados. Parênquima com espessura discretamente reduzida e diferenciação corticomedular mantida.` + textoLesoes;
+                    hd.push('Achados ecográficos sugestivos de insuficiência renal incipiente à esquerda.');
+                } else {
+                    relatorio += `${rins} em topografia habitual, com dimensões habituais e contornos lobulados. Parênquima com espessura discretamente reduzida e diferenciação corticomedular mantida.` + textoLesoes;
+                    hd.push('Achados ecográficos sugestivos de insuficiência renal incipiente bilateral.');
+                }
+            }
+        } else if (formulario.situacao === "aguda") {
+            if (formulario.nefrectomiaDireita == true || formulario.nefrectomiaEsquerda == true) {
+                if ($('#inputRinsSitAgu').val() == 'direita') {
+                    relatorio += `${rins} em topografia habitual, com dimensões aumentadas e contornos regulares. Parênquima com espessura preservada e diferenciação corticomedular mantida. Observa-se aumento difuso da ecogenicidade cortical renal à direita.` + textoLesoes;
+                    hd.push('Achados ecográficos compatíveis com nefropatia parenquimatosa aguda à direita.');
+                } else if ($('#inputRinsSitAgu').val() == 'esquerda') {
+                    relatorio += `${rins} em topografia habitual, com dimensões aumentadas e contornos regulares. Parênquima com espessura preservada e diferenciação corticomedular mantida. Observa-se aumento difuso da ecogenicidade cortical renal à esquerda.` + textoLesoes;
+                    hd.push('Achados ecográficos compatíveis com nefropatia parenquimatosa aguda à esquerda.');
+                } else {
+                    relatorio += `${rins} em topografia habitual, com dimensões aumentadas e contornos regulares. Parênquima com espessura preservada e diferenciação corticomedular mantida. Observa-se aumento difuso da ecogenicidade cortical renal bilateralmente.` + textoLesoes;
+                    hd.push('Achados ecográficos compatíveis com nefropatia parenquimatosa aguda bilateral.');
+                }
+            } else {
+                if ($('#inputRinsSitAgu').val() == 'direita') {
+                    relatorio += `${rins} em topografia habitual, com contornos regulares. Rim direito encontra-se com dimensões aumentadas, enquanto que o rim esquerdo conserva dimensões. Parênquima com espessura preservada e diferenciação corticomedular mantida. Observa-se aumento difuso da ecogenicidade cortical renal à direita.` + textoLesoes;
+                    hd.push('Achados ecográficos compatíveis com nefropatia parenquimatosa aguda à direita.');
+                } else if ($('#inputRinsSitAgu').val() == 'esquerda') {
+                    relatorio += `${rins} em topografia habitual, com contornos regulares. Rim esquerdo encontra-se com dimensões aumentadas, enquanto que o rim direito conserva dimensões. Parênquima com espessura preservada e diferenciação corticomedular mantida. Observa-se aumento difuso da ecogenicidade cortical renal à esquerda.` + textoLesoes;
+                    hd.push('Achados ecográficos compatíveis com nefropatia parenquimatosa aguda à esquerda.');
+                } else {
+                    relatorio += `${rins} em topografia habitual, com dimensões aumentadas e contornos regulares. Parênquima com espessura preservada e diferenciação corticomedular mantida. Observa-se aumento difuso da ecogenicidade cortical renal bilateralmente.` + textoLesoes;
+                    hd.push('Achados ecográficos compatíveis com nefropatia parenquimatosa aguda bilateral.');
+                }
+            }
+
+        } else if (formulario.situacao === "cronica") {
+            if (formulario.nefrectomiaDireita == true || formulario.nefrectomiaEsquerda == true) {
+                if ($('#inputRinsSitCro').val() == 'direita') {
+                    relatorio += `${rins} em topografia habitual, com dimensões reduzidas e contornos regulares. Parênquima com espessura reduzida e perda da diferenciação corticomedular, associado a aumento difuso da ecogenicidade cortical renal à direita.` + textoLesoes;
+                    hd.push('Achados ecográficos compatíveis com nefropatia crônica à direita.');
+                } else if ($('#inputRinsSitCro').val() == 'esquerda') {
+                    relatorio += `${rins} em topografia habitual, com dimensões reduzidas e contornos regulares. Parênquima com espessura reduzida e perda da diferenciação corticomedular, associado a aumento difuso da ecogenicidade cortical renal à esquerda.` + textoLesoes;
+                    hd.push('Achados ecográficos compatíveis com nefropatia crônica à esquerda.');
+                } else {
+                    relatorio += `${rins} em topografia habitual, com dimensões reduzidas e contornos regulares. Parênquima com espessura reduzida e perda da diferenciação corticomedular. Observa-se aumento difuso da ecogenicidade cortical renal bilateralmente.` + textoLesoes;
+                    hd.push('Achados ecográficos compatíveis com nefropatia crônica bilateral.');
+                }
+            } else {
+                if ($('#inputRinsSitCro').val() == 'direita') {
+                    relatorio += `${rins} em topografia habitual, com contornos regulares. Rim direito encontra-se com dimensões reduzidas, enquanto que o rim esquerdo conserva dimensões. Parênquima com espessura reduzida e perda da diferenciação corticomedular, associado a aumento difuso da ecogenicidade cortical renal à direita.` + textoLesoes;
+                    hd.push('Achados ecográficos compatíveis com nefropatia crônica à direita.');
+                } else if ($('#inputRinsSitCro').val() == 'esquerda') {
+                    relatorio += `${rins} em topografia habitual, com contornos regulares. Rim esquerdo encontra-se com dimensões reduzidas, enquanto que o rim direito conserva dimensões. Parênquima com espessura reduzida e perda da diferenciação corticomedular, associado a aumento difuso da ecogenicidade cortical renal à esquerda.` + textoLesoes;
+                    hd.push('Achados ecográficos compatíveis com nefropatia crônica à esquerda.');
+                } else {
+                    relatorio += `${rins} em topografia habitual, com dimensões reduzidas e contornos regulares. Parênquima com espessura reduzida e perda da diferenciação corticomedular. Observa-se aumento difuso da ecogenicidade cortical renal bilateralmente.` + textoLesoes;
+                    hd.push('Achados ecográficos compatíveis com nefropatia crônica bilateral.');
+                }
+            }
+        }
+
+        if (formulario.dilatacaoDireita == 'presente' && formulario.dilatacaoEsquerda == 'ausente') {
+            if (formulario.ureteralDireita == true) {
+                hidronefrose = `${capitalizeFirstLetter($('#inputRinsDilDPre').val())} dilatação do sistema coletor à direita, associado a dilatação do ureter à direita, sem caracterização de fator obstrutivo ao presente método.`;
+            } else {
+                hidronefrose = `${capitalizeFirstLetter($('#inputRinsDilDPre').val())} dilatação do sistema coletor à direita, sem caracterização de fator obstrutivo ao presente método.`;
+            }
+            if (obstrutivoDireita == false) {
+                hdLesoesRenais.push('Dilatação do sistema coletor à direita.');
+            } else {
+                hidronefrose = "";
+            }
+        } else if (formulario.dilatacaoEsquerda == 'presente' && formulario.dilatacaoDireita == 'ausente') {
+            if (formulario.ureteralEsquerda == true) {
+                hidronefrose = `${capitalizeFirstLetter($('#inputRinsDilEPre').val())} dilatação do sistema coletor à esquerda, associado a dilatação do ureter à esquerda, sem caracterização de fator obstrutivo ao presente método.`;
+            } else {
+                hidronefrose = `${capitalizeFirstLetter($('#inputRinsDilEPre').val())} dilatação do sistema coletor à esquerda, sem caracterização de fator obstrutivo ao presente método.`;
+            }
+            if (obstrutivoEsquerda == false) {
+                hdLesoesRenais.push('Dilatação do sistema coletor à esquerda.');
+            } else {
+                hidronefrose = "";
+            }
+        } else if (formulario.dilatacaoEsquerda == 'presente' && formulario.dilatacaoDireita == 'presente') {
+            if ($('#inputRinsDilDPre').val() == $('#inputRinsDilEPre').val()) {
+                hidronefrose = `${capitalizeFirstLetter($('#inputRinsDilEPre').val())} dilatação do sistema coletor bilateralmente, sem caracterização de fator obstrutivo ao presente método`;
+            } else {
+                hidronefrose = `Dilatação do sistema coletor bilateralmente, sem caracterização de fator obstrutivo ao presente método, sendo ${$('#inputRinsDilDPre').val()} à direita e ${$('#inputRinsDilEPre').val()} à esquerda`;
+            }
+            if (formulario.ureteralDireita == true && formulario.ureteralEsquerda == false) {
+                hidronefrose += `, associado a dilatação ureteral à direita.`;
+            } else if (formulario.ureteralDireita == false && formulario.ureteralEsquerda == true) {
+                hidronefrose += `, associado a dilatação ureteral à esquerda.`;
+            } else if (formulario.ureteralDireita == true && formulario.ureteralEsquerda == true) {
+                hidronefrose += `, associado a dilatação ureteral bilateral.`;
+            } else {
+                hidronefrose += ".";
+            }
+            if (obstrutivoDireita == false && obstrutivoEsquerda == false) {
+                hdLesoesRenais.push('Dilatação do sistema coletor bilateralmente.');
+            } else if (obstrutivoDireita == true && obstrutivoEsquerda == true) {
+                hidronefrose = "";
+            }
+        }
+
+        relatorio += " " + textoAchados + " " + hidronefrose + " " + (nefrectomia !== "" ? (" " + nefrectomia) : "");
+
+        hdLesoesRenais = removeDuplicates(hdLesoesRenais);
+        if (hdLesoesRenais.includes('Nefrolitíase não obstrutiva à direita.') && hdLesoesRenais.includes('Nefrolitíase não obstrutiva à esquerda.')) {
+            hdLesoesRenais = hdLesoesRenais.filter(function(item) {
+                return item !== "Nefrolitíase não obstrutiva à direita."
+            })
+            hdLesoesRenais = hdLesoesRenais.filter(function(item) {
+                return item !== "Nefrolitíase não obstrutiva à esquerda."
+            })
+            hdLesoesRenais.push('Nefrolitíase não obstrutiva bilateral.');
+        }
+
+        if (formulario.nefrectomiaDireita == false) {
+            var medidasD = tratarFloatModal('RinsDimDL');
+            if (tratarFloatModal('RinsDimDAP') !== null) {
+                medidasD += ` x ${tratarFloatModal('RinsDimDAP')}`;
+            }
+            if (tratarFloatModal('RinsDimDT') !== null) {
+                medidasD += ` x ${tratarFloatModal('RinsDimDT')}`;
+            }
+            if (medidasD == null) {
+                medidasD = '_';
+            }
+            if (medidasD !== "_") {
+                medidasD += ` cm`;
+                relatorio += `<br>Rim direito mede ${medidasD}${(!isNaN(volRimD) ? `, com volume de ${volRimD.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1})} cm³.` : ".")}`;
+            }
+            if (tratarFloatModal('RinsDimDP') !== null) {
+                relatorio += " " + `Espessura do parênquima à direita: ${tratarFloat('RinsDimDP')} cm.`;
+            }
+        }
+
+        if (formulario.nefrectomiaEsquerda == false) {
+            var medidasE = tratarFloatModal('RinsDimEL');
+            if (tratarFloatModal('RinsDimEAP') !== null) {
+                medidasE += ` x ${tratarFloatModal('RinsDimEAP')}`;
+            }
+            if (tratarFloatModal('RinsDimET') !== null) {
+                medidasE += ` x ${tratarFloatModal('RinsDimET')}`;
+            }
+            if (medidasE == null) {
+                medidasE = '_';
+            }
+            if (medidasE !== "_") {
+                medidasE += ` cm`;
+                relatorio += `<br>Rim esquerdo mede ${medidasE}${(!isNaN(volRimE) ? `, com volume de ${volRimE.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1})} cm³.` : ".")}`;
+            }
+            if (tratarFloatModal('RinsDimEP') !== null) {
+                relatorio += " " + `Espessura do parênquima à esquerda: ${tratarFloat('RinsDimEP')} cm.`;
+            }
+        }
+
+        if (formulario.nefrectomiaDireita == true) {
+            hd.push("Status pós-nefrectomia direita.");
+        }
+        if (formulario.nefrectomiaEsquerda == true) {
+            hd.push("Status pós-nefrectomia esquerda.");
+        }
+
+        if (hdLesoesRenais.length > 0) {
+            for (var i = 0; i < hdLesoesRenais.length; i++) {
+                hd.push(hdLesoesRenais[i]);
+            }
+        }
+
+        return relatorio;
+    }
+
+    function removeDuplicates(data) {
+        return data.filter((value, index) => data.indexOf(value) === index);
+    }
+</script>        </div>
+        <div class="tab-pane" id="contentBexiga" role="tabpanel" aria-labelledby="tabBexiga">
+            <div class="p-2">
+    <h4 class="title-laudo px-2 pt-1">Bexiga</h4>
+    <h5 class="bold px-2 pb-1 pt-1">Situação</h5>
+    <div class="row px-2 pb-2 mb-2 border-bottom rgBexigaSituacao">
+                <label class="option-border option-checked">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkBexSitHab" type="radio" checked value="habitual" name="checkBexiga[]" />
+                </div>
+                habitual
+            </span>
+        </label>
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkBexSitPar" type="radio" value="parcial" name="checkBexiga[]" />
+                </div>
+                distensão parcial
+            </span>
+        </label>
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkBexSitEsp" type="radio" value="espessada" name="checkBexiga[]" />
+                </div>
+                paredes espessadas, medindo
+                <input class="form-control-small" id="inputBexSitEspMed" type="number" disabled />
+                cm
+            </span>
+            <span class="form-label subitem">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkBexSitDiv" disabled type="checkbox" />
+                </div>
+                <label for="checkBexSitDiv">divertículos presentes</label>
+            </span>
+        </label>
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkBexSitVaz" type="radio" value="vazia" name="checkBexiga[]" />
+                </div>
+                vazia
+            </span>
+        </label>
+    </div>
+    <h5 class="bold px-2 pb-1 pt-1">Conteúdo</h5>
+    <div class="row px-2 pb-2 mb-2 border-bottom rgBexigaConteudo">
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkBexDeb" type="checkbox" />
+                </div>
+                focos ecogênicos em suspensão (debris)
+            </span>
+        </label>
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkBexCoa" type="checkbox" />
+                </div>
+                coágulo medindo
+                <input class="form-control-small" id="inputBexCoaMed1" type="number" disabled />
+                x
+                <input class="form-control-small" id="inputBexCoaMed2" type="number" disabled />
+                x
+                <input class="form-control-small" id="inputBexCoaMed3" type="number" disabled />
+                cm
+            </span>
+        </label>
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkBexCal" type="checkbox" />
+                </div>
+                cálculo medindo
+                <input class="form-control-small" id="inputBexCalMed1" type="number" disabled />
+                x
+                <input class="form-control-small" id="inputBexCalMed2" type="number" disabled />
+                x
+                <input class="form-control-small" id="inputBexCalMed3" type="number" disabled />
+                cm
+            </span>
+        </label>
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkBexLes" type="checkbox" />
+                </div>
+                lesão vegetante medindo
+                <input class="form-control-small" id="inputBexLesMed1" type="number" disabled />
+                x
+                <input class="form-control-small" id="inputBexLesMed2" type="number" disabled />
+                x
+                <input class="form-control-small" id="inputBexLesMed3" type="number" disabled />
+                cm
+            </span>
+            <span class="form-label">
+                <label for="checkBexLes">localizada em</label>
+                <select class="form-select-small" id="inputBexLesLoc" disabled>
+                    <option value="assoalho" selected>no assoalho vesical</option>
+                    <option value="assoalhodireita">no assoalho vesical à direita</option>
+                    <option value="assoalhoesquerda">no assoalho vesical à esquerda</option>
+                    <option value="lateraldireita">na parede lateral direita</option>
+                    <option value="lateralesquerda">na parede lateral esquerda</option>
+                    <option value="posterior">na parede posterior</option>
+                    <option value="anterior">na parede anterior</option>
+                    <option value="superior">na parede superior</option>
+                </select>
+            </span>
+            <span class="form-label">
+                <label for="checkBexLes">com Doppler</label>
+                <select class="form-select-small" id="inputBexLesDop" disabled>
+                    <option value="ausente" selected>ausente</option>
+                    <option value="presente">presente</option>
+                </select>
+            </span>
+        </label>
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkBexSon" type="checkbox" />
+                </div>
+                presença de balão de sonda vesical
+            </span>
+        </label>
+    </div>
+    <h5 class="bold px-2 pb-1 pt-1">Jatos ureterais</h5>
+    <div class="row px-2 pb-2 mb-2 rgBexigaJatos border-bottom">
+        <label class="option-border option-checked">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkBexJatNC" type="radio" checked value="nc" name="checkJatos[]" />
+                </div>
+                não citar
+            </span>
+        </label>
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkBexJatPre" type="radio" value="presentes" name="checkJatos[]" />
+                </div>
+                presentes e simétricos
+            </span>
+        </label>
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkBexJatRed" type="radio" value="reduzidos" name="checkJatos[]" />
+                </div>
+                presentes, reduzido à
+                <select class="form-select-small" id="inputBexJatRed" disabled>
+                    <option value="direita" selected>à direita</option>
+                    <option value="esquerda">à esquerda</option>
+                </select>
+            </span>
+        </label>
+        <label class="option-border">
+            <span class="form-label">
+                <div class="box-container">
+                    <input class="form-check-input" id="checkBexJatAus" type="radio" value="ausentes" name="checkJatos[]" />
+                </div>
+                não caracterizados
+            </span>
+        </label>
+    </div>
+            <h5 class="bold px-2 pb-1 pt-1">Volume vesical</h5>
+        <div class="row px-2 pb-2 mb-2 rgBexigaMiccional">
+            <label class="option-border">
+                <span class="form-label">
+                    <div class="box-container">
+                        <input class="form-check-input" id="checkBexVolPre" type="checkbox" />
+                    </div>
+                    citar pré-miccional:
+                    <input class="form-control-small" id="inputBexVolPreMed1" type="number" disabled />
+                    x
+                    <input class="form-control-small" id="inputBexVolPreMed2" type="number" disabled />
+                    x
+                    <input class="form-control-small" id="inputBexVolPreMed3" type="number" disabled />
+                    cm (<span id="spanBexVolPre">0 mL</span>)
+                </span>
+            </label>
+            <label class="option-border">
+                <span class="form-label">
+                    <div class="box-container">
+                        <input class="form-check-input" id="checkBexVolPos" type="checkbox" />
+                    </div>
+                    citar pós-miccional:
+                    <input class="form-control-small" id="inputBexVolPosMed1" type="number" disabled />
+                    x
+                    <input class="form-control-small" id="inputBexVolPosMed2" type="number" disabled />
+                    x
+                    <input class="form-control-small" id="inputBexVolPosMed3" type="number" disabled />
+                    cm (<span id="spanBexVolPos">0 mL</span>)
+                </span>
+            </label>
+        </div>
+    </div>
+<script>
+    radioGroup('rgBexigaSituacao');
+    checkGroup('rgBexigaConteudo');
+    radioGroup('rgBexigaJatos');
+
+            checkGroup('rgBexigaMiccional');
+        var volPre = null;
+        var volPos = null;
+        $('#inputBexVolPreMed1, #inputBexVolPreMed2, #inputBexVolPreMed3').on('keyup', function() {
+            var vol = parseFloat($('#inputBexVolPreMed1').val()) * parseFloat($('#inputBexVolPreMed2').val()) * parseFloat($('#inputBexVolPreMed3').val()) * 0.52;
+            $('#spanBexVolPre').html(parseFloat(vol).toFixed(0) + " mL");
+            if (!vol) {
+                $('#spanBexVolPre').html(parseFloat(0).toFixed(0) + " mL");
+                volPre = null;
+            } else {
+                volPre = parseFloat(vol).toFixed(0);
+            }
+        });
+        $('#inputBexVolPosMed1, #inputBexVolPosMed2, #inputBexVolPosMed3').on('keyup', function() {
+            var vol = parseFloat($('#inputBexVolPosMed1').val()) * parseFloat($('#inputBexVolPosMed2').val()) * parseFloat($('#inputBexVolPosMed3').val()) * 0.52;
+            $('#spanBexVolPos').html(parseFloat(vol).toFixed(0) + " mL");
+            if (!vol) {
+                $('#spanBexVolPos').html(parseFloat(0).toFixed(0) + " mL");
+                volPos = null;
+            } else {
+                volPos = parseFloat(vol).toFixed(0);
+            }
+        });
+    
+    function checkCamposBexiga() {
+        var arrayCheckboxes = [
+            '#checkBexSitEsp',
+            '#checkBexCoa',
+            '#checkBexCal',
+            '#checkBexLes',
+            '#checkBexVolPre',
+            '#checkBexVolPos',
+            '#checkBexJatRed',
+        ];
+        var arrayCampos = [
+            ['#inputBexSitEspMed', '#checkBexSitDiv'],
+            ['#inputBexCoaMed1', '#inputBexCoaMed2', '#inputBexCoaMed3'],
+            ['#inputBexCalMed1', '#inputBexCalMed2', '#inputBexCalMed3'],
+            ['#inputBexLesMed1', '#inputBexLesMed2', '#inputBexLesMed3', '#inputBexLesLoc', '#inputBexLesDop'],
+            ['#inputBexVolPreMed1', '#inputBexVolPreMed2', '#inputBexVolPreMed3'],
+            ['#inputBexVolPosMed1', '#inputBexVolPosMed2', '#inputBexVolPosMed3'],
+            ['#inputBexJatRed'],
+        ];
+        for (var i = 0; i < arrayCheckboxes.length; i++) {
+            var campos = arrayCampos[i];
+            for (var k = 0; k < campos.length; k++) {
+                if ($(arrayCheckboxes[i]).is(':checked')) {
+                    $(campos[k]).attr('disabled', false);
+                } else {
+                    $(campos[k]).attr('disabled', true);
+                }
+            }
+        }
+    }
+
+    $('input[id*="checkBex"]').on('change', function() {
+        setTimeout(function() {
+            checkCamposBexiga();
+            montarLaudo(CKEDITOR.instances['editor']);
+        }, 10);
+    });
+    $('input[type="number"]').on('blur', function() {
+        $(this).val(parseFloat($(this).val()).toFixed(1));
+        montarLaudo(CKEDITOR.instances['editor']);
+    });
+
+    function laudoBexiga() {
+        $('#tabMiccional').css('opacity', 1).attr('data-bs-target', '#contentMiccional').attr('data-bs-toggle', 'pill');
+
+        const formulario = {
+            situacao: $('input[name="checkBexiga[]"]:checked').val(),
+            diverticulos: $('#checkBexSitDiv').is(':checked'),
+            debris: $('#checkBexDeb').is(':checked'),
+            coagulo: $('#checkBexCoa').is(':checked'),
+            calculo: $('#checkBexCal').is(':checked'),
+            sonda: $('#checkBexSon').is(':checked'),
+            lesao: $('#checkBexLes').is(':checked'),
+            jatos: $('input[name="checkJatos[]"]:checked').val(),
+        };
+
+        let relatorio = "";
+        if (formulario.situacao !== "nc") {
+            var achados = [];
+            var conteudo = "e conteúdo homogêneo.";
+            if (formulario.debris == true) {
+                achados.push('debris');
+                hd.push("Bexiga contendo debris em seu interior.");
+            }
+            if (formulario.coagulo == true) {
+                achados.push('coagulo');
+                hd.push("Coágulo vesical.");
+            }
+            if (formulario.calculo == true) {
+                achados.push('calculo');
+                hd.push("Litíase vesical.");
+            }
+            if (formulario.lesao == true) {
+                achados.push('lesao');
+                hd.push("Lesão vesical de provável natureza neoplásica. Sugere-se, a critério clínico, complementação diagnóstica com cistoscopia.");
+            }
+            if (achados.length > 0) {
+                conteudo = "e conteúdo heterogêneo à custa de";
+                for (var i = 0; i < achados.length; i++) {
+                    if (achados.length > 1 && i == achados.length - 1) {
+                        conteudo = conteudo.slice(0, -1) + " e ";
+                    }
+                    if (achados[i] == 'debris') {
+                        conteudo += " " + "ecos em suspensão,";
+                    }
+                    if (achados[i] == 'coagulo') {
+                        var medidas = tratarFloat('BexCoaMed1');
+                        if (tratarFloat('BexCoaMed2') !== null) {
+                            medidas += ` x ${tratarFloat('BexCoaMed2')}`;
+                        }
+                        if (tratarFloat('BexCoaMed3') !== null) {
+                            medidas += ` x ${tratarFloat('BexCoaMed3')}`;
+                        }
+                        if (medidas == null) {
+                            medidas = '_';
+                        }
+                        medidas += ` cm`;
+                        conteudo += " " + `coágulo móvel medindo cerca de ${medidas},`;
+                    }
+                    if (achados[i] == 'calculo') {
+                        var medidas = tratarFloat('BexCalMed1');
+                        if (tratarFloat('BexCalMed2') !== null) {
+                            medidas += ` x ${tratarFloat('BexCalMed2')}`;
+                        }
+                        if (tratarFloat('BexCalMed3') !== null) {
+                            medidas += ` x ${tratarFloat('BexCalMed3')}`;
+                        }
+                        if (medidas == null) {
+                            medidas = '_';
+                        }
+                        medidas += ` cm`;
+                        conteudo += " " + `cálculo medindo cerca de ${medidas},`;
+                    }
+                    if (achados[i] == 'lesao') {
+                        var localizacao = '';
+                        switch ($('#inputBexLesLoc').val()) {
+                            case 'assoalho':
+                                localizacao = 'no assoalho vesical';
+                                break;
+                            case 'assoalhodireita':
+                                localizacao = 'no assoalho vesical à direita';
+                                break;
+                            case 'assoalhoesquerda':
+                                localizacao = 'no assoalho vesical à esquerda';
+                                break;
+                            case 'lateraldireita':
+                                localizacao = 'na parede lateral direita';
+                                break;
+                            case 'lateralesquerda':
+                                localizacao = 'na parede lateral esquerda';
+                                break;
+                            case 'posterior':
+                                localizacao = 'na parede posterior';
+                                break;
+                            case 'anterior':
+                                localizacao = 'na parede anterior';
+                                break;
+                            case 'superior':
+                                localizacao = 'na parede superior';
+                                break;
+                        }
+                        var medidas = tratarFloat('BexLesMed1');
+                        if (tratarFloat('BexLesMed2') !== null) {
+                            medidas += ` x ${tratarFloat('BexLesMed2')}`;
+                        }
+                        if (tratarFloat('BexLesMed3') !== null) {
+                            medidas += ` x ${tratarFloat('BexLesMed3')}`;
+                        }
+                        if (medidas == null) {
+                            medidas = '_';
+                        }
+                        medidas += ` cm`;
+                        conteudo += " " + `lesão exofítica de contornos irregulares localizada ${localizacao}, medindo cerca de ${medidas},`;
+                        if ($('#inputBexLesDop').val() == 'presente') {
+                            conteudo += " " + `caracterizando fluxo vascular interno ao estudo complementar com Doppler.`;
+                        } else {
+                            conteudo += " " + `não caracterizando fluxo vascular interno ao estudo complementar com Doppler.`;
+                        }
+                    }
+                }
+                conteudo = conteudo.slice(0, -1) + ".";
+            }
+            if (formulario.sonda == true) {
+                conteudo += " " + "Presença de balonete de sonda vesical.";
+                hd.push("Bexiga contendo balonete de sonda em seu interior.");
+            }
+
+            if (formulario.situacao === "habitual") {
+                relatorio += "Bexiga com distensão adequada, apresentando contornos regulares, parede com espessura normal" + " " + conteudo;
+            } else if (formulario.situacao === "parcial") {
+                relatorio += "Bexiga com distensão parcial, apresentando contornos regulares, paredes com espessura normal" + " " + conteudo;
+            } else if (formulario.situacao === "espessada") {
+                relatorio += `Bexiga com distensão adequada, apresentando contornos regulares, paredes com espessura aumentada, medindo até ${tratarFloat('BexSitEspMed')} cm` + " " + conteudo;
+                if (formulario.diverticulos) {
+                    relatorio += " " + "Presença de divertículos parietais.";
+                    hd.push("Espessamento parietal vesical difuso (associado a divertículos).");
+                } else {
+                    hd.push("Espessamento parietal vesical difuso.");
+                }
+            } else if (formulario.situacao === "vazia") {
+                if (formulario.sonda == true) {
+                    relatorio += "Bexiga vazia. Presença de balonete de sonda vesical.";
+                } else {
+                    relatorio += "Bexiga vazia.";
+                }
+                hd.push("Bexiga com repleção insuficiente.");
+            }
+
+            if (formulario.jatos !== "nc") {
+                if (formulario.jatos == "presentes") {
+                    relatorio += "<br>" + `Jatos ureterais presentes e simétricos.`;
+                } else if (formulario.jatos == "reduzidos") {
+                    relatorio += "<br>" + `Jatos ureterais presentes, assimétricos, reduzidos à ${$('#inputBexJatRed').val()}.`;
+                    hd.push(`Jatos ureterais reduzidos à ${$('#inputBexJatRed').val()}.`);
+                } else if (formulario.jatos == "ausentes") {
+                    relatorio += "<br>" + `Jatos ureterais não caracterizados.`;
+                }
+            }
+
+                            if ($('#checkBexVolPre').is(':checked') && volPre) {
+                    relatorio += `<br>Volume vesical pré-miccional estimado em ${volPre} mL.`;
+                }
+                if ($('#checkBexVolPos').is(':checked') == true) {
+                    if (volPos == null || volPos == 0) {
+                        relatorio += `<br>Resíduo vesical pós-miccional ausente.`;
+                        //hd.push("Resíduo pós-miccional ausente.");
+                    } else {
+                        if (volPos <= 30) {
+                            relatorio += `<br>Resíduo vesical pós-miccional desprezível.`;
+                            //hd.push("Resíduo pós-miccional desprezível.");
+                        }
+                        if (volPos > 30 && volPos <= 80) {
+                            relatorio += `<br>Resíduo vesical pós-miccional pequeno (${volPos} mL).`;
+                            hd.push("Resíduo pós-miccional pequeno.");
+                        }
+                        if (volPos > 80 && volPos <= 150) {
+                            relatorio += `<br>Resíduo vesical pós-miccional moderado (${volPos} mL).`;
+                            hd.push("Resíduo pós-miccional moderado.");
+                        }
+                        if (volPos > 150 && volPos <= 300) {
+                            relatorio += `<br>Resíduo vesical pós-miccional acentuado (${volPos} mL).`;
+                            hd.push("Resíduo pós-miccional acentuado.");
+                        }
+                        if (volPos >= 300) {
+                            relatorio += `<br>Resíduo vesical pós-miccional muito acentuado (${volPos} mL).`;
+                            hd.push("Resíduo pós-miccional muito acentuado.");
+                        }
+                    }
+                }
+                    } else {
+            $('#tabMiccional').css('opacity', 0.3).attr('data-bs-target', '').attr('data-bs-toggle', '');
+            bexiga = false;
+        }
+
+        return relatorio;
+    }
+</script>        </div>
+        <div class="tab-pane" id="contentAchados" role="tabpanel" aria-labelledby="tabAchados">
+            <script>
+    function laudoConclusao() {
+        var relatorio = "";
+
+        relatorio += `<b>${(!json.tituloConclusao ? "OPINIÃO DO RELATÓRIO" : json.tituloConclusao)}:</b><br>`;
+
+        if (hd.length == 0) {
+            relatorio += `${(!json.textoConclusao ? "Estudo ecográfico sem evidentes anormalidades apreciáveis ao método." : json.textoConclusao)}`;
+        } else {
+            if (json.laudoDefensivo && json.laudoDefensivo == true) {
+                relatorio += "Estudo ecográfico com achados que podem corresponder a:<br>";
+            }
+            for (var i = 0; i < hd.length; i++) {
+                relatorio += `${(json.laudoDefensivo && json.laudoDefensivo == true ? "- " : "")}` + hd[i] + '<br>';
+            }
+            var demaisEstruturas = true;
+            if (json.demaisEstruturas == false) {
+                demaisEstruturas = false;
+            }
+            if (demaisEstruturas == true) {
+                relatorio += `${(json.laudoDefensivo && json.laudoDefensivo == true ? "- " : "")}`;
+                relatorio += `Demais estruturas sem evidentes anormalidades apreciáveis ao método.`;
+            }
+        }
+
+        if (json.conclusoesMaiusculo == true) {
+            relatorio = relatorio.toUpperCase();
+        }
+
+        return relatorio;
+    }
+</script><div class="p-2">
+    <h4 class="title-laudo px-2 pt-1">Achados Adicionais</h4>
+    <h5 class="bold px-2 pt-1">Descreva os achados</h5>
+    <div class="italic px-2 pb-1 fs--2"></div>
+    <div class="row px-2 pb-2 mb-2">
+        <label class="option-border">
+            <div>
+                <textarea class="form-control-small w-100" id="inputAchados" style="resize:none; height:200px;"></textarea>
+            </div>
+        </label>
+    </div>
+</div>
+<script>
+    $('textarea').on('change, keyup', function() {
+        montarLaudo(CKEDITOR.instances['editor']);
+    });
+
+    function laudoAchados() {
+        const formulario = {
+            achados: $('#inputAchados').val()
+        };
+
+        let relatorio = "";
+        if (formulario.achados !== "") {
+            relatorio += `<br><br>Achados adicionais: ${formulario.achados}`;
+        }
+
+        return relatorio;
+    }
+</script>        </div>
+    </div>
+</div>
+<script>
+    var hd = [];
+
+    function montarLaudo(ed) {
+        hd = [];
+
+        function breakLine() {
+            laudo += '<br><br>';
+        }
+        var laudo = '<div align="center">';
+        laudo += '<span style="font-size:10pt; font-family:Arial, Helvetica;"><div align="center"><b>ULTRASSONOGRAFIA DO APARELHO URINÁRIO</b></div></span>';
+        laudo += '</div><br>';
+        laudo += '<span style="font-size:10pt; font-family:Helvetica;">';
+        if (carater == true) {
+            laudo += 'Exame realizado em caráter de urgência.<br><br>'
+        }
+        if(analise == true && $('#checkApaSonNC').is(':checked') == false){
+            laudo += '<b>TÉCNICA:</b><br>';
+        }
+        //laudo += laudoAparelho();
+        laudo += laudoLimitacoes();
+        laudo += laudoIndicacao();
+        if(analise == true){
+            laudo += '<b>ANÁLISE:</b><br>';
+        }
+        laudo += laudoRins();
+        breakLine();
+        laudo += laudoBexiga();
+        breakLine();
+        laudo += laudoConclusao();
+        laudo += laudoAchados();
+        laudo += '</span>';
+        ed.setData(laudo);
+    }
+</script>

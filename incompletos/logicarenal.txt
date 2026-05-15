@@ -1,0 +1,343 @@
+text
+ULTRASSONOGRAFIA DO APARELHO URINÁRIO
+
+TÉCNICA:
+Exame realizado em aparelho dinâmico com transdutor convexo por via abdominal.
+
+ANÁLISE:
+Rins em topografia habitual, com dimensões usuais e contornos regulares. Parênquima com espessura preservada e diferenciação corticomedular mantida. Não há evidências de cálculos calicinais. Ausência de hidronefrose.
+
+Bexiga com distensão adequada, apresentando contornos regulares, parede com espessura normal e conteúdo homogêneo.
+
+OPINIÃO DO RELATÓRIO:
+Estudo ecográfico sem evidentes anormalidades apreciáveis ao método.
+VARIÁVEIS DE REFERÊNCIA
+Rins: dimensões usuais (não há valores numéricos fixos no código – usa-se "dimensões usuais")
+
+Parênquima renal: espessura preservada (normalmente entre 1,0 e 1,5 cm, mas o código não explicita limite)
+
+Bexiga: parede com espessura normal (não há valor numérico fixo)
+
+OPÇÕES DE EDIÇÃO POR ESTRUTURA
+1. RINS E URETERES
+Situação dos rins
+Habituais (padrão)
+
+Frase: Rins em topografia habitual, com dimensões usuais e contornos regulares. Parênquima com espessura preservada e diferenciação corticomedular mantida.
+
+Ectópico (à direita ou à esquerda, localizado em fossa ilíaca ou na pelve)
+
+Se apenas um rim ectópico:
+
+Frase: Rim [direito/esquerdo] localizado [em fossa ilíaca direita/esquerda/na pelve]. Rim [esquerdo/direito] em topografia habitual. [Rins] com dimensões usuais e contornos regulares. Parênquima com espessura preservada e diferenciação corticomedular mantida.
+
+Opinião: Rim [direito/esquerdo] ectópico.
+
+Se nefrectomia do outro rim:
+
+Frase: Rim [direito/esquerdo] localizado [em fossa ilíaca/na pelve], com dimensões usuais e contornos regulares. Parênquima com espessura preservada e diferenciação corticomedular mantida.
+
+Opinião: Rim [direito/esquerdo] ectópico.
+
+Em ferradura
+
+Frase: Rins apresentando desvio anterior do seu eixo de rotação assim como fusão de seus polos inferiores em topografia de linha média, anteriormente à aorta abdominal. Parênquima com espessura preservada e diferenciação corticomedular mantida.
+
+Opinião: Rins em ferradura.
+
+Obs: desabilita checkboxes de nefrectomia.
+
+Doença renal policística autossômica dominante (DRPAD)
+
+Frase: Rins em topografia habitual, com dimensões aumentadas e contornos lobulados. Presença de alteração ecotextural caracterizada por distorção arquitetural difusa à custa de múltiplos cistos dispersos por todo o parênquima renal [bilateralmente / à direita / à esquerda], predominantemente corticais, o maior localizado no [terço superior/médio/inferior] do rim [direito/esquerdo], medindo cerca de X cm.
+
+Opinião: Achados ecográficos compatíveis com doença renal policística autossômica dominante.
+
+Obs: desabilita adição manual de cistos.
+
+Insuficiência renal incipiente (à direita, esquerda ou bilateral)
+
+Frase: Rins em topografia habitual, com dimensões habituais e contornos lobulados. Parênquima com espessura discretamente reduzida e diferenciação corticomedular mantida.
+
+Opinião: Achados ecográficos sugestivos de insuficiência renal incipiente à [direita/esquerda/bilateral].
+
+Nefropatia aguda (à direita, esquerda ou bilateral)
+
+Frase:
+
+Se unilateral: Rins em topografia habitual, com contornos regulares. Rim [direito/esquerdo] encontra-se com dimensões aumentadas, enquanto que o rim [esquerdo/direito] conserva dimensões. Parênquima com espessura preservada e diferenciação corticomedular mantida. Observa-se aumento difuso da ecogenicidade cortical renal à [direita/esquerda].
+
+Se bilateral: Rins em topografia habitual, com dimensões aumentadas e contornos regulares. Parênquima com espessura preservada e diferenciação corticomedular mantida. Observa-se aumento difuso da ecogenicidade cortical renal bilateralmente.
+
+Opinião: Achados ecográficos compatíveis com nefropatia parenquimatosa aguda à [direita/esquerda/bilateral].
+
+Nefropatia crônica (à direita, esquerda ou bilateral)
+
+Frase:
+
+Se unilateral: Rins em topografia habitual, com contornos regulares. Rim [direito/esquerdo] encontra-se com dimensões reduzidas, enquanto que o rim [esquerdo/direito] conserva dimensões. Parênquima com espessura reduzida e perda da diferenciação corticomedular, associado a aumento difuso da ecogenicidade cortical renal à [direita/esquerda].
+
+Se bilateral: Rins em topografia habitual, com dimensões reduzidas e contornos regulares. Parênquima com espessura reduzida e perda da diferenciação corticomedular. Observa-se aumento difuso da ecogenicidade cortical renal bilateralmente.
+
+Opinião: Achados ecográficos compatíveis com nefropatia crônica à [direita/esquerda/bilateral].
+
+Nefrectomia (à direita ou à esquerda)
+
+Checkbox independente.
+
+Frase: Rim [direito/esquerdo] não caracterizado (status pós-operatório).
+
+Opinião: Status pós-nefrectomia [direita/esquerda].
+
+Obs: ao marcar nefrectomia, o lado correspondente é ocultado das opções e as medidas ficam desabilitadas.
+
+Dimensões dos rins (opcional)
+Rim direito
+
+Medidas: comprimento (L) x diâmetro ântero-posterior (AP) x largura (T) – em cm
+
+Volume calculado: L x AP x T x 0,52 → exibido em cm³
+
+Frase (se medidas preenchidas): Rim direito mede A x B x C cm, com volume de V cm³.
+
+Espessura do parênquima (opcional): Espessura do parênquima à direita: X cm.
+
+Rim esquerdo (mesma lógica)
+
+Cálculos renais
+Podem ser descritos até 4 cálculos individuais ou "vários bilaterais".
+
+Para cada cálculo:
+
+Medida (cm)
+
+Localização: terço superior / médio / inferior / junção ureteropiélica / junção ureterovesical / ureter proximal / médio / distal
+
+Rim: direito / esquerdo
+
+Se não obstrutivo (localização em terço superior/médio/inferior):
+
+Frase: cálculo não obstrutivo em [localização] à [direita/esquerda], medindo X cm;
+
+Opinião: Nefrolitíase não obstrutiva à [direita/esquerda].
+
+Se obstrutivo (demais localizações):
+
+Frase: cálculo obstrutivo em [localização] à [direita/esquerda] medindo X cm , associado a [discreta/moderada/acentuada] dilatação do sistema coletor a montante (se dilatação presente) ;
+
+Opinião: Cálculo obstrutivo em [localização] à [direita/esquerda] , associado a [discreta/moderada/acentuada] dilatação do sistema coletor a montante.
+
+Múltiplos cálculos bilaterais (opção "vários bilaterais"):
+
+Frase: múltiplos cálculos não obstrutivos, o maior localizado em [localização] à [direita/esquerda], medindo X cm; ou múltiplos cálculos, sendo o maior obstrutivo...
+
+Opinião: Nefrolitíase não obstrutiva bilateral. ou Múltiplos cálculos, o maior obstrutivo...
+
+Agrupamento automático: se houver cálculos não obstrutivos à direita e à esquerda, a opinião vira Nefrolitíase não obstrutiva bilateral.
+
+Cistos renais
+Adição manual de cistos (botão "Adicionar cisto").
+
+Tipos de adição:
+
+Descrever cistos separadamente (um a um)
+
+Descrever o maior entre múltiplos cistos
+
+Atributos do cisto:
+
+Composição: simples / complexo
+
+Topografia: córtex / seio renal
+
+Lateralidade: direita / esquerda
+
+Localização: terço superior / médio / inferior
+
+Dimensões: até 3 medidas (cm)
+
+Exemplo de frase para cisto único:
+
+cisto simples em terço superior cortical à direita, medindo cerca de 2,0 x 1,5 x 1,5 cm
+
+Exemplo de frase para múltiplos cistos:
+
+múltiplos cistos simples corticais, o maior localizado no terço superior à direita, medindo cerca de 2,0 x 2,0 cm
+
+Opiniões geradas:
+
+Cisto único à direita: Cisto renal à direita.
+
+Cisto único à esquerda: Cisto renal à esquerda.
+
+Múltiplos cistos unilaterais: Múltiplos cistos renais à direita.
+
+Cistos bilaterais: Cistos renais bilaterais.
+
+Nódulos renais
+Adição manual de nódulos (botão "Adicionar nódulo").
+
+Tipos de adição:
+
+Descrever nódulos separadamente
+
+Descrever o maior entre múltiplos nódulos
+
+Atributos do nódulo:
+
+Composição: sólido / sólido-cístico
+
+Ecogenicidade: hipoecoico / isoecoico / hiperecoico
+
+Contornos: regulares / irregulares
+
+Lateralidade: direita / esquerda
+
+Localização: terço superior / médio / inferior
+
+Dimensões: até 3 medidas (cm)
+
+Exemplo de frase para nódulo único:
+
+nódulo sólido, hipoecoico, de contornos regulares, localizado no terço superior à direita, medindo cerca de 2,5 x 2,0 x 2,0 cm
+
+Exemplo para múltiplos nódulos:
+
+múltiplos nódulos sólidos, o maior hipoecoico, de contornos regulares à direita, localizado no terço superior, medindo cerca de 2,5 x 2,0 cm
+
+Opiniões geradas (sempre com complemento):
+
+Nódulo renal sólido em rim direito. Sugere-se, a critério clínico, prosseguimento da investigação com tomografia computadorizada ou ressonância magnética com contraste.
+(similar para esquerdo, bilateral, múltiplos)
+
+Dilatação do sistema coletor (hidronefrose)
+Direita e Esquerda separadas.
+
+Opções: ausente (padrão) / presente (discreta, moderada, acentuada)
+
+Se presente, opção adicional: dilatação ureteral (checkbox)
+
+Frase quando unilateral:
+
+Sem dilatação ureteral: [Discreta/Moderada/Acentuada] dilatação do sistema coletor à [direita/esquerda], sem caracterização de fator obstrutivo ao presente método.
+
+Com dilatação ureteral: ... associado a dilatação do ureter à [direita/esquerda]...
+
+Frase quando bilateral:
+
+Se mesmo grau: [Discreta/Moderada/Acentuada] dilatação do sistema coletor bilateralmente, sem caracterização de fator obstrutivo ao presente método (acrescenta dilatação ureteral se marcada).
+
+Se graus diferentes: Dilatação do sistema coletor bilateralmente, sem caracterização de fator obstrutivo ao presente método, sendo [discreta] à direita e [moderada] à esquerda (+ ureteral se aplicável).
+
+Opinião (se não houver cálculo obstrutivo associado):
+
+Dilatação do sistema coletor à direita. (ou esquerda, ou bilateral)
+
+Se houver cálculo obstrutivo no mesmo lado, a frase de hidronefrose é omitida (já incluída na descrição do cálculo).
+
+2. BEXIGA
+Situação da bexiga
+Habitual (padrão)
+
+Frase: Bexiga com distensão adequada, apresentando contornos regulares, parede com espessura normal e conteúdo homogêneo.
+
+Distensão parcial
+
+Frase: Bexiga com distensão parcial, apresentando contornos regulares, paredes com espessura normal e conteúdo homogêneo.
+
+Paredes espessadas + medida (cm)
+
+Frase: Bexiga com distensão adequada, apresentando contornos regulares, paredes com espessura aumentada, medindo até X cm e conteúdo homogêneo.
+
+Opinião: Espessamento parietal vesical difuso.
+
+Opção adicional: divertículos presentes → acrescenta Presença de divertículos parietais. e opinião Espessamento parietal vesical difuso (associado a divertículos).
+
+Bexiga vazia
+
+Frase: Bexiga vazia.
+
+Opinião: Bexiga com repleção insuficiente.
+
+Conteúdo da bexiga (múltiplas opções)
+Debris (focos ecogênicos em suspensão)
+
+Frase: ecos em suspensão (no lugar de "conteúdo homogêneo")
+
+Opinião: Bexiga contendo debris em seu interior.
+
+Coágulo (com medidas)
+
+Frase: coágulo móvel medindo cerca de A x B x C cm
+
+Opinião: Coágulo vesical.
+
+Cálculo (com medidas)
+
+Frase: cálculo medindo cerca de A x B x C cm
+
+Opinião: Litíase vesical.
+
+Lesão vegetante (com medidas, localização, Doppler)
+
+Frase: lesão exofítica de contornos irregulares localizada [no assoalho vesical / na parede lateral direita / etc.], medindo cerca de A x B x C cm, [caracterizando / não caracterizando] fluxo vascular interno ao estudo complementar com Doppler.
+
+Opinião: Lesão vesical de provável natureza neoplásica. Sugere-se, a critério clínico, complementação diagnóstica com cistoscopia.
+
+Balão de sonda vesical
+
+Frase: Presença de balonete de sonda vesical.
+
+Opinião: Bexiga contendo balonete de sonda em seu interior.
+
+Jatos ureterais
+Não citar (padrão)
+
+Presentes e simétricos – Frase: Jatos ureterais presentes e simétricos.
+
+Presentes, reduzido à direita/esquerda – Frase: Jatos ureterais presentes, assimétricos, reduzidos à [direita/esquerda]. Opinião: Jatos ureterais reduzidos à [direita/esquerda].
+
+Não caracterizados – Frase: Jatos ureterais não caracterizados.
+
+Volume vesical e resíduo pós-miccional
+Pré-miccional (opcional)
+
+Medidas (3 eixos em cm) → volume estimado (mL) = L x AP x T x 0,52 x 1000 (arredondado)
+
+Frase: Volume vesical pré-miccional estimado em X mL.
+
+Pós-miccional (opcional)
+
+Mesmo cálculo.
+
+Se volume = 0 ou não preenchido: Resíduo vesical pós-miccional ausente.
+
+Se volume ≤ 30 mL: Resíduo vesical pós-miccional desprezível.
+
+Se 30 < volume ≤ 80: Resíduo vesical pós-miccional pequeno (X mL). + opinião Resíduo pós-miccional pequeno.
+
+Se 80 < volume ≤ 150: Resíduo vesical pós-miccional moderado (X mL). + opinião Resíduo pós-miccional moderado.
+
+Se 150 < volume ≤ 300: Resíduo vesical pós-miccional acentuado (X mL). + opinião Resíduo pós-miccional acentuado.
+
+Se volume ≥ 300 mL: Resíduo vesical pós-miccional muito acentuado (X mL). + opinião Resíduo pós-miccional muito acentuado.
+
+3. ACHADOS ADICIONAIS (texto livre)
+Campo textarea para digitar observações.
+
+Frase: Achados adicionais: [texto]
+
+4. OPINIÃO DO RELATÓRIO (CONCLUSÃO)
+Se nenhum achado (hd vazio):
+
+Estudo ecográfico sem evidentes anormalidades apreciáveis ao método.
+
+Se houver achados:
+
+Opção Laudo defensivo (se ativada): inicia com Estudo ecográfico com achados que podem corresponder a: e lista cada hipótese com -.
+
+Caso contrário, lista as opiniões diretamente.
+
+Ao final, se demais estruturas = true (padrão), acrescenta: Demais estruturas sem evidentes anormalidades apreciáveis ao método.
+
+Opção Conclusões em maiúsculo (se ativada): todo o texto da conclusão é convertido para maiúsculas.
