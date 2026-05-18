@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THI-RADS — US Cervical (Linfonodos)</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#1a56db;--blue-dark:#1140a6;--blue-light:#e8f0fe;--blue-mid:#dbeafe;
+  --surface:#f4f6fb;--border:#e2e6ef;--border-strong:#c8cfe0;
+  --text:#1a1f2e;--text-2:#4b5570;--text-3:#8892a4;
+  --white:#ffffff;--green:#059669;--amber:#d97706;--red:#dc2626;
+  --radius:8px;--radius-lg:12px;
+}
+body.dark{
+  --blue:#4d86f5;--blue-dark:#3a6fd4;--blue-light:#1e2d4a;--blue-mid:#1e2d4a;
+  --surface:#141820;--border:#2a2f3d;--border-strong:#3a4155;
+  --text:#e2e6f0;--text-2:#9aa3b8;--text-3:#5d6680;
+  --white:#1e2230;--green:#34d399;--amber:#fbbf24;--red:#f87171;
+}
+body.dark .laudo-doc{color:#e2e6f0;}
+body.dark .laudo-panel{background:#1e2230;border-left-color:var(--border);}
+body.dark .laudo-body{background:#1e2230;}
+body.dark .laudo-header{background:#1e2230;border-bottom-color:var(--border);}
+@media print{body.dark .laudo-doc,body.dark .laudo-doc *{color:#111 !important;}}
+.btn-dark{margin-left:auto;}
+body.dark .btn-dark{background:#2a2f3d;border-color:#3a4155;color:#e2e6f0;}
+body.dark .btn-dark:hover{background:#343a4d;color:#fff;}
+body.dark .pac-input,.pac-select-dark{background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .ff select,body.dark .ff input[type=text]{background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .radio-mark{background:var(--white);}
+body.dark .check-box{background:var(--white);}
+body.dark .toolbar{background:var(--white);border-bottom-color:var(--border);}
+body.dark .sidebar{background:var(--white);border-right-color:var(--border);}
+body.dark .sidebar-hd{border-bottom-color:var(--border);}
+body.dark .block{background:var(--white);border-color:var(--border);}
+body.dark .block-title{background:var(--white);border-bottom-color:var(--border);}
+body.dark .radio-opt:hover{background:#1e2d4a;}
+body.dark .radio-opt.selected{background:#1e2d4a;}
+body.dark .check-row{background:#1a1f2e;}
+body.dark .check-row:hover{background:#1e2d4a;}
+body.dark .check-row.selected{background:#1e2d4a;}
+body.dark .sel-tag{background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .pac-row{border-bottom-color:var(--border);}
+body.dark .nivel-badge{background:#1e2d4a;border-color:var(--border-strong);color:var(--text-2);}
+body.dark .nivel-badge.active{background:var(--blue);border-color:var(--blue);color:#fff;}
+body.dark .atipica-card{background:#1a1f2e;border-color:var(--border);}
+body.dark .ff select,body.dark .ff input[type=text]{background:#1a1f2e;color:var(--text);border-color:var(--border-strong);}
+body.dark .info-niveis{background:#1a2040;border-color:var(--border);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',system-ui,sans-serif;font-size:13px;background:var(--surface);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+/* TOOLBAR */
+.toolbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:10px;height:48px;flex-shrink:0;}
+.logo{display:flex;align-items:baseline;gap:6px;margin-right:12px;}
+.logo-name{font-size:17px;font-weight:600;color:var(--blue);letter-spacing:-.3px;}
+.logo-sub{font-size:11px;color:var(--text-3);font-weight:400;letter-spacing:.2px;}
+.tb-sep{width:1px;height:20px;background:var(--border);margin:0 4px;}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid var(--border);font-weight:500;transition:all .13s;background:var(--white);color:var(--text-2);}
+.btn:hover{background:var(--surface);border-color:var(--border-strong);color:var(--text);}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue);}
+.btn-primary:hover{background:var(--blue-dark);border-color:var(--blue-dark);color:#fff;}
+.btn-danger{background:#fff5f5;color:var(--red);border-color:#fecaca;}
+body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
+.btn-danger:hover{background:#fee2e2;border-color:#fca5a5;}
+.btn svg{width:13px;height:13px;flex-shrink:0;}
+/* LAYOUT */
+.body{display:flex;flex:1;overflow:hidden;}
+.sidebar{width:152px;background:var(--white);border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;}
+.sidebar-hd{padding:10px 12px 8px;border-bottom:1px solid var(--border);}
+.sidebar-tipo{font-size:9px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;}
+.sidebar-titulo{font-size:11px;font-weight:600;color:var(--text);}
+.nav-group{padding:6px 0;}
+.nav-item{display:flex;align-items:center;gap:7px;padding:7px 12px;font-size:11.5px;color:var(--text-2);cursor:pointer;transition:all .12s;border-left:2px solid transparent;}
+.nav-item:hover{background:var(--blue-light);color:var(--blue);}
+.nav-item.active{background:var(--blue-light);color:var(--blue);border-left-color:var(--blue);font-weight:600;}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.4;flex-shrink:0;}
+.nav-item.active .nav-dot{opacity:1;}
+.panel{width:500px;flex-shrink:0;overflow-y:auto;padding:14px 14px 24px;background:var(--surface);}
+/* SECTION */
+.sec-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.sec-title::before{content:'';display:block;width:3px;height:16px;background:var(--blue);border-radius:2px;}
+/* BLOCK */
+.block{margin-bottom:10px;background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden;}
+.block-title{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.7px;padding:8px 14px 7px;border-bottom:1px solid var(--border);background:var(--white);display:flex;align-items:center;justify-content:space-between;}
+.block-badge{font-size:9px;padding:2px 7px;border-radius:10px;font-weight:600;letter-spacing:.2px;}
+.badge-reacional{background:#dcfce7;color:#166534;border:1px solid #bbf7d0;}
+body.dark .badge-reacional{background:#052e16;border-color:#166534;color:#86efac;}
+.badge-atipica{background:#fef3c7;color:#92400e;border:1px solid #fde68a;}
+body.dark .badge-atipica{background:#2d2200;border-color:#6b5000;color:#fbbf24;}
+/* RADIO */
+.radio-opt{display:flex;align-items:flex-start;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;position:relative;}
+.radio-opt:last-child{border-bottom:none;}
+.radio-opt:hover{background:#f5f8ff;}
+.radio-opt.selected{background:var(--blue-light);}
+.radio-opt input[type=radio]{position:absolute;opacity:0;pointer-events:none;}
+.radio-label{display:flex;align-items:center;gap:10px;width:100%;padding:9px 14px;font-size:12.5px;color:var(--text-2);line-height:1.4;cursor:pointer;}
+.radio-opt.selected .radio-label{color:var(--blue);font-weight:500;}
+.radio-mark{width:16px;height:16px;border-radius:50%;border:2px solid var(--border-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.radio-opt:hover .radio-mark{border-color:var(--blue);}
+.radio-opt.selected .radio-mark{border-color:var(--blue);background:var(--blue);}
+.radio-mark::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff;opacity:0;transition:opacity .15s;}
+.radio-opt.selected .radio-mark::after{opacity:1;}
+/* CHECK */
+.check-row{display:flex;align-items:center;border-bottom:1px solid var(--border);cursor:pointer;background:#fafbff;}
+.check-row:last-child{border-bottom:none;}
+.check-row:hover{background:#f0f5ff;}
+.check-row.selected{background:#e6eeff;}
+.check-row input[type=checkbox]{position:absolute;opacity:0;pointer-events:none;}
+.check-label{display:flex;align-items:center;gap:10px;width:100%;padding:8px 14px;font-size:12px;color:var(--text-2);cursor:pointer;}
+.check-row.selected .check-label{color:var(--blue);font-weight:500;}
+.check-box{width:15px;height:15px;border-radius:4px;border:2px solid var(--border-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.check-row:hover .check-box{border-color:var(--blue);}
+.check-row.selected .check-box{border-color:var(--blue);background:var(--blue);}
+.check-box svg{display:none;width:9px;height:9px;}
+.check-row.selected .check-box svg{display:block;}
+/* PACIENTE */
+.pac-row{display:flex;align-items:center;padding:8px 14px;border-bottom:1px solid var(--border);gap:10px;}
+.pac-row:last-child{border-bottom:none;}
+.pac-lbl{width:145px;font-size:11.5px;color:var(--text-3);flex-shrink:0;}
+.pac-input{flex:1;border:1px solid var(--border-strong);border-radius:5px;padding:4px 8px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--white);}
+.pac-input:focus{outline:none;border-color:var(--blue);}
+.pac-select{flex:1;border:1px solid var(--border-strong);border-radius:5px;padding:4px 8px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--white);}
+body.dark .pac-select{background:var(--white);color:var(--text);border-color:var(--border-strong);}
+/* LINFONODOS — sub-area */
+.lf-sub{padding:12px 14px;border-bottom:1px solid var(--border);}
+.lf-sub:last-child{border-bottom:none;}
+.lf-sub-title{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;}
+/* NIVEIS badges */
+.niveis-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.nivel-badge{display:flex;flex-direction:column;align-items:center;padding:5px 10px;border-radius:8px;border:1.5px solid var(--border-strong);background:var(--white);cursor:pointer;transition:all .14s;user-select:none;min-width:52px;}
+.nivel-badge:hover{border-color:var(--blue);color:var(--blue);}
+.nivel-badge.active{background:var(--blue);border-color:var(--blue);color:#fff;}
+.nivel-code{font-size:12px;font-weight:700;line-height:1.2;}
+.nivel-desc{font-size:8.5px;font-weight:400;opacity:.75;line-height:1.2;text-align:center;margin-top:1px;}
+/* FF (field group) */
+.ff-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;align-items:flex-end;}
+.ff{display:flex;flex-direction:column;gap:2px;}
+.ff label{font-size:9px;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
+.ff select,.ff input[type=text]{font-size:11px;padding:4px 7px;border:1px solid var(--border-strong);border-radius:5px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);}
+.ff select:focus,.ff input:focus{outline:none;border-color:var(--blue);}
+.ff input[type=text]{width:52px;text-align:center;}
+.ff-med{display:flex;align-items:center;gap:4px;}
+.ff-med span{font-size:11px;color:var(--text-3);}
+/* ATIPICA card */
+.atipica-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:11px 13px;}
+.atipica-card-title{font-size:10px;font-weight:600;color:var(--amber);text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px;}
+.paaf-row{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--text-2);margin-top:9px;}
+.paaf-row input{accent-color:var(--blue);}
+/* MAIOR row */
+.maior-row{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
+.maior-lbl{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;}
+/* INFO niveis */
+.info-niveis{background:#f0f5ff;border:1px solid #c7d7fb;border-radius:var(--radius);padding:9px 12px;margin-bottom:10px;}
+body.dark .info-niveis{background:#1a2040;border-color:var(--border);}
+.info-niveis-title{font-size:9px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+.info-niveis-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2px 14px;}
+.info-niveis-item{font-size:10px;color:var(--text-2);line-height:1.5;}
+.info-niveis-item b{color:var(--blue);}
+/* DIM */
+.dim-rows{padding:8px 14px;display:flex;flex-direction:column;gap:6px;}
+/* LAUDO */
+.laudo-panel{flex:1;min-width:0;background:var(--white);display:flex;flex-direction:column;border-left:1px solid var(--border);}
+.laudo-header{padding:9px 20px 8px;border-bottom:1px solid var(--border);background:var(--white);display:flex;align-items:center;}
+.laudo-header-title{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.6px;}
+.laudo-body{flex:1;overflow-y:auto;padding:22px 28px;}
+.laudo-doc{font-family:Helvetica,Arial,sans-serif;font-size:10pt;line-height:1.65;color:#111;max-width:720px;}
+.doc-titulo{text-align:center;font-weight:700;font-size:10pt;margin-bottom:16px;text-transform:uppercase;letter-spacing:.3px;}
+.doc-label{font-weight:700;font-size:10pt;}
+.doc-p{margin-bottom:8px;font-size:10pt;}
+.doc-secao{margin-bottom:14px;}
+.sel-tag{font-size:11px;border:1px solid var(--border-strong);border-radius:5px;padding:2px 6px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);cursor:pointer;}
+body.dark .sel-tag{background:var(--white);color:var(--text);}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="logo" style="cursor:pointer" onclick="window.location.href='../laudo-thirads.html'"><span class="logo-name">THI-RADS</span><span class="logo-sub">laudo estruturado</span></div>
+  <button class="btn" onclick="window.location.href='../laudo-thirads.html'"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 2L4 8l6 6"/></svg>Voltar</button>
+  <div class="tb-sep"></div>
+  <button class="btn" onclick="copiar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>Copiar laudo</button>
+  <button class="btn btn-primary" onclick="imprimir()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6V2h8v4M4 12H2V7h12v5h-2M4 9h8M4 12v2h8v-2"/></svg>Imprimir</button>
+  <button class="btn btn-dark" id="btn-dark-toggle" onclick="toggleDark()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro</button>
+  <button class="btn btn-danger" onclick="reiniciar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8a6 6 0 1 0 1.5-3.9M2 4v4h4"/></svg>Reiniciar</button>
+</div>
+
+<div class="body">
+  <div class="sidebar">
+    <div class="sidebar-hd">
+      <div class="sidebar-tipo">Ultrassonografia</div>
+      <div class="sidebar-titulo">Cervical — Linfonodos</div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-item" id="nav-paciente" onclick="showSection('paciente')"><span class="nav-dot"></span>Paciente</div>
+      <div class="nav-item" id="nav-tecnica" onclick="showSection('tecnica')"><span class="nav-dot"></span>Técnica</div>
+      <div class="nav-item" id="nav-linfonodos" onclick="showSection('linfonodos')"><span class="nav-dot"></span>Linfonodos</div>
+      <div class="nav-item" id="nav-achados" onclick="showSection('achados')"><span class="nav-dot"></span>Achados Adicionais</div>
+    </div>
+  </div>
+
+  <div class="panel" id="main-panel"></div>
+
+  <div class="laudo-panel">
+    <div class="laudo-header"><span class="laudo-header-title">Pré-visualização do Laudo</span></div>
+    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc"></div></div>
+  </div>
+</div>
+
+<script>
+// ── CONSTANTES ──
+const NIVEIS = [
+  { code:'IA',  desc:'Submentonianos' },
+  { code:'IB',  desc:'Submandibulares' },
+  { code:'IIA', desc:'Jugulares sup. ant.' },
+  { code:'IIB', desc:'Jugulares sup. post.' },
+  { code:'III', desc:'Jugulares médios' },
+  { code:'IV',  desc:'Jugulares inferiores' },
+  { code:'VA',  desc:'Triângulo post. sup.' },
+  { code:'VB',  desc:'Triângulo post. inf.' },
+  { code:'VI',  desc:'Compartimento central' },
+  { code:'VII', desc:'Mediastinais sup.' },
+];
+
+// ── ESTADO GLOBAL ──
+const estado = {
+  paciente: { nome:'', dn:'', sexo:'O', convenio:'', medico:'' },
+  tecnica: { urgencia:false, citarSonda:true, indicacao:'nc', indicacaoOutros:'', limitacaoBiotipo:false },
+  linfonodos: {
+    // Reacional
+    reacional: 'ausentes',      // ausentes | isolada | multiplas
+    reaIsoLoc: 'IIA', reaIsoLat: 'direita',
+    reaIsoM1: '', reaIsoM2: '', reaIsoM3: '',
+    reaMulLat: 'direita',
+    reaMulNiveis: [],
+    reaMulMaiorLoc: 'IIA', reaMulMaiorLat: 'direita',
+    reaMulM1: '', reaMulM2: '', reaMulM3: '',
+    // Atípica
+    atipica: 'ausentes',        // ausentes | isolada | multiplas
+    atiIsoLoc: 'IIA', atiIsoLat: 'direita',
+    atiIsoForma: 'ovalado', atiIsoEco: 'hipoecogênico',
+    atiIsoTex: 'homogênea', atiIsoCon: 'regulares', atiIsoFlu: 'ausente',
+    atiIsoM1: '', atiIsoM2: '', atiIsoM3: '',
+    atiIsoPaaf: false,
+    atiMulLat: 'direita',
+    atiMulNiveis: [],
+    atiMulMaiorLoc: 'IIA', atiMulMaiorLat: 'direita',
+    atiMulM1: '', atiMulM2: '', atiMulM3: '',
+    atiMulPaaf: false,
+  },
+  achados: { texto: '' }
+};
+
+let secaoAtual = 'linfonodos';
+
+// ── NAVEGAÇÃO ──
+function showSection(sec) {
+  secaoAtual = sec;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('nav-'+sec).classList.add('active');
+  renderPanel(sec);
+  updateLaudo();
+}
+
+// ── HELPERS ──
+function svgChk(){ return `<svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.8"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg>`; }
+
+function fmtMed(m1, m2, m3) {
+  const parts = [m1,m2,m3].map(v => (v||'').trim()).filter(v => v && v !== '—');
+  if(!parts.length) return '_';
+  return parts.join(' x ') + ' cm';
+}
+
+function fmtNiveis(arr) {
+  if(!arr.length) return '_';
+  if(arr.length === 1) return arr[0];
+  return arr.slice(0,-1).join(', ') + ' e ' + arr[arr.length-1];
+}
+
+function niveisGrid(selectedArr, onToggle) {
+  return `<div class="niveis-grid">${NIVEIS.map(n => `
+    <div class="nivel-badge ${selectedArr.includes(n.code)?'active':''}" onclick="${onToggle}('${n.code}')">
+      <span class="nivel-code">${n.code}</span>
+      <span class="nivel-desc">${n.desc}</span>
+    </div>`).join('')}</div>`;
+}
+
+function locSelect(id, val, onchange) {
+  return `<select class="sel-tag" id="${id}" onchange="${onchange}" style="font-size:12px;padding:3px 7px;">
+    ${NIVEIS.map(n=>`<option value="${n.code}" ${val===n.code?'selected':''}>${n.code} – ${n.desc}</option>`).join('')}
+  </select>`;
+}
+
+function latSelect(id, val, onchange) {
+  return `<select class="sel-tag" id="${id}" onchange="${onchange}" style="font-size:12px;padding:3px 7px;">
+    <option value="direita" ${val==='direita'?'selected':''}>à direita</option>
+    <option value="esquerda" ${val==='esquerda'?'selected':''}>à esquerda</option>
+    <option value="bilateral" ${val==='bilateral'?'selected':''}>bilateralmente</option>
+  </select>`;
+}
+
+function medFields(prefix, m1, m2, m3) {
+  return `<div class="ff-med">
+    <input class="ff" type="text" id="${prefix}-m1" value="${m1}" placeholder="—" oninput="setMed('${prefix}','m1',this.value)" style="width:46px;border:1px solid var(--border-strong);border-radius:5px;padding:4px 6px;font-size:11px;text-align:center;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);">
+    <span style="font-size:12px;color:var(--text-3);">×</span>
+    <input class="ff" type="text" id="${prefix}-m2" value="${m2}" placeholder="—" oninput="setMed('${prefix}','m2',this.value)" style="width:46px;border:1px solid var(--border-strong);border-radius:5px;padding:4px 6px;font-size:11px;text-align:center;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);">
+    <span style="font-size:12px;color:var(--text-3);">×</span>
+    <input class="ff" type="text" id="${prefix}-m3" value="${m3}" placeholder="—" oninput="setMed('${prefix}','m3',this.value)" style="width:46px;border:1px solid var(--border-strong);border-radius:5px;padding:4px 6px;font-size:11px;text-align:center;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);">
+    <span style="font-size:12px;color:var(--text-3);">cm</span>
+  </div>`;
+}
+
+// Mapa de inputs de medida para estado
+const medMap = {
+  'rea-iso': ['reaIsoM1','reaIsoM2','reaIsoM3'],
+  'rea-mul': ['reaMulM1','reaMulM2','reaMulM3'],
+  'ati-iso': ['atiIsoM1','atiIsoM2','atiIsoM3'],
+  'ati-mul': ['atiMulM1','atiMulM2','atiMulM3'],
+};
+function setMed(prefix, axis, val) {
+  const keys = medMap[prefix];
+  if(!keys) return;
+  const idx = {m1:0,m2:1,m3:2}[axis];
+  estado.linfonodos[keys[idx]] = val;
+  updateLaudo();
+}
+
+// ── RENDER PANEL ──
+function renderPanel(sec) {
+  const p = document.getElementById('main-panel');
+  const titles = {paciente:'Dados do Paciente',tecnica:'Técnica',linfonodos:'Linfonodos Cervicais',achados:'Achados Adicionais'};
+  let html = `<div class="sec-title">${titles[sec]}</div>`;
+  if(sec==='paciente') html += renderPaciente();
+  else if(sec==='tecnica') html += renderTecnica();
+  else if(sec==='linfonodos') html += renderLinfonodos();
+  else if(sec==='achados') html += renderAchados();
+  p.innerHTML = html;
+}
+
+// ── PACIENTE ──
+function renderPaciente() {
+  const p = estado.paciente;
+  return `
+  <div class="block">
+    <div class="block-title">Dados do Paciente</div>
+    <div class="pac-row"><span class="pac-lbl">Nome completo</span><input class="pac-input" type="text" value="${p.nome}" placeholder="NOME DO PACIENTE" oninput="estado.paciente.nome=this.value;updateLaudo()" style="text-transform:uppercase"></div>
+    <div class="pac-row"><span class="pac-lbl">Data de nascimento</span><input class="pac-input" type="text" value="${p.dn}" placeholder="dd/mm/aaaa" oninput="estado.paciente.dn=this.value;updateLaudo()" maxlength="10"></div>
+    <div class="pac-row"><span class="pac-lbl">Sexo</span>
+      <select class="pac-select" onchange="estado.paciente.sexo=this.value;updateLaudo()">
+        <option value="O" ${p.sexo==='O'?'selected':''}>não informar</option>
+        <option value="M" ${p.sexo==='M'?'selected':''}>masculino</option>
+        <option value="F" ${p.sexo==='F'?'selected':''}>feminino</option>
+      </select>
+    </div>
+    <div class="pac-row"><span class="pac-lbl">Convênio</span><input class="pac-input" type="text" value="${p.convenio}" placeholder="CONVÊNIO" oninput="estado.paciente.convenio=this.value;updateLaudo()" style="text-transform:uppercase"></div>
+    <div class="pac-row"><span class="pac-lbl">Médico solicitante</span><input class="pac-input" type="text" value="${p.medico}" placeholder="DR. NOME" oninput="estado.paciente.medico=this.value;updateLaudo()" style="text-transform:uppercase"></div>
+  </div>`;
+}
+
+// ── TÉCNICA ──
+function renderTecnica() {
+  const t = estado.tecnica;
+  function chkRow(id, label, checked, onchange) {
+    return `<div class="check-row ${checked?'selected':''}" onclick="toggleChkTec('${id}')">
+      <input type="checkbox" id="${id}" ${checked?'checked':''} onchange="${onchange}">
+      <label class="check-label"><span class="check-box">${svgChk()}</span>${label}</label></div>`;
+  }
+  function radioOpt(val, label, cur) {
+    return `<div class="radio-opt ${cur===val?'selected':''}" onclick="setIndicacao('${val}')">
+      <input type="radio"><label class="radio-label"><span class="radio-mark"></span>${label}</label></div>`;
+  }
+  return `
+  <div class="block">
+    <div class="block-title">Condições do Exame</div>
+    ${chkRow('chk-urg','Exame em caráter de urgência',t.urgencia,"estado.tecnica.urgencia=this.checked;updateLaudo()")}
+    ${chkRow('chk-sonda','Citar transdutor linear (região cervical)',t.citarSonda,"estado.tecnica.citarSonda=this.checked;updateLaudo()")}
+  </div>
+  <div class="block">
+    <div class="block-title">Indicação clínica</div>
+    ${radioOpt('nc','não citar',t.indicacao)}
+    ${radioOpt('linfonodomegalia','linfonodomegalia cervical',t.indicacao)}
+    ${radioOpt('parotidite','parotidite',t.indicacao)}
+    ${radioOpt('sialoadenite','sialoadenite',t.indicacao)}
+    ${radioOpt('neoplasia','investigação de neoplasia cervical',t.indicacao)}
+    ${radioOpt('pos-op','controle pós-operatório',t.indicacao)}
+    <div class="radio-opt ${t.indicacao==='outros'?'selected':''}" onclick="setIndicacao('outros')">
+      <input type="radio"><label class="radio-label"><span class="radio-mark"></span>outra: <input class="pac-input" type="text" value="${t.indicacaoOutros}" placeholder="descrever" onclick="event.stopPropagation()" oninput="estado.tecnica.indicacaoOutros=this.value;updateLaudo()" style="width:180px;margin-left:6px;padding:2px 6px;font-size:11px;"></label></div>
+  </div>
+  <div class="block">
+    <div class="block-title">Limitações técnicas</div>
+    ${chkRow('chk-lim-bio','biotipo (atenuação do feixe acústico)',t.limitacaoBiotipo,"estado.tecnica.limitacaoBiotipo=this.checked;updateLaudo()")}
+  </div>`;
+}
+function toggleChkTec(id) {
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.checked = !el.checked;
+  el.dispatchEvent(new Event('change'));
+}
+function setIndicacao(val) { estado.tecnica.indicacao=val; renderPanel('tecnica'); updateLaudo(); }
+
+// ── LINFONODOS ──
+function renderLinfonodos() {
+  const lf = estado.linfonodos;
+  return `
+  <div class="info-niveis">
+    <div class="info-niveis-title">Classificação dos Níveis Cervicais (SOM 2000)</div>
+    <div class="info-niveis-grid">
+      <div class="info-niveis-item"><b>IA</b> Submentonianos</div>
+      <div class="info-niveis-item"><b>IB</b> Submandibulares</div>
+      <div class="info-niveis-item"><b>IIA</b> Jugulares sup. (ant. ao n. acessório)</div>
+      <div class="info-niveis-item"><b>IIB</b> Jugulares sup. (post. ao n. acessório)</div>
+      <div class="info-niveis-item"><b>III</b> Jugulares médios</div>
+      <div class="info-niveis-item"><b>IV</b> Jugulares inferiores</div>
+      <div class="info-niveis-item"><b>VA</b> Triângulo posterior superior</div>
+      <div class="info-niveis-item"><b>VB</b> Triângulo posterior inferior</div>
+      <div class="info-niveis-item"><b>VI</b> Compartimento central</div>
+      <div class="info-niveis-item"><b>VII</b> Mediastinais superiores</div>
+    </div>
+  </div>
+
+  <!-- REACIONAL -->
+  <div class="block">
+    <div class="block-title">Linfonodomegalia Reacional <span class="block-badge badge-reacional">BENIGNO / INFECCIOSO</span></div>
+    <div class="radio-opt ${lf.reacional==='ausentes'?'selected':''}" onclick="setLf('reacional','ausentes')">
+      <input type="radio"><label class="radio-label"><span class="radio-mark"></span>ausentes</label></div>
+    <div class="radio-opt ${lf.reacional==='isolada'?'selected':''}" onclick="setLf('reacional','isolada')">
+      <input type="radio"><label class="radio-label"><span class="radio-mark"></span>isolada</label></div>
+    ${lf.reacional==='isolada' ? renderReacionalIsolada() : ''}
+    <div class="radio-opt ${lf.reacional==='multiplas'?'selected':''}" onclick="setLf('reacional','multiplas')">
+      <input type="radio"><label class="radio-label"><span class="radio-mark"></span>múltiplas</label></div>
+    ${lf.reacional==='multiplas' ? renderReacionalMultiplas() : ''}
+  </div>
+
+  <!-- ATÍPICA -->
+  <div class="block">
+    <div class="block-title">Linfonodomegalia Atípica <span class="block-badge badge-atipica">SUSPEITA / INESPECÍFICA</span></div>
+    <div class="radio-opt ${lf.atipica==='ausentes'?'selected':''}" onclick="setLf('atipica','ausentes')">
+      <input type="radio"><label class="radio-label"><span class="radio-mark"></span>ausentes</label></div>
+    <div class="radio-opt ${lf.atipica==='isolada'?'selected':''}" onclick="setLf('atipica','isolada')">
+      <input type="radio"><label class="radio-label"><span class="radio-mark"></span>isolada</label></div>
+    ${lf.atipica==='isolada' ? renderAtipicoIsolado() : ''}
+    <div class="radio-opt ${lf.atipica==='multiplas'?'selected':''}" onclick="setLf('atipica','multiplas')">
+      <input type="radio"><label class="radio-label"><span class="radio-mark"></span>múltiplas</label></div>
+    ${lf.atipica==='multiplas' ? renderAtipicoMultiplo() : ''}
+  </div>`;
+}
+
+function renderReacionalIsolada() {
+  const lf = estado.linfonodos;
+  return `<div style="padding:10px 14px 12px 28px;border-bottom:1px solid var(--border);background:#f7faff;">
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px;">
+      <div class="ff"><label>Nível</label>${locSelect('rea-iso-loc', lf.reaIsoLoc, "estado.linfonodos.reaIsoLoc=this.value;updateLaudo()")}</div>
+      <div class="ff"><label>Lateralidade</label>
+        <select class="sel-tag" onchange="estado.linfonodos.reaIsoLat=this.value;updateLaudo()" style="font-size:12px;padding:3px 7px;">
+          <option value="direita" ${lf.reaIsoLat==='direita'?'selected':''}>à direita</option>
+          <option value="esquerda" ${lf.reaIsoLat==='esquerda'?'selected':''}>à esquerda</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+      <span style="font-size:11px;color:var(--text-3);">Medidas:</span>
+      ${medFields('rea-iso', lf.reaIsoM1, lf.reaIsoM2, lf.reaIsoM3)}
+    </div>
+  </div>`;
+}
+
+function renderReacionalMultiplas() {
+  const lf = estado.linfonodos;
+  return `<div style="padding:10px 14px 12px 28px;border-bottom:1px solid var(--border);background:#f7faff;">
+    <div class="ff" style="margin-bottom:8px;"><label>Distribuição</label>
+      <select class="sel-tag" onchange="estado.linfonodos.reaMulLat=this.value;updateLaudo()" style="font-size:12px;padding:3px 7px;">
+        <option value="direita" ${lf.reaMulLat==='direita'?'selected':''}>à direita</option>
+        <option value="esquerda" ${lf.reaMulLat==='esquerda'?'selected':''}>à esquerda</option>
+        <option value="bilateralmente" ${lf.reaMulLat==='bilateralmente'?'selected':''}>bilateralmente</option>
+      </select>
+    </div>
+    <div style="font-size:10px;color:var(--text-3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;font-weight:600;">Níveis acometidos</div>
+    ${niveisGrid(lf.reaMulNiveis, 'toggleNivelRea')}
+    <div class="maior-row">
+      <div class="maior-lbl">Maior linfonodo — localização e medidas</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px;">
+        <div class="ff"><label>Nível</label>${locSelect('rea-mul-loc', lf.reaMulMaiorLoc, "estado.linfonodos.reaMulMaiorLoc=this.value;updateLaudo()")}</div>
+        <div class="ff"><label>Lateralidade</label>
+          <select class="sel-tag" onchange="estado.linfonodos.reaMulMaiorLat=this.value;updateLaudo()" style="font-size:12px;padding:3px 7px;">
+            <option value="direita" ${lf.reaMulMaiorLat==='direita'?'selected':''}>à direita</option>
+            <option value="esquerda" ${lf.reaMulMaiorLat==='esquerda'?'selected':''}>à esquerda</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+        <span style="font-size:11px;color:var(--text-3);">Medidas:</span>
+        ${medFields('rea-mul', lf.reaMulM1, lf.reaMulM2, lf.reaMulM3)}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderAtipicoIsolado() {
+  const lf = estado.linfonodos;
+  return `<div style="padding:10px 14px 12px 28px;border-bottom:1px solid var(--border);background:#fffbf0;">
+    <div class="atipica-card">
+      <div class="atipica-card-title">⚠ Linfonodo Atípico Isolado</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:9px;">
+        <div class="ff"><label>Nível</label>${locSelect('ati-iso-loc', lf.atiIsoLoc, "estado.linfonodos.atiIsoLoc=this.value;updateLaudo()")}</div>
+        <div class="ff"><label>Lateralidade</label>
+          <select class="sel-tag" onchange="estado.linfonodos.atiIsoLat=this.value;updateLaudo()" style="font-size:12px;padding:3px 7px;">
+            <option value="direita" ${lf.atiIsoLat==='direita'?'selected':''}>à direita</option>
+            <option value="esquerda" ${lf.atiIsoLat==='esquerda'?'selected':''}>à esquerda</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:9px;">
+        <div class="ff"><label>Forma</label>
+          <select class="sel-tag" onchange="estado.linfonodos.atiIsoForma=this.value;updateLaudo()" style="font-size:12px;padding:3px 7px;">
+            <option value="ovalado" ${lf.atiIsoForma==='ovalado'?'selected':''}>ovalado</option>
+            <option value="globoso" ${lf.atiIsoForma==='globoso'?'selected':''}>globoso</option>
+          </select>
+        </div>
+        <div class="ff"><label>Ecogenicidade</label>
+          <select class="sel-tag" onchange="estado.linfonodos.atiIsoEco=this.value;updateLaudo()" style="font-size:12px;padding:3px 7px;">
+            <option value="hipoecogênico" ${lf.atiIsoEco==='hipoecogênico'?'selected':''}>hipoecogênico</option>
+            <option value="isoecogênico" ${lf.atiIsoEco==='isoecogênico'?'selected':''}>isoecogênico</option>
+            <option value="hiperecogênico" ${lf.atiIsoEco==='hiperecogênico'?'selected':''}>hiperecogênico</option>
+          </select>
+        </div>
+        <div class="ff"><label>Ecotextura</label>
+          <select class="sel-tag" onchange="estado.linfonodos.atiIsoTex=this.value;updateLaudo()" style="font-size:12px;padding:3px 7px;">
+            <option value="homogênea" ${lf.atiIsoTex==='homogênea'?'selected':''}>homogênea</option>
+            <option value="heterogênea" ${lf.atiIsoTex==='heterogênea'?'selected':''}>heterogênea</option>
+          </select>
+        </div>
+        <div class="ff"><label>Contornos</label>
+          <select class="sel-tag" onchange="estado.linfonodos.atiIsoCon=this.value;updateLaudo()" style="font-size:12px;padding:3px 7px;">
+            <option value="regulares" ${lf.atiIsoCon==='regulares'?'selected':''}>regulares</option>
+            <option value="lobulados" ${lf.atiIsoCon==='lobulados'?'selected':''}>lobulados</option>
+            <option value="irregulares" ${lf.atiIsoCon==='irregulares'?'selected':''}>irregulares</option>
+          </select>
+        </div>
+        <div class="ff"><label>Fluxo Doppler</label>
+          <select class="sel-tag" onchange="estado.linfonodos.atiIsoFlu=this.value;updateLaudo()" style="font-size:12px;padding:3px 7px;">
+            <option value="ausente" ${lf.atiIsoFlu==='ausente'?'selected':''}>ausente</option>
+            <option value="hilar" ${lf.atiIsoFlu==='hilar'?'selected':''}>hilar</option>
+            <option value="periférico" ${lf.atiIsoFlu==='periférico'?'selected':''}>periférico</option>
+            <option value="caótico" ${lf.atiIsoFlu==='caótico'?'selected':''}>caótico</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;">
+        <span style="font-size:11px;color:var(--text-3);">Medidas:</span>
+        ${medFields('ati-iso', lf.atiIsoM1, lf.atiIsoM2, lf.atiIsoM3)}
+      </div>
+      <div class="paaf-row">
+        <input type="checkbox" id="ati-iso-paaf" ${lf.atiIsoPaaf?'checked':''} onchange="estado.linfonodos.atiIsoPaaf=this.checked;updateLaudo()">
+        <label for="ati-iso-paaf">Sugerir PAAF para caracterização histológica</label>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderAtipicoMultiplo() {
+  const lf = estado.linfonodos;
+  return `<div style="padding:10px 14px 12px 28px;border-bottom:1px solid var(--border);background:#fffbf0;">
+    <div class="atipica-card">
+      <div class="atipica-card-title">⚠ Linfonodos Atípicos Múltiplos</div>
+      <div class="ff" style="margin-bottom:8px;"><label>Distribuição</label>
+        <select class="sel-tag" onchange="estado.linfonodos.atiMulLat=this.value;updateLaudo()" style="font-size:12px;padding:3px 7px;">
+          <option value="direita" ${lf.atiMulLat==='direita'?'selected':''}>à direita</option>
+          <option value="esquerda" ${lf.atiMulLat==='esquerda'?'selected':''}>à esquerda</option>
+          <option value="bilateralmente" ${lf.atiMulLat==='bilateralmente'?'selected':''}>bilateralmente</option>
+        </select>
+      </div>
+      <div style="font-size:10px;color:var(--text-3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;font-weight:600;">Níveis acometidos</div>
+      ${niveisGrid(lf.atiMulNiveis, 'toggleNivelAti')}
+      <div class="maior-row">
+        <div class="maior-lbl">Maior linfonodo — localização e medidas</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px;">
+          <div class="ff"><label>Nível</label>${locSelect('ati-mul-loc', lf.atiMulMaiorLoc, "estado.linfonodos.atiMulMaiorLoc=this.value;updateLaudo()")}</div>
+          <div class="ff"><label>Lateralidade</label>
+            <select class="sel-tag" onchange="estado.linfonodos.atiMulMaiorLat=this.value;updateLaudo()" style="font-size:12px;padding:3px 7px;">
+              <option value="direita" ${lf.atiMulMaiorLat==='direita'?'selected':''}>à direita</option>
+              <option value="esquerda" ${lf.atiMulMaiorLat==='esquerda'?'selected':''}>à esquerda</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;">
+          <span style="font-size:11px;color:var(--text-3);">Medidas:</span>
+          ${medFields('ati-mul', lf.atiMulM1, lf.atiMulM2, lf.atiMulM3)}
+        </div>
+      </div>
+      <div class="paaf-row">
+        <input type="checkbox" id="ati-mul-paaf" ${lf.atiMulPaaf?'checked':''} onchange="estado.linfonodos.atiMulPaaf=this.checked;updateLaudo()">
+        <label for="ati-mul-paaf">Sugerir PAAF para caracterização histológica</label>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── ACHADOS ──
+function renderAchados() {
+  return `
+  <div class="block">
+    <div class="block-title">Achados Adicionais / Complementos</div>
+    <div style="padding:12px 14px;">
+      <textarea style="width:100%;min-height:180px;border:1px solid var(--border-strong);border-radius:6px;padding:8px 10px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--white);resize:vertical;" placeholder="Descreva outros achados relevantes..." oninput="estado.achados.texto=this.value;updateLaudo()">${estado.achados.texto}</textarea>
+    </div>
+  </div>
+  <div class="block">
+    <div class="block-title">Sobre a Conclusão</div>
+    <div style="padding:9px 14px 11px;">
+      <p style="font-size:11.5px;color:var(--text-2);line-height:1.5;">A conclusão é gerada automaticamente conforme os achados selecionados. Em caso de laudo normal, será usada a frase padrão:</p>
+      <p style="font-size:11.5px;color:var(--text-3);font-style:italic;margin-top:6px;">"Estudo ecográfico sem evidentes anormalidades apreciáveis ao método."</p>
+    </div>
+  </div>`;
+}
+
+// ── AÇÕES ──
+function setLf(campo, val) { estado.linfonodos[campo]=val; renderPanel('linfonodos'); updateLaudo(); }
+
+function toggleNivelRea(code) {
+  const arr = estado.linfonodos.reaMulNiveis;
+  const idx = arr.indexOf(code);
+  if(idx>=0) arr.splice(idx,1); else arr.push(code);
+  // mantém a ordem dos níveis
+  estado.linfonodos.reaMulNiveis = NIVEIS.map(n=>n.code).filter(c=>arr.includes(c));
+  renderPanel('linfonodos'); updateLaudo();
+}
+function toggleNivelAti(code) {
+  const arr = estado.linfonodos.atiMulNiveis;
+  const idx = arr.indexOf(code);
+  if(idx>=0) arr.splice(idx,1); else arr.push(code);
+  estado.linfonodos.atiMulNiveis = NIVEIS.map(n=>n.code).filter(c=>arr.includes(c));
+  renderPanel('linfonodos'); updateLaudo();
+}
+
+// ── GERAÇÃO DO LAUDO ──
+function updateLaudo() {
+  const t = estado.tecnica;
+  const lf = estado.linfonodos;
+  const opiniao = [];
+
+  // Texto análise
+  let analise = '';
+  const reaAus = lf.reacional === 'ausentes';
+  const atiAus = lf.atipica === 'ausentes';
+
+  if(reaAus && atiAus) {
+    analise = 'Ausência de linfonodomegalias cervicais.';
+  } else {
+    let partes = [];
+
+    // REACIONAL
+    if(!reaAus) {
+      if(lf.reacional === 'isolada') {
+        const med = fmtMed(lf.reaIsoM1, lf.reaIsoM2, lf.reaIsoM3);
+        partes.push(`Linfonodomegalia de aspecto reacional, medindo cerca de ${med}, localizada em nível cervical ${lf.reaIsoLoc} ${lf.reaIsoLat==='direita'?'à direita':'à esquerda'}.`);
+        opiniao.push(`Linfonodomegalia cervical reacional ${lf.reaIsoLat==='direita'?'à direita':'à esquerda'}.`);
+      } else {
+        const niveis = fmtNiveis(lf.reaMulNiveis);
+        const lat = lf.reaMulLat;
+        const latStr = lat==='bilateralmente' ? 'bilateralmente' : lat==='direita' ? 'à direita' : 'à esquerda';
+        const med = fmtMed(lf.reaMulM1, lf.reaMulM2, lf.reaMulM3);
+        const maiorLat = lf.reaMulMaiorLat==='direita' ? 'à direita' : 'à esquerda';
+        partes.push(`Linfonodomegalias de aspecto reacional ${latStr}, em níveis cervicais ${niveis}, sendo o maior medindo cerca de ${med}, localizado em nível cervical ${lf.reaMulMaiorLoc} ${maiorLat}.`);
+        opiniao.push(`Linfonodomegalias cervicais reacionais ${latStr}.`);
+      }
+    }
+
+    // ATÍPICA
+    if(!atiAus) {
+      if(lf.atipica === 'isolada') {
+        const med = fmtMed(lf.atiIsoM1, lf.atiIsoM2, lf.atiIsoM3);
+        const lat = lf.atiIsoLat==='direita' ? 'à direita' : 'à esquerda';
+        let fluStr = '';
+        if(lf.atiIsoFlu==='ausente') fluStr = 'sem fluxo vascular ao Doppler colorido';
+        else fluStr = `com fluxo vascular ${lf.atiIsoFlu} ao Doppler colorido`;
+        partes.push(`Linfonodomegalia atípica, caracterizada por linfonodo ${lf.atiIsoForma}, ${lf.atiIsoEco}, de ecotextura ${lf.atiIsoTex}, com contornos ${lf.atiIsoCon}, ${fluStr}, medindo cerca de ${med}, localizada em nível cervical ${lf.atiIsoLoc} ${lat}.`);
+        const paafStr = lf.atiIsoPaaf ? ' Sugere-se, a critério clínico, prosseguir investigação diagnóstica com PAAF para análise histopatológica.' : '';
+        opiniao.push(`Linfonodomegalia cervical atípica ${lat}, inespecífica ao método.${paafStr}`);
+      } else {
+        const niveis = fmtNiveis(lf.atiMulNiveis);
+        const lat = lf.atiMulLat;
+        const latStr = lat==='bilateralmente' ? 'bilateralmente' : lat==='direita' ? 'à direita' : 'à esquerda';
+        const med = fmtMed(lf.atiMulM1, lf.atiMulM2, lf.atiMulM3);
+        const maiorLat = lf.atiMulMaiorLat==='direita' ? 'à direita' : 'à esquerda';
+        partes.push(`Linfonodomegalias atípicas ${latStr}, em níveis cervicais ${niveis}, sendo a maior medindo cerca de ${med}, localizada em nível cervical ${lf.atiMulMaiorLoc} ${maiorLat}.`);
+        const paafStr = lf.atiMulPaaf ? ' Sugere-se, a critério clínico, prosseguir investigação diagnóstica com PAAF para análise histopatológica.' : '';
+        opiniao.push(`Linfonodomegalias cervicais atípicas ${latStr}, inespecíficas ao método.${paafStr}`);
+      }
+    }
+
+    analise = partes.join(' ');
+  }
+
+  // OPINIÃO FINAL
+  let opFinal;
+  if(opiniao.length === 0) {
+    opFinal = 'Estudo ecográfico sem evidentes anormalidades apreciáveis ao método.';
+  } else {
+    opFinal = opiniao.join('<br>') + '<br>Demais estruturas sem evidentes anormalidades apreciáveis ao método.';
+  }
+
+  // TÉCNICA
+  let tecHtml = '';
+  if(t.citarSonda) {
+    let tecTxt = 'Exame realizado em aparelho dinâmico com transdutor linear sobre a região cervical.';
+    if(t.limitacaoBiotipo) tecTxt += ' O exame foi limitado parcialmente pela atenuação do feixe acústico inerente ao biotipo.';
+    tecHtml = `<div class="doc-secao"><span class="doc-label">TÉCNICA:</span><div class="doc-p">${tecTxt}</div></div>`;
+  }
+  if(t.urgencia) tecHtml = `<div class="doc-p"><em>Exame realizado em caráter de urgência.</em></div>` + tecHtml;
+
+  // INDICAÇÃO
+  let indHtml = '';
+  if(t.indicacao !== 'nc') {
+    const indMap = {
+      linfonodomegalia: 'Linfonodomegalia cervical.',
+      parotidite: 'Parotidite.',
+      sialoadenite: 'Sialoadenite.',
+      neoplasia: 'Investigação de neoplasia cervical.',
+      'pos-op': 'Controle pós-operatório.',
+      outros: t.indicacaoOutros || '—',
+    };
+    indHtml = `<div class="doc-secao"><span class="doc-label">INDICAÇÃO:</span><div class="doc-p">${indMap[t.indicacao]||t.indicacao}</div></div>`;
+  }
+
+  // ACHADOS
+  let achadosHtml = '';
+  if(estado.achados.texto.trim()) {
+    achadosHtml = `<div class="doc-secao"><span class="doc-label">ACHADOS ADICIONAIS:</span><div class="doc-p">${estado.achados.texto.replace(/\n/g,'<br>')}</div></div>`;
+  }
+
+  document.getElementById('laudo-doc').innerHTML = `
+    <div class="doc-titulo">ULTRASSONOGRAFIA CERVICAL</div>
+    ${tecHtml}
+    ${indHtml}
+    <div class="doc-secao">
+      <span class="doc-label">ANÁLISE:</span>
+      <div class="doc-p">${analise}</div>
+    </div>
+    ${achadosHtml}
+    <div class="doc-secao">
+      <span class="doc-label">OPINIÃO DO RELATÓRIO:</span>
+      <div class="doc-p">${opFinal}</div>
+    </div>`;
+}
+
+// ── DARK MODE ──
+function toggleDark() {
+  const isDark = document.body.classList.toggle('dark');
+  const btn = document.getElementById('btn-dark-toggle');
+  if(isDark) {
+    btn.innerHTML='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 8.5A5.5 5.5 0 0 1 6 3c0-.18.01-.36.03-.53A6 6 0 1 0 13.97 9.5c-.15.01-.31.01-.47 0z"/></svg>Modo claro';
+  } else {
+    btn.innerHTML='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro';
+  }
+  localStorage.setItem('darkMode', isDark ? '1' : '0');
+}
+(function(){ if(localStorage.getItem('darkMode')==='1') toggleDark(); })();
+
+// ── COPIAR / IMPRIMIR ──
+function copiar() {
+  const el = document.getElementById('laudo-doc');
+  navigator.clipboard.writeText(el.innerText).then(()=>alert('Laudo copiado!')).catch(()=>alert('Use Ctrl+A e Ctrl+C no texto do laudo.'));
+}
+function imprimir() {
+  const h = document.getElementById('laudo-doc').innerHTML;
+  const w = window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+    body{font-family:Helvetica,Arial,sans-serif;font-size:10pt;padding:32px;color:#111;line-height:1.65;}
+    .doc-titulo{text-align:center;font-weight:700;text-transform:uppercase;margin-bottom:16px;}
+    .doc-label{font-weight:700;}
+    .doc-p{margin-bottom:8px;}
+    .doc-secao{margin-bottom:14px;}
+    *{color:#111 !important;}
+  </style></head><body>${h}</body></html>`);
+  w.document.close(); w.print();
+}
+
+// ── REINICIAR ──
+function reiniciar() {
+  estado.paciente = { nome:'', dn:'', sexo:'O', convenio:'', medico:'' };
+  estado.tecnica  = { urgencia:false, citarSonda:true, indicacao:'nc', indicacaoOutros:'', limitacaoBiotipo:false };
+  estado.linfonodos = {
+    reacional:'ausentes', reaIsoLoc:'IIA', reaIsoLat:'direita',
+    reaIsoM1:'', reaIsoM2:'', reaIsoM3:'',
+    reaMulLat:'direita', reaMulNiveis:[], reaMulMaiorLoc:'IIA', reaMulMaiorLat:'direita',
+    reaMulM1:'', reaMulM2:'', reaMulM3:'',
+    atipica:'ausentes', atiIsoLoc:'IIA', atiIsoLat:'direita',
+    atiIsoForma:'ovalado', atiIsoEco:'hipoecogênico', atiIsoTex:'homogênea',
+    atiIsoCon:'regulares', atiIsoFlu:'ausente',
+    atiIsoM1:'', atiIsoM2:'', atiIsoM3:'', atiIsoPaaf:false,
+    atiMulLat:'direita', atiMulNiveis:[], atiMulMaiorLoc:'IIA', atiMulMaiorLat:'direita',
+    atiMulM1:'', atiMulM2:'', atiMulM3:'', atiMulPaaf:false,
+  };
+  estado.achados = { texto:'' };
+  showSection('linfonodos');
+}
+
+// ── INICIALIZAÇÃO ──
+showSection('linfonodos');
+</script>
+</body>
+</html>

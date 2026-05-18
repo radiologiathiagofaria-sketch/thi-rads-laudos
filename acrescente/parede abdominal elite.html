@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THI-RADS — laudo estruturado</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#1a56db;--blue-dark:#1140a6;--blue-light:#e8f0fe;--blue-mid:#dbeafe;
+  --surface:#f4f6fb;--border:#e2e6ef;--border-strong:#c8cfe0;
+  --text:#1a1f2e;--text-2:#4b5570;--text-3:#8892a4;
+  --white:#ffffff;--green:#059669;--red:#dc2626;--radius:8px;--radius-lg:12px;
+  --amber:#b45309;--amber-bg:#fffbeb;--amber-border:#fde68a;
+}
+body.dark{
+  --blue:#4d86f5;--blue-dark:#3a6fd4;--blue-light:#1e2d4a;--blue-mid:#1e2d4a;
+  --surface:#141820;--border:#2a2f3d;--border-strong:#3a4155;
+  --text:#e2e6f0;--text-2:#9aa3b8;--text-3:#5d6680;
+  --white:#1e2230;--green:#34d399;--red:#f87171;
+  --amber-bg:#1c1407;--amber-border:#78450a;
+}
+body.dark .laudo-doc{color:#e2e6f0;}
+body.dark .laudo-panel{background:#1e2230;border-left-color:var(--border);}
+body.dark .laudo-body{background:#1e2230;}
+body.dark .laudo-header{background:#1e2230;border-bottom-color:var(--border);}
+@media print{body.dark .laudo-doc,body.dark .laudo-doc *{color:#111 !important;}}
+.btn-dark{margin-left:auto;}
+body.dark .btn-dark{background:#2a2f3d;border-color:#3a4155;color:#e2e6f0;}
+body.dark .btn-dark:hover{background:#343a4d;color:#fff;}
+body.dark .dim-input,body.dark select.sel-tag,body.dark select{background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .radio-mark{background:var(--white);}
+body.dark .check-box{background:var(--white);}
+body.dark .toolbar{background:var(--white);border-bottom-color:var(--border);}
+body.dark .sidebar{background:var(--white);border-right-color:var(--border);}
+body.dark .sidebar-hd{border-bottom-color:var(--border);}
+body.dark .block{background:var(--white);border-color:var(--border);}
+body.dark .block-title{background:var(--white);border-bottom-color:var(--border);}
+body.dark .radio-opt:hover{background:#1e2d4a;}
+body.dark .radio-opt.selected{background:#1e2d4a;}
+body.dark .check-row{background:#1a1f2e;}
+body.dark .check-row:hover{background:#1e2d4a;}
+body.dark .check-row.selected{background:#1e2d4a;}
+body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
+body.dark .hernia-badge{background:#1e2d4a;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',system-ui,sans-serif;font-size:13px;background:var(--surface);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+.toolbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:10px;height:48px;flex-shrink:0;}
+.logo{display:flex;align-items:baseline;gap:6px;margin-right:12px;}
+.logo-name{font-size:17px;font-weight:600;color:var(--blue);letter-spacing:-.3px;}
+.logo-sub{font-size:11px;color:var(--text-3);font-weight:400;}
+.tb-sep{width:1px;height:20px;background:var(--border);margin:0 4px;}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid var(--border);font-weight:500;transition:all .13s;background:var(--white);color:var(--text-2);}
+.btn:hover{background:var(--surface);border-color:var(--border-strong);color:var(--text);}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue);}
+.btn-primary:hover{background:var(--blue-dark);border-color:var(--blue-dark);color:#fff;}
+.btn-danger{background:#fff5f5;color:var(--red);border-color:#fecaca;}
+.btn-danger:hover{background:#fee2e2;border-color:#fca5a5;}
+.btn svg{width:13px;height:13px;flex-shrink:0;}
+.body{display:flex;flex:1;overflow:hidden;}
+.sidebar{width:158px;background:var(--white);border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;}
+.sidebar-hd{padding:10px 12px 8px;border-bottom:1px solid var(--border);}
+.sidebar-tipo{font-size:9px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;}
+.sidebar-titulo{font-size:11px;font-weight:600;color:var(--text);}
+.nav-group{padding:6px 0;}
+.nav-group-label{font-size:9px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.7px;padding:8px 12px 3px;}
+.nav-item{display:flex;align-items:center;gap:7px;padding:7px 12px;font-size:11.5px;color:var(--text-2);cursor:pointer;transition:all .12s;border-left:2px solid transparent;}
+.nav-item:hover{background:var(--blue-light);color:var(--blue);}
+.nav-item.active{background:var(--blue-light);color:var(--blue);border-left-color:var(--blue);font-weight:600;}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.4;flex-shrink:0;}
+.nav-item.active .nav-dot{opacity:1;}
+.nav-item .badge{margin-left:auto;background:var(--blue);color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;min-width:16px;text-align:center;}
+.panel{width:490px;flex-shrink:0;overflow-y:auto;padding:14px 14px 24px;background:var(--surface);}
+.sec-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.sec-title::before{content:'';display:block;width:3px;height:16px;background:var(--blue);border-radius:2px;}
+.block{margin-bottom:10px;background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden;}
+.block-title{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.7px;padding:8px 14px 7px;border-bottom:1px solid var(--border);background:var(--white);}
+.radio-opt{display:flex;align-items:flex-start;gap:0;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;position:relative;}
+.radio-opt:last-child{border-bottom:none;}
+.radio-opt:hover{background:#f5f8ff;}
+.radio-opt.selected{background:var(--blue-light);}
+.radio-opt input[type=radio]{position:absolute;opacity:0;pointer-events:none;}
+.radio-label{display:flex;align-items:center;gap:10px;width:100%;padding:9px 14px;font-size:12.5px;color:var(--text-2);line-height:1.4;cursor:pointer;flex-wrap:wrap;}
+.radio-opt.selected .radio-label{color:var(--blue);font-weight:500;}
+.radio-mark{width:16px;height:16px;border-radius:50%;border:2px solid var(--border-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.radio-opt:hover .radio-mark{border-color:var(--blue);}
+.radio-opt.selected .radio-mark{border-color:var(--blue);background:var(--blue);}
+.radio-mark::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff;opacity:0;transition:opacity .15s;}
+.radio-opt.selected .radio-mark::after{opacity:1;}
+.check-row{display:flex;align-items:center;gap:0;border-bottom:1px solid var(--border);cursor:pointer;background:#fafbff;}
+.check-row:last-child{border-bottom:none;}
+.check-row:hover{background:#f0f5ff;}
+.check-row.selected{background:#e6eeff;}
+.check-row input[type=checkbox]{position:absolute;opacity:0;pointer-events:none;}
+.check-label{display:flex;align-items:center;gap:10px;width:100%;padding:8px 14px;font-size:12px;color:var(--text-2);cursor:pointer;flex-wrap:wrap;}
+.check-row.selected .check-label{color:var(--blue);font-weight:500;}
+.check-box{width:15px;height:15px;border-radius:4px;border:2px solid var(--border-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.check-row:hover .check-box{border-color:var(--blue);}
+.check-row.selected .check-box{border-color:var(--blue);background:var(--blue);}
+.check-box svg{display:none;width:9px;height:9px;}
+.check-row.selected .check-box svg{display:block;}
+.sel-tag{font-size:11px;border:1px solid var(--border-strong);border-radius:5px;padding:2px 6px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);cursor:pointer;}
+.dim-rows{padding:8px 14px;display:flex;flex-direction:column;gap:6px;}
+.dim-row{display:flex;align-items:center;gap:10px;}
+.dim-lbl{flex:1;font-size:12px;color:var(--text-2);}
+.dim-input{width:60px;padding:5px 8px;border:1px solid var(--border-strong);border-radius:6px;font-size:12.5px;font-family:'DM Sans',sans-serif;text-align:center;color:var(--text);background:var(--white);transition:border .12s;}
+.dim-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,.08);}
+.dim-unit{font-size:12px;color:var(--text-3);}
+.inline-grid{display:grid;gap:8px;padding:10px 14px;}
+.inline-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-2);flex-wrap:wrap;}
+.inline-row label{color:var(--text-3);font-size:11px;}
+.hernia-badge{display:inline-flex;align-items:center;gap:4px;background:var(--blue-light);color:var(--blue);font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;margin-left:4px;}
+.complicacao-row{display:flex;gap:8px;padding:8px 14px;border-top:1px solid var(--border);background:var(--amber-bg);}
+.complicacao-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:6px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--amber-border);background:transparent;color:var(--amber);transition:all .12s;font-family:'DM Sans',sans-serif;}
+.complicacao-btn:hover{background:var(--amber-border);}
+.complicacao-btn.active{background:var(--amber);color:#fff;border-color:var(--amber);}
+body.dark .complicacao-btn{color:#fb923c;}
+body.dark .complicacao-btn.active{background:#92400e;color:#fff;border-color:#92400e;}
+.laudo-panel{flex:1;min-width:0;background:var(--white);display:flex;flex-direction:column;border-left:1px solid var(--border);}
+.laudo-header{padding:9px 20px 8px;border-bottom:1px solid var(--border);background:var(--white);display:flex;align-items:center;}
+.laudo-header-title{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.6px;}
+.laudo-body{flex:1;overflow-y:auto;padding:22px 28px;}
+.laudo-doc{font-family:Helvetica,Arial,sans-serif;font-size:10pt;line-height:1.65;color:#111;max-width:720px;}
+.doc-titulo{text-align:center;font-weight:700;font-size:10pt;margin-bottom:16px;text-transform:uppercase;}
+.doc-label{font-weight:700;font-size:10pt;}
+.doc-p{margin-bottom:8px;font-size:10pt;}
+.doc-secao{margin-bottom:14px;}
+select{font-family:'DM Sans',sans-serif;font-size:11.5px;border:1px solid var(--border-strong);border-radius:5px;padding:3px 6px;background:var(--white);color:var(--text);cursor:pointer;}
+select:focus{outline:none;border-color:var(--blue);}
+</style>
+</head>
+<body>
+ 
+<div class="toolbar">
+  <div class="logo" style="cursor:pointer" onclick="window.location.href='../laudo-thirads.html'"><span class="logo-name">THI-RADS</span><span class="logo-sub">laudo estruturado</span></div>
+  <button class="btn" onclick="window.location.href='../laudo-thirads.html'"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 2L4 8l6 6"/></svg>Voltar</button>
+  <div class="tb-sep"></div>
+  <button class="btn" onclick="copiar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>Copiar laudo</button>
+  <button class="btn btn-primary" onclick="imprimir()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6V2h8v4M4 12H2V7h12v5h-2M4 9h8M4 12v2h8v-2"/></svg>Imprimir</button>
+  <button class="btn btn-dark" id="btn-dark-toggle" onclick="toggleDark()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro</button>
+  <button class="btn btn-danger" onclick="reiniciar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8a6 6 0 1 0 1.5-3.9M2 4v4h4"/></svg>Reiniciar</button>
+</div>
+ 
+<div class="body">
+  <div class="sidebar">
+    <div class="sidebar-hd"><div class="sidebar-tipo">Ultrassonografia</div><div class="sidebar-titulo">Parede Abdominal</div></div>
+    <div class="nav-group">
+      <div class="nav-item" id="nav-pele" onclick="showSection('pele')"><span class="nav-dot"></span>Pele e Subcutâneo</div>
+      <div class="nav-item" id="nav-preop" onclick="showSection('preop')"><span class="nav-dot"></span>Pré-Operatório</div>
+      <div class="nav-item" id="nav-muscular" onclick="showSection('muscular')"><span class="nav-dot"></span>Plano Muscular</div>
+      <div class="nav-item" id="nav-diastases" onclick="showSection('diastases')"><span class="nav-dot"></span>Diástases</div>
+      <div class="nav-group-label">Hérnias</div>
+      <div class="nav-item" id="nav-epigastrica" onclick="showSection('epigastrica')"><span class="nav-dot"></span>Epigástrica<span class="badge" id="badge-epigastrica" style="display:none">1</span></div>
+      <div class="nav-item" id="nav-supraumbilical" onclick="showSection('supraumbilical')"><span class="nav-dot"></span>Supraumbilical<span class="badge" id="badge-supraumbilical" style="display:none">1</span></div>
+      <div class="nav-item" id="nav-umbilical" onclick="showSection('umbilical')"><span class="nav-dot"></span>Umbilical<span class="badge" id="badge-umbilical" style="display:none">1</span></div>
+      <div class="nav-item" id="nav-paramediana" onclick="showSection('paramediana')"><span class="nav-dot"></span>Paramediana<span class="badge" id="badge-paramediana" style="display:none">1</span></div>
+      <div class="nav-item" id="nav-semilunar" onclick="showSection('semilunar')"><span class="nav-dot"></span>Semilunar<span class="badge" id="badge-semilunar" style="display:none">1</span></div>
+      <div class="nav-item" id="nav-incisional" onclick="showSection('incisional')"><span class="nav-dot"></span>Incisional<span class="badge" id="badge-incisional" style="display:none">1</span></div>
+      <div class="nav-item" id="nav-inguinal" onclick="showSection('inguinal')"><span class="nav-dot"></span>Inguinal<span class="badge" id="badge-inguinal" style="display:none">1</span></div>
+      <div class="nav-item" id="nav-femoral" onclick="showSection('femoral')"><span class="nav-dot"></span>Femoral<span class="badge" id="badge-femoral" style="display:none">1</span></div>
+      <div class="nav-group-label">Outros</div>
+      <div class="nav-item" id="nav-linfonodos" onclick="showSection('linfonodos')"><span class="nav-dot"></span>Linfonodos</div>
+      <div class="nav-item" id="nav-achados" onclick="showSection('achados')"><span class="nav-dot"></span>Achados Adicionais</div>
+    </div>
+  </div>
+ 
+  <div class="panel" id="main-panel"></div>
+ 
+  <div class="laudo-panel">
+    <div class="laudo-header"><span class="laudo-header-title">Pré-visualização</span></div>
+    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc"></div></div>
+  </div>
+</div>
+ 
+<script>
+// ── Estado global ──
+const HERNIA_KEYS = ['epigastrica','supraumbilical','umbilical','paramediana','semilunar','incisional','inguinalD','inguinalE','femoral'];
+ 
+function defaultHernia(tipo){
+  const h={sit:'ausente',conteudo:'adiposo',d1:'',d2:'',d3:'',colo:'',complicacao:'nenhuma'};
+  if(tipo==='epigastrica') h.distXif='';
+  if(tipo==='supraumbilical') h.distUmb='';
+  if(['paramediana','semilunar','incisional'].includes(tipo)) h.lat='direita';
+  if(['inguinalD','inguinalE'].includes(tipo)){ h.origem='ne'; }
+  return h;
+}
+ 
+const estado = {
+  pele:     { hab:true, ausNodMas:true, edema:false,
+              lipoma:false, lipoD1:'', lipoD2:'', lipoD3:'', lipoReg:true,
+              nodulo:false, nodEco:'hipoecogenico', nodTex:'homogeneo', nodLoc:'subcutaneo', nodCon:'definidos', nodD1:'', nodD2:'', nodD3:'', nodDop:false,
+              colOrg:false, colOrgLoc:'subcutaneo', colOrgPar:'finas', colOrgCon:'anecoico', colOrgD1:'', colOrgD2:'', colOrgD3:'', colOrgDis:'',
+              colNao:false, colNaoLoc:'subcutaneo', colNaoD1:'', colNaoD2:'', colNaoD3:'', colNaoDis:'' },
+  preop:    { ativo:false, sub1Esp:'', sub1Dis:'', sub2Esp:'', sub2Dis:'', gor1Esp:'', gor1Dis:'', gor2Esp:'', gor2Dis:'' },
+  muscular: { hab:true,
+              colOrg:false, colOrgPar:'finas', colOrgCon:'anecoico', colOrgD1:'', colOrgD2:'', colOrgD3:'', colOrgDis:'', colOrgSep:false,
+              colNao:false, colNaoD1:'', colNaoD2:'', colNaoD3:'', colNaoDis:'' },
+  diastases:{ sit:'ausente', nivel:'epigastro', distancia:'' },
+  epigastrica:    defaultHernia('epigastrica'),
+  supraumbilical: defaultHernia('supraumbilical'),
+  umbilical:      defaultHernia('umbilical'),
+  paramediana:    defaultHernia('paramediana'),
+  semilunar:      defaultHernia('semilunar'),
+  incisional:     defaultHernia('incisional'),
+  inguinalD:      defaultHernia('inguinalD'),
+  inguinalE:      defaultHernia('inguinalE'),
+  femoral:        defaultHernia('femoral'),
+  linfonodos:     { sit:'ausente', loc:'inguinal direita', d1:'', d2:'' },
+  achados:        { texto:'' },
+};
+ 
+let secaoAtual='pele';
+ 
+// ── HELPERS ──
+function fmt(v){return v||'_';}
+function vol(a,b,c){const x=parseFloat(a),y=parseFloat(b),z=parseFloat(c);if(isNaN(x)||isNaN(y)||isNaN(z))return null;return (x*y*z*0.52).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1});}
+function medStr(d1,d2,d3){if(!d1)return '_';let s=fmt(d1);if(d2)s+=' x '+fmt(d2);if(d3)s+=' x '+fmt(d3);return s+' cm';}
+function chkSvg(){return `<svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.8"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg>`;}
+ 
+function setV(sec,key,val){estado[sec][key]=val;renderPanel(secaoAtual);updateLaudo();}
+function toggle(sec,key){estado[sec][key]=!estado[sec][key];renderPanel(secaoAtual);updateLaudo();}
+ 
+function chkRow(id,label,checked,cb){
+  const sel=checked?'selected':'';
+  return `<div class="check-row ${sel}" onclick="${cb}"><input type="checkbox" id="${id}" ${checked?'checked':''}><label class="check-label"><span class="check-box">${chkSvg()}</span>${label}</label></div>`;
+}
+function radioOpt(val,label,current,key,extra=''){
+  const sel=current===val?'selected':'';
+  return `<div class="radio-opt ${sel}" onclick="setV('${key}','sit','${val}')"><input type="radio"><label class="radio-label"><span class="radio-mark"></span>${label}${extra}</label></div>`;
+}
+function dimInput(id,label,val,unit='cm',onin="updateLaudo()"){
+  return `<div class="dim-row"><span class="dim-lbl">${label}</span><input class="dim-input" type="text" id="${id}" value="${val||''}" placeholder="—" oninput="${onin}"><span class="dim-unit">${unit}</span></div>`;
+}
+function triDim(pre,label,d1,d2,d3,suffix=''){
+  return `<div style="display:flex;align-items:center;gap:6px;padding:9px 14px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text-2);flex-wrap:wrap;">
+    <span style="min-width:64px;">${label}</span>
+    <input class="dim-input" type="text" id="${pre}D1" value="${d1||''}" placeholder="—" style="width:50px" oninput="updateLaudo()">
+    <span style="color:var(--text-3)">×</span>
+    <input class="dim-input" type="text" id="${pre}D2" value="${d2||''}" placeholder="—" style="width:50px" oninput="updateLaudo()">
+    <span style="color:var(--text-3)">×</span>
+    <input class="dim-input" type="text" id="${pre}D3" value="${d3||''}" placeholder="—" style="width:50px" oninput="updateLaudo()">
+    <span style="color:var(--text-3)">cm${suffix}</span>
+  </div>`;
+}
+ 
+// ── NAVEGAÇÃO ──
+function showSection(sec){
+  secaoAtual=sec;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('nav-'+sec).classList.add('active');
+  renderPanel(sec);
+  updateLaudo();
+}
+ 
+// ── PAINEL ──
+function renderPanel(sec){
+  const p=document.getElementById('main-panel');
+  const titles={pele:'Pele e Tecido Subcutâneo',preop:'Pré-Operatório',muscular:'Plano Muscular',diastases:'Diástases',epigastrica:'Hérnia Epigástrica',supraumbilical:'Hérnia Supraumbilical',umbilical:'Hérnia Umbilical',paramediana:'Hérnia Paramediana',semilunar:'Hérnia Semilunar',incisional:'Hérnia Incisional',inguinal:'Hérnia Inguinal',femoral:'Hérnia Femoral',linfonodos:'Linfonodos Inguinais',achados:'Achados Adicionais'};
+  let html=`<div class="sec-title">${titles[sec]||sec}</div>`;
+  if(sec==='pele') html+=renderPele();
+  else if(sec==='preop') html+=renderPreop();
+  else if(sec==='muscular') html+=renderMuscular();
+  else if(sec==='diastases') html+=renderDiastases();
+  else if(['epigastrica','supraumbilical','umbilical','paramediana','semilunar','incisional'].includes(sec)) html+=renderHerniaMidline(sec);
+  else if(sec==='inguinal') html+=renderInguinal();
+  else if(sec==='femoral') html+=renderFemoral();
+  else if(sec==='linfonodos') html+=renderLinfonodos();
+  else if(sec==='achados') html+=renderAchados();
+  p.innerHTML=html;
+}
+ 
+// ── PELE E SUBCUTÂNEO ──
+function renderPele(){
+  const e=estado.pele;
+  const hasAchadosEspecificos=e.edema||e.lipoma||e.nodulo||e.colOrg||e.colNao;
+  return `
+  <div class="block"><div class="block-title">Achados Normais</div>
+    ${chkRow('pel-hab','Pele e tecido subcutâneo sem anormalidades detectáveis',hasAchadosEspecificos?false:e.hab,`toggle('pele','hab')`)}
+    ${chkRow('pel-aus','Ausência de nódulos, massas ou coleções',hasAchadosEspecificos?false:e.ausNodMas,`toggle('pele','ausNodMas')`)}
+  </div>
+  <div class="block"><div class="block-title">Achados Patológicos</div>
+    ${chkRow('pel-ede','Edema de tecido subcutâneo',e.edema,`toggle('pele','edema')`)}
+    ${chkRow('pel-lip','Lipoma',e.lipoma,`toggle('pele','lipoma')`)}
+    ${e.lipoma?`<div style="padding:8px 14px;background:#f5f8ff;border-bottom:1px solid var(--border);">
+      ${triDim('pelLip','medindo',e.lipoD1,e.lipoD2,e.lipoD3)}
+      <div style="padding:6px 0 2px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-2);">
+        contornos
+        <select class="sel-tag" onchange="estado.pele.lipoReg=this.value==='regulares';updateLaudo()">
+          <option value="regulares" ${e.lipoReg?'selected':''}>regulares</option>
+          <option value="irregulares" ${!e.lipoReg?'selected':''}>irregulares</option>
+        </select>
+      </div>
+    </div>`:''}
+    ${chkRow('pel-nod','Nódulo sólido',e.nodulo,`toggle('pele','nodulo')`)}
+    ${e.nodulo?`<div style="padding:8px 14px;background:#f5f8ff;border-bottom:1px solid var(--border);">
+      ${triDim('pelNod','medindo',e.nodD1,e.nodD2,e.nodD3)}
+      <div style="display:flex;gap:8px;flex-wrap:wrap;padding:7px 0 2px;font-size:11px;color:var(--text-2);">
+        <div><label style="display:block;font-size:9px;color:var(--text-3);font-weight:600;text-transform:uppercase;margin-bottom:2px;">Ecogenicidade</label>
+          <select class="sel-tag" onchange="estado.pele.nodEco=this.value;updateLaudo()">
+            <option value="anecoico" ${e.nodEco==='anecoico'?'selected':''}>anecoico</option>
+            <option value="hipoecogenico" ${e.nodEco==='hipoecogenico'?'selected':''}>hipoecogênico</option>
+            <option value="heterogeneo" ${e.nodEco==='heterogeneo'?'selected':''}>heterogêneo</option>
+          </select></div>
+        <div><label style="display:block;font-size:9px;color:var(--text-3);font-weight:600;text-transform:uppercase;margin-bottom:2px;">Textura</label>
+          <select class="sel-tag" onchange="estado.pele.nodTex=this.value;updateLaudo()">
+            <option value="homogeneo" ${e.nodTex==='homogeneo'?'selected':''}>homogêneo</option>
+            <option value="heterogeneo" ${e.nodTex==='heterogeneo'?'selected':''}>heterogêneo</option>
+          </select></div>
+        <div><label style="display:block;font-size:9px;color:var(--text-3);font-weight:600;text-transform:uppercase;margin-bottom:2px;">Plano</label>
+          <select class="sel-tag" onchange="estado.pele.nodLoc=this.value;updateLaudo()">
+            <option value="pele" ${e.nodLoc==='pele'?'selected':''}>da pele</option>
+            <option value="subcutaneo" ${e.nodLoc==='subcutaneo'?'selected':''}>do subcutâneo</option>
+          </select></div>
+        <div><label style="display:block;font-size:9px;color:var(--text-3);font-weight:600;text-transform:uppercase;margin-bottom:2px;">Contornos</label>
+          <select class="sel-tag" onchange="estado.pele.nodCon=this.value;updateLaudo()">
+            <option value="definidos" ${e.nodCon==='definidos'?'selected':''}>definidos</option>
+            <option value="indefinidos" ${e.nodCon==='indefinidos'?'selected':''}>indefinidos</option>
+            <option value="irregulares" ${e.nodCon==='irregulares'?'selected':''}>irregulares</option>
+          </select></div>
+      </div>
+      ${chkRow('pel-nod-dop','Fluxo presente ao Doppler',e.nodDop,`toggle('pele','nodDop')`)}
+    </div>`:''}
+    ${chkRow('pel-colOrg','Coleção organizada (subcutâneo)',e.colOrg,`toggle('pele','colOrg')`)}
+    ${e.colOrg?`<div style="padding:8px 14px;background:#f5f8ff;border-bottom:1px solid var(--border);">
+      ${triDim('pelCO','medindo',e.colOrgD1,e.colOrgD2,e.colOrgD3)}
+      <div style="display:flex;gap:8px;flex-wrap:wrap;padding:6px 0 4px;font-size:11px;">
+        <div><label style="font-size:9px;color:var(--text-3);font-weight:600;text-transform:uppercase;display:block;margin-bottom:2px;">Paredes</label>
+          <select class="sel-tag" onchange="estado.pele.colOrgPar=this.value;updateLaudo()">
+            <option value="finas" ${e.colOrgPar==='finas'?'selected':''}>finas</option>
+            <option value="espessas" ${e.colOrgPar==='espessas'?'selected':''}>espessas</option>
+          </select></div>
+        <div><label style="font-size:9px;color:var(--text-3);font-weight:600;text-transform:uppercase;display:block;margin-bottom:2px;">Conteúdo</label>
+          <select class="sel-tag" onchange="estado.pele.colOrgCon=this.value;updateLaudo()">
+            <option value="anecoico" ${e.colOrgCon==='anecoico'?'selected':''}>anecoico</option>
+            <option value="hipoecoico" ${e.colOrgCon==='hipoecoico'?'selected':''}>hipoecoico</option>
+            <option value="heterogeneo" ${e.colOrgCon==='heterogeneo'?'selected':''}>heterogêneo</option>
+          </select></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px;color:var(--text-2);">distando <input class="dim-input" type="text" id="pelCODis" value="${e.colOrgDis}" placeholder="—" style="width:50px" oninput="updateLaudo()"> <span style="color:var(--text-3)">cm da pele</span></div>
+    </div>`:''}
+    ${chkRow('pel-colNao','Coleção não organizada (subcutâneo)',e.colNao,`toggle('pele','colNao')`)}
+    ${e.colNao?`<div style="padding:8px 14px;background:#f5f8ff;border-bottom:1px solid var(--border);">
+      ${triDim('pelCN','medindo',e.colNaoD1,e.colNaoD2,e.colNaoD3)}
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 0 2px;font-size:12px;color:var(--text-2);">distando <input class="dim-input" type="text" id="pelCNDis" value="${e.colNaoDis}" placeholder="—" style="width:50px" oninput="updateLaudo()"> <span style="color:var(--text-3)">cm da pele</span></div>
+    </div>`:''}
+  </div>`;
+}
+ 
+// ── PRÉ-OPERATÓRIO ──
+function renderPreop(){
+  const e=estado.preop;
+  return `
+  <div class="block"><div class="block-title">Medidas para Pré-Operatório</div>
+    <div class="radio-opt ${!e.ativo?'selected':''}" onclick="setV('preop','ativo',false)"><input type="radio" name="r_pre"><label class="radio-label"><span class="radio-mark"></span>Não realizar medidas</label></div>
+    <div class="radio-opt ${e.ativo?'selected':''}" onclick="setV('preop','ativo',true)"><input type="radio" name="r_pre"><label class="radio-label"><span class="radio-mark"></span>Incluir medidas no laudo</label></div>
+  </div>
+  ${e.ativo?`
+  <div class="block"><div class="block-title">Subcutâneo Acima da Cicatriz Umbilical</div><div class="dim-rows">
+    ${dimInput('pre-sub1esp','Espessura',e.sub1Esp,'cm',"estado.preop.sub1Esp=this.value;updateLaudo()")}
+    ${dimInput('pre-sub1dis','Distância (ao umbigo)',e.sub1Dis,'cm',"estado.preop.sub1Dis=this.value;updateLaudo()")}
+  </div></div>
+  <div class="block"><div class="block-title">Subcutâneo Abaixo da Cicatriz Umbilical</div><div class="dim-rows">
+    ${dimInput('pre-sub2esp','Espessura',e.sub2Esp,'cm',"estado.preop.sub2Esp=this.value;updateLaudo()")}
+    ${dimInput('pre-sub2dis','Distância (ao umbigo)',e.sub2Dis,'cm',"estado.preop.sub2Dis=this.value;updateLaudo()")}
+  </div></div>
+  <div class="block"><div class="block-title">Gordura Pré-Peritoneal Acima do Umbigo</div><div class="dim-rows">
+    ${dimInput('pre-gor1esp','Espessura',e.gor1Esp,'cm',"estado.preop.gor1Esp=this.value;updateLaudo()")}
+    ${dimInput('pre-gor1dis','Distância (ao umbigo)',e.gor1Dis,'cm',"estado.preop.gor1Dis=this.value;updateLaudo()")}
+  </div></div>
+  <div class="block"><div class="block-title">Gordura Pré-Peritoneal Abaixo do Umbigo</div><div class="dim-rows">
+    ${dimInput('pre-gor2esp','Espessura',e.gor2Esp,'cm',"estado.preop.gor2Esp=this.value;updateLaudo()")}
+    ${dimInput('pre-gor2dis','Distância (ao umbigo)',e.gor2Dis,'cm',"estado.preop.gor2Dis=this.value;updateLaudo()")}
+  </div></div>`:''}`;
+}
+ 
+// ── MUSCULAR ──
+function renderMuscular(){
+  const e=estado.muscular;
+  const hasAchados=e.colOrg||e.colNao;
+  return `
+  <div class="block"><div class="block-title">Situação</div>
+    ${chkRow('mus-hab','Planos musculares de aspecto preservado',hasAchados?false:e.hab,`toggle('muscular','hab')`)}
+    ${chkRow('mus-colOrg','Coleção organizada no plano muscular',e.colOrg,`toggle('muscular','colOrg')`)}
+    ${e.colOrg?`<div style="padding:8px 14px;background:#f5f8ff;border-bottom:1px solid var(--border);">
+      ${triDim('musCO','medindo',e.colOrgD1,e.colOrgD2,e.colOrgD3)}
+      <div style="display:flex;gap:8px;flex-wrap:wrap;padding:6px 0 4px;font-size:11px;">
+        <div><label style="font-size:9px;color:var(--text-3);font-weight:600;text-transform:uppercase;display:block;margin-bottom:2px;">Paredes</label>
+          <select class="sel-tag" onchange="estado.muscular.colOrgPar=this.value;updateLaudo()">
+            <option value="finas" ${e.colOrgPar==='finas'?'selected':''}>finas</option>
+            <option value="espessas" ${e.colOrgPar==='espessas'?'selected':''}>espessas</option>
+          </select></div>
+        <div><label style="font-size:9px;color:var(--text-3);font-weight:600;text-transform:uppercase;display:block;margin-bottom:2px;">Conteúdo</label>
+          <select class="sel-tag" onchange="estado.muscular.colOrgCon=this.value;updateLaudo()">
+            <option value="anecoico" ${e.colOrgCon==='anecoico'?'selected':''}>anecoico</option>
+            <option value="hipoecoico" ${e.colOrgCon==='hipoecoico'?'selected':''}>hipoecoico/espesso</option>
+            <option value="heterogeneo" ${e.colOrgCon==='heterogeneo'?'selected':''}>heterogêneo</option>
+          </select></div>
+      </div>
+      ${chkRow('mus-sep','Contendo septos de permeio',e.colOrgSep,`toggle('muscular','colOrgSep')`)}
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 0 2px;font-size:12px;color:var(--text-2);">distando <input class="dim-input" type="text" id="musCODis" value="${e.colOrgDis}" placeholder="—" style="width:50px" oninput="updateLaudo()"> <span style="color:var(--text-3)">cm da pele</span></div>
+    </div>`:''}
+    ${chkRow('mus-colNao','Coleção não organizada no plano muscular',e.colNao,`toggle('muscular','colNao')`)}
+    ${e.colNao?`<div style="padding:8px 14px;background:#f5f8ff;border-bottom:1px solid var(--border);">
+      ${triDim('musCN','medindo',e.colNaoD1,e.colNaoD2,e.colNaoD3)}
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 0 2px;font-size:12px;color:var(--text-2);">distando <input class="dim-input" type="text" id="musCNDis" value="${e.colNaoDis}" placeholder="—" style="width:50px" oninput="updateLaudo()"> <span style="color:var(--text-3)">cm da pele</span></div>
+    </div>`:''}
+  </div>`;
+}
+ 
+// ── DIÁSTASES ──
+function renderDiastases(){
+  const e=estado.diastases;
+  const isSit=(v)=>e.sit===v?'selected':'';
+  return `
+  <div class="block"><div class="block-title">Situação</div>
+    <div class="radio-opt ${isSit('ausente')}" onclick="setV('diastases','sit','ausente')"><input type="radio" name="r_dia"><label class="radio-label"><span class="radio-mark"></span>Ausente</label></div>
+    <div class="radio-opt ${isSit('epigastro')}" onclick="setV('diastases','sit','epigastro')"><input type="radio" name="r_dia"><label class="radio-label"><span class="radio-mark"></span>Presente ao nível do epigastro</label></div>
+    <div class="radio-opt ${isSit('mesogastro')}" onclick="setV('diastases','sit','mesogastro')"><input type="radio" name="r_dia"><label class="radio-label"><span class="radio-mark"></span>Presente ao nível do mesogastro</label></div>
+    <div class="radio-opt ${isSit('hipogastro')}" onclick="setV('diastases','sit','hipogastro')"><input type="radio" name="r_dia"><label class="radio-label"><span class="radio-mark"></span>Presente ao nível do hipogastro</label></div>
+    <div class="radio-opt ${isSit('epigastro e hipogastro')}" onclick="setV('diastases','sit','epigastro e hipogastro')"><input type="radio" name="r_dia"><label class="radio-label"><span class="radio-mark"></span>Epigastro e hipogastro</label></div>
+  </div>
+  ${e.sit!=='ausente'?`
+  <div class="block"><div class="block-title">Distância Máxima de Afastamento</div><div class="dim-rows">
+    ${dimInput('dia-afa','afastamento máximo',e.distancia,'cm',"estado.diastases.distancia=this.value;updateLaudo()")}
+  </div></div>`:''}`;
+}
+ 
+// ── HÉRNIAS MIDLINE (Epigástrica, Supraumbilical, Umbilical, Paramediana, Semilunar, Incisional) ──
+function renderHerniaMidline(tipo){
+  const e=estado[tipo];
+  const isSit=(v)=>e.sit===v?'selected':'';
+  const temLateral=['paramediana','semilunar','incisional'].includes(tipo);
+  const temXif=tipo==='epigastrica';
+  const temDistUmb=tipo==='supraumbilical';
+  const temOrigem=false;
+  const conteudoMap={adiposo:'tecido adiposo',alcas:'alças intestinais',epiploon:'epiploon'};
+ 
+  return `
+  <div class="block"><div class="block-title">Situação</div>
+    <div class="radio-opt ${isSit('ausente')}" onclick="setV('${tipo}','sit','ausente')"><input type="radio" name="r_${tipo}"><label class="radio-label"><span class="radio-mark"></span>Ausente</label></div>
+    <div class="radio-opt ${isSit('presente')}" onclick="setV('${tipo}','sit','presente')"><input type="radio" name="r_${tipo}"><label class="radio-label"><span class="radio-mark"></span>Presente</label></div>
+  </div>
+  ${e.sit==='presente'?`
+  ${temLateral?`<div class="block"><div class="block-title">Lateralidade</div>
+    <div class="radio-opt ${e.lat==='direita'?'selected':''}" onclick="setV('${tipo}','lat','direita')"><input type="radio" name="r_${tipo}lat"><label class="radio-label"><span class="radio-mark"></span>À direita</label></div>
+    <div class="radio-opt ${e.lat==='esquerda'?'selected':''}" onclick="setV('${tipo}','lat','esquerda')"><input type="radio" name="r_${tipo}lat"><label class="radio-label"><span class="radio-mark"></span>À esquerda</label></div>
+  </div>`:''}
+  <div class="block"><div class="block-title">Conteúdo do Saco Herniário</div>
+    <div class="radio-opt ${e.conteudo==='adiposo'?'selected':''}" onclick="setV('${tipo}','conteudo','adiposo')"><input type="radio" name="r_${tipo}con"><label class="radio-label"><span class="radio-mark"></span>Tecido adiposo</label></div>
+    <div class="radio-opt ${e.conteudo==='alcas'?'selected':''}" onclick="setV('${tipo}','conteudo','alcas')"><input type="radio" name="r_${tipo}con"><label class="radio-label"><span class="radio-mark"></span>Alças intestinais</label></div>
+    <div class="radio-opt ${e.conteudo==='epiploon'?'selected':''}" onclick="setV('${tipo}','conteudo','epiploon')"><input type="radio" name="r_${tipo}con"><label class="radio-label"><span class="radio-mark"></span>Epiploon</label></div>
+  </div>
+  <div class="block"><div class="block-title">Medidas do Saco Herniário</div>
+    ${triDim(tipo+'Sac','medindo',e.d1,e.d2,e.d3)}
+    <div class="dim-rows">
+      ${dimInput(tipo+'-colo','colo herniário',e.colo,'cm',"estado['"+tipo+"'].colo=this.value;updateLaudo()")}
+      ${temXif?dimInput(tipo+'-xif','dist. do apêndice xifóide',e.distXif,'cm',"estado['"+tipo+"'].distXif=this.value;updateLaudo()"):''}
+      ${temDistUmb?dimInput(tipo+'-umb','dist. da cicatriz umbilical',e.distUmb,'cm',"estado['"+tipo+"'].distUmb=this.value;updateLaudo()"):''}
+    </div>
+  </div>
+  <div class="block"><div class="block-title">Complicações</div>
+    <div class="complicacao-row">
+      <button class="complicacao-btn ${e.complicacao==='nenhuma'?'active':''}" onclick="setV('${tipo}','complicacao','nenhuma')">✓ Redutível</button>
+      <button class="complicacao-btn ${e.complicacao==='encarcerada'?'active':''}" onclick="setV('${tipo}','complicacao','encarcerada')">⚠ Encarcerada</button>
+      <button class="complicacao-btn ${e.complicacao==='estrangulada'?'active':''}" onclick="setV('${tipo}','complicacao','estrangulada')">✕ Estrangulada</button>
+    </div>
+  </div>`:''}`;
+}
+ 
+// ── HÉRNIA INGUINAL ──
+function renderInguinal(){
+  const d=estado.inguinalD;
+  const es=estado.inguinalE;
+  function ladoBlock(lado, e){
+    const key='inguinal'+lado;
+    const lbl=lado==='D'?'Direita':'Esquerda';
+    return `
+    <div class="block"><div class="block-title">Inguinal ${lbl}</div>
+      <div class="radio-opt ${e.sit==='ausente'?'selected':''}" onclick="setV('${key}','sit','ausente')"><input type="radio" name="r_ing${lado}"><label class="radio-label"><span class="radio-mark"></span>Ausente</label></div>
+      <div class="radio-opt ${e.sit==='presente'?'selected':''}" onclick="setV('${key}','sit','presente')"><input type="radio" name="r_ing${lado}"><label class="radio-label"><span class="radio-mark"></span>Presente</label></div>
+      ${e.sit==='presente'?`
+      <div style="padding:8px 14px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-2);">Conteúdo
+          <select class="sel-tag" onchange="estado['${key}'].conteudo=this.value;updateLaudo()">
+            <option value="adiposo" ${e.conteudo==='adiposo'?'selected':''}>tecido adiposo</option>
+            <option value="alcas" ${e.conteudo==='alcas'?'selected':''}>alças intestinais</option>
+            <option value="epiploon" ${e.conteudo==='epiploon'?'selected':''}>epiploon</option>
+          </select></div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-2);">Origem provável
+          <select class="sel-tag" onchange="estado['${key}'].origem=this.value;updateLaudo()">
+            <option value="ne" ${e.origem==='ne'?'selected':''}>não especificar</option>
+            <option value="direta" ${e.origem==='direta'?'selected':''}>direta (triângulo de Hasselbach)</option>
+            <option value="indireta" ${e.origem==='indireta'?'selected':''}>indireta (lateral à epigástrica)</option>
+          </select></div>
+      </div>
+      ${triDim(key+'Sac','medindo',e.d1,e.d2,e.d3)}
+      <div class="dim-rows">${dimInput(key+'-colo','colo herniário',e.colo,'cm',"estado['"+key+"'].colo=this.value;updateLaudo()")}</div>
+      <div class="complicacao-row">
+        <button class="complicacao-btn ${e.complicacao==='nenhuma'?'active':''}" onclick="setV('${key}','complicacao','nenhuma')">✓ Redutível</button>
+        <button class="complicacao-btn ${e.complicacao==='encarcerada'?'active':''}" onclick="setV('${key}','complicacao','encarcerada')">⚠ Encarcerada</button>
+        <button class="complicacao-btn ${e.complicacao==='estrangulada'?'active':''}" onclick="setV('${key}','complicacao','estrangulada')">✕ Estrangulada</button>
+      </div>`:''}
+    </div>`;
+  }
+  return ladoBlock('D',d)+ladoBlock('E',es);
+}
+ 
+// ── HÉRNIA FEMORAL ──
+function renderFemoral(){
+  const d=estado.femoral;
+  const key='femoral';
+  return `
+  <div class="block"><div class="block-title">Situação</div>
+    <div class="radio-opt ${d.sit==='ausente'?'selected':''}" onclick="setV('${key}','sit','ausente')"><input type="radio" name="r_fem"><label class="radio-label"><span class="radio-mark"></span>Ausente</label></div>
+    <div class="radio-opt ${d.sit==='presente'?'selected':''}" onclick="setV('${key}','sit','presente')"><input type="radio" name="r_fem"><label class="radio-label"><span class="radio-mark"></span>Presente</label></div>
+  </div>
+  ${d.sit==='presente'?`
+  <div class="block"><div class="block-title">Lateralidade</div>
+    <div class="radio-opt ${d.lat==='direita'?'selected':''}" onclick="setV('${key}','lat','direita')"><input type="radio" name="r_femlat"><label class="radio-label"><span class="radio-mark"></span>À direita</label></div>
+    <div class="radio-opt ${d.lat==='esquerda'?'selected':''}" onclick="setV('${key}','lat','esquerda')"><input type="radio" name="r_femlat"><label class="radio-label"><span class="radio-mark"></span>À esquerda</label></div>
+    <div class="radio-opt ${d.lat==='bilateral'?'selected':''}" onclick="setV('${key}','lat','bilateral')"><input type="radio" name="r_femlat"><label class="radio-label"><span class="radio-mark"></span>Bilateral</label></div>
+  </div>
+  <div class="block"><div class="block-title">Conteúdo</div>
+    <div class="radio-opt ${d.conteudo==='adiposo'?'selected':''}" onclick="setV('${key}','conteudo','adiposo')"><input type="radio" name="r_femcon"><label class="radio-label"><span class="radio-mark"></span>Tecido adiposo</label></div>
+    <div class="radio-opt ${d.conteudo==='alcas'?'selected':''}" onclick="setV('${key}','conteudo','alcas')"><input type="radio" name="r_femcon"><label class="radio-label"><span class="radio-mark"></span>Alças intestinais</label></div>
+  </div>
+  <div class="block"><div class="block-title">Medidas</div>
+    ${triDim('femorSac','medindo',d.d1,d.d2,d.d3)}
+    <div class="dim-rows">${dimInput('femoral-colo','colo herniário',d.colo,'cm',"estado.femoral.colo=this.value;updateLaudo()")}</div>
+  </div>
+  <div class="block"><div class="block-title">Complicações</div>
+    <div class="complicacao-row">
+      <button class="complicacao-btn ${d.complicacao==='nenhuma'?'active':''}" onclick="setV('${key}','complicacao','nenhuma')">✓ Redutível</button>
+      <button class="complicacao-btn ${d.complicacao==='encarcerada'?'active':''}" onclick="setV('${key}','complicacao','encarcerada')">⚠ Encarcerada</button>
+      <button class="complicacao-btn ${d.complicacao==='estrangulada'?'active':''}" onclick="setV('${key}','complicacao','estrangulada')">✕ Estrangulada</button>
+    </div>
+  </div>`:''}`;
+}
+ 
+// ── LINFONODOS ──
+function renderLinfonodos(){
+  const e=estado.linfonodos;
+  const isSit=(v)=>e.sit===v?'selected':'';
+  return `
+  <div class="block"><div class="block-title">Linfonodos Inguinais</div>
+    <div class="radio-opt ${isSit('ausente')}" onclick="setV('linfonodos','sit','ausente')"><input type="radio" name="r_lnf"><label class="radio-label"><span class="radio-mark"></span>Sem linfonodos aumentados</label></div>
+    <div class="radio-opt ${isSit('presente')}" onclick="setV('linfonodos','sit','presente')"><input type="radio" name="r_lnf"><label class="radio-label"><span class="radio-mark"></span>Linfonodo(s) aumentado(s) presente(s)</label></div>
+  </div>
+  ${e.sit==='presente'?`
+  <div class="block"><div class="block-title">Localização</div>
+    <div class="radio-opt ${e.loc==='inguinal direita'?'selected':''}" onclick="setV('linfonodos','loc','inguinal direita')"><input type="radio" name="r_lnfloc"><label class="radio-label"><span class="radio-mark"></span>Região inguinal direita</label></div>
+    <div class="radio-opt ${e.loc==='inguinal esquerda'?'selected':''}" onclick="setV('linfonodos','loc','inguinal esquerda')"><input type="radio" name="r_lnfloc"><label class="radio-label"><span class="radio-mark"></span>Região inguinal esquerda</label></div>
+    <div class="radio-opt ${e.loc==='inguinal bilateral'?'selected':''}" onclick="setV('linfonodos','loc','inguinal bilateral')"><input type="radio" name="r_lnfloc"><label class="radio-label"><span class="radio-mark"></span>Bilateral</label></div>
+  </div>
+  <div class="block"><div class="block-title">Maior Linfonodo (eixo longo × curto)</div><div class="dim-rows">
+    ${dimInput('lnf-d1','eixo longo',e.d1,'cm',"estado.linfonodos.d1=this.value;updateLaudo()")}
+    ${dimInput('lnf-d2','eixo curto',e.d2,'cm',"estado.linfonodos.d2=this.value;updateLaudo()")}
+  </div></div>`:''}`;
+}
+ 
+// ── ACHADOS ADICIONAIS ──
+function renderAchados(){
+  return `<div class="block"><div class="block-title">Texto Livre</div>
+    <div style="padding:10px 14px;">
+      <textarea id="achados-texto" style="width:100%;height:140px;border:1px solid var(--border-strong);border-radius:6px;padding:8px 10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);background:var(--white);resize:vertical;" placeholder="Descreva achados adicionais..." oninput="estado.achados.texto=this.value;updateLaudo()">${estado.achados.texto}</textarea>
+    </div>
+  </div>`;
+}
+ 
+// ── GERAÇÃO DO LAUDO ──
+function syncDims(){
+  function g(id){const el=document.getElementById(id);return el?el.value:'';}
+  // Pele
+  estado.pele.lipoD1=g('pelLipD1');estado.pele.lipoD2=g('pelLipD2');estado.pele.lipoD3=g('pelLipD3');
+  estado.pele.nodD1=g('pelNodD1');estado.pele.nodD2=g('pelNodD2');estado.pele.nodD3=g('pelNodD3');
+  estado.pele.colOrgD1=g('pelCOD1');estado.pele.colOrgD2=g('pelCOD2');estado.pele.colOrgD3=g('pelCOD3');
+  estado.pele.colOrgDis=g('pelCODis');
+  estado.pele.colNaoD1=g('pelCND1');estado.pele.colNaoD2=g('pelCND2');estado.pele.colNaoD3=g('pelCND3');
+  estado.pele.colNaoDis=g('pelCNDis');
+  // Muscular
+  estado.muscular.colOrgD1=g('musCOD1');estado.muscular.colOrgD2=g('musCOD2');estado.muscular.colOrgD3=g('musCOD3');
+  estado.muscular.colOrgDis=g('musCODis');
+  estado.muscular.colNaoD1=g('musCND1');estado.muscular.colNaoD2=g('musCND2');estado.muscular.colNaoD3=g('musCND3');
+  estado.muscular.colNaoDis=g('musCNDis');
+  // Hernias
+  const hernTipos=['epigastrica','supraumbilical','umbilical','paramediana','semilunar','incisional','inguinalD','inguinalE','femoral'];
+  for(const t of hernTipos){
+    const pre=t+'Sac';
+    estado[t].d1=g(pre+'D1');estado[t].d2=g(pre+'D2');estado[t].d3=g(pre+'D3');
+    const co=g(t+'-colo');if(co)estado[t].colo=co;
+    const xf=g(t+'-xif');if(xf!==undefined)estado[t].distXif=xf;
+    const um=g(t+'-umb');if(um!==undefined)estado[t].distUmb=um;
+  }
+  // Diastases
+  const da=g('dia-afa');if(da)estado.diastases.distancia=da;
+  // Linfonodos
+  const ld1=g('lnf-d1');if(ld1)estado.linfonodos.d1=ld1;
+  const ld2=g('lnf-d2');if(ld2)estado.linfonodos.d2=ld2;
+  // Preop
+  ['sub1Esp','sub1Dis','sub2Esp','sub2Dis','gor1Esp','gor1Dis','gor2Esp','gor2Dis'].forEach(k=>{
+    const id='pre-'+k.toLowerCase().replace(/([A-Z])/,m=>m.toLowerCase());
+    const v=g('pre-'+k.replace(/([A-Z])/,c=>c.toLowerCase()));
+    // fallback
+  });
+}
+ 
+function compStr(c){return c==='encarcerada'?' com sinais de encarceramento':c==='estrangulada'?' com sinais de estrangulamento':'';}
+ 
+function updateLaudo(){
+  syncDims();
+ 
+  const hd=[];
+  let html='';
+ 
+  html+=`<div class="doc-titulo">ULTRASSONOGRAFIA DA PAREDE ABDOMINAL</div>`;
+  html+=`<div class="doc-secao"><span class="doc-label">TÉCNICA:</span><div class="doc-p">Exame realizado em aparelho dinâmico com transdutor linear de alta frequência.</div></div>`;
+  html+=`<div class="doc-secao"><span class="doc-label">ANÁLISE:</span>`;
+  html+=`<div class="doc-p">Exame orientado para a avaliação da parede abdominal.</div>`;
+ 
+  // ── PELE E SUBCUTÂNEO ──
+  const pe=estado.pele;
+  const hasAchadosPele=pe.edema||pe.lipoma||pe.nodulo||pe.colOrg||pe.colNao;
+  if(!hasAchadosPele){
+    if(pe.hab) html+=`<div class="doc-p">Pele e tecido subcutâneo sem anormalidades detectáveis.</div>`;
+    if(pe.ausNodMas) html+=`<div class="doc-p">Ausência de nódulos, massas ou coleções.</div>`;
+  } else {
+    if(pe.edema){ html+=`<div class="doc-p">Espessamento da pele e aumento difuso da ecogenicidade do tecido celular subcutâneo, sugestivo de edema.</div>`; hd.push('Edema de tecido subcutâneo.'); }
+    if(pe.lipoma){
+      const m=medStr(pe.lipoD1,pe.lipoD2,pe.lipoD3);
+      html+=`<div class="doc-p">Presença de nódulo sólido de contornos ${pe.lipoReg?'regulares':'irregulares'}, isoecogênico em relação ao tecido adiposo, medindo cerca de ${m}, situado em meio à gordura subcutânea.</div>`;
+      hd.push('Nódulo com características ecográficas sugestivas de lesão lipomatosa.');
+    }
+    if(pe.nodulo){
+      const m=medStr(pe.nodD1,pe.nodD2,pe.nodD3);
+      const ecoMap={anecoico:'anecoico',hipoecogenico:'hipoecogênico',heterogeneo:'heterogêneo'};
+      html+=`<div class="doc-p">Presença de nódulo sólido, ${ecoMap[pe.nodEco]||pe.nodEco}, ${pe.nodTex==='homogeneo'?'homogêneo':'heterogêneo'}, de contornos ${pe.nodCon}, ${pe.nodDop?'com':'sem'} fluxo vascular ao estudo Doppler, localizado no plano ${pe.nodLoc==='pele'?'da pele':'do subcutâneo'}, medindo cerca de ${m}.</div>`;
+      hd.push('Nódulo com características inespecíficas ao método (natureza indefinida).');
+    }
+    if(pe.colOrg){
+      const m=medStr(pe.colOrgD1,pe.colOrgD2,pe.colOrgD3);
+      const v=vol(pe.colOrgD1,pe.colOrgD2,pe.colOrgD3);
+      const dis=pe.colOrgDis||'_';
+      const conMap={anecoico:'anecoico',hipoecoico:'hipoecoico/espesso',heterogeneo:'heterogêneo'};
+      html+=`<div class="doc-p">No plano do subcutâneo, nota-se coleção de paredes ${pe.colOrgPar} e conteúdo ${conMap[pe.colOrgCon]||pe.colOrgCon}, medindo ${m}${v?`, com volume de ${v} cm³`:''}${dis!=='_'?`, e seu centro distando ${dis} cm da pele`:''}.</div>`;
+      hd.push('Coleção organizada no plano subcutâneo.');
+    }
+    if(pe.colNao){
+      const m=medStr(pe.colNaoD1,pe.colNaoD2,pe.colNaoD3);
+      const v=vol(pe.colNaoD1,pe.colNaoD2,pe.colNaoD3);
+      const dis=pe.colNaoDis||'_';
+      html+=`<div class="doc-p">No plano do subcutâneo, nota-se área heterogênea, predominantemente hipoecogênica, de limites imprecisos, medindo cerca de ${m}${v?`, com volume de ${v} cm³`:''}${dis!=='_'?`, e seu centro distando ${dis} cm da pele`:''}.</div>`;
+      hd.push('Achados sugestivos de coleção em organização no plano subcutâneo.');
+    }
+  }
+ 
+  // ── PRÉ-OPERATÓRIO ──
+  const pr=estado.preop;
+  if(pr.ativo){
+    html+=`<div class="doc-p">Medidas para pré-operatório:<br>
+      - espessura do plano subcutâneo de até ${pr.sub1Esp||'_'} cm, distando cerca de ${pr.sub1Dis||'_'} cm acima da cicatriz umbilical;<br>
+      - espessura do plano subcutâneo de até ${pr.sub2Esp||'_'} cm, distando cerca de ${pr.sub2Dis||'_'} cm abaixo da cicatriz umbilical;<br>
+      - espessura da gordura pré-peritoneal de até ${pr.gor1Esp||'_'} cm, distando cerca de ${pr.gor1Dis||'_'} cm acima da cicatriz umbilical;<br>
+      - espessura da gordura pré-peritoneal de até ${pr.gor2Esp||'_'} cm, distando cerca de ${pr.gor2Dis||'_'} cm abaixo da cicatriz umbilical.</div>`;
+  }
+ 
+  // ── MUSCULAR ──
+  const mu=estado.muscular;
+  const hasAchadosMus=mu.colOrg||mu.colNao;
+  if(!hasAchadosMus){
+    if(mu.hab) html+=`<div class="doc-p">Planos musculares de aspecto preservado.</div>`;
+  } else {
+    if(mu.colOrg){
+      const m=medStr(mu.colOrgD1,mu.colOrgD2,mu.colOrgD3);
+      const v=vol(mu.colOrgD1,mu.colOrgD2,mu.colOrgD3);
+      const dis=mu.colOrgDis||'_';
+      const conMap={anecoico:'anecoico',hipoecoico:'hipoecoico/espesso',heterogeneo:'heterogêneo'};
+      html+=`<div class="doc-p">No plano muscular, nota-se coleção de paredes ${mu.colOrgPar} e conteúdo ${conMap[mu.colOrgCon]||mu.colOrgCon}${mu.colOrgSep?', contendo septos de permeio':''}, medindo ${m}${v?`, com volume de ${v} cm³`:''}${dis!=='_'?`, e seu centro distando ${dis} cm da pele`:''}.</div>`;
+      hd.push('Coleção organizada no plano muscular.');
+    }
+    if(mu.colNao){
+      const m=medStr(mu.colNaoD1,mu.colNaoD2,mu.colNaoD3);
+      const v=vol(mu.colNaoD1,mu.colNaoD2,mu.colNaoD3);
+      const dis=mu.colNaoDis||'_';
+      html+=`<div class="doc-p">No plano muscular, nota-se área heterogênea, predominantemente hipoecogênica, de limites imprecisos, medindo cerca de ${m}${v?`, com volume de ${v} cm³`:''}${dis!=='_'?`, e seu centro distando ${dis} cm da pele`:''}.</div>`;
+      hd.push('Achados sugestivos de coleção em organização no plano muscular.');
+    }
+  }
+ 
+  // ── DIÁSTASES ──
+  const di=estado.diastases;
+  if(di.sit!=='ausente'){
+    html+=`<div class="doc-p">Nota-se afastamento patológico dos ventres do músculo reto abdominal ao nível do ${di.sit}, com distância transversa máxima de ${di.distancia||'_'} cm entre as bordas mediais.</div>`;
+    hd.push('Diástase do músculo reto abdominal.');
+  }
+ 
+  // ── HÉRNIAS ──
+  function fraseHernia(tipo, e){
+    if(e.sit!=='presente') return '';
+    const conMap={adiposo:'tecido adiposo',alcas:'alças intestinais',epiploon:'epiploon'};
+    const con=conMap[e.conteudo]||e.conteudo;
+    const m=medStr(e.d1,e.d2,e.d3);
+    const colo=e.colo?`com colo de ${e.colo} cm`:'';
+    const comp=compStr(e.complicacao);
+ 
+    const nomeMap={epigastrica:'epigástrica',supraumbilical:'supraumbilical',umbilical:'umbilical',paramediana:'paramediana',semilunar:'semilunar (de Spiegel)',incisional:'incisional'};
+    const nome=nomeMap[tipo]||tipo;
+ 
+    let frase='';
+    const hdComp=e.complicacao!=='nenhuma'?` ${e.complicacao}`:'';
+ 
+    if(tipo==='epigastrica'){
+      frase=`Na região epigástrica, identificado saco herniário contendo ${con}, medindo ${m}${colo?', '+colo:''}${e.distXif?`, com seu limite superior distando ${e.distXif} cm do apêndice xifóide`:''}${comp}.`;
+      hd.push(`Hérnia epigástrica${hdComp}.`);
+    } else if(tipo==='supraumbilical'){
+      frase=`Na região supraumbilical, identificado saco herniário contendo ${con}, medindo ${m}${colo?', '+colo:''}${e.distUmb?`, com limite inferior distando ${e.distUmb} cm da cicatriz umbilical`:''}${comp}.`;
+      hd.push(`Hérnia supraumbilical${hdComp}.`);
+    } else if(tipo==='umbilical'){
+      frase=`Na região umbilical, identificado saco herniário contendo ${con}, medindo ${m}${colo?', '+colo:''}${comp}.`;
+      hd.push(`Hérnia umbilical${hdComp}.`);
+    } else if(['paramediana','semilunar'].includes(tipo)){
+      frase=`Na região ${nome}, à ${e.lat||'direita'}, identificado saco herniário contendo ${con}, medindo ${m}${colo?', '+colo:''}${comp}.`;
+      hd.push(`Hérnia ${nome} à ${e.lat||'direita'}${hdComp}.`);
+    } else if(tipo==='incisional'){
+      frase=`Identificado saco herniário incisional à ${e.lat||'direita'}, contendo ${con}, medindo ${m}${colo?', '+colo:''}${comp}.`;
+      hd.push(`Hérnia incisional à ${e.lat||'direita'}${hdComp}.`);
+    }
+    return frase?`<div class="doc-p">${frase}</div>`:'';
+  }
+ 
+  html+=fraseHernia('epigastrica',estado.epigastrica);
+  html+=fraseHernia('supraumbilical',estado.supraumbilical);
+  html+=fraseHernia('umbilical',estado.umbilical);
+  html+=fraseHernia('paramediana',estado.paramediana);
+  html+=fraseHernia('semilunar',estado.semilunar);
+  html+=fraseHernia('incisional',estado.incisional);
+ 
+  // Inguinal (D e E, com fusão bilateral)
+  const iD=estado.inguinalD, iE=estado.inguinalE;
+  const origemFrase=(o)=>o==='direta'?'no trígono de Hasselbach, medialmente à artéria epigástrica inferior':o==='indireta'?'lateralmente à artéria epigástrica inferior':'';
+  if(iD.sit==='presente'&&iE.sit==='presente'&&iD.conteudo===iE.conteudo&&iD.origem===iE.origem){
+    const mD=medStr(iD.d1,iD.d2,iD.d3), mE=medStr(iE.d1,iE.d2,iE.d3);
+    const of=origemFrase(iD.origem);
+    html+=`<div class="doc-p">Na região inguinal bilateralmente são observados sacos herniários contendo ${({adiposo:'tecido adiposo',alcas:'alças intestinais',epiploon:'epiploon'})[iD.conteudo]}, medindo à direita ${mD}${iD.colo?', com colo de '+iD.colo+' cm':''}${compStr(iD.complicacao)}, e à esquerda ${mE}${iE.colo?', com colo de '+iE.colo+' cm':''}${compStr(iE.complicacao)}.${of?' Ambos os sacos herniários parecem se originar '+of+'.':''}</div>`;
+    hd.push(`Hérnia inguinal${iD.origem!=='ne'?' '+(iD.origem==='direta'?'direta':'indireta'):''} bilateral.`);
+  } else {
+    if(iD.sit==='presente'){
+      const m=medStr(iD.d1,iD.d2,iD.d3); const of=origemFrase(iD.origem);
+      const con=({adiposo:'tecido adiposo',alcas:'alças intestinais',epiploon:'epiploon'})[iD.conteudo];
+      html+=`<div class="doc-p">Na região inguinal direita observa-se saco herniário contendo ${con}, medindo ${m}${iD.colo?', com colo de '+iD.colo+' cm':''}${compStr(iD.complicacao)}.${of?' O saco herniário parece se originar '+of+'.':''}</div>`;
+      hd.push(`Hérnia inguinal${iD.origem!=='ne'?' '+(iD.origem==='direta'?'direta':'indireta'):''} à direita.`);
+    }
+    if(iE.sit==='presente'){
+      const m=medStr(iE.d1,iE.d2,iE.d3); const of=origemFrase(iE.origem);
+      const con=({adiposo:'tecido adiposo',alcas:'alças intestinais',epiploon:'epiploon'})[iE.conteudo];
+      html+=`<div class="doc-p">Na região inguinal esquerda observa-se saco herniário contendo ${con}, medindo ${m}${iE.colo?', com colo de '+iE.colo+' cm':''}${compStr(iE.complicacao)}.${of?' O saco herniário parece se originar '+of+'.':''}</div>`;
+      hd.push(`Hérnia inguinal${iE.origem!=='ne'?' '+(iE.origem==='direta'?'direta':'indireta'):''} à esquerda.`);
+    }
+  }
+ 
+  // Femoral
+  const fe=estado.femoral;
+  if(fe.sit==='presente'){
+    const m=medStr(fe.d1,fe.d2,fe.d3);
+    const con=({adiposo:'tecido adiposo',alcas:'alças intestinais'})[fe.conteudo]||fe.conteudo;
+    const lat=fe.lat==='bilateral'?'bilateralmente':(`à ${fe.lat||'direita'}`);
+    html+=`<div class="doc-p">Na região inguinal ${lat}, observa-se saco herniário contendo ${con}, medindo ${m}${fe.colo?', com colo de '+fe.colo+' cm':''}${compStr(fe.complicacao)}. O saco herniário parece se originar no canal femoral, medialmente à artéria epigástrica inferior.</div>`;
+    hd.push(`Hérnia femoral ${lat}.`);
+  }
+ 
+  // ── LINFONODOS ──
+  const ln=estado.linfonodos;
+  if(ln.sit==='presente'){
+    const m=ln.d1?`medindo ${ln.d1}${ln.d2?' x '+ln.d2:''} cm`:'';
+    html+=`<div class="doc-p">Linfonodos ${m?'de aspecto reativo ':' '}identificados na ${ln.loc}${m?', '+m:''}.</div>`;
+    hd.push(`Linfonodos reativos na ${ln.loc}.`);
+  }
+ 
+  html+=`</div>`;
+ 
+  // ── OPINIÃO ──
+  let op='';
+  if(hd.length===0) op='Estudo ecográfico sem evidentes anormalidades apreciáveis ao método.';
+  else op=hd.join('<br>')+'<br>Demais estruturas sem evidentes anormalidades apreciáveis ao método.';
+ 
+  html+=`<div class="doc-secao"><span class="doc-label">OPINIÃO DO RELATÓRIO:</span><div class="doc-p">${op}</div></div>`;
+ 
+  if(estado.achados.texto) html+=`<div class="doc-secao"><span class="doc-label">ACHADOS ADICIONAIS:</span><div class="doc-p">${estado.achados.texto}</div></div>`;
+ 
+  document.getElementById('laudo-doc').innerHTML=html;
+ 
+  // Atualizar badges das hérnias na sidebar
+  const hernTipos=['epigastrica','supraumbilical','umbilical','paramediana','semilunar','incisional','inguinal','femoral'];
+  hernTipos.forEach(t=>{
+    const badge=document.getElementById('badge-'+t);
+    if(!badge) return;
+    let presente=false;
+    if(t==='inguinal') presente=estado.inguinalD.sit==='presente'||estado.inguinalE.sit==='presente';
+    else presente=estado[t]&&estado[t].sit==='presente';
+    badge.style.display=presente?'inline-flex':'none';
+  });
+}
+ 
+function toggleDark(){
+  const isDark=document.body.classList.toggle('dark');
+  const btn=document.getElementById('btn-dark-toggle');
+  if(isDark){ btn.innerHTML='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 8.5A5.5 5.5 0 0 1 6 3c0-.18.01-.36.03-.53A6 6 0 1 0 13.97 9.5c-.15.01-.31.01-.47 0z"/></svg>Modo claro'; }
+  else { btn.innerHTML='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro'; }
+  localStorage.setItem('darkMode',isDark?'1':'0');
+}
+(function(){ if(localStorage.getItem('darkMode')==='1') toggleDark(); })();
+ 
+function copiar(){
+  const el=document.getElementById('laudo-doc');
+  navigator.clipboard.writeText(el.innerText).then(()=>alert('Laudo copiado!')).catch(()=>alert('Use Ctrl+A e Ctrl+C no texto do laudo.'));
+}
+function imprimir(){
+  const h=document.getElementById('laudo-doc').innerHTML;
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Helvetica,Arial,sans-serif;font-size:10pt;padding:32px;color:#111;line-height:1.65;}.doc-titulo{text-align:center;font-weight:700;text-transform:uppercase;margin-bottom:16px;}.doc-label{font-weight:700;}.doc-p{margin-bottom:8px;}.doc-secao{margin-bottom:14px;}*{color:#111 !important;}</style></head><body>${h}</body></html>`);
+  w.document.close(); w.print();
+}
+function reiniciar(){
+  Object.assign(estado.pele,{hab:true,ausNodMas:true,edema:false,lipoma:false,lipoD1:'',lipoD2:'',lipoD3:'',lipoReg:true,nodulo:false,nodEco:'hipoecogenico',nodTex:'homogeneo',nodLoc:'subcutaneo',nodCon:'definidos',nodD1:'',nodD2:'',nodD3:'',nodDop:false,colOrg:false,colOrgLoc:'subcutaneo',colOrgPar:'finas',colOrgCon:'anecoico',colOrgD1:'',colOrgD2:'',colOrgD3:'',colOrgDis:'',colNao:false,colNaoLoc:'subcutaneo',colNaoD1:'',colNaoD2:'',colNaoD3:'',colNaoDis:''});
+  Object.assign(estado.preop,{ativo:false,sub1Esp:'',sub1Dis:'',sub2Esp:'',sub2Dis:'',gor1Esp:'',gor1Dis:'',gor2Esp:'',gor2Dis:''});
+  Object.assign(estado.muscular,{hab:true,colOrg:false,colOrgPar:'finas',colOrgCon:'anecoico',colOrgD1:'',colOrgD2:'',colOrgD3:'',colOrgDis:'',colOrgSep:false,colNao:false,colNaoD1:'',colNaoD2:'',colNaoD3:'',colNaoDis:''});
+  Object.assign(estado.diastases,{sit:'ausente',nivel:'epigastro',distancia:''});
+  ['epigastrica','supraumbilical','umbilical','paramediana','semilunar','incisional','inguinalD','inguinalE','femoral'].forEach(t=>{
+    const d=defaultHernia(t);
+    Object.keys(d).forEach(k=>estado[t][k]=d[k]);
+  });
+  Object.assign(estado.linfonodos,{sit:'ausente',loc:'inguinal direita',d1:'',d2:''});
+  estado.achados.texto='';
+  showSection('pele');
+}
+ 
+showSection('pele');
+</script>
+</body>
+</html>

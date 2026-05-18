@@ -305,23 +305,51 @@
                 window.location.href = 'acrescente/abdome-total_elite (2).html';
             } else if (exame === 'ABDOME SUPERIOR') {
                 window.location.href = 'acrescente/abdome_superior_elite.html';
+            } else if (exame === 'PAREDE ABDOMINAL') {
+                window.location.href = 'acrescente/parede abdominal elite.html';
             } else if (exame === 'TRANSVAGINAL') {
                 window.location.href = 'acrescente/ustransvaginal.html';
             } else if (exame === 'APARELHO URINÁRIO') {
                 window.location.href = 'acrescente/renal.html';
+            } else if (exame === 'PÉLVICO ABDOMINAL') {
+                window.location.href = 'acrescente/pelvico_abdominal_elite.html';
+            } else if (exame === 'BOLSA ESCROTAL') {
+                window.location.href = 'acrescente/bolsa_escrotal_elite.html';
+            } else if (exame === 'BOLSA ESCROTAL COM DOPPLER') {
+                window.location.href = 'acrescente/bolsa escrotal com doppler.html';
+            } else if (exame === 'CARÓTIDAS') {
+                window.location.href = 'acrescente/carotidas.html';
+            } else if (exame === 'TVP MEMBROS INF') {
+                window.location.href = 'acrescente/tvp_membros_inferiores (2).html';
+            } else if (exame === 'CERVICAL') {
+                window.location.href = 'acrescente/cervical_elite.html';
+            } else if (exame === 'CERVICAL LINFONODOS') {
+                window.location.href = 'acrescente/cervical_linfonodos_elite.html';
+            } else if (exame === 'TIREOIDE') {
+                window.location.href = 'acrescente/tireoide elite.html';
+            } else if (exame === 'GLÂNDULAS SALIVARES') {
+                window.location.href = 'acrescente/glandulas_salivares_elite.html';
+            } else if (exame === 'MAMAS' || exame === 'MAMAS E AXILAS') {
+                window.location.href = 'acrescente/mamas_elite.html';
+            } else if (exame === 'PARTES MOLES') {
+                window.location.href = 'acrescente/partes_moles_elite.html';
             } else {
                 alert('O módulo para "' + exame + '" está em desenvolvimento e estará disponível em breve!');
             }
         }
 
+        function removerAcentos(str) {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        }
+
         function filtrarCards() {
-            const termo = document.getElementById("searchInput").value.toLowerCase().trim();
+            const termo = removerAcentos(document.getElementById("searchInput").value.toLowerCase().trim());
             const secoes = document.querySelectorAll(".categoria-secao");
             secoes.forEach(secao => {
                 const cards = secao.querySelectorAll(".card");
                 let algumVisivel = false;
                 cards.forEach(card => {
-                    const nomeExame = card.getAttribute("data-exame").toLowerCase();
+                    const nomeExame = removerAcentos(card.getAttribute("data-exame").toLowerCase());
                     if (nomeExame.includes(termo)) {
                         card.classList.remove("hidden");
                         algumVisivel = true;

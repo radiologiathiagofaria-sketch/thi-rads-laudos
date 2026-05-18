@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THI-RADS — Laudo estruturado</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#1a56db;--blue-dark:#1140a6;--blue-light:#e8f0fe;--blue-mid:#dbeafe;
+  --surface:#f4f6fb;--border:#e2e6ef;--border-strong:#c8cfe0;
+  --text:#1a1f2e;--text-2:#4b5570;--text-3:#8892a4;
+  --white:#ffffff;--green:#059669;--red:#dc2626;--radius:8px;--radius-lg:12px;
+}
+body.dark{
+  --blue:#4d86f5;--blue-dark:#3a6fd4;--blue-light:#1e2d4a;--blue-mid:#1e2d4a;
+  --surface:#141820;--border:#2a2f3d;--border-strong:#3a4155;
+  --text:#e2e6f0;--text-2:#9aa3b8;--text-3:#5d6680;
+  --white:#1e2230;--green:#34d399;--red:#f87171;
+}
+body.dark .laudo-doc{color:#e2e6f0;}
+body.dark .laudo-panel{background:#1e2230;border-left-color:var(--border);}
+body.dark .laudo-body{background:#1e2230;}
+body.dark .laudo-header{background:#1e2230;border-bottom-color:var(--border);}
+@media print{
+  body.dark .laudo-doc,
+  body.dark .laudo-doc *{color:#111 !important;}
+}
+.btn-dark{margin-left:auto;}
+body.dark .btn-dark{background:#2a2f3d;border-color:#3a4155;color:#e2e6f0;}
+body.dark .btn-dark:hover{background:#343a4d;color:#fff;}
+body.dark .dim-input,body.dark .ff select,body.dark .ff input[type=text]{background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .radio-mark{background:var(--white);}
+body.dark .check-box{background:var(--white);}
+body.dark .sub-opts{background:#1a2040;border-bottom-color:#2a3460;}
+body.dark .sub-opt-label{background:var(--white);color:var(--text-2);}
+body.dark .lesao-card{background:#141820;border-color:var(--border);}
+body.dark .toolbar{background:var(--white);border-bottom-color:var(--border);}
+body.dark .sidebar{background:var(--white);border-right-color:var(--border);}
+body.dark .sidebar-hd{border-bottom-color:var(--border);}
+body.dark .block{background:var(--white);border-color:var(--border);}
+body.dark .block-title{background:var(--white);border-bottom-color:var(--border);}
+body.dark .radio-opt:hover{background:#1e2d4a;}
+body.dark .radio-opt.selected{background:#1e2d4a;}
+body.dark .check-row{background:#1a1f2e;}
+body.dark .check-row:hover{background:#1e2d4a;}
+body.dark .check-row.selected{background:#1e2d4a;}
+body.dark .btn-add-lesao{background:var(--white);color:var(--text-2);border-color:var(--border-strong);}
+body.dark .sel-tag{background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .nodulo-card{background:#141820;border-color:var(--border);}
+body.dark .badge-tirads{filter:brightness(0.85);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',system-ui,sans-serif;font-size:13px;background:var(--surface);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+.toolbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:10px;height:48px;flex-shrink:0;}
+.logo{display:flex;align-items:baseline;gap:6px;margin-right:12px;}
+.logo-name{font-size:17px;font-weight:600;color:var(--blue);letter-spacing:-.3px;}
+.logo-sub{font-size:11px;color:var(--text-3);font-weight:400;letter-spacing:.2px;}
+.tb-sep{width:1px;height:20px;background:var(--border);margin:0 4px;}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid var(--border);font-weight:500;transition:all .13s;background:var(--white);color:var(--text-2);}
+.btn:hover{background:var(--surface);border-color:var(--border-strong);color:var(--text);}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue);}
+.btn-primary:hover{background:var(--blue-dark);border-color:var(--blue-dark);color:#fff;}
+.btn-danger{background:#fff5f5;color:var(--red);border-color:#fecaca;}
+body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
+.btn-danger:hover{background:#fee2e2;border-color:#fca5a5;}
+.btn svg{width:13px;height:13px;flex-shrink:0;}
+.body{display:flex;flex:1;overflow:hidden;}
+.sidebar{width:140px;background:var(--white);border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;}
+.sidebar-hd{padding:10px 12px 8px;border-bottom:1px solid var(--border);}
+.sidebar-tipo{font-size:9px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;}
+.sidebar-titulo{font-size:11px;font-weight:600;color:var(--text);}
+.nav-group{padding:6px 0;}
+.nav-item{display:flex;align-items:center;gap:7px;padding:7px 12px;font-size:11.5px;color:var(--text-2);cursor:pointer;transition:all .12s;border-left:2px solid transparent;}
+.nav-item:hover{background:var(--blue-light);color:var(--blue);}
+.nav-item.active{background:var(--blue-light);color:var(--blue);border-left-color:var(--blue);font-weight:600;}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.4;flex-shrink:0;}
+.nav-item.active .nav-dot{opacity:1;}
+.panel{width:480px;flex-shrink:0;overflow-y:auto;padding:14px 14px 20px;background:var(--surface);}
+.sec-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.sec-title::before{content:'';display:block;width:3px;height:16px;background:var(--blue);border-radius:2px;}
+.block{margin-bottom:10px;background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden;}
+.block-title{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.7px;padding:8px 14px 7px;border-bottom:1px solid var(--border);background:var(--white);}
+.radio-opt{display:flex;align-items:flex-start;gap:0;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;position:relative;}
+.radio-opt:last-child{border-bottom:none;}
+.radio-opt:hover{background:#f5f8ff;}
+.radio-opt.selected{background:var(--blue-light);}
+.radio-opt input[type=radio]{position:absolute;opacity:0;pointer-events:none;}
+.radio-label{display:flex;align-items:center;gap:10px;width:100%;padding:9px 14px;font-size:12.5px;color:var(--text-2);line-height:1.4;cursor:pointer;}
+.radio-opt.selected .radio-label{color:var(--blue);font-weight:500;}
+.radio-mark{width:16px;height:16px;border-radius:50%;border:2px solid var(--border-strong);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.radio-opt:hover .radio-mark{border-color:var(--blue);}
+.radio-opt.selected .radio-mark{border-color:var(--blue);background:var(--blue);}
+.radio-mark::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff;opacity:0;transition:opacity .15s;}
+.radio-opt.selected .radio-mark::after{opacity:1;}
+.check-row{display:flex;align-items:center;gap:0;border-bottom:1px solid var(--border);cursor:pointer;background:#fafbff;}
+.check-row:last-child{border-bottom:none;}
+.check-row:hover{background:#f0f5ff;}
+.check-row.selected{background:#e6eeff;}
+.check-row input[type=checkbox]{position:absolute;opacity:0;pointer-events:none;}
+.check-label{display:flex;align-items:center;gap:10px;width:100%;padding:8px 14px;font-size:12px;color:var(--text-2);cursor:pointer;}
+.check-row.selected .check-label{color:var(--blue);font-weight:500;}
+.check-box{width:15px;height:15px;border-radius:4px;border:2px solid var(--border-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.check-row:hover .check-box{border-color:var(--blue);}
+.check-row.selected .check-box{border-color:var(--blue);background:var(--blue);}
+.check-box svg{display:none;width:9px;height:9px;}
+.check-row.selected .check-box svg{display:block;}
+.sub-opts{display:none;padding:8px 14px 9px 32px;gap:16px;background:#eef3ff;border-bottom:1px solid #d0dcff;flex-wrap:wrap;}
+.sub-opt-label{font-size:12px;color:var(--text-2);cursor:pointer;display:flex;align-items:center;gap:6px;padding:3px 8px;border-radius:20px;border:1px solid var(--border);background:var(--white);transition:all .12s;}
+.sub-opt-label:has(input:checked){background:var(--blue);color:#fff;border-color:var(--blue);}
+.sub-opt-label input{position:absolute;opacity:0;pointer-events:none;}
+.sel-tag{font-size:11px;border:1px solid var(--border-strong);border-radius:5px;padding:4px 7px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);cursor:pointer;}
+.sel-tag:focus{outline:none;border-color:var(--blue);}
+.dim-rows{padding:8px 14px;display:flex;flex-direction:column;gap:6px;}
+.dim-row{display:flex;align-items:center;gap:10px;}
+.dim-lbl{flex:1;font-size:12px;color:var(--text-2);}
+.dim-input{width:60px;padding:5px 8px;border:1px solid var(--border-strong);border-radius:6px;font-size:12.5px;font-family:'DM Sans',sans-serif;text-align:center;color:var(--text);background:var(--white);transition:border .12s;}
+.dim-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,.08);}
+.dim-unit{font-size:12px;color:var(--text-3);}
+.dim-vol{font-size:11px;color:var(--text-3);font-style:italic;}
+/* Nódulo cards */
+.nodulos-wrap{padding:8px 14px;display:flex;flex-direction:column;gap:7px;}
+.btn-add-nodulo{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;transition:all .12s;border:1.5px dashed var(--border-strong);background:var(--white);color:var(--text-2);width:100%;justify-content:center;}
+.btn-add-nodulo:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-light);}
+.nodulo-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;margin-bottom:6px;}
+.nodulo-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.nodulo-hd-title{font-size:10px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.5px;}
+.btn-rem{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:4px;font-size:10px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;border:1px solid #fecaca;background:#fff5f5;color:var(--red);transition:all .12s;}
+.btn-rem:hover{background:#fee2e2;}
+.ff-grid{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;}
+.ff{display:flex;flex-direction:column;gap:2px;}
+.ff label{font-size:9px;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
+.ff select,.ff input[type=text],.ff input[type=number]{font-size:11px;padding:4px 7px;border:1px solid var(--border-strong);border-radius:5px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);}
+.ff select:focus,.ff input:focus{outline:none;border-color:var(--blue);}
+.ff input[type=text],.ff input[type=number]{width:58px;text-align:center;}
+.badge-tirads{display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:.3px;text-transform:uppercase;}
+.badge-tr1{background:#dcfce7;color:#166534;}
+.badge-tr2{background:#dcfce7;color:#166534;}
+.badge-tr3{background:#fef9c3;color:#854d0e;}
+.badge-tr4{background:#fed7aa;color:#9a3412;}
+.badge-tr5{background:#fee2e2;color:#991b1b;}
+/* Laudo */
+.laudo-panel{flex:1;min-width:0;background:var(--white);display:flex;flex-direction:column;border-left:1px solid var(--border);}
+.laudo-header{padding:9px 20px 8px;border-bottom:1px solid var(--border);background:var(--white);display:flex;align-items:center;gap:10px;}
+.laudo-header-title{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.6px;}
+.laudo-body{flex:1;overflow-y:auto;padding:22px 28px;}
+.laudo-doc{font-family:Helvetica,Arial,sans-serif;font-size:10pt;line-height:1.65;color:#111;max-width:720px;}
+.doc-titulo{text-align:center;font-weight:700;font-size:10pt;margin-bottom:16px;text-transform:uppercase;letter-spacing:.3px;}
+.doc-label{font-weight:700;font-size:10pt;}
+.doc-p{margin-bottom:8px;font-size:10pt;}
+.doc-secao{margin-bottom:14px;}
+/* Modal de nódulo */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:var(--white);border-radius:12px;width:680px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.2);padding:24px;}
+body.dark .modal-box{background:#1e2230;color:var(--text);}
+.modal-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.modal-sub{font-size:12px;color:var(--text-3);margin-bottom:18px;}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px;}
+.modal-col{}
+.modal-col-title{font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.mopt{display:flex;align-items:center;gap:7px;padding:6px 0;font-size:12px;color:var(--text-2);cursor:pointer;border-bottom:1px solid var(--border);}
+.mopt:last-child{border-bottom:none;}
+.mopt input{position:absolute;opacity:0;pointer-events:none;}
+.mopt-mark{width:14px;height:14px;border-radius:50%;border:2px solid var(--border-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .13s;background:var(--white);}
+.mopt.sel .mopt-mark{border-color:var(--blue);background:var(--blue);}
+.mopt.sel .mopt-mark::after{content:'';width:5px;height:5px;border-radius:50%;background:#fff;}
+.mopt.sel{color:var(--blue);font-weight:500;}
+.mchk{display:flex;align-items:center;gap:7px;padding:6px 0;font-size:12px;color:var(--text-2);cursor:pointer;border-bottom:1px solid var(--border);}
+.mchk:last-child{border-bottom:none;}
+.mchk input{position:absolute;opacity:0;pointer-events:none;}
+.mchk-box{width:14px;height:14px;border-radius:4px;border:2px solid var(--border-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .13s;background:var(--white);}
+.mchk.sel .mchk-box{border-color:var(--blue);background:var(--blue);}
+.mchk.sel{color:var(--blue);font-weight:500;}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--border);padding-top:14px;margin-top:14px;}
+.tirads-score{background:var(--blue-light);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:14px;}
+.tirads-score-num{font-size:22px;font-weight:700;color:var(--blue);}
+.tirads-score-label{font-size:12px;color:var(--text-2);}
+.tirads-score-class{font-size:11px;font-weight:600;}
+body.dark .tirads-score{background:#1e2d4a;}
+.modal-dim-row{display:flex;align-items:center;gap:10px;padding:8px 0;}
+.modal-dim-label{font-size:12px;color:var(--text-2);flex:1;}
+.modal-dim-input{width:65px;padding:5px 8px;border:1px solid var(--border-strong);border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;text-align:center;color:var(--text);background:var(--white);}
+.modal-dim-input:focus{outline:none;border-color:var(--blue);}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="logo" style="cursor:pointer" onclick="window.location.href='../laudo-thirads.html'"><span class="logo-name">THI-RADS</span><span class="logo-sub">laudo estruturado</span></div>
+  <button class="btn" onclick="window.location.href='../laudo-thirads.html'"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 2L4 8l6 6"/></svg>Voltar</button>
+  <div class="tb-sep"></div>
+  <button class="btn" onclick="copiar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>Copiar laudo</button>
+  <button class="btn btn-primary" onclick="imprimir()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6V2h8v4M4 12H2V7h12v5h-2M4 9h8M4 12v2h8v-2"/></svg>Imprimir</button>
+  <button class="btn btn-dark" id="btn-dark-toggle" onclick="toggleDark()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro</button>
+  <button class="btn btn-danger" onclick="reiniciar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8a6 6 0 1 0 1.5-3.9M2 4v4h4"/></svg>Reiniciar</button>
+</div>
+
+<div class="body">
+  <div class="sidebar">
+    <div class="sidebar-hd"><div class="sidebar-tipo">Ultrassonografia</div><div class="sidebar-titulo">Cervical</div></div>
+    <div class="nav-group">
+      <div class="nav-item" id="nav-tireoide" onclick="showSection('tireoide')"><span class="nav-dot"></span>Tireoide</div>
+      <div class="nav-item" id="nav-paratireoides" onclick="showSection('paratireoides')"><span class="nav-dot"></span>Paratireoides</div>
+      <div class="nav-item" id="nav-parotidas" onclick="showSection('parotidas')"><span class="nav-dot"></span>Parótidas</div>
+      <div class="nav-item" id="nav-submandibulares" onclick="showSection('submandibulares')"><span class="nav-dot"></span>Submandibulares</div>
+      <div class="nav-item" id="nav-sublinguais" onclick="showSection('sublinguais')"><span class="nav-dot"></span>Sublinguais</div>
+      <div class="nav-item" id="nav-linfonodos" onclick="showSection('linfonodos')"><span class="nav-dot"></span>Linfonodos</div>
+      <div class="nav-item" id="nav-achados" onclick="showSection('achados')"><span class="nav-dot"></span>Achados Adicionais</div>
+    </div>
+  </div>
+
+  <div class="panel" id="main-panel"></div>
+
+  <div class="laudo-panel">
+    <div class="laudo-header"><span class="laudo-header-title">Pré-visualização</span></div>
+    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc"></div></div>
+  </div>
+</div>
+
+<!-- Modal de Nódulo TI-RADS -->
+<div class="modal-overlay" id="modal-nodulo">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-nodulo-title">Adicionar nódulo tireoidiano</div>
+    <div class="modal-sub">Preencha as características para cálculo ACR TI-RADS e geração do texto</div>
+
+    <div class="tirads-score" id="tirads-score-box">
+      <div>
+        <div class="tirads-score-num" id="tirads-pts">0 pts</div>
+        <div class="tirads-score-label">Pontuação ACR TI-RADS</div>
+      </div>
+      <div>
+        <div class="tirads-score-class" id="tirads-class">TR1 — Benigno</div>
+        <div class="tirads-score-label" id="tirads-rec" style="margin-top:2px;">Nenhuma biópsia necessária</div>
+      </div>
+    </div>
+
+    <div class="modal-grid">
+      <!-- Composição -->
+      <div class="modal-col">
+        <div class="modal-col-title">Composição</div>
+        <div class="mopt sel" id="mopt-comp-cist" onclick="selectMopt('comp','cist',0)"><span class="mopt-mark"></span>Predominantemente cístico</div>
+        <div class="mopt" id="mopt-comp-esp" onclick="selectMopt('comp','esp',0)"><span class="mopt-mark"></span>Espongiforme</div>
+        <div class="mopt" id="mopt-comp-misto" onclick="selectMopt('comp','misto',1)"><span class="mopt-mark"></span>Misto</div>
+        <div class="mopt" id="mopt-comp-psol" onclick="selectMopt('comp','psol',2)"><span class="mopt-mark"></span>Predominantemente sólido</div>
+        <div class="mopt" id="mopt-comp-sol" onclick="selectMopt('comp','sol',2)"><span class="mopt-mark"></span>Sólido</div>
+      </div>
+      <!-- Ecogenicidade -->
+      <div class="modal-col">
+        <div class="modal-col-title">Ecogenicidade</div>
+        <div class="mopt sel" id="mopt-eco-ane" onclick="selectMopt('eco','ane',0)"><span class="mopt-mark"></span>Anecoico</div>
+        <div class="mopt" id="mopt-eco-hiper" onclick="selectMopt('eco','hiper',1)"><span class="mopt-mark"></span>Hiperecoico</div>
+        <div class="mopt" id="mopt-eco-iso" onclick="selectMopt('eco','iso',1)"><span class="mopt-mark"></span>Isoecoico</div>
+        <div class="mopt" id="mopt-eco-hipo" onclick="selectMopt('eco','hipo',2)"><span class="mopt-mark"></span>Hipoecoico</div>
+        <div class="mopt" id="mopt-eco-mhipo" onclick="selectMopt('eco','mhipo',3)"><span class="mopt-mark"></span>Marcadamente hipoecoico</div>
+      </div>
+      <!-- Forma -->
+      <div class="modal-col">
+        <div class="modal-col-title">Forma</div>
+        <div class="mopt sel" id="mopt-forma-largo" onclick="selectMopt('forma','largo',0)"><span class="mopt-mark"></span>Mais largo do que alto</div>
+        <div class="mopt" id="mopt-forma-alto" onclick="selectMopt('forma','alto',3)"><span class="mopt-mark"></span>Mais alto do que largo</div>
+      </div>
+    </div>
+
+    <div class="modal-grid">
+      <!-- Margens -->
+      <div class="modal-col">
+        <div class="modal-col-title">Margens</div>
+        <div class="mopt sel" id="mopt-marg-bdef" onclick="selectMopt('marg','bdef',0)"><span class="mopt-mark"></span>Bem definidas</div>
+        <div class="mopt" id="mopt-marg-mdef" onclick="selectMopt('marg','mdef',0)"><span class="mopt-mark"></span>Mal definidas</div>
+        <div class="mopt" id="mopt-marg-lob" onclick="selectMopt('marg','lob',2)"><span class="mopt-mark"></span>Lobuladas</div>
+        <div class="mopt" id="mopt-marg-irr" onclick="selectMopt('marg','irr',2)"><span class="mopt-mark"></span>Irregulares</div>
+        <div class="mopt" id="mopt-marg-ext" onclick="selectMopt('marg','ext',3)"><span class="mopt-mark"></span>Extensão extratireoidiana</div>
+      </div>
+      <!-- Focos Ecogênicos -->
+      <div class="modal-col">
+        <div class="modal-col-title">Focos Ecogênicos</div>
+        <div class="mchk sel" id="mchk-foco-nenhum" onclick="toggleFocoNenhum()"><span class="mchk-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.5"><path d="M2 5l2.5 2.5L8 3"/></svg></span>Ausentes / não aplicável</div>
+        <div class="mchk" id="mchk-foco-macro" onclick="toggleFoco('macro',1)"><span class="mchk-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.5"><path d="M2 5l2.5 2.5L8 3"/></svg></span>Macrocalcificações</div>
+        <div class="mchk" id="mchk-foco-peri" onclick="toggleFoco('peri',2)"><span class="mchk-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.5"><path d="M2 5l2.5 2.5L8 3"/></svg></span>Calcificações periféricas</div>
+        <div class="mchk" id="mchk-foco-punt" onclick="toggleFoco('punt',3)"><span class="mchk-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.5"><path d="M2 5l2.5 2.5L8 3"/></svg></span>Focos puntiformes</div>
+      </div>
+      <!-- Localização + Dimensões -->
+      <div class="modal-col">
+        <div class="modal-col-title">Localização</div>
+        <select class="sel-tag" id="modal-loc" onchange="calcTirads()" style="width:100%;margin-bottom:10px;">
+          <option value="tsld">Terço sup. lobo D</option>
+          <option value="tmld">Terço méd. lobo D</option>
+          <option value="tild">Terço inf. lobo D</option>
+          <option value="tsle">Terço sup. lobo E</option>
+          <option value="tmle">Terço méd. lobo E</option>
+          <option value="tile">Terço inf. lobo E</option>
+          <option value="i">Istmo</option>
+          <option value="id">Istmo à direita</option>
+          <option value="ie">Istmo à esquerda</option>
+        </select>
+        <div class="modal-col-title">Dimensões (cm)</div>
+        <div class="modal-dim-row"><span class="modal-dim-label">Medida 1</span><input class="modal-dim-input" type="number" id="modal-m1" step="0.1" min="0" onchange="calcTirads()"></div>
+        <div class="modal-dim-row"><span class="modal-dim-label">Medida 2</span><input class="modal-dim-input" type="number" id="modal-m2" step="0.1" min="0" onchange="calcTirads()"></div>
+        <div class="modal-dim-row"><span class="modal-dim-label">Medida 3</span><input class="modal-dim-input" type="number" id="modal-m3" step="0.1" min="0" onchange="calcTirads()"></div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn" onclick="fecharModalNodulo()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarNodulo()">Salvar nódulo</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  ESTADO
+// ═══════════════════════════════════════════════════════
+const estado = {
+  tireoide: {
+    sit: 'habitual',         // habitual | parcialD | parcialE | total
+    par: 'habitual',         // habitual | difusa | tireoidite
+    parDifDim: 'habituais', parDifCon: 'preservados', parDifEco: 'nc',
+    parTirDim: 'habituais', parTirCon: 'preservados',
+    cistos: 'nenhum',        // nenhum | unico | multiplos
+    cistLoc: 'tsld', cistMed: '',
+    nodulos: [],
+    ldA:'', ldB:'', ldC:'',
+    leA:'', leB:'', leC:'',
+    istmo: 'filiforme',     // filiforme | espessado
+    istmoMed: '',
+  },
+  paratireoides: { sit: 'normais' }, // normais | aumentadas
+  parotidas: { sit: 'habitual' },    // habitual | alterada
+  parotAlt: 'nc', // nc | parotidite | calculose | litiase | neoformacao
+  submandibulares: { sit: 'habitual' },
+  subAlt: 'nc',
+  sublinguais: { sit: 'habitual' },
+  subLingAlt: 'nc',
+  linfonodos: { sit: 'ausentes' },   // ausentes | tipicos | atipicos
+  linfoTipo: 'unico', linfoLat: 'direita', linfoNivel: 'II',
+  linfoMed: '', linfoLoc: 'II',
+  linfoAtipoMed:'', linfoAtipoLat:'direita', linfoAtipoNivel:'II',
+  achados: '',
+};
+
+let editingNoduloIdx = -1;
+
+// TI-RADS temp state (modal)
+let mState = {
+  comp: {key:'cist', pts:0},
+  eco:  {key:'ane',  pts:0},
+  forma:{key:'largo',pts:0},
+  marg: {key:'bdef', pts:0},
+  focos:{nenhum:true, macro:false, peri:false, punt:false},
+};
+
+// ═══════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════
+function setVal(obj, key, val){ estado[obj][key]=val; updateLaudo(); }
+function setValDirect(key, val){ estado[key]=val; updateLaudo(); }
+function setSit(obj, val){ estado[obj].sit=val; renderSection(); updateLaudo(); }
+
+function radio(name, opts, current, onchangeFn, extraClass=''){
+  return opts.map(o=>`
+    <div class="radio-opt ${current===o.v?'selected':''} ${extraClass}" onclick="${onchangeFn}('${o.v}')">
+      <input type="radio" name="${name}" ${current===o.v?'checked':''}>
+      <label class="radio-label"><span class="radio-mark"></span>${o.l}</label>
+    </div>`).join('');
+}
+
+function chk(id, label, checked, onchangeFn){
+  return `<div class="check-row ${checked?'selected':''}" onclick="toggleCheck('${id}', ${onchangeFn})">
+    <label class="check-label"><span class="check-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.5"><path d="M2 5l2.5 2.5L8 3"/></svg></span>${label}</label>
+    <input type="checkbox" id="${id}" ${checked?'checked':''}>
+  </div>`;
+}
+
+function dimInput(id, label, val, unit='cm', onchange='updateLaudo()'){
+  return `<div class="dim-row">
+    <span class="dim-lbl">${label}</span>
+    <input class="dim-input" type="number" id="${id}" value="${val||''}" step="0.1" min="0" oninput="onDimChange('${id}');${onchange}">
+    <span class="dim-unit">${unit}</span>
+  </div>`;
+}
+
+function onDimChange(id){
+  // update estado from dim inputs
+  const v = document.getElementById(id)?.value || '';
+  const map = {
+    'tir-ldA': ['tireoide','ldA'], 'tir-ldB': ['tireoide','ldB'], 'tir-ldC': ['tireoide','ldC'],
+    'tir-leA': ['tireoide','leA'], 'tir-leB': ['tireoide','leB'], 'tir-leC': ['tireoide','leC'],
+    'tir-istmoMed': ['tireoide','istmoMed'],
+  };
+  if(map[id]) estado[map[id][0]][map[id][1]] = v;
+}
+
+function calcVol(a, b, c){
+  const va=parseFloat(a)||0, vb=parseFloat(b)||0, vc=parseFloat(c)||0;
+  if(!va||!vb||!vc) return null;
+  return (va * vb * vc * 0.524).toFixed(1);
+}
+
+// ═══════════════════════════════════════════════════════
+//  SEÇÕES RENDER
+// ═══════════════════════════════════════════════════════
+let currentSection = 'tireoide';
+
+function showSection(sec){
+  currentSection = sec;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const nav = document.getElementById('nav-'+sec);
+  if(nav) nav.classList.add('active');
+  renderSection();
+}
+
+function renderSection(){
+  const panel = document.getElementById('main-panel');
+  const sec = currentSection;
+  let html = '';
+  if(sec==='tireoide') html = renderTireoide();
+  else if(sec==='paratireoides') html = renderParatireoides();
+  else if(sec==='parotidas') html = renderParotidas();
+  else if(sec==='submandibulares') html = renderSubmandibulares();
+  else if(sec==='sublinguais') html = renderSublinguais();
+  else if(sec==='linfonodos') html = renderLinfonodos();
+  else if(sec==='achados') html = renderAchados();
+  panel.innerHTML = html;
+  // Restaurar valores em inputs
+  restoreInputs();
+}
+
+function restoreInputs(){
+  const t = estado.tireoide;
+  // Dim inputs
+  ['ldA','ldB','ldC','leA','leB','leC','istmoMed'].forEach(k=>{
+    const el = document.getElementById('tir-'+k);
+    if(el) el.value = t[k]||'';
+  });
+  // Selects
+  const parDifDim = document.getElementById('par-dif-dim');
+  if(parDifDim) parDifDim.value = t.parDifDim;
+  const parDifCon = document.getElementById('par-dif-con');
+  if(parDifCon) parDifCon.value = t.parDifCon;
+  const parDifEco = document.getElementById('par-dif-eco');
+  if(parDifEco) parDifEco.value = t.parDifEco;
+  const parTirDim = document.getElementById('par-tir-dim');
+  if(parTirDim) parTirDim.value = t.parTirDim;
+  const parTirCon = document.getElementById('par-tir-con');
+  if(parTirCon) parTirCon.value = t.parTirCon;
+  const cistLoc = document.getElementById('cist-loc');
+  if(cistLoc) cistLoc.value = t.cistLoc;
+  const cistMed = document.getElementById('cist-med');
+  if(cistMed) cistMed.value = t.cistMed;
+  const achadosEl = document.getElementById('input-achados');
+  if(achadosEl) achadosEl.value = estado.achados;
+  // Linfonodo
+  const lfLat = document.getElementById('lf-lat');
+  if(lfLat) lfLat.value = estado.linfoLat;
+  const lfNiv = document.getElementById('lf-nivel');
+  if(lfNiv) lfNiv.value = estado.linfoNivel;
+  const lfMed = document.getElementById('lf-med');
+  if(lfMed) lfMed.value = estado.linfoMed;
+  const lfAtiLat = document.getElementById('lf-ati-lat');
+  if(lfAtiLat) lfAtiLat.value = estado.linfoAtipoLat;
+  const lfAtiNiv = document.getElementById('lf-ati-nivel');
+  if(lfAtiNiv) lfAtiNiv.value = estado.linfoAtipoNivel;
+  const lfAtiMed = document.getElementById('lf-ati-med');
+  if(lfAtiMed) lfAtiMed.value = estado.linfoAtipoMed;
+  // Parótida alt
+  const paAlt = document.getElementById('par-alt-tipo');
+  if(paAlt) paAlt.value = estado.parotAlt;
+  const subAlt = document.getElementById('sub-alt-tipo');
+  if(subAlt) subAlt.value = estado.subAlt;
+  const subLingAlt = document.getElementById('sublng-alt-tipo');
+  if(subLingAlt) subLingAlt.value = estado.subLingAlt;
+}
+
+// ── TIREOIDE ──
+function renderTireoide(){
+  const t = estado.tireoide;
+  const sit = t.sit;
+  const par = t.par;
+  const volD = calcVol(t.ldA, t.ldB, t.ldC);
+  const volE = calcVol(t.leA, t.leB, t.leC);
+  const volTotal = (volD && volE) ? ((parseFloat(volD)+parseFloat(volE)).toFixed(1)) : null;
+
+  const nodolosHtml = t.nodulos.length===0 ? '' : t.nodulos.map((n,i)=>{
+    const trClass = `badge-tr${n.trads}`;
+    return `<div class="nodulo-card">
+      <div class="nodulo-hd">
+        <span class="nodulo-hd-title">Nódulo ${i+1} <span class="badge-tirads ${trClass}">TR${n.trads} · ${n.pts} pts</span></span>
+        <div style="display:flex;gap:6px;">
+          <button class="btn-rem" onclick="editarNodulo(${i})" style="background:#eff6ff;border-color:#bfdbfe;color:var(--blue)">Editar</button>
+          <button class="btn-rem" onclick="removerNodulo(${i})">Remover</button>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text-2)">${n.resumo}</div>
+    </div>`;
+  }).join('');
+
+  return `
+  <div class="sec-title">Tireoide</div>
+
+  <div class="block"><div class="block-title">Situação</div>
+    <div class="radio-opt ${sit==='habitual'?'selected':''}" onclick="setSit('tireoide','habitual')"><input type="radio" name="sit_tir"><label class="radio-label"><span class="radio-mark"></span>Tópica e de dimensões habituais</label></div>
+    <div class="radio-opt ${sit==='parcialD'?'selected':''}" onclick="setSit('tireoide','parcialD')"><input type="radio" name="sit_tir"><label class="radio-label"><span class="radio-mark"></span>Tireoidectomia parcial direita</label></div>
+    <div class="radio-opt ${sit==='parcialE'?'selected':''}" onclick="setSit('tireoide','parcialE')"><input type="radio" name="sit_tir"><label class="radio-label"><span class="radio-mark"></span>Tireoidectomia parcial esquerda</label></div>
+    <div class="radio-opt ${sit==='total'?'selected':''}" onclick="setSit('tireoide','total')"><input type="radio" name="sit_tir"><label class="radio-label"><span class="radio-mark"></span>Tireoidectomia total</label></div>
+  </div>
+
+  ${sit!=='total' ? `
+  <div class="block"><div class="block-title">Parênquima</div>
+    <div class="radio-opt ${par==='habitual'?'selected':''}" onclick="setTirPar('habitual')"><input type="radio" name="par_tir"><label class="radio-label"><span class="radio-mark"></span>Habitual (ecotextura homogênea)</label></div>
+    <div class="radio-opt ${par==='difusa'?'selected':''}" onclick="setTirPar('difusa')"><input type="radio" name="par_tir"><label class="radio-label"><span class="radio-mark"></span>Tireoidopatia difusa inespecífica</label></div>
+    ${par==='difusa'?`<div style="padding:8px 14px 10px;display:flex;gap:10px;flex-wrap:wrap;">
+      <div class="ff"><label>Dimensões</label><select id="par-dif-dim" class="sel-tag" onchange="estado.tireoide.parDifDim=this.value;updateLaudo()"><option value="habituais">habituais</option><option value="aumentadas">aumentadas</option><option value="reduzidas">reduzidas</option></select></div>
+      <div class="ff"><label>Contornos</label><select id="par-dif-con" class="sel-tag" onchange="estado.tireoide.parDifCon=this.value;updateLaudo()"><option value="preservados">preservados</option><option value="lobulados">lobulados</option><option value="irregulares">irregulares</option></select></div>
+      <div class="ff"><label>Ecogenicidade</label><select id="par-dif-eco" class="sel-tag" onchange="estado.tireoide.parDifEco=this.value;updateLaudo()"><option value="nc">não citar</option><option value="hipoecogenica">hipoecogênica</option></select></div>
+    </div>`:''}
+    <div class="radio-opt ${par==='tireoidite'?'selected':''}" onclick="setTirPar('tireoidite')"><input type="radio" name="par_tir"><label class="radio-label"><span class="radio-mark"></span>Padrão tireoidite (heterogêneo e hipoecoico)</label></div>
+    ${par==='tireoidite'?`<div style="padding:8px 14px 10px;display:flex;gap:10px;flex-wrap:wrap;">
+      <div class="ff"><label>Dimensões</label><select id="par-tir-dim" class="sel-tag" onchange="estado.tireoide.parTirDim=this.value;updateLaudo()"><option value="habituais">habituais</option><option value="aumentadas">aumentadas</option><option value="reduzidas">reduzidas</option></select></div>
+      <div class="ff"><label>Contornos</label><select id="par-tir-con" class="sel-tag" onchange="estado.tireoide.parTirCon=this.value;updateLaudo()"><option value="preservados">preservados</option><option value="lobulados">lobulados</option><option value="irregulares">irregulares</option></select></div>
+    </div>`:''}
+  </div>
+
+  <div class="block"><div class="block-title">Medidas — Lobo Direito</div>
+    <div class="dim-rows">
+      ${dimInput('tir-ldA','Comprimento',t.ldA)}
+      ${dimInput('tir-ldB','Altura',t.ldB)}
+      ${dimInput('tir-ldC','Largura',t.ldC)}
+      ${volD!==null?`<div class="dim-row"><span class="dim-lbl dim-vol">Volume estimado</span><span class="dim-vol">${volD} cm³</span></div>`:''}
+    </div>
+  </div>
+
+  ${sit!=='parcialD' ? `
+  <div class="block"><div class="block-title">Medidas — Lobo Esquerdo</div>
+    <div class="dim-rows">
+      ${dimInput('tir-leA','Comprimento',t.leA)}
+      ${dimInput('tir-leB','Altura',t.leB)}
+      ${dimInput('tir-leC','Largura',t.leC)}
+      ${volE!==null?`<div class="dim-row"><span class="dim-lbl dim-vol">Volume estimado</span><span class="dim-vol">${volE} cm³</span></div>`:''}
+    </div>
+  </div>` : ''}
+
+  <div class="block"><div class="block-title">Istmo</div>
+    <div class="radio-opt ${t.istmo==='filiforme'?'selected':''}" onclick="setTirIstmo('filiforme')"><input type="radio" name="istmo"><label class="radio-label"><span class="radio-mark"></span>Filiforme (habitual)</label></div>
+    <div class="radio-opt ${t.istmo==='espessado'?'selected':''}" onclick="setTirIstmo('espessado')"><input type="radio" name="istmo"><label class="radio-label"><span class="radio-mark"></span>Espessado</label></div>
+    ${t.istmo==='espessado'?`<div class="dim-rows">${dimInput('tir-istmoMed','Espessura',t.istmoMed,'mm')}</div>`:''}
+  </div>
+
+  <div class="block"><div class="block-title">Cistos</div>
+    <div class="radio-opt ${t.cistos==='nenhum'?'selected':''}" onclick="setTirCistos('nenhum')"><input type="radio" name="cistos"><label class="radio-label"><span class="radio-mark"></span>Sem cistos identificados</label></div>
+    <div class="radio-opt ${t.cistos==='unico'?'selected':''}" onclick="setTirCistos('unico')"><input type="radio" name="cistos"><label class="radio-label"><span class="radio-mark"></span>Cisto único</label></div>
+    <div class="radio-opt ${t.cistos==='multiplos'?'selected':''}" onclick="setTirCistos('multiplos')"><input type="radio" name="cistos"><label class="radio-label"><span class="radio-mark"></span>Cistos múltiplos</label></div>
+    ${t.cistos==='unico'?`<div style="padding:8px 14px;display:flex;gap:10px;flex-wrap:wrap;">
+      <div class="ff"><label>Localização</label><select id="cist-loc" class="sel-tag" onchange="estado.tireoide.cistLoc=this.value;updateLaudo()">
+        <option value="tsld">Terço sup. lobo D</option><option value="tmld">Terço méd. lobo D</option><option value="tild">Terço inf. lobo D</option>
+        <option value="tsle">Terço sup. lobo E</option><option value="tmle">Terço méd. lobo E</option><option value="tile">Terço inf. lobo E</option>
+        <option value="i">Istmo</option>
+      </select></div>
+      <div class="ff"><label>Medida (cm)</label><input type="number" id="cist-med" step="0.1" min="0" onchange="estado.tireoide.cistMed=this.value;updateLaudo()"></div>
+    </div>`:''}
+  </div>
+
+  <div class="block"><div class="block-title">Nódulos</div>
+    <div class="nodulos-wrap">
+      ${nodolosHtml}
+      <button class="btn-add-nodulo" onclick="abrirModalNodulo(-1)">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v12M2 8h12"/></svg>
+        Adicionar nódulo (TI-RADS)
+      </button>
+    </div>
+  </div>
+  ` : `<div class="block" style="padding:14px;font-size:12px;color:var(--text-3)">Tireoidectomia total: nenhuma estrutura tireoidiana para avaliar.</div>`}
+  `;
+}
+
+function setTirPar(v){ estado.tireoide.par = v; renderSection(); updateLaudo(); }
+function setTirIstmo(v){ estado.tireoide.istmo = v; renderSection(); updateLaudo(); }
+function setTirCistos(v){ estado.tireoide.cistos = v; renderSection(); updateLaudo(); }
+
+// ── PARATIREOIDES ──
+function renderParatireoides(){
+  const p = estado.paratireoides;
+  return `
+  <div class="sec-title">Paratireoides</div>
+  <div class="block"><div class="block-title">Situação</div>
+    <div class="radio-opt ${p.sit==='normais'?'selected':''}" onclick="setSit('paratireoides','normais')"><input type="radio" name="sit_para"><label class="radio-label"><span class="radio-mark"></span>Não identificadas (habitual)</label></div>
+    <div class="radio-opt ${p.sit==='aumentadas'?'selected':''}" onclick="setSit('paratireoides','aumentadas')"><input type="radio" name="sit_para"><label class="radio-label"><span class="radio-mark"></span>Glândula aumentada identificada</label></div>
+    <div class="radio-opt ${p.sit==='multiplas'?'selected':''}" onclick="setSit('paratireoides','multiplas')"><input type="radio" name="sit_para"><label class="radio-label"><span class="radio-mark"></span>Múltiplas glândulas aumentadas</label></div>
+  </div>
+  <div style="padding:12px 0 4px;font-size:11px;color:var(--text-3);">
+    As glândulas paratireoides normais não são visualizadas à ultrassonografia.
+  </div>`;
+}
+
+// ── PARÓTIDAS ──
+function renderParotidas(){
+  const p = estado.parotidas;
+  return `
+  <div class="sec-title">Glândulas Parótidas</div>
+  <div class="block"><div class="block-title">Situação</div>
+    <div class="radio-opt ${p.sit==='habitual'?'selected':''}" onclick="setSit('parotidas','habitual')"><input type="radio" name="sit_par"><label class="radio-label"><span class="radio-mark"></span>Tópicas com ecotextura e dimensões habituais</label></div>
+    <div class="radio-opt ${p.sit==='alterada'?'selected':''}" onclick="setSit('parotidas','alterada')"><input type="radio" name="sit_par"><label class="radio-label"><span class="radio-mark"></span>Alteradas</label></div>
+  </div>
+  ${p.sit==='alterada'?`
+  <div class="block"><div class="block-title">Tipo de alteração</div>
+    <div style="padding:10px 14px;">
+      <select id="par-alt-tipo" class="sel-tag" style="width:100%" onchange="estado.parotAlt=this.value;updateLaudo()">
+        <option value="nc">Selecione...</option>
+        <option value="parotidite">Parotidite (aumento difuso, hipoecogênica)</option>
+        <option value="litiase">Litíase parotídea</option>
+        <option value="neoformacao">Neoformação parotídea</option>
+      </select>
+    </div>
+  </div>`:''}`;
+}
+
+// ── SUBMANDIBULARES ──
+function renderSubmandibulares(){
+  const s = estado.submandibulares;
+  return `
+  <div class="sec-title">Glândulas Submandibulares</div>
+  <div class="block"><div class="block-title">Situação</div>
+    <div class="radio-opt ${s.sit==='habitual'?'selected':''}" onclick="setSit('submandibulares','habitual')"><input type="radio" name="sit_sub"><label class="radio-label"><span class="radio-mark"></span>Tópicas com ecotextura e dimensões habituais</label></div>
+    <div class="radio-opt ${s.sit==='alterada'?'selected':''}" onclick="setSit('submandibulares','alterada')"><input type="radio" name="sit_sub"><label class="radio-label"><span class="radio-mark"></span>Alteradas</label></div>
+  </div>
+  ${s.sit==='alterada'?`
+  <div class="block"><div class="block-title">Tipo de alteração</div>
+    <div style="padding:10px 14px;">
+      <select id="sub-alt-tipo" class="sel-tag" style="width:100%" onchange="estado.subAlt=this.value;updateLaudo()">
+        <option value="nc">Selecione...</option>
+        <option value="sialoadenite">Sialoadenite (aumento com hipoecogenicidade)</option>
+        <option value="litiase">Litíase submandibular</option>
+        <option value="neoformacao">Neoformação submandibular</option>
+      </select>
+    </div>
+  </div>`:''}`;
+}
+
+// ── SUBLINGUAIS ──
+function renderSublinguais(){
+  const s = estado.sublinguais;
+  return `
+  <div class="sec-title">Glândulas Sublinguais</div>
+  <div class="block"><div class="block-title">Situação</div>
+    <div class="radio-opt ${s.sit==='habitual'?'selected':''}" onclick="setSit('sublinguais','habitual')"><input type="radio" name="sit_slng"><label class="radio-label"><span class="radio-mark"></span>Tópicas com ecotextura e dimensões habituais</label></div>
+    <div class="radio-opt ${s.sit==='alterada'?'selected':''}" onclick="setSit('sublinguais','alterada')"><input type="radio" name="sit_slng"><label class="radio-label"><span class="radio-mark"></span>Alteradas</label></div>
+  </div>
+  ${s.sit==='alterada'?`
+  <div class="block"><div class="block-title">Tipo de alteração</div>
+    <div style="padding:10px 14px;">
+      <select id="sublng-alt-tipo" class="sel-tag" style="width:100%" onchange="estado.subLingAlt=this.value;updateLaudo()">
+        <option value="nc">Selecione...</option>
+        <option value="rânula">Rânula</option>
+        <option value="sialoadenite">Sialoadenite sublingual</option>
+        <option value="neoformacao">Neoformação sublingual</option>
+      </select>
+    </div>
+  </div>`:''}`;
+}
+
+// ── LINFONODOS ──
+function renderLinfonodos(){
+  const lf = estado.linfonodos;
+  return `
+  <div class="sec-title">Linfonodos Cervicais</div>
+  <div class="block"><div class="block-title">Situação</div>
+    <div class="radio-opt ${lf.sit==='ausentes'?'selected':''}" onclick="setSit('linfonodos','ausentes')"><input type="radio" name="sit_lf"><label class="radio-label"><span class="radio-mark"></span>Ausência de linfonodomegalias</label></div>
+    <div class="radio-opt ${lf.sit==='tipicos'?'selected':''}" onclick="setSit('linfonodos','tipicos')"><input type="radio" name="sit_lf"><label class="radio-label"><span class="radio-mark"></span>Linfonodo(s) de aspecto típico (reativo)</label></div>
+    <div class="radio-opt ${lf.sit==='atipicos'?'selected':''}" onclick="setSit('linfonodos','atipicos')"><input type="radio" name="sit_lf"><label class="radio-label"><span class="radio-mark"></span>Linfonodo(s) de aspecto atípico</label></div>
+  </div>
+
+  ${lf.sit==='tipicos'?`
+  <div class="block"><div class="block-title">Detalhes — Linfonodo Típico</div>
+    <div style="padding:10px 14px;display:flex;gap:10px;flex-wrap:wrap;">
+      <div class="ff"><label>Lateralidade</label>
+        <select id="lf-lat" class="sel-tag" onchange="estado.linfoLat=this.value;updateLaudo()">
+          <option value="direita">direita</option><option value="esquerda">esquerda</option><option value="bilateral">bilateral</option>
+        </select>
+      </div>
+      <div class="ff"><label>Nível cervical</label>
+        <select id="lf-nivel" class="sel-tag" onchange="estado.linfoNivel=this.value;updateLaudo()">
+          <option>IA</option><option>IB</option><option>IIA</option><option>IIB</option><option>III</option><option>IV</option><option>VA</option><option>VB</option><option>VI</option><option>VII</option>
+        </select>
+      </div>
+      <div class="ff"><label>Maior eixo (cm)</label>
+        <input type="number" id="lf-med" step="0.1" min="0" onchange="estado.linfoMed=this.value;updateLaudo()">
+      </div>
+    </div>
+  </div>`:''}
+
+  ${lf.sit==='atipicos'?`
+  <div class="block"><div class="block-title">Detalhes — Linfonodo Atípico</div>
+    <div style="padding:10px 14px;display:flex;gap:10px;flex-wrap:wrap;">
+      <div class="ff"><label>Lateralidade</label>
+        <select id="lf-ati-lat" class="sel-tag" onchange="estado.linfoAtipoLat=this.value;updateLaudo()">
+          <option value="direita">direita</option><option value="esquerda">esquerda</option><option value="bilateral">bilateral</option>
+        </select>
+      </div>
+      <div class="ff"><label>Nível cervical</label>
+        <select id="lf-ati-nivel" class="sel-tag" onchange="estado.linfoAtipoNivel=this.value;updateLaudo()">
+          <option>IA</option><option>IB</option><option>IIA</option><option>IIB</option><option>III</option><option>IV</option><option>VA</option><option>VB</option><option>VI</option><option>VII</option>
+        </select>
+      </div>
+      <div class="ff"><label>Maior eixo (cm)</label>
+        <input type="number" id="lf-ati-med" step="0.1" min="0" onchange="estado.linfoAtipoMed=this.value;updateLaudo()">
+      </div>
+    </div>
+  </div>
+  <div class="block" style="padding:10px 14px;font-size:12px;color:var(--text-2);">
+    ⚠ Linfonodos atípicos sugerem investigação com PAAF a critério clínico.
+  </div>`:''}
+  `;
+}
+
+// ── ACHADOS ADICIONAIS ──
+function renderAchados(){
+  return `
+  <div class="sec-title">Achados Adicionais</div>
+  <div class="block"><div class="block-title">Descreva os achados</div>
+    <div style="padding:10px 14px;">
+      <textarea id="input-achados" style="width:100%;resize:vertical;min-height:160px;border:1px solid var(--border-strong);border-radius:6px;padding:8px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--white);" oninput="estado.achados=this.value;updateLaudo()" placeholder="Descreva achados adicionais aqui..."></textarea>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+//  MODAL NÓDULO
+// ═══════════════════════════════════════════════════════
+function abrirModalNodulo(idx){
+  editingNoduloIdx = idx;
+  const modal = document.getElementById('modal-nodulo');
+  const title = document.getElementById('modal-nodulo-title');
+
+  if(idx >= 0){
+    title.textContent = `Editar nódulo ${idx+1}`;
+    const n = estado.tireoide.nodulos[idx];
+    // Restaurar state modal
+    mState = JSON.parse(JSON.stringify(n.mState));
+    document.getElementById('modal-loc').value = n.loc;
+    document.getElementById('modal-m1').value = n.m1||'';
+    document.getElementById('modal-m2').value = n.m2||'';
+    document.getElementById('modal-m3').value = n.m3||'';
+  } else {
+    title.textContent = 'Adicionar nódulo tireoidiano';
+    mState = {
+      comp: {key:'cist', pts:0},
+      eco:  {key:'ane',  pts:0},
+      forma:{key:'largo',pts:0},
+      marg: {key:'bdef', pts:0},
+      focos:{nenhum:true, macro:false, peri:false, punt:false},
+    };
+    document.getElementById('modal-m1').value = '';
+    document.getElementById('modal-m2').value = '';
+    document.getElementById('modal-m3').value = '';
+    document.getElementById('modal-loc').value = 'tsld';
+  }
+  renderModalState();
+  modal.classList.add('open');
+}
+
+function fecharModalNodulo(){
+  document.getElementById('modal-nodulo').classList.remove('open');
+}
+
+function renderModalState(){
+  // Atualizar seleção visual
+  ['cist','esp','misto','psol','sol'].forEach(k=>{
+    const el = document.getElementById('mopt-comp-'+k);
+    if(el) el.classList.toggle('sel', mState.comp.key===k);
+  });
+  ['ane','hiper','iso','hipo','mhipo'].forEach(k=>{
+    const el = document.getElementById('mopt-eco-'+k);
+    if(el) el.classList.toggle('sel', mState.eco.key===k);
+  });
+  ['largo','alto'].forEach(k=>{
+    const el = document.getElementById('mopt-forma-'+k);
+    if(el) el.classList.toggle('sel', mState.forma.key===k);
+  });
+  ['bdef','mdef','lob','irr','ext'].forEach(k=>{
+    const el = document.getElementById('mopt-marg-'+k);
+    if(el) el.classList.toggle('sel', mState.marg.key===k);
+  });
+  // Focos
+  const focos = mState.focos;
+  document.getElementById('mchk-foco-nenhum').classList.toggle('sel', focos.nenhum);
+  document.getElementById('mchk-foco-macro').classList.toggle('sel', focos.macro);
+  document.getElementById('mchk-foco-peri').classList.toggle('sel', focos.peri);
+  document.getElementById('mchk-foco-punt').classList.toggle('sel', focos.punt);
+  calcTirads();
+}
+
+function selectMopt(group, key, pts){
+  mState[group] = {key, pts};
+  renderModalState();
+}
+
+function toggleFocoNenhum(){
+  mState.focos = {nenhum:true, macro:false, peri:false, punt:false};
+  renderModalState();
+}
+
+function toggleFoco(key, pts){
+  mState.focos.nenhum = false;
+  mState.focos[key] = !mState.focos[key];
+  renderModalState();
+}
+
+function calcTirads(){
+  let score = mState.comp.pts + mState.eco.pts + mState.forma.pts + mState.marg.pts;
+  // Focos
+  const f = mState.focos;
+  let focoPts = 0;
+  if(f.punt) focoPts = Math.max(focoPts, 3);
+  if(f.peri) focoPts = Math.max(focoPts, 2);
+  if(f.macro) focoPts = Math.max(focoPts, 1);
+  score += focoPts;
+
+  let tr, cls, rec;
+  if(score===0) { tr=1; cls='TR1 — Benigno'; rec='Nenhuma biópsia necessária'; }
+  else if(score===2) { tr=2; cls='TR2 — Não suspeito'; rec='Nenhuma biópsia necessária'; }
+  else if(score>=3&&score<=4) { tr=3; cls='TR3 — Levemente suspeito'; rec='FNA ≥ 2,5 cm | Seguimento ≥ 1,5 cm'; }
+  else if(score>=5&&score<=6) { tr=4; cls='TR4 — Moderadamente suspeito'; rec='FNA ≥ 1,5 cm | Seguimento ≥ 1 cm'; }
+  else { tr=5; cls='TR5 — Altamente suspeito'; rec='FNA ≥ 1 cm | Seguimento ≥ 0,5 cm'; }
+
+  document.getElementById('tirads-pts').textContent = score+' pts';
+  document.getElementById('tirads-class').textContent = cls;
+  document.getElementById('tirads-rec').textContent = rec;
+  document.getElementById('tirads-class').className = `tirads-score-class badge-tirads badge-tr${tr}`;
+  return {score, tr};
+}
+
+const LOC_TEXT = {
+  tsld:'no terço superior do lobo direito', tmld:'no terço médio do lobo direito', tild:'no terço inferior do lobo direito',
+  tsle:'no terço superior do lobo esquerdo', tmle:'no terço médio do lobo esquerdo', tile:'no terço inferior do lobo esquerdo',
+  i:'no istmo', id:'no istmo à direita', ie:'no istmo à esquerda'
+};
+const COMP_TEXT = {cist:'predominantemente cístico', esp:'espongiforme', misto:'misto (cístico e sólido)', psol:'predominantemente sólido', sol:'sólido'};
+const ECO_TEXT = {ane:'anecoico', hiper:'hiperecoico', iso:'isoecoico', hipo:'hipoecoico', mhipo:'marcadamente hipoecoico'};
+const FORMA_TEXT = {largo:'mais largo do que alto', alto:'mais alto do que largo'};
+const MARG_TEXT = {bdef:'bem definidas', mdef:'mal definidas', lob:'lobuladas', irr:'irregulares', ext:'com extensão extratireoidiana'};
+
+function salvarNodulo(){
+  const {score, tr} = calcTirads();
+  const loc = document.getElementById('modal-loc').value;
+  const m1 = document.getElementById('modal-m1').value;
+  const m2 = document.getElementById('modal-m2').value;
+  const m3 = document.getElementById('modal-m3').value;
+  const medStr = (m1&&m2&&m3) ? ` medindo ${m1} x ${m2} x ${m3} cm` : '';
+
+  const f = mState.focos;
+  let focosTexto = '';
+  if(f.nenhum) focosTexto = 'sem focos ecogênicos';
+  else {
+    const arr=[];
+    if(f.macro) arr.push('macrocalcificações');
+    if(f.peri) arr.push('calcificações periféricas');
+    if(f.punt) arr.push('focos ecogênicos puntiformes');
+    focosTexto = arr.join(', ');
+  }
+
+  const resumo = `${COMP_TEXT[mState.comp.key]}, ${ECO_TEXT[mState.eco.key]}, ${FORMA_TEXT[mState.forma.key]}, margens ${MARG_TEXT[mState.marg.key]}, ${focosTexto}${medStr} — ${LOC_TEXT[loc]}`;
+
+  const nodulo = {
+    mState: JSON.parse(JSON.stringify(mState)),
+    loc, m1, m2, m3, pts: score, trads: tr, resumo
+  };
+
+  if(editingNoduloIdx >= 0){
+    estado.tireoide.nodulos[editingNoduloIdx] = nodulo;
+  } else {
+    estado.tireoide.nodulos.push(nodulo);
+  }
+
+  fecharModalNodulo();
+  renderSection();
+  updateLaudo();
+}
+
+function removerNodulo(idx){
+  estado.tireoide.nodulos.splice(idx, 1);
+  renderSection();
+  updateLaudo();
+}
+
+function editarNodulo(idx){
+  abrirModalNodulo(idx);
+}
+
+// Fechar modal clicando fora
+document.getElementById('modal-nodulo').addEventListener('click', function(e){
+  if(e.target === this) fecharModalNodulo();
+});
+
+// ═══════════════════════════════════════════════════════
+//  GERAÇÃO DO LAUDO
+// ═══════════════════════════════════════════════════════
+function updateLaudo(){
+  const t = estado.tireoide;
+  const opinioes = [];
+  let html = '';
+
+  // ── TÉCNICA ──
+  html += `<div class="doc-secao"><span class="doc-label">TÉCNICA:</span><div class="doc-p">Exame realizado em aparelho dinâmico com transdutor linear sobre a região cervical.</div></div>`;
+
+  // ── ANÁLISE ──
+  let analise = '';
+
+  // TIREOIDE
+  if(t.sit==='total'){
+    analise += `<div class="doc-p">Ausência de parênquima tireoidiano identificável (status pós-tireoidectomia total).</div>`;
+    opinioes.push('Status pós-tireoidectomia total.');
+  } else {
+    // Parênquima
+    let parFrase = '';
+    if(t.sit==='parcialD'){
+      parFrase = `Glândula tireoide com status pós-tireoidectomia parcial direita. `;
+    } else if(t.sit==='parcialE'){
+      parFrase = `Glândula tireoide com status pós-tireoidectomia parcial esquerda. `;
+    } else {
+      parFrase = `Glândula tireoide tópica, `;
+    }
+
+    if(t.par==='habitual'){
+      if(t.sit==='habitual') parFrase += `de dimensões habituais e contornos preservados. Parênquima tireoidiano com ecotextura homogênea.`;
+      else parFrase += `de contornos preservados. Parênquima tireoidiano com ecotextura homogênea.`;
+    } else if(t.par==='difusa'){
+      const eco = t.parDifEco==='hipoecogenica' ? ' e ecogenicidade hipoecogênica' : '';
+      parFrase += `de dimensões ${t.parDifDim} e contornos ${t.parDifCon}. Parênquima tireoidiano com ecotextura heterogênea${eco}, compatível com tireoidopatia difusa inespecífica.`;
+      opinioes.push(`Tireoidopatia difusa inespecífica. Sugere-se correlação clínico-laboratorial.`);
+    } else if(t.par==='tireoidite'){
+      parFrase += `de dimensões ${t.parTirDim} e contornos ${t.parTirCon}. Parênquima tireoidiano com ecotextura heterogênea e hipoecogênica difusamente, com aspecto em padrão de tireoidite.`;
+      opinioes.push(`Achados ecográficos compatíveis com tireoidite. Sugere-se correlação clínico-laboratorial.`);
+    }
+    analise += `<div class="doc-p">${parFrase}</div>`;
+
+    // Medidas
+    const volD = calcVol(t.ldA, t.ldB, t.ldC);
+    const volE = calcVol(t.leA, t.leB, t.leC);
+    const medD = (t.ldA||'_') + ' x ' + (t.ldB||'_') + ' x ' + (t.ldC||'_');
+    const medE = (t.leA||'_') + ' x ' + (t.leB||'_') + ' x ' + (t.leC||'_');
+
+    if(t.sit!=='parcialD'){
+      analise += `<div class="doc-p">O lobo direito tireoidiano mede ${medD} cm, com volume de ${volD||'0,0'} cm³.</div>`;
+    }
+    if(t.sit!=='parcialE' && t.sit!=='parcialD'){
+      analise += `<div class="doc-p">O lobo esquerdo tireoidiano mede ${medE} cm, com volume de ${volE||'0,0'} cm³.</div>`;
+    }
+
+    // Istmo
+    if(t.istmo==='filiforme'){
+      analise += `<div class="doc-p">Istmo filiforme.</div>`;
+    } else {
+      const espStr = t.istmoMed ? ` medindo ${t.istmoMed} mm` : '';
+      analise += `<div class="doc-p">Istmo espessado${espStr}.</div>`;
+    }
+
+    // Volume total
+    const volD2 = calcVol(t.ldA, t.ldB, t.ldC);
+    const volE2 = calcVol(t.leA, t.leB, t.leC);
+    if(volD2 && volE2 && t.sit==='habitual'){
+      const vt = (parseFloat(volD2)+parseFloat(volE2)).toFixed(1);
+      analise += `<div class="doc-p">Volume tireoidiano estimado de ${vt} cm³ (normal de 6,0 a 14,0 cm³).</div>`;
+    }
+
+    // Cistos
+    if(t.cistos==='unico'){
+      const cistMedStr = t.cistMed ? ` medindo ${t.cistMed} cm` : '';
+      analise += `<div class="doc-p">Identificado cisto tireoidiano ${LOC_TEXT[t.cistLoc]||''}${cistMedStr}, de conteúdo anecoico e paredes finas, compatível com cisto simples.</div>`;
+    } else if(t.cistos==='multiplos'){
+      analise += `<div class="doc-p">Identificados cistos tireoidianos múltiplos, de conteúdo anecoico e paredes finas, compatíveis com cistos simples.</div>`;
+    }
+
+    // Nódulos
+    if(t.nodulos.length > 0){
+      t.nodulos.forEach((n, i)=>{
+        const medStr = (n.m1&&n.m2&&n.m3) ? ` medindo ${n.m1} x ${n.m2} x ${n.m3} cm` : '';
+        const f = n.mState.focos;
+        let focosTexto = '';
+        if(f.nenhum) focosTexto = 'sem focos ecogênicos';
+        else {
+          const arr=[];
+          if(f.macro) arr.push('macrocalcificações');
+          if(f.peri) arr.push('calcificações periféricas');
+          if(f.punt) arr.push('focos ecogênicos puntiformes');
+          focosTexto = arr.join(', ');
+        }
+        analise += `<div class="doc-p">Nódulo ${i+1}: ${COMP_TEXT[n.mState.comp.key]}, ${ECO_TEXT[n.mState.eco.key]}, ${FORMA_TEXT[n.mState.forma.key]}, margens ${MARG_TEXT[n.mState.marg.key]}, ${focosTexto}${medStr}, localizado ${LOC_TEXT[n.loc]||n.loc}. <b>ACR TI-RADS ${n.trads} (${n.pts} pontos).</b></div>`;
+        opinioes.push(`Nódulo tireoidiano ACR TI-RADS ${n.trads} ${LOC_TEXT[n.loc]||''}${medStr}.`);
+      });
+    }
+  }
+
+  // PARATIREOIDES
+  const para = estado.paratireoides;
+  if(para.sit==='normais'){
+    analise += `<div class="doc-p">Glândulas paratireoides não identificadas ao presente exame (padrão de normalidade).</div>`;
+  } else if(para.sit==='aumentadas'){
+    analise += `<div class="doc-p">Identificada glândula paratireoide aumentada de volume em topografia habitual.</div>`;
+    opinioes.push('Glândula paratireoide aumentada. Sugere-se correlação clínico-laboratorial.');
+  } else if(para.sit==='multiplas'){
+    analise += `<div class="doc-p">Identificadas múltiplas glândulas paratireoides aumentadas de volume.</div>`;
+    opinioes.push('Múltiplas glândulas paratireoides aumentadas. Sugere-se correlação clínico-laboratorial.');
+  }
+
+  // PARÓTIDAS
+  const par = estado.parotidas;
+  if(par.sit==='habitual'){
+    analise += `<div class="doc-p">Glândulas parótidas tópicas, com ecotextura habitual e dimensões habituais.</div>`;
+  } else {
+    const altTexto = {
+      nc: 'com alteração não especificada',
+      parotidite: 'com aspecto ecográfico compatível com parotidite (aumento difuso e hipoecogenicidade parenquimatosa)',
+      litiase: 'com litíase identificada em topografia do ducto parotídeo',
+      neoformacao: 'com neoformação parotídea identificada',
+    }[estado.parotAlt] || 'com alterações identificadas';
+    analise += `<div class="doc-p">Glândulas parótidas ${altTexto}.</div>`;
+    if(estado.parotAlt !== 'nc') opinioes.push(`Alteração parotídea (${estado.parotAlt}). Sugere-se correlação clínica.`);
+  }
+
+  // SUBMANDIBULARES
+  const sub = estado.submandibulares;
+  if(sub.sit==='habitual'){
+    analise += `<div class="doc-p">Glândulas submandibulares tópicas, com ecotextura habitual e dimensões habituais.</div>`;
+  } else {
+    const altTexto = {
+      nc: 'com alteração não especificada',
+      sialoadenite: 'com aspecto ecográfico compatível com sialoadenite (aumento e hipoecogenicidade)',
+      litiase: 'com litíase identificada no ducto de Wharton',
+      neoformacao: 'com neoformação submandibular identificada',
+    }[estado.subAlt] || 'com alterações identificadas';
+    analise += `<div class="doc-p">Glândulas submandibulares ${altTexto}.</div>`;
+    if(estado.subAlt !== 'nc') opinioes.push(`Alteração submandibular (${estado.subAlt}).`);
+  }
+
+  // SUBLINGUAIS
+  const slng = estado.sublinguais;
+  if(slng.sit==='habitual'){
+    analise += `<div class="doc-p">Glândulas sublinguais tópicas, com ecotextura habitual e dimensões habituais.</div>`;
+  } else {
+    const altTexto = {
+      nc: 'com alteração não especificada',
+      'rânula': 'com rânula identificada',
+      sialoadenite: 'com aspecto de sialoadenite sublingual',
+      neoformacao: 'com neoformação sublingual identificada',
+    }[estado.subLingAlt] || 'com alterações identificadas';
+    analise += `<div class="doc-p">Glândulas sublinguais ${altTexto}.</div>`;
+    if(estado.subLingAlt !== 'nc') opinioes.push(`Alteração sublingual (${estado.subLingAlt}).`);
+  }
+
+  // LINFONODOS
+  const lf = estado.linfonodos;
+  if(lf.sit==='ausentes'){
+    analise += `<div class="doc-p">Ausência de linfonodomegalias cervicais.</div>`;
+  } else if(lf.sit==='tipicos'){
+    const medStr = estado.linfoMed ? ` O maior mede cerca de ${estado.linfoMed} cm.` : '';
+    analise += `<div class="doc-p">Identificados linfonodos cervicais de aspecto típico (reativo) em nível ${estado.linfoNivel} à ${estado.linfoLat}.${medStr}</div>`;
+    opinioes.push(`Linfonodos cervicais de aspecto reativo em nível ${estado.linfoNivel}.`);
+  } else if(lf.sit==='atipicos'){
+    const medStr = estado.linfoAtipoMed ? ` medindo cerca de ${estado.linfoAtipoMed} cm` : '';
+    analise += `<div class="doc-p">Identificados linfonodos cervicais de aspecto atípico em nível ${estado.linfoAtipoNivel} à ${estado.linfoAtipoLat}${medStr}.</div>`;
+    opinioes.push(`Linfonodomegalias cervicais atípicas em nível ${estado.linfoAtipoNivel}. Sugere-se, a critério clínico, prosseguir investigação diagnóstica com PAAF.`);
+  }
+
+  html += `<div class="doc-secao"><span class="doc-label">ANÁLISE:</span>${analise}</div>`;
+
+  // ── OPINIÃO ──
+  let opiniao = '';
+  if(opinioes.length === 0){
+    opiniao = 'Estudo ecográfico sem evidentes anormalidades apreciáveis ao método.';
+  } else {
+    opiniao = opinioes.join('<br>');
+    opiniao += '<br>Demais estruturas sem evidentes anormalidades apreciáveis ao método.';
+  }
+  html += `<div class="doc-secao"><span class="doc-label">OPINIÃO DO RELATÓRIO:</span><div class="doc-p">${opiniao}</div></div>`;
+
+  // ── ACHADOS ADICIONAIS ──
+  if(estado.achados){
+    html += `<div class="doc-secao"><div class="doc-p">Achados adicionais: ${estado.achados}</div></div>`;
+  }
+
+  // TI-RADS tabela
+  if(t.nodulos.length > 0){
+    html += `<div class="doc-secao" style="margin-top:12px;"><span class="doc-label">CLASSIFICAÇÃO ACR TI-RADS:</span><div class="doc-p" style="font-family:Helvetica,Arial,sans-serif;font-size:9pt;">`;
+    t.nodulos.forEach((n,i)=>{
+      html += `Nódulo ${i+1}: ACR TI-RADS ${n.trads} (${n.pts} pontos) — ${LOC_TEXT[n.loc]||n.loc}<br>`;
+    });
+    html += `</div></div>`;
+  }
+
+  document.getElementById('laudo-doc').innerHTML = `
+    <div class="doc-titulo">ULTRASSONOGRAFIA CERVICAL</div>${html}`;
+}
+
+// ═══════════════════════════════════════════════════════
+//  UTILIDADES
+// ═══════════════════════════════════════════════════════
+function toggleDark(){
+  const isDark = document.body.classList.toggle('dark');
+  const btn = document.getElementById('btn-dark-toggle');
+  if(isDark){
+    btn.innerHTML='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 8.5A5.5 5.5 0 0 1 6 3c0-.18.01-.36.03-.53A6 6 0 1 0 13.97 9.5c-.15.01-.31.01-.47 0z"/></svg>Modo claro';
+  } else {
+    btn.innerHTML='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro';
+  }
+  localStorage.setItem('darkMode', isDark ? '1' : '0');
+}
+(function(){ if(localStorage.getItem('darkMode')==='1') toggleDark(); })();
+
+function copiar(){
+  const el = document.getElementById('laudo-doc');
+  navigator.clipboard.writeText(el.innerText).then(()=>alert('Laudo copiado!')).catch(()=>alert('Use Ctrl+A e Ctrl+C no texto do laudo.'));
+}
+
+function imprimir(){
+  const h = document.getElementById('laudo-doc').innerHTML;
+  const w = window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Helvetica,Arial,sans-serif;font-size:10pt;padding:32px;color:#111;line-height:1.65;}.doc-titulo{text-align:center;font-weight:700;text-transform:uppercase;margin-bottom:16px;}.doc-label{font-weight:700;}.doc-p{margin-bottom:8px;}.doc-secao{margin-bottom:14px;}*{color:#111 !important;}</style></head><body>${h}</body></html>`);
+  w.document.close();
+  w.print();
+}
+
+function reiniciar(){
+  estado.tireoide   = { sit:'habitual', par:'habitual', parDifDim:'habituais', parDifCon:'preservados', parDifEco:'nc', parTirDim:'habituais', parTirCon:'preservados', cistos:'nenhum', cistLoc:'tsld', cistMed:'', nodulos:[], ldA:'', ldB:'', ldC:'', leA:'', leB:'', leC:'', istmo:'filiforme', istmoMed:'' };
+  estado.paratireoides = { sit:'normais' };
+  estado.parotidas  = { sit:'habitual' };
+  estado.parotAlt   = 'nc';
+  estado.submandibulares = { sit:'habitual' };
+  estado.subAlt     = 'nc';
+  estado.sublinguais = { sit:'habitual' };
+  estado.subLingAlt = 'nc';
+  estado.linfonodos = { sit:'ausentes' };
+  estado.linfoLat   = 'direita';
+  estado.linfoNivel = 'II';
+  estado.linfoMed   = '';
+  estado.linfoAtipoLat   = 'direita';
+  estado.linfoAtipoNivel = 'II';
+  estado.linfoAtipoMed   = '';
+  estado.achados    = '';
+  showSection('tireoide');
+}
+
+// ── INIT ──
+showSection('tireoide');
+updateLaudo();
+</script>
+</body>
+</html>

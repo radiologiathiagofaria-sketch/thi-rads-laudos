@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THI-RADS | US Doppler de Carótidas e Vertebrais</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#1a56db;--blue-dark:#1140a6;--blue-light:#e8f0fe;--blue-mid:#dbeafe;
+  --surface:#f4f6fb;--border:#e2e6ef;--border-strong:#c8cfe0;
+  --text:#1a1f2e;--text-2:#4b5570;--text-3:#8892a4;
+  --white:#ffffff;--green:#059669;--red:#dc2626;--amber:#b45309;--amber-bg:#fffbeb;--amber-border:#fde68a;
+  --radius:8px;--radius-lg:12px;
+}
+body.dark{
+  --blue:#4d86f5;--blue-dark:#3a6fd4;--blue-light:#1e2d4a;--blue-mid:#1e2d4a;
+  --surface:#141820;--border:#2a2f3d;--border-strong:#3a4155;
+  --text:#e2e6f0;--text-2:#9aa3b8;--text-3:#5d6680;
+  --white:#1e2230;--green:#34d399;--red:#f87171;--amber:#fbbf24;--amber-bg:#1c1810;--amber-border:#78350f;
+}
+body.dark .laudo-doc{color:#e2e6f0;}
+body.dark .laudo-panel{background:#1e2230;border-left-color:var(--border);}
+body.dark .laudo-body{background:#1e2230;}
+body.dark .laudo-header{background:#1e2230;border-bottom-color:var(--border);}
+body.dark .info-box{background:#1e2a1e;border-color:#2a4a2a;}
+@media print{body.dark .laudo-doc,body.dark .laudo-doc *{color:#111 !important;}}
+.btn-dark{margin-left:auto;}
+body.dark .btn-dark{background:#2a2f3d;border-color:#3a4155;color:#e2e6f0;}
+body.dark .btn-dark:hover{background:#343a4d;color:#fff;}
+body.dark .dim-input,body.dark .ff select,body.dark .ff input[type=text]{background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .radio-mark{background:var(--white);}
+body.dark .check-box{background:var(--white);}
+body.dark .sub-opts{background:#1a2040;border-bottom-color:#2a3460;}
+body.dark .sub-opt-label{background:var(--white);color:var(--text-2);}
+body.dark .toolbar{background:var(--white);border-bottom-color:var(--border);}
+body.dark .sidebar{background:var(--white);border-right-color:var(--border);}
+body.dark .sidebar-hd{border-bottom-color:var(--border);}
+body.dark .block{background:var(--white);border-color:var(--border);}
+body.dark .block-title{background:var(--white);border-bottom-color:var(--border);}
+body.dark .radio-opt:hover{background:#1e2d4a;}
+body.dark .radio-opt.selected{background:#1e2d4a;}
+body.dark .check-row{background:#1a1f2e;}
+body.dark .check-row:hover{background:#1e2d4a;}
+body.dark .check-row.selected{background:#1e2d4a;}
+body.dark .btn-add{background:var(--white);color:var(--text-2);border-color:var(--border-strong);}
+body.dark .sel-tag{background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .plaq-details{background:#1a2040;border-color:#2a3460;}
+body.dark .info-box{background:#1a2040;border-color:#2a4460;color:#a0b4d0;}
+body.dark .amber-box{background:#1c1810;border-color:#78350f;color:#fbbf24;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',system-ui,sans-serif;font-size:13px;background:var(--surface);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+.toolbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:10px;height:48px;flex-shrink:0;}
+.logo{display:flex;align-items:baseline;gap:6px;margin-right:12px;}
+.logo-name{font-size:17px;font-weight:600;color:var(--blue);letter-spacing:-.3px;}
+.logo-sub{font-size:11px;color:var(--text-3);font-weight:400;letter-spacing:.2px;}
+.tb-sep{width:1px;height:20px;background:var(--border);margin:0 4px;}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid var(--border);font-weight:500;transition:all .13s;background:var(--white);color:var(--text-2);}
+.btn:hover{background:var(--surface);border-color:var(--border-strong);color:var(--text);}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue);}
+.btn-primary:hover{background:var(--blue-dark);border-color:var(--blue-dark);color:#fff;}
+.btn-danger{background:#fff5f5;color:var(--red);border-color:#fecaca;}
+body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
+.btn-danger:hover{background:#fee2e2;border-color:#fca5a5;}
+.btn svg{width:13px;height:13px;flex-shrink:0;}
+.body{display:flex;flex:1;overflow:hidden;}
+.sidebar{width:148px;background:var(--white);border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;}
+.sidebar-hd{padding:10px 12px 8px;border-bottom:1px solid var(--border);}
+.sidebar-tipo{font-size:9px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;}
+.sidebar-titulo{font-size:11px;font-weight:600;color:var(--text);}
+.nav-group{padding:4px 0 8px;}
+.nav-group-hd{padding:8px 12px 3px;font-size:9px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;margin-top:2px;}
+.nav-item{display:flex;align-items:center;gap:7px;padding:6px 12px;font-size:11.5px;color:var(--text-2);cursor:pointer;transition:all .12s;border-left:2px solid transparent;}
+.nav-item:hover{background:var(--blue-light);color:var(--blue);}
+.nav-item.active{background:var(--blue-light);color:var(--blue);border-left-color:var(--blue);font-weight:600;}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.4;flex-shrink:0;}
+.nav-item.active .nav-dot{opacity:1;}
+.panel{width:490px;flex-shrink:0;overflow-y:auto;padding:14px 14px 20px;background:var(--surface);}
+.sec-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.sec-title::before{content:'';display:block;width:3px;height:16px;background:var(--blue);border-radius:2px;}
+.block{margin-bottom:10px;background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden;}
+.block-title{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.7px;padding:8px 14px 7px;border-bottom:1px solid var(--border);background:var(--white);}
+.radio-opt{display:flex;align-items:flex-start;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;position:relative;}
+.radio-opt:last-child{border-bottom:none;}
+.radio-opt:hover{background:#f5f8ff;}
+.radio-opt.selected{background:var(--blue-light);}
+.radio-opt input[type=radio]{position:absolute;opacity:0;pointer-events:none;}
+.radio-label{display:flex;align-items:center;gap:10px;width:100%;padding:9px 14px;font-size:12.5px;color:var(--text-2);line-height:1.4;cursor:pointer;}
+.radio-opt.selected .radio-label{color:var(--blue);font-weight:500;}
+.radio-mark{width:16px;height:16px;border-radius:50%;border:2px solid var(--border-strong);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.radio-opt:hover .radio-mark{border-color:var(--blue);}
+.radio-opt.selected .radio-mark{border-color:var(--blue);background:var(--blue);}
+.radio-mark::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff;opacity:0;transition:opacity .15s;}
+.radio-opt.selected .radio-mark::after{opacity:1;}
+.check-row{display:flex;align-items:center;border-bottom:1px solid var(--border);cursor:pointer;background:#fafbff;}
+.check-row:last-child{border-bottom:none;}
+.check-row:hover{background:#f0f5ff;}
+.check-row.selected{background:#e6eeff;}
+.check-row input[type=checkbox]{position:absolute;opacity:0;pointer-events:none;}
+.check-label{display:flex;align-items:center;gap:10px;width:100%;padding:8px 14px;font-size:12px;color:var(--text-2);cursor:pointer;}
+.check-row.selected .check-label{color:var(--blue);font-weight:500;}
+.check-box{width:15px;height:15px;border-radius:4px;border:2px solid var(--border-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.check-row:hover .check-box{border-color:var(--blue);}
+.check-row.selected .check-box{border-color:var(--blue);background:var(--blue);}
+.check-box svg{display:none;width:9px;height:9px;}
+.check-row.selected .check-box svg{display:block;}
+.dim-rows{padding:8px 14px;display:flex;flex-direction:column;gap:6px;}
+.dim-row{display:flex;align-items:center;gap:10px;}
+.dim-lbl{flex:1;font-size:12px;color:var(--text-2);}
+.dim-input{width:65px;padding:5px 8px;border:1px solid var(--border-strong);border-radius:6px;font-size:12.5px;font-family:'DM Sans',sans-serif;text-align:center;color:var(--text);background:var(--white);transition:border .12s;}
+.dim-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,.08);}
+.dim-unit{font-size:12px;color:var(--text-3);min-width:30px;}
+.sel-tag{font-size:11px;border:1px solid var(--border-strong);border-radius:5px;padding:3px 6px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);cursor:pointer;}
+.ff-grid{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;}
+.ff{display:flex;flex-direction:column;gap:2px;}
+.ff label{font-size:9px;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
+.ff select,.ff input[type=text]{font-size:11px;padding:4px 7px;border:1px solid var(--border-strong);border-radius:5px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);}
+.ff select:focus,.ff input:focus{outline:none;border-color:var(--blue);}
+.ff input[type=text]{width:65px;text-align:center;}
+.plaq-details{padding:10px 14px;background:#eef3ff;border-top:1px solid #d0dcff;display:flex;flex-direction:column;gap:8px;}
+.laudo-panel{flex:1;min-width:0;background:var(--white);display:flex;flex-direction:column;border-left:1px solid var(--border);}
+.laudo-header{padding:9px 20px 8px;border-bottom:1px solid var(--border);background:var(--white);display:flex;align-items:center;}
+.laudo-header-title{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.6px;}
+.laudo-body{flex:1;overflow-y:auto;padding:22px 28px;}
+.laudo-doc{font-family:Helvetica,Arial,sans-serif;font-size:10pt;line-height:1.65;color:#111;max-width:740px;}
+.doc-titulo{text-align:center;font-weight:700;font-size:10pt;margin-bottom:16px;text-transform:uppercase;letter-spacing:.3px;}
+.doc-label{font-weight:700;font-size:10pt;}
+.doc-p{margin-bottom:8px;font-size:10pt;}
+.doc-secao{margin-bottom:14px;}
+.info-box{padding:8px 14px;font-size:11px;color:#1e40af;background:#eff6ff;border-top:1px solid #bfdbfe;line-height:1.6;}
+.amber-box{padding:8px 14px;font-size:11px;color:var(--amber);background:var(--amber-bg);border-top:1px solid var(--amber-border);line-height:1.6;}
+</style>
+</head>
+<body>
+ 
+<div class="toolbar">
+  <div class="logo" style="cursor:pointer" onclick="window.location.href='../laudo-thirads.html'"><span class="logo-name">THI-RADS</span><span class="logo-sub">laudo estruturado</span></div>
+  <button class="btn" onclick="window.location.href='../laudo-thirads.html'"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 2L4 8l6 6"/></svg>Voltar</button>
+  <div class="tb-sep"></div>
+  <button class="btn" onclick="copiar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>Copiar laudo</button>
+  <button class="btn btn-primary" onclick="imprimir()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6V2h8v4M4 12H2V7h12v5h-2M4 9h8M4 12v2h8v-2"/></svg>Imprimir</button>
+  <button class="btn btn-dark" id="btn-dark-toggle" onclick="toggleDark()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro</button>
+  <button class="btn btn-danger" onclick="reiniciar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8a6 6 0 1 0 1.5-3.9M2 4v4h4"/></svg>Reiniciar</button>
+</div>
+ 
+<div class="body">
+  <div class="sidebar">
+    <div class="sidebar-hd"><div class="sidebar-tipo">US Doppler</div><div class="sidebar-titulo">Carótidas e Vertebrais</div></div>
+    <div class="nav-group">
+      <div class="nav-group-hd">Geral</div>
+      <div class="nav-item" id="nav-tecnica" onclick="showSection('tecnica')"><span class="nav-dot"></span>Técnica</div>
+      <div class="nav-item" id="nav-imt" onclick="showSection('imt')"><span class="nav-dot"></span>C. Miointimal</div>
+      <div class="nav-group-hd">Sistema Direito</div>
+      <div class="nav-item" id="nav-accd" onclick="showSection('accd')"><span class="nav-dot"></span>ACC Direita</div>
+      <div class="nav-item" id="nav-bulboD" onclick="showSection('bulboD')"><span class="nav-dot"></span>Bulbo Direito</div>
+      <div class="nav-item" id="nav-acid" onclick="showSection('acid')"><span class="nav-dot"></span>ACI Direita</div>
+      <div class="nav-item" id="nav-aced" onclick="showSection('aced')"><span class="nav-dot"></span>ACE Direita</div>
+      <div class="nav-item" id="nav-avd" onclick="showSection('avd')"><span class="nav-dot"></span>A.V. Direita</div>
+      <div class="nav-group-hd">Sistema Esquerdo</div>
+      <div class="nav-item" id="nav-acce" onclick="showSection('acce')"><span class="nav-dot"></span>ACC Esquerda</div>
+      <div class="nav-item" id="nav-bulboE" onclick="showSection('bulboE')"><span class="nav-dot"></span>Bulbo Esquerdo</div>
+      <div class="nav-item" id="nav-acie" onclick="showSection('acie')"><span class="nav-dot"></span>ACI Esquerda</div>
+      <div class="nav-item" id="nav-acee" onclick="showSection('acee')"><span class="nav-dot"></span>ACE Esquerda</div>
+      <div class="nav-item" id="nav-ave" onclick="showSection('ave')"><span class="nav-dot"></span>A.V. Esquerda</div>
+    </div>
+  </div>
+ 
+  <div class="panel" id="main-panel"></div>
+ 
+  <div class="laudo-panel">
+    <div class="laudo-header"><span class="laudo-header-title">Pré-visualização do laudo</span></div>
+    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc"></div></div>
+  </div>
+</div>
+ 
+<script>
+// ── ESTADO GLOBAL ──
+function defaultArteria() {
+  return { sit:'habitual', kinkSeg:'proximal', kinkVPS1:'', kinkVPS2:'', plaqSit:'sem', plaqTipo:'fibrocalcificada', plaqSup:'nc', plaqVPS1:'', plaqVPS2:'', plaqExt:'', plaqEsp:'', velVPS:'', velVDF:'' };
+}
+function defaultBulbo() {
+  return { plaqSit:'sem', plaqTipo:'fibrocalcificada', plaqSup:'nc', plaqVPS1:'', plaqVPS2:'', plaqExt:'', plaqEsp:'' };
+}
+function defaultAV() {
+  return { sit:'anterogrado', velVPS:'', velVDF:'' };
+}
+ 
+const estado = {
+  tecnica: { indicacao:'nc', indicacaoOutro:'', limitBifalta:false, limitBiotipo:false },
+  imt:     { citar:true, medD:'', medE:'' },
+  accd:    defaultArteria(),
+  bulboD:  defaultBulbo(),
+  acid:    defaultArteria(),
+  aced:    defaultArteria(),
+  avd:     defaultAV(),
+  acce:    defaultArteria(),
+  bulboE:  defaultBulbo(),
+  acie:    defaultArteria(),
+  acee:    defaultArteria(),
+  ave:     defaultAV(),
+};
+ 
+let secaoAtual = 'imt';
+let hd = [];
+ 
+// ── NAVEGAÇÃO ──
+function showSection(sec) {
+  secaoAtual = sec;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const el = document.getElementById('nav-' + sec);
+  if (el) el.classList.add('active');
+  renderPanel(sec);
+  updateLaudo();
+}
+ 
+function renderPanel(sec) {
+  const p = document.getElementById('main-panel');
+  const titles = {
+    tecnica:'Técnica e Indicação', imt:'Complexo Miointimal (IMT)',
+    accd:'A. Carótida Comum Direita', bulboD:'Bulbo Carotídeo Direito',
+    acid:'A. Carótida Interna Direita', aced:'A. Carótida Externa Direita', avd:'A. Vertebral Direita',
+    acce:'A. Carótida Comum Esquerda', bulboE:'Bulbo Carotídeo Esquerdo',
+    acie:'A. Carótida Interna Esquerda', acee:'A. Carótida Externa Esquerda', ave:'A. Vertebral Esquerda',
+  };
+  let html = `<div class="sec-title">${titles[sec]||sec}</div>`;
+  if(sec==='tecnica') html += renderTecnica();
+  else if(sec==='imt') html += renderIMT();
+  else if(sec==='accd') html += renderACC('accd','direita');
+  else if(sec==='bulboD') html += renderBulbo('bulboD','direito');
+  else if(sec==='acid') html += renderACI('acid','direita');
+  else if(sec==='aced') html += renderACE('aced','direita');
+  else if(sec==='avd') html += renderAV('avd','direita');
+  else if(sec==='acce') html += renderACC('acce','esquerda');
+  else if(sec==='bulboE') html += renderBulbo('bulboE','esquerdo');
+  else if(sec==='acie') html += renderACI('acie','esquerda');
+  else if(sec==='acee') html += renderACE('acee','esquerda');
+  else if(sec==='ave') html += renderAV('ave','esquerda');
+  p.innerHTML = html;
+}
+ 
+// ── HELPERS UI ──
+function radioOpt(artKey, sitVal, label) {
+  const sel = estado[artKey].sit === sitVal ? 'selected' : '';
+  return `<div class="radio-opt ${sel}" onclick="setSit('${artKey}','${sitVal}')"><input type="radio"><label class="radio-label"><span class="radio-mark"></span>${label}</label></div>`;
+}
+function plaqOpt(artKey, plaqVal, label) {
+  const sel = estado[artKey].plaqSit === plaqVal ? 'selected' : '';
+  return `<div class="radio-opt ${sel}" onclick="setPlaqSit('${artKey}','${plaqVal}')"><input type="radio"><label class="radio-label"><span class="radio-mark"></span>${label}</label></div>`;
+}
+function chkRow(id, label, checked, sec, key) {
+  const sel = checked ? 'selected' : '';
+  return `<div class="check-row ${sel}" id="crow-${id}" onclick="toggleChk('${id}','${sec}','${key}')"><input type="checkbox" id="${id}" ${checked?'checked':''}><label class="check-label"><span class="check-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.8"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg></span>${label}</label></div>`;
+}
+function dimInput(id, label, val, unit, sec, key) {
+  return `<div class="dim-row"><span class="dim-lbl">${label}</span><input class="dim-input" type="text" id="${id}" value="${val||''}" placeholder="—" data-sec="${sec}" data-key="${key}" oninput="handleInput(this)"><span class="dim-unit">${unit}</span></div>`;
+}
+function selInline(id, opts, val, sec, key) {
+  const options = opts.map(o=>`<option value="${o.v}" ${val===o.v?'selected':''}>${o.l}</option>`).join('');
+  return `<select class="sel-tag" id="${id}" data-sec="${sec}" data-key="${key}" onchange="handleInput(this)">${options}</select>`;
+}
+ 
+// ── SEÇÃO: TÉCNICA ──
+function renderTecnica() {
+  const e = estado.tecnica;
+  const isInd = v => e.indicacao === v ? 'selected' : '';
+  return `
+  <div class="block"><div class="block-title">Indicação Clínica</div>
+    <div class="radio-opt ${isInd('nc')}" onclick="setInd('nc')"><input type="radio"><label class="radio-label"><span class="radio-mark"></span>não citar</label></div>
+    <div class="radio-opt ${isInd('risco')}" onclick="setInd('risco')"><input type="radio"><label class="radio-label"><span class="radio-mark"></span>avaliação de risco cardiovascular</label></div>
+    <div class="radio-opt ${isInd('aterosclerose')}" onclick="setInd('aterosclerose')"><input type="radio"><label class="radio-label"><span class="radio-mark"></span>aterosclerose</label></div>
+    <div class="radio-opt ${isInd('posop')}" onclick="setInd('posop')"><input type="radio"><label class="radio-label"><span class="radio-mark"></span>acompanhamento pós-operatório</label></div>
+    <div class="radio-opt ${isInd('enxaqueca')}" onclick="setInd('enxaqueca')"><input type="radio"><label class="radio-label"><span class="radio-mark"></span>enxaqueca / cefaleia</label></div>
+    <div class="radio-opt ${isInd('postavc')}" onclick="setInd('postavc')"><input type="radio"><label class="radio-label"><span class="radio-mark"></span>protocolo pós-AVC isquêmico</label></div>
+    <div class="radio-opt ${isInd('outro')}" onclick="setInd('outro')"><input type="radio"><label class="radio-label"><span class="radio-mark"></span>outra indicação</label></div>
+    ${e.indicacao==='outro' ? `<div style="padding:8px 14px"><input class="dim-input" type="text" id="tc-indOutro" value="${e.indicacaoOutro}" placeholder="especificar..." style="width:100%;text-align:left" data-sec="tecnica" data-key="indicacaoOutro" oninput="handleInput(this)"></div>` : ''}
+  </div>
+  <div class="block"><div class="block-title">Limitações Técnicas</div>
+    ${chkRow('tc-bifalta','bifurcação alta das artérias carótidas comuns',e.limitBifalta,'tecnica','limitBifalta')}
+    ${chkRow('tc-biotipo','biotipo (obesidade / pescoço curto)',e.limitBiotipo,'tecnica','limitBiotipo')}
+  </div>`;
+}
+ 
+// ── SEÇÃO: IMT ──
+function renderIMT() {
+  const e = estado.imt;
+  const dVal = parseFloat((e.medD||'').replace(',','.'));
+  const eVal = parseFloat((e.medE||'').replace(',','.'));
+  const dAlerta = !isNaN(dVal) && dVal > 0.9;
+  const eAlerta = !isNaN(eVal) && eVal > 0.9;
+  return `
+  <div class="block"><div class="block-title">Avaliar Complexo Miointimal</div>
+    <div class="radio-opt ${!e.citar?'selected':''}" onclick="setIMTCitar(false)"><input type="radio"><label class="radio-label"><span class="radio-mark"></span>não citar</label></div>
+    <div class="radio-opt ${e.citar?'selected':''}" onclick="setIMTCitar(true)"><input type="radio"><label class="radio-label"><span class="radio-mark"></span>citar com medidas</label></div>
+  </div>
+  ${e.citar ? `<div class="block"><div class="block-title">Espessuras do Complexo Miointimal</div>
+    <div class="dim-rows">
+      ${dimInput('imt-medD','à direita',e.medD,'mm','imt','medD')}
+      ${dimInput('imt-medE','à esquerda',e.medE,'mm','imt','medE')}
+    </div>
+    <div class="info-box">
+      Normal ≤0,9 mm &nbsp;|&nbsp; Espessado 0,9–1,2 mm &nbsp;|&nbsp; Placa &gt;1,2 mm (CBR/SBC)
+    </div>
+    ${(dAlerta||eAlerta) ? `<div class="amber-box">⚠ ${dAlerta&&eAlerta?'Ambas as medidas':'Medida '+(dAlerta?'direita':'esquerda')} acima do limite normal — será registrado na conclusão.</div>` : ''}
+  </div>` : ''}`;
+}
+ 
+// ── HELPER: DETALHES PLACA ──
+function renderPlaqDetails(artKey) {
+  const e = estado[artKey];
+  const tipoOpts = [
+    {v:'fibrocalcificada',l:'Fibrocalcificada'},{v:'calcificada',l:'Calcificada'},{v:'hipoecogenica',l:'Lipídica (hipoecogênica)'}
+  ];
+  const supOpts = [
+    {v:'nc',l:'não citar'},{v:'lisa',l:'lisa e regular'},{v:'irregular',l:'irregular'},{v:'ulcerada',l:'ulcerada'}
+  ];
+  const tipoOptions = tipoOpts.map(o=>`<option value="${o.v}" ${e.plaqTipo===o.v?'selected':''}>${o.l}</option>`).join('');
+  const supOptions = supOpts.map(o=>`<option value="${o.v}" ${e.plaqSup===o.v?'selected':''}>${o.l}</option>`).join('');
+  return `<div class="plaq-details">
+    <div class="ff-grid">
+      <div class="ff"><label>Tipo da placa</label><select data-sec="${artKey}" data-key="plaqTipo" onchange="handleInput(this)">${tipoOptions}</select></div>
+      <div class="ff"><label>Superfície</label><select data-sec="${artKey}" data-key="plaqSup" onchange="handleInput(this)">${supOptions}</select></div>
+    </div>
+    <div class="ff-grid">
+      <div class="ff"><label>VPS pré-lesão (cm/s)</label><input type="text" class="dim-input" value="${e.plaqVPS1}" data-sec="${artKey}" data-key="plaqVPS1" oninput="handleInput(this)"></div>
+      <div class="ff"><label>VPS na lesão (cm/s)</label><input type="text" class="dim-input" value="${e.plaqVPS2}" data-sec="${artKey}" data-key="plaqVPS2" oninput="handleInput(this)"></div>
+    </div>
+    <div class="ff-grid">
+      <div class="ff"><label>Extensão (mm)</label><input type="text" class="dim-input" value="${e.plaqExt}" data-sec="${artKey}" data-key="plaqExt" oninput="handleInput(this)"></div>
+      <div class="ff"><label>Espessura (mm)</label><input type="text" class="dim-input" value="${e.plaqEsp}" data-sec="${artKey}" data-key="plaqEsp" oninput="handleInput(this)"></div>
+    </div>
+    <div style="font-size:10.5px;color:#1e40af;margin-top:2px">A estenose é calculada automaticamente pela razão VPS lesão/pré-lesão.</div>
+  </div>`;
+}
+ 
+function renderPlacas(artKey) {
+  const e = estado[artKey];
+  return `<div class="block"><div class="block-title">Placas Ateromatosas</div>
+    ${plaqOpt(artKey,'sem','ausentes')}
+    ${plaqOpt(artKey,'min','ateromatose difusa incipiente / placas mínimas esparsas')}
+    ${plaqOpt(artKey,'pre','placa ateromatosa específica')}
+    ${e.plaqSit==='pre' ? renderPlaqDetails(artKey) : ''}
+  </div>`;
+}
+ 
+function renderKinkSeg(artKey) {
+  const e = estado[artKey];
+  return `<div class="block"><div class="block-title">Segmento da Angulação</div>
+    <div class="dim-rows">
+      <div class="dim-row"><span class="dim-lbl">Segmento</span>
+        <select class="sel-tag" data-sec="${artKey}" data-key="kinkSeg" onchange="handleInput(this)">
+          <option value="proximal" ${e.kinkSeg==='proximal'?'selected':''}>proximal</option>
+          <option value="medio" ${e.kinkSeg==='medio'?'selected':''}>médio</option>
+          <option value="distal" ${e.kinkSeg==='distal'?'selected':''}>distal</option>
+        </select>
+      </div>
+    </div>
+  </div>`;
+}
+ 
+function renderKinkHemDetails(artKey) {
+  const e = estado[artKey];
+  const vps1 = parseFloat(e.kinkVPS1); const vps2 = parseFloat(e.kinkVPS2);
+  let ratioInfo = '';
+  if (!isNaN(vps1) && !isNaN(vps2) && vps1 > 0) {
+    const r = (vps2/vps1).toFixed(2);
+    ratioInfo = `<div style="font-size:10.5px;color:#1e40af;margin-top:2px">Razão VPS: ${r} → ${calcKinkGrau(vps2/vps1)}</div>`;
+  }
+  return `<div class="block"><div class="block-title">Dados Velocimétricos do Kinking</div>
+    <div class="dim-rows">
+      <div class="dim-row"><span class="dim-lbl">Segmento</span>
+        <select class="sel-tag" data-sec="${artKey}" data-key="kinkSeg" onchange="handleInput(this)">
+          <option value="proximal" ${e.kinkSeg==='proximal'?'selected':''}>proximal</option>
+          <option value="medio" ${e.kinkSeg==='medio'?'selected':''}>médio</option>
+          <option value="distal" ${e.kinkSeg==='distal'?'selected':''}>distal</option>
+        </select>
+      </div>
+      ${dimInput(artKey+'-kinkVPS1','VPS pré-angulação',e.kinkVPS1,'cm/s',artKey,'kinkVPS1')}
+      ${dimInput(artKey+'-kinkVPS2','VPS na angulação',e.kinkVPS2,'cm/s',artKey,'kinkVPS2')}
+    </div>
+    ${ratioInfo}
+  </div>`;
+}
+ 
+function renderVelocidades(artKey) {
+  const e = estado[artKey];
+  return `<div class="block"><div class="block-title">Velocidades — Doppler Pulsado</div>
+    <div class="dim-rows">
+      ${dimInput(artKey+'-velVPS','VPS',e.velVPS,'cm/s',artKey,'velVPS')}
+      ${dimInput(artKey+'-velVDF','VDF',e.velVDF,'cm/s',artKey,'velVDF')}
+    </div>
+  </div>`;
+}
+ 
+// ── SEÇÕES POR TIPO DE ARTÉRIA ──
+function renderACC(artKey, lado) {
+  const e = estado[artKey];
+  return `
+  <div class="block"><div class="block-title">Situação</div>
+    ${radioOpt(artKey,'habitual','habitual (trajeto, calibre e paredes normais, fluxo laminar)')}
+    ${radioOpt(artKey,'kink_ana','kinking anatômico (tortuosidade sem repercussão hemodinâmica)')}
+    ${radioOpt(artKey,'kink_hem','kinking hemodinâmico (tortuosidade com repercussão hemodinâmica)')}
+  </div>
+  ${e.sit==='kink_ana' ? renderKinkSeg(artKey) : ''}
+  ${e.sit==='kink_hem' ? renderKinkHemDetails(artKey) : ''}
+  ${renderPlacas(artKey)}
+  ${renderVelocidades(artKey)}`;
+}
+ 
+function renderBulbo(artKey, lado) {
+  return `
+  <div class="block"><div class="block-title">Informação</div>
+    <div class="info-box" style="border-top:none">O bulbo carotídeo apresenta fisiologicamente fluxo turbilhonar e hipercinético.<br>Selecione abaixo apenas se houver alteração das placas.</div>
+  </div>
+  ${renderPlacas(artKey)}`;
+}
+ 
+function renderACI(artKey, lado) {
+  const e = estado[artKey];
+  return `
+  <div class="block"><div class="block-title">Situação</div>
+    ${radioOpt(artKey,'habitual','habitual (pérvia, sem estenose significativa)')}
+    ${radioOpt(artKey,'kink_ana','kinking anatômico (sem repercussão hemodinâmica)')}
+    ${radioOpt(artKey,'kink_hem','kinking hemodinâmico (com repercussão hemodinâmica)')}
+    ${radioOpt(artKey,'oclusao','oclusão (ausência completa de fluxo)')}
+  </div>
+  ${e.sit==='kink_ana' ? renderKinkSeg(artKey) : ''}
+  ${e.sit==='kink_hem' ? renderKinkHemDetails(artKey) : ''}
+  ${e.sit!=='oclusao' ? renderPlacas(artKey) : ''}
+  ${e.sit!=='oclusao' ? renderVelocidades(artKey) : ''}
+  ${e.sit!=='oclusao' ? `<div class="block"><div class="block-title">Critérios NASCET / CBR — Estenose ACI</div>
+    <div class="amber-box" style="border-top:none">
+      <b>Classificação automática pela VPS (Critérios SBC/CBR):</b><br>
+      VPS &lt;125 cm/s → normal / &lt;50% (sem estenose significativa)<br>
+      VPS 125–230 cm/s → estenose moderada (50–69%)<br>
+      VPS &gt;230 cm/s + VDF &gt;100 cm/s → estenose grave (≥70%)<br>
+      VPS &gt;400 cm/s → estenose crítica (≥90%)
+    </div>
+  </div>` : ''}`;
+}
+ 
+function renderACE(artKey, lado) {
+  const e = estado[artKey];
+  return `
+  <div class="block"><div class="block-title">Situação</div>
+    ${radioOpt(artKey,'habitual','habitual (trajeto, calibre e paredes normais, fluxo laminar)')}
+    ${radioOpt(artKey,'alterada','com alterações / descrição específica')}
+  </div>
+  ${renderPlacas(artKey)}
+  ${renderVelocidades(artKey)}`;
+}
+ 
+function renderAV(artKey, lado) {
+  const e = estado[artKey];
+  return `
+  <div class="block"><div class="block-title">Fluxo da Artéria Vertebral</div>
+    ${radioOpt(artKey,'anterogrado','anterógrado habitual — normal')}
+    ${radioOpt(artKey,'reduzido','anterógrado com velocidades reduzidas')}
+    ${radioOpt(artKey,'invertido','invertido — síndrome do roubo da subclávia')}
+    ${radioOpt(artKey,'ausente','ausente — compatível com oclusão')}
+    ${radioOpt(artKey,'nao_car','não caracterizada ao presente exame')}
+  </div>
+  ${e.sit!=='ausente' && e.sit!=='nao_car' ? renderVelocidades(artKey) : ''}`;
+}
+ 
+// ── EVENT HANDLERS ──
+function setSit(artKey, val) { estado[artKey].sit = val; renderPanel(secaoAtual); updateLaudo(); }
+function setPlaqSit(artKey, val) { estado[artKey].plaqSit = val; renderPanel(secaoAtual); updateLaudo(); }
+function setInd(val) { estado.tecnica.indicacao = val; renderPanel('tecnica'); updateLaudo(); }
+function setIMTCitar(val) { estado.imt.citar = val; renderPanel('imt'); updateLaudo(); }
+ 
+function handleInput(el) {
+  const sec = el.dataset.sec; const key = el.dataset.key;
+  if (sec && key && estado[sec] !== undefined) {
+    estado[sec][key] = el.value;
+    updateLaudo();
+    if(key==='medD'||key==='medE') renderPanel(secaoAtual);
+    if(key==='kinkVPS1'||key==='kinkVPS2') renderPanel(secaoAtual);
+  }
+}
+ 
+function toggleChk(id, sec, key) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.checked = !el.checked;
+  const crow = document.getElementById('crow-' + id);
+  if (crow) crow.classList.toggle('selected', el.checked);
+  if (sec && key) { estado[sec][key] = el.checked; updateLaudo(); }
+}
+ 
+// ── LAUDO BUILDER ──
+function updateLaudo() {
+  hd = [];
+  document.getElementById('laudo-doc').innerHTML = buildLaudo();
+}
+ 
+function buildLaudo() {
+  let html = '<div class="doc-titulo">DOPPLER DE CARÓTIDAS E VERTEBRAIS</div>';
+ 
+  // TÉCNICA
+  html += `<div class="doc-secao"><span class="doc-label">TÉCNICA:</span>
+    <div class="doc-p">${textTecnica()}</div>
+  </div>`;
+ 
+  // ANÁLISE
+  html += `<div class="doc-secao"><span class="doc-label">ANÁLISE:</span>
+    <div class="doc-p">Foram avaliadas as artérias carótidas comuns, internas e externas bilaterais, assim como as artérias vertebrais.</div>`;
+ 
+  const imtTxt = textIMT();
+  if (imtTxt) html += `<div class="doc-p">${imtTxt}</div>`;
+ 
+  html += `<div class="doc-p"><b>SISTEMA CAROTÍDEO DIREITO:</b></div>`;
+  html += textSistemaD();
+ 
+  html += `<div class="doc-p"><b>SISTEMA CAROTÍDEO ESQUERDO:</b></div>`;
+  html += textSistemaE();
+ 
+  const velTabela = textVelocidades();
+  if (velTabela) html += velTabela;
+ 
+  html += `</div>`;
+ 
+  // OPINIÃO
+  html += `<div class="doc-secao"><span class="doc-label">OPINIÃO DO RELATÓRIO:</span>
+    <div class="doc-p">${textConclusao()}</div>
+  </div>`;
+ 
+  return html;
+}
+ 
+function textTecnica() {
+  const e = estado.tecnica;
+  const lims = [];
+  if (e.limitBifalta) lims.push('por bifurcação alta das artérias carótidas comuns');
+  if (e.limitBiotipo) lims.push('pela intensa atenuação do feixe acústico inerente ao biotipo');
+ 
+  let txt = 'Exame realizado em aparelho dinâmico com transdutor linear de alta frequência, utilizando as modalidades Doppler colorido e Doppler pulsado';
+  if (lims.length > 0) txt += `, limitado parcialmente ${lims.join(' e ')}`;
+  txt += ', para avaliação morfológica e hemodinâmica das artérias carótidas e vertebrais.';
+ 
+  const inds = { risco:'Avaliação de risco cardiovascular.', aterosclerose:'Aterosclerose.', posop:'Acompanhamento pós-operatório.', enxaqueca:'Enxaqueca / cefaleia.', postavc:'Protocolo pós-AVC isquêmico.', outro:e.indicacaoOutro||'—' };
+  if (e.indicacao !== 'nc') txt += `<br><b>INDICAÇÃO:</b> ${inds[e.indicacao]||''}`;
+  return txt;
+}
+ 
+function textIMT() {
+  const e = estado.imt;
+  if (!e.citar) return '';
+  const d = parseFloat((e.medD||'').replace(',','.')); const esq = parseFloat((e.medE||'').replace(',','.'));
+  let txt = 'A espessura do complexo miointimal foi avaliada em ambas as carótidas comuns, medindo:';
+  txt += `<br>- ${e.medD||'_'} mm à direita (normal até 0,9 mm);`;
+  txt += `<br>- ${e.medE||'_'} mm à esquerda (normal até 0,9 mm).`;
+  const dA = !isNaN(d) && d > 0.9; const eA = !isNaN(esq) && esq > 0.9;
+  const dP = !isNaN(d) && d > 1.2; const eP = !isNaN(esq) && esq > 1.2;
+  if (dA && eA) {
+    if (dP || eP) hd.push('Placa ateromatosa (espessamento focal do complexo miointimal >1,2 mm) nas carótidas comuns bilateralmente.');
+    else hd.push('Espessamento do complexo miointimal nas carótidas comuns bilateralmente, compatível com ateromatose incipiente.');
+  } else if (dA) {
+    if (dP) hd.push('Placa ateromatosa (espessamento focal do complexo miointimal >1,2 mm) na carótida comum direita.');
+    else hd.push('Espessamento do complexo miointimal na carótida comum direita, compatível com ateromatose incipiente.');
+  } else if (eA) {
+    if (eP) hd.push('Placa ateromatosa (espessamento focal do complexo miointimal >1,2 mm) na carótida comum esquerda.');
+    else hd.push('Espessamento do complexo miointimal na carótida comum esquerda, compatível com ateromatose incipiente.');
+  }
+  return txt;
+}
+ 
+function calcKinkGrau(ratio) {
+  if (ratio < 1.5) return 'sem repercussão hemodinâmica significativa';
+  if (ratio < 2.0) return 'repercussão hemodinâmica leve';
+  if (ratio < 3.0) return 'repercussão hemodinâmica moderada';
+  if (ratio < 4.0) return 'repercussão hemodinâmica importante';
+  return 'repercussão hemodinâmica crítica';
+}
+ 
+function textPlacas(artKey, nomeHD) {
+  const e = estado[artKey];
+  if (e.plaqSit === 'sem') return '';
+  if (e.plaqSit === 'min') {
+    hd.push(`Ateromatose difusa incipiente / placas mínimas ${nomeHD}, sem repercussão hemodinâmica significativa.`);
+    return ' Presença de raras placas ateromatosas delgadas esparsas, de contornos regulares, sem repercussão hemodinâmica significativa.';
+  }
+  // plaqSit === 'pre'
+  const tipos = { fibrocalcificada:'fibrocalcificada', calcificada:'calcificada', hipoecogenica:'lipídica (hipoecogênica)' };
+  const tipo = tipos[e.plaqTipo] || e.plaqTipo;
+  const sups = { lisa:'lisa e regular', irregular:'irregular', ulcerada:'ulcerada' };
+  const sup = e.plaqSup !== 'nc' ? `, de superfície ${sups[e.plaqSup]||e.plaqSup}` : '';
+  const ext = e.plaqExt ? `, com extensão de ${e.plaqExt} mm` : '';
+  const esp = e.plaqEsp ? ` e espessura de ${e.plaqEsp} mm` : '';
+  let estenose = '';
+  const vps1 = parseFloat(e.plaqVPS1); const vps2 = parseFloat(e.plaqVPS2);
+  if (!isNaN(vps1) && !isNaN(vps2) && vps1 > 0) {
+    const ratio = vps2 / vps1;
+    if (ratio >= 1.5 && ratio < 2.0) estenose = ', determinando estenose luminal discreta';
+    else if (ratio >= 2.0 && ratio < 3.0) estenose = ', determinando estenose luminal moderada';
+    else if (ratio >= 3.0 && ratio < 4.0) estenose = ', determinando estenose luminal importante';
+    else if (ratio >= 4.0) estenose = ', determinando estenose luminal crítica';
+  }
+  hd.push(`Placa ateromatosa ${tipo} ${nomeHD}${estenose||''}.`);
+  return ` Nota-se placa ateromatosa ${tipo}${sup}${ext}${esp}${estenose}.`;
+}
+ 
+function textACC(artKey, lado) {
+  const e = estado[artKey];
+  const nomeHD = `na artéria carótida comum ${lado}`;
+  let txt = '';
+  if (e.sit === 'habitual') {
+    txt = `Artéria carótida comum ${lado} com trajeto, calibre e contornos habituais, com paredes regulares e fluxo laminar.`;
+  } else if (e.sit === 'kink_ana') {
+    txt = `Artéria carótida comum ${lado} com tortuosidade do tipo kinking anatômico em segmento ${e.kinkSeg}, sem repercussão hemodinâmica.`;
+  } else if (e.sit === 'kink_hem') {
+    const vps1 = parseFloat(e.kinkVPS1); const vps2 = parseFloat(e.kinkVPS2);
+    let rep = '';
+    if (!isNaN(vps1) && !isNaN(vps2) && vps1 > 0) {
+      const ratio = vps2 / vps1;
+      const grau = calcKinkGrau(ratio);
+      rep = `, com ${grau} (razão VPS: ${ratio.toFixed(1)})`;
+      if (ratio >= 1.5) hd.push(`Kinking hemodinâmico da artéria carótida comum ${lado}, com ${grau}.`);
+    }
+    txt = `Artéria carótida comum ${lado} com tortuosidade do tipo kinking hemodinâmico em segmento ${e.kinkSeg}${rep}.`;
+  }
+  txt += textPlacas(artKey, nomeHD);
+  return txt;
+}
+ 
+function textBulbo(artKey, lado) {
+  const e = estado[artKey];
+  const nomeHD = `no bulbo carotídeo ${lado}`;
+  let txt = `Bulbo carotídeo ${lado} com conformação habitual, pérvio, com fluxo turbilhonar e hipercinético.`;
+  txt += textPlacas(artKey, nomeHD);
+  return txt;
+}
+ 
+function textACI(artKey, lado) {
+  const e = estado[artKey];
+  const nomeHD = `na artéria carótida interna ${lado}`;
+  if (e.sit === 'oclusao') {
+    hd.push(`Oclusão da artéria carótida interna ${lado}.`);
+    return `<div class="doc-p">Artéria carótida interna ${lado} com ausência completa de fluxo ao Doppler colorido e pulsado, compatível com oclusão.</div>`;
+  }
+  let txt = '';
+  if (e.sit === 'habitual') {
+    txt = `Artéria carótida interna ${lado} com trajeto, calibre e contornos habituais, com paredes regulares e fluxo laminar.`;
+  } else if (e.sit === 'kink_ana') {
+    txt = `Artéria carótida interna ${lado} com tortuosidade do tipo kinking anatômico em segmento ${e.kinkSeg}, sem repercussão hemodinâmica.`;
+  } else if (e.sit === 'kink_hem') {
+    const vps1 = parseFloat(e.kinkVPS1); const vps2 = parseFloat(e.kinkVPS2);
+    let rep = '';
+    if (!isNaN(vps1) && !isNaN(vps2) && vps1 > 0) {
+      const ratio = vps2 / vps1;
+      const grau = calcKinkGrau(ratio);
+      rep = `, com ${grau} (razão VPS: ${ratio.toFixed(1)})`;
+      if (ratio >= 1.5) hd.push(`Kinking hemodinâmico da artéria carótida interna ${lado}, com ${grau}.`);
+    }
+    txt = `Artéria carótida interna ${lado} com tortuosidade do tipo kinking hemodinâmico em segmento ${e.kinkSeg}${rep}.`;
+  }
+  txt += textPlacas(artKey, nomeHD);
+  // Estenose por critérios NASCET/CBR (VPS)
+  const vps = parseFloat(e.velVPS); const vdf = parseFloat(e.velVDF);
+  if (!isNaN(vps)) {
+    if (vps >= 400) {
+      txt += ' Os achados velocimétricos são compatíveis com <b>estenose crítica (≥90%)</b> da artéria carótida interna, pelos critérios NASCET/CBR.';
+      hd.push(`Estenose crítica (≥90%) da artéria carótida interna ${lado} pelos critérios NASCET/CBR.`);
+    } else if (vps >= 230 && (!isNaN(vdf) ? vdf >= 100 : true)) {
+      txt += ' Os achados velocimétricos são compatíveis com <b>estenose grave (≥70%)</b> da artéria carótida interna, pelos critérios NASCET/CBR.';
+      hd.push(`Estenose grave (≥70%) da artéria carótida interna ${lado} pelos critérios NASCET/CBR.`);
+    } else if (vps >= 125) {
+      txt += ' Os achados velocimétricos são compatíveis com <b>estenose moderada (50–69%)</b> da artéria carótida interna, pelos critérios NASCET/CBR.';
+      hd.push(`Estenose moderada (50–69%) da artéria carótida interna ${lado} pelos critérios NASCET/CBR.`);
+    }
+  }
+  return `<div class="doc-p">${txt}</div>`;
+}
+ 
+function textACE(artKey, lado) {
+  const e = estado[artKey];
+  const nomeHD = `na artéria carótida externa ${lado}`;
+  let txt = '';
+  if (e.sit === 'habitual') {
+    txt = `Artéria carótida externa ${lado} com trajeto, calibre e contornos habituais, com paredes regulares e fluxo laminar.`;
+  } else {
+    txt = `Artéria carótida externa ${lado} com alterações ao exame (correlacionar com dados clínicos).`;
+  }
+  txt += textPlacas(artKey, nomeHD);
+  return txt;
+}
+ 
+function textAV(artKey, lado) {
+  const e = estado[artKey];
+  const ladoAb = lado === 'direita' ? 'direita' : 'esquerda';
+  if (e.sit === 'invertido') hd.push(`Síndrome do roubo da subclávia à ${ladoAb} — fluxo vertebral ${ladoAb} invertido.`);
+  if (e.sit === 'ausente') hd.push(`Oclusão da artéria vertebral ${ladoAb}.`);
+  if (e.sit === 'reduzido') hd.push(`Velocidades reduzidas na artéria vertebral ${ladoAb}, sugerindo estenose proximal não caracterizada ao método.`);
+  const texts = {
+    anterogrado: `Artéria vertebral ${ladoAb} pérvia, com fluxo anterógrado, sem alterações.`,
+    reduzido: `Artéria vertebral ${ladoAb} pérvia, com fluxo anterógrado e velocidades reduzidas, sugerindo estenose proximal não completamente caracterizada ao método.`,
+    invertido: `Artéria vertebral ${ladoAb} com fluxo invertido (fluxo reverso), achado sugestivo de síndrome do roubo da subclávia à ${ladoAb}.`,
+    ausente: `Artéria vertebral ${ladoAb} com ausência completa de fluxo ao Doppler, compatível com oclusão.`,
+    nao_car: `Artéria vertebral ${ladoAb} não caracterizada ao presente exame.`,
+  };
+  return texts[e.sit] || texts.anterogrado;
+}
+ 
+function textSistemaD() {
+  let html = '';
+  html += `<div class="doc-p">${textACC('accd','direita')}</div>`;
+  html += `<div class="doc-p">${textBulbo('bulboD','direito')}</div>`;
+  html += textACI('acid','direita');
+  html += `<div class="doc-p">${textACE('aced','direita')}</div>`;
+  html += `<div class="doc-p">${textAV('avd','direita')}</div>`;
+  return html;
+}
+ 
+function textSistemaE() {
+  let html = '';
+  html += `<div class="doc-p">${textACC('acce','esquerda')}</div>`;
+  html += `<div class="doc-p">${textBulbo('bulboE','esquerdo')}</div>`;
+  html += textACI('acie','esquerda');
+  html += `<div class="doc-p">${textACE('acee','esquerda')}</div>`;
+  html += `<div class="doc-p">${textAV('ave','esquerda')}</div>`;
+  return html;
+}
+ 
+function textVelocidades() {
+  const arts = [
+    {key:'accd',label:'ACC Direita'}, {key:'acid',label:'ACI Direita'},
+    {key:'aced',label:'ACE Direita'}, {key:'avd', label:'AV Direita'},
+    {key:'acce',label:'ACC Esquerda'},{key:'acie',label:'ACI Esquerda'},
+    {key:'acee',label:'ACE Esquerda'},{key:'ave', label:'AV Esquerda'},
+  ];
+  const rows = arts.filter(a => estado[a.key] && (estado[a.key].velVPS || estado[a.key].velVDF));
+  if (rows.length === 0) return '';
+  let trs = rows.map(a => {
+    const e = estado[a.key];
+    return `<tr><td style="border:1px solid #ccc;padding:3px 8px">${a.label}</td><td style="border:1px solid #ccc;padding:3px 8px;text-align:center">${e.velVPS||'—'}</td><td style="border:1px solid #ccc;padding:3px 8px;text-align:center">${e.velVDF||'—'}</td></tr>`;
+  }).join('');
+  return `<div class="doc-p"><b>VELOCIDADES DOPPLER (VPS / VDF em cm/s):</b><br>
+    <table style="border-collapse:collapse;width:100%;font-size:9.5pt;margin-top:4px">
+      <thead><tr style="background:#f0f0f0">
+        <th style="border:1px solid #ccc;padding:3px 8px;text-align:left">Artéria</th>
+        <th style="border:1px solid #ccc;padding:3px 8px">VPS (cm/s)</th>
+        <th style="border:1px solid #ccc;padding:3px 8px">VDF (cm/s)</th>
+      </tr></thead><tbody>${trs}</tbody>
+    </table></div>`;
+}
+ 
+function textConclusao() {
+  if (hd.length === 0) return 'Estudo ecográfico sem evidentes anormalidades apreciáveis ao método.';
+  return hd.join('<br>') + '<br>Demais estruturas avaliadas sem evidentes anormalidades apreciáveis ao método.';
+}
+ 
+// ── TOOLBAR ──
+function toggleDark() {
+  const isDark = document.body.classList.toggle('dark');
+  const btn = document.getElementById('btn-dark-toggle');
+  btn.innerHTML = isDark
+    ? '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 8.5A5.5 5.5 0 0 1 6 3c0-.18.01-.36.03-.53A6 6 0 1 0 13.97 9.5c-.15.01-.31.01-.47 0z"/></svg>Modo claro'
+    : '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro';
+  localStorage.setItem('darkMode', isDark ? '1' : '0');
+}
+ 
+function copiar() {
+  const el = document.getElementById('laudo-doc');
+  navigator.clipboard.writeText(el.innerText).then(() => alert('Laudo copiado!')).catch(() => alert('Use Ctrl+A e Ctrl+C no painel do laudo.'));
+}
+ 
+function imprimir() {
+  const h = document.getElementById('laudo-doc').innerHTML;
+  const w = window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Helvetica,Arial,sans-serif;font-size:10pt;padding:32px;color:#111;line-height:1.65;max-width:820px;margin:auto}.doc-titulo{text-align:center;font-weight:700;text-transform:uppercase;margin-bottom:16px}.doc-label{font-weight:700}.doc-p{margin-bottom:8px}.doc-secao{margin-bottom:14px}*{color:#111!important}table{border-collapse:collapse;width:100%;font-size:9pt}td,th{border:1px solid #ccc;padding:3px 8px}</style></head><body>${h}</body></html>`);
+  w.document.close(); w.print();
+}
+ 
+function reiniciar() {
+  estado.tecnica = { indicacao:'nc', indicacaoOutro:'', limitBifalta:false, limitBiotipo:false };
+  estado.imt     = { citar:true, medD:'', medE:'' };
+  estado.accd    = defaultArteria(); estado.bulboD = defaultBulbo();
+  estado.acid    = defaultArteria(); estado.aced   = defaultArteria(); estado.avd = defaultAV();
+  estado.acce    = defaultArteria(); estado.bulboE = defaultBulbo();
+  estado.acie    = defaultArteria(); estado.acee   = defaultArteria(); estado.ave = defaultAV();
+  showSection('imt');
+}
+ 
+// ── INIT ──
+(function(){
+  if (localStorage.getItem('darkMode') === '1') toggleDark();
+  showSection('imt');
+})();
+</script>
+</body>
+</html>

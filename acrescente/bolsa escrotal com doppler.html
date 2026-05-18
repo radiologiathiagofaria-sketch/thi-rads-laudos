@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THI-RADS — US Bolsa Escrotal com Doppler</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#1a56db;--blue-dark:#1140a6;--blue-light:#e8f0fe;--blue-mid:#dbeafe;
+  --surface:#f4f6fb;--border:#e2e6ef;--border-strong:#c8cfe0;
+  --text:#1a1f2e;--text-2:#4b5570;--text-3:#8892a4;
+  --white:#ffffff;--green:#059669;--red:#dc2626;--orange:#d97706;
+  --radius:8px;--radius-lg:12px;
+}
+body.dark{
+  --blue:#4d86f5;--blue-dark:#3a6fd4;--blue-light:#1e2d4a;--blue-mid:#1e2d4a;
+  --surface:#141820;--border:#2a2f3d;--border-strong:#3a4155;
+  --text:#e2e6f0;--text-2:#9aa3b8;--text-3:#5d6680;
+  --white:#1e2230;--green:#34d399;--red:#f87171;--orange:#fbbf24;
+}
+body.dark .laudo-doc{color:#e2e6f0;}
+body.dark .laudo-panel{background:#1e2230;border-left-color:var(--border);}
+body.dark .laudo-body{background:#1e2230;}
+body.dark .laudo-header{background:#1e2230;border-bottom-color:var(--border);}
+@media print{body.dark .laudo-doc,body.dark .laudo-doc *{color:#111 !important;}}
+.btn-dark{margin-left:auto;}
+body.dark .btn-dark{background:#2a2f3d;border-color:#3a4155;color:#e2e6f0;}
+body.dark .btn-dark:hover{background:#343a4d;color:#fff;}
+body.dark .dim-input,body.dark .ff select,body.dark .ff input[type=text]{background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .radio-mark{background:var(--white);}
+body.dark .check-box{background:var(--white);}
+body.dark .sub-opts{background:#1a2040;border-bottom-color:#2a3460;}
+body.dark .sub-opt-label{background:var(--white);color:var(--text-2);}
+body.dark .toolbar{background:var(--white);border-bottom-color:var(--border);}
+body.dark .sidebar{background:var(--white);border-right-color:var(--border);}
+body.dark .sidebar-hd{border-bottom-color:var(--border);}
+body.dark .block{background:var(--white);border-color:var(--border);}
+body.dark .block-title{background:var(--white);border-bottom-color:var(--border);}
+body.dark .block-subtitle{background:#1e2d4a;}
+body.dark .radio-opt:hover{background:#1e2d4a;}
+body.dark .radio-opt.selected{background:#1e2d4a;}
+body.dark .check-row{background:#1a1f2e;}
+body.dark .check-row:hover{background:#1e2d4a;}
+body.dark .check-row.selected{background:#1e2d4a;}
+body.dark .sel-tag{background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .dim-nota{background:#1a2040;color:#9aa3b8;}
+body.dark .doppler-warn{background:#2d1a1a;border-color:#6b2929;color:#f87171;}
+body.dark .doppler-alert{background:#2d1a00;border-color:#7c2d00;color:#fb923c;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',system-ui,sans-serif;font-size:13px;background:var(--surface);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+.toolbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:10px;height:48px;flex-shrink:0;}
+.logo{display:flex;align-items:baseline;gap:6px;margin-right:12px;}
+.logo-name{font-size:17px;font-weight:600;color:var(--blue);letter-spacing:-.3px;}
+.logo-sub{font-size:11px;color:var(--text-3);font-weight:400;letter-spacing:.2px;}
+.tb-sep{width:1px;height:20px;background:var(--border);margin:0 4px;}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid var(--border);font-weight:500;transition:all .13s;background:var(--white);color:var(--text-2);}
+.btn:hover{background:var(--surface);border-color:var(--border-strong);color:var(--text);}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue);}
+.btn-primary:hover{background:var(--blue-dark);border-color:var(--blue-dark);color:#fff;}
+.btn-danger{background:#fff5f5;color:var(--red);border-color:#fecaca;}
+body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
+.btn-danger:hover{background:#fee2e2;border-color:#fca5a5;}
+.btn svg{width:13px;height:13px;flex-shrink:0;}
+.body{display:flex;flex:1;overflow:hidden;}
+.sidebar{width:152px;background:var(--white);border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;}
+.sidebar-hd{padding:10px 12px 8px;border-bottom:1px solid var(--border);}
+.sidebar-tipo{font-size:9px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;}
+.sidebar-titulo{font-size:11px;font-weight:600;color:var(--text);}
+.nav-group{padding:6px 0;}
+.nav-item{display:flex;align-items:center;gap:7px;padding:7px 12px;font-size:11.5px;color:var(--text-2);cursor:pointer;transition:all .12s;border-left:2px solid transparent;}
+.nav-item:hover{background:var(--blue-light);color:var(--blue);}
+.nav-item.active{background:var(--blue-light);color:var(--blue);border-left-color:var(--blue);font-weight:600;}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.4;flex-shrink:0;}
+.nav-item.active .nav-dot{opacity:1;}
+.panel{width:490px;flex-shrink:0;overflow-y:auto;padding:14px 14px 20px;background:var(--surface);}
+.sec-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.sec-title::before{content:'';display:block;width:3px;height:16px;background:var(--blue);border-radius:2px;}
+.block{margin-bottom:10px;background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden;}
+.block-title{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.7px;padding:8px 14px 7px;border-bottom:1px solid var(--border);background:var(--white);}
+.block-subtitle{font-size:10px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.5px;padding:6px 14px 5px;border-bottom:1px solid var(--border);background:var(--blue-light);}
+.block-title-doppler{font-size:10px;font-weight:600;color:#7c3aed;text-transform:uppercase;letter-spacing:.7px;padding:8px 14px 7px;border-bottom:1px solid #e9d5ff;background:#faf5ff;display:flex;align-items:center;gap:6px;}
+body.dark .block-title-doppler{color:#c4b5fd;background:#1e1a2e;border-bottom-color:#3b2f5e;}
+.radio-opt{display:flex;align-items:flex-start;gap:0;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;position:relative;}
+.radio-opt:last-child{border-bottom:none;}
+.radio-opt:hover{background:#f5f8ff;}
+.radio-opt.selected{background:var(--blue-light);}
+.radio-opt input[type=radio]{position:absolute;opacity:0;pointer-events:none;}
+.radio-label{display:flex;align-items:center;gap:10px;width:100%;padding:9px 14px;font-size:12.5px;color:var(--text-2);line-height:1.4;cursor:pointer;flex-wrap:wrap;}
+.radio-opt.selected .radio-label{color:var(--blue);font-weight:500;}
+.radio-mark{width:16px;height:16px;border-radius:50%;border:2px solid var(--border-strong);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.radio-opt:hover .radio-mark{border-color:var(--blue);}
+.radio-opt.selected .radio-mark{border-color:var(--blue);background:var(--blue);}
+.radio-mark::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff;opacity:0;transition:opacity .15s;}
+.radio-opt.selected .radio-mark::after{opacity:1;}
+/* Doppler radio variants */
+.radio-opt.dop-warn{background:#fffbeb;}
+.radio-opt.dop-warn:hover{background:#fef3c7;}
+.radio-opt.dop-warn.selected{background:#fef3c7;}
+.radio-opt.dop-warn.selected .radio-label{color:var(--orange);font-weight:500;}
+.radio-opt.dop-warn.selected .radio-mark{border-color:var(--orange);background:var(--orange);}
+.radio-opt.dop-alert{background:#fff5f5;}
+.radio-opt.dop-alert:hover{background:#fee2e2;}
+.radio-opt.dop-alert.selected{background:#fee2e2;}
+.radio-opt.dop-alert.selected .radio-label{color:var(--red);font-weight:600;}
+.radio-opt.dop-alert.selected .radio-mark{border-color:var(--red);background:var(--red);}
+.radio-opt.dop-crit{background:#fff0f0;}
+.radio-opt.dop-crit:hover{background:#ffe0e0;}
+.radio-opt.dop-crit.selected{background:#ffe0e0;}
+.radio-opt.dop-crit.selected .radio-label{color:#9b1c1c;font-weight:700;}
+.radio-opt.dop-crit.selected .radio-mark{border-color:#9b1c1c;background:#9b1c1c;}
+body.dark .radio-opt.dop-warn{background:#1f1a00;}
+body.dark .radio-opt.dop-warn.selected{background:#2d2600;}
+body.dark .radio-opt.dop-alert{background:#200000;}
+body.dark .radio-opt.dop-alert.selected{background:#2d0000;}
+body.dark .radio-opt.dop-crit{background:#1a0000;}
+body.dark .radio-opt.dop-crit.selected{background:#250000;}
+.check-row{display:flex;align-items:center;gap:0;border-bottom:1px solid var(--border);cursor:pointer;background:#fafbff;}
+.check-row:last-child{border-bottom:none;}
+.check-row:hover{background:#f0f5ff;}
+.check-row.selected{background:#e6eeff;}
+.check-row input[type=checkbox]{position:absolute;opacity:0;pointer-events:none;}
+.check-label{display:flex;align-items:center;gap:10px;width:100%;padding:8px 14px;font-size:12px;color:var(--text-2);cursor:pointer;flex-wrap:wrap;}
+.check-row.selected .check-label{color:var(--blue);font-weight:500;}
+.check-box{width:15px;height:15px;border-radius:4px;border:2px solid var(--border-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.check-row:hover .check-box{border-color:var(--blue);}
+.check-row.selected .check-box{border-color:var(--blue);background:var(--blue);}
+.check-box svg{display:none;width:9px;height:9px;}
+.check-row.selected .check-box svg{display:block;}
+.sel-tag{font-size:11px;border:1px solid var(--border-strong);border-radius:5px;padding:2px 6px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);margin-left:5px;cursor:pointer;}
+.dim-rows{padding:8px 14px;display:flex;flex-direction:column;gap:6px;}
+.dim-row{display:flex;align-items:center;gap:10px;}
+.dim-lbl{flex:1;font-size:12px;color:var(--text-2);}
+.dim-input{width:60px;padding:5px 8px;border:1px solid var(--border-strong);border-radius:6px;font-size:12.5px;font-family:'DM Sans',sans-serif;text-align:center;color:var(--text);background:var(--white);transition:border .12s;}
+.dim-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,.08);}
+.dim-unit{font-size:12px;color:var(--text-3);}
+.dim-nota{font-size:11px;color:var(--text-3);padding:6px 14px 7px;background:#f8f9fc;border-top:1px solid var(--border);line-height:1.5;}
+.vol-badge{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:20px;background:var(--blue-light);color:var(--blue);font-size:11px;font-weight:600;}
+.vol-badge.warn{background:#fef3c7;color:#d97706;}
+.vol-badge.alert{background:#fee2e2;color:var(--red);}
+.alert-box{margin:0;padding:10px 14px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;border-top:1px solid;}
+.alert-box.red{background:#fff5f5;color:#9b1c1c;border-color:#fecaca;}
+.alert-box.orange{background:#fffbeb;color:#92400e;border-color:#fcd34d;}
+body.dark .alert-box.red{background:#2d0000;color:#f87171;border-color:#6b2929;}
+body.dark .alert-box.orange{background:#1a1000;color:#fbbf24;border-color:#78350f;}
+.laudo-panel{flex:1;min-width:0;background:var(--white);display:flex;flex-direction:column;border-left:1px solid var(--border);}
+.laudo-header{padding:9px 20px 8px;border-bottom:1px solid var(--border);background:var(--white);display:flex;align-items:center;gap:10px;}
+.laudo-header-title{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.6px;}
+.laudo-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:#faf5ff;color:#7c3aed;border:1px solid #e9d5ff;}
+.laudo-body{flex:1;overflow-y:auto;padding:22px 28px;}
+.laudo-doc{font-family:Helvetica,Arial,sans-serif;font-size:10pt;line-height:1.65;color:#111;max-width:720px;}
+.doc-titulo{text-align:center;font-weight:700;font-size:10pt;margin-bottom:16px;text-transform:uppercase;letter-spacing:.3px;}
+.doc-label{font-weight:700;font-size:10pt;}
+.doc-p{margin-bottom:8px;font-size:10pt;}
+.doc-secao{margin-bottom:14px;}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="logo" style="cursor:pointer" onclick="window.location.href='../laudo-thirads.html'"><span class="logo-name">THI-RADS</span><span class="logo-sub">laudo estruturado</span></div>
+  <button class="btn" onclick="window.location.href='../laudo-thirads.html'"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2L4 8l6 6"/></svg>Voltar</button>
+  <div class="tb-sep"></div>
+  <button class="btn" onclick="copiar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>Copiar laudo</button>
+  <button class="btn btn-primary" onclick="imprimir()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6V2h8v4M4 12H2V7h12v5h-2M4 9h8M4 12v2h8v-2"/></svg>Imprimir</button>
+  <button class="btn btn-dark" id="btn-dark-toggle" onclick="toggleDark()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro</button>
+  <button class="btn btn-danger" onclick="reiniciar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8a6 6 0 1 0 1.5-3.9M2 4v4h4"/></svg>Reiniciar</button>
+</div>
+
+<div class="body">
+  <div class="sidebar">
+    <div class="sidebar-hd">
+      <div class="sidebar-tipo">Ultrassonografia</div>
+      <div class="sidebar-titulo">Bolsa Escrotal<br><span style="color:#7c3aed;font-size:9px;font-weight:700;letter-spacing:.3px;">▶ com Doppler</span></div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-item" id="nav-tecnica" onclick="showSection('tecnica')"><span class="nav-dot"></span>Técnica</div>
+      <div class="nav-item" id="nav-testiculoD" onclick="showSection('testiculoD')"><span class="nav-dot"></span>Testículo D</div>
+      <div class="nav-item" id="nav-testiculoE" onclick="showSection('testiculoE')"><span class="nav-dot"></span>Testículo E</div>
+      <div class="nav-item" id="nav-epididimos" onclick="showSection('epididimos')"><span class="nav-dot"></span>Epidídimos</div>
+      <div class="nav-item" id="nav-plexos" onclick="showSection('plexos')"><span class="nav-dot"></span>Plexos Pampin.</div>
+      <div class="nav-item" id="nav-liquido" onclick="showSection('liquido')"><span class="nav-dot"></span>Líquido Livre</div>
+      <div class="nav-item" id="nav-achados" onclick="showSection('achados')"><span class="nav-dot"></span>Achados Adicionais</div>
+    </div>
+  </div>
+
+  <div class="panel" id="main-panel"></div>
+
+  <div class="laudo-panel">
+    <div class="laudo-header">
+      <span class="laudo-header-title">Pré-visualização do laudo</span>
+      <span class="laudo-badge">com Doppler</span>
+    </div>
+    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc"></div></div>
+  </div>
+</div>
+
+<script>
+// ── Estado global ──
+const estado = {
+  tecnica: {
+    urgencia: false,
+    indicacao: 'nc',
+    indicacaoOutros: '',
+    limEdema: false,
+    limBiotipo: false
+  },
+  testiculoD: {
+    sit: 'habitual', criLoc: 'canal', protese: false,
+    parenquima: 'homogeneo',
+    dim1: '', dim2: '', dim3: '',
+    doppler: 'habitual',
+    achCisto: false, achCistoDim1: '', achCistoDim2: '', achCistoDim3: '',
+    achEctasia: false, achEctasiaCal: '',
+    achAbscesso: false, achAbscessoDim1: '', achAbscessoDim2: '', achAbscessoDim3: '',
+    achEpiCisto: false, achEpiCistoDim1: '', achEpiCistoDim2: '', achEpiCistoDim3: ''
+  },
+  testiculoE: {
+    sit: 'habitual', criLoc: 'canal', protese: false,
+    parenquima: 'homogeneo',
+    dim1: '', dim2: '', dim3: '',
+    doppler: 'habitual',
+    achCisto: false, achCistoDim1: '', achCistoDim2: '', achCistoDim3: '',
+    achEctasia: false, achEctasiaCal: '',
+    achAbscesso: false, achAbscessoDim1: '', achAbscessoDim2: '', achAbscessoDim3: '',
+    achEpiCisto: false, achEpiCistoDim1: '', achEpiCistoDim2: '', achEpiCistoDim3: ''
+  },
+  epididimos: {
+    sitD: 'habitual', sitE: 'habitual',
+    cistoDDim1: '', cistoDDim2: '',
+    cistoEDim1: '', cistoEDim2: ''
+  },
+  plexos: {
+    sitD: 'habitual', sitE: 'habitual',
+    calibreD: '', calibreE: '',
+    // Para habitual: sub-opção de citar ausência de refluxo
+    habRefluxoD: false, habRefluxoE: false,
+    // Para ectasia: tipo de refluxo e duração
+    refluxoD: 'nc', refluxoE: 'nc',
+    duracaoD: '0', duracaoE: '0'
+  },
+  liquido: {
+    sitD: 'fisio', sitE: 'fisio',
+    qtdD: 'discreta', aspD: 'anecoico',
+    qtdE: 'discreta', aspE: 'anecoico'
+  },
+  achados: { texto: '' }
+};
+
+let secaoAtual = 'testiculoD';
+
+// ── UTILITÁRIOS ──
+function calcVol(d1, d2, d3) {
+  const a = parseFloat(d1), b = parseFloat(d2), c = parseFloat(d3);
+  if (isNaN(a)||isNaN(b)||isNaN(c)||a<=0||b<=0||c<=0) return null;
+  return (a*b*c*0.71).toFixed(1);
+}
+function fmtDims(d1, d2, d3) {
+  const parts = [d1,d2,d3].filter(v=>v&&parseFloat(v)>0);
+  if (!parts.length) return null;
+  return parts.map(v=>v+' cm').join(' x ');
+}
+function sv(key, field, val) { estado[key][field]=val; updateLaudo(); }
+function setRadio(key, field, val) { estado[key][field]=val; renderPanel(secaoAtual); updateLaudo(); }
+function toggleChk(key, field) { estado[key][field]=!estado[key][field]; renderPanel(secaoAtual); updateLaudo(); }
+function setDim(key, field, val) { estado[key][field]=val; updateLaudo(); }
+
+function radio(id, val, label, key, field, extraClass='') {
+  const sel = estado[key][field]===val?'selected':'';
+  return `<div class="radio-opt ${extraClass} ${sel}" onclick="setRadio('${key}','${field}','${val}')">
+    <label class="radio-label"><span class="radio-mark"></span>${label}</label>
+  </div>`;
+}
+function chk(id, label, key, field) {
+  const sel = estado[key][field]?'selected':'';
+  return `<div class="check-row ${sel}" onclick="toggleChk('${key}','${field}')">
+    <label class="check-label"><span class="check-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.8"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg></span>${label}</label>
+  </div>`;
+}
+function dimInput(id, label, key, field, unit='cm') {
+  return `<div class="dim-row"><span class="dim-lbl">${label}</span>
+    <input class="dim-input" type="number" min="0" step="0.1" id="${id}" value="${estado[key][field]}" placeholder="—"
+      oninput="setDim('${key}','${field}',this.value)">
+    <span class="dim-unit">${unit}</span></div>`;
+}
+function selTag(id, opts, key, field) {
+  return `<select class="sel-tag" id="${id}" onchange="sv('${key}','${field}',this.value)" onclick="event.stopPropagation()">${opts.map(o=>`<option value="${o.v}" ${estado[key][field]===o.v?'selected':''}>${o.l}</option>`).join('')}</select>`;
+}
+function inlineInput(id, key, field, w='52px') {
+  return `<input class="dim-input" style="width:${w}" type="number" min="0" step="0.1" id="${id}" value="${estado[key][field]}" placeholder="—"
+    oninput="setDim('${key}','${field}',this.value);updateLaudo()" onclick="event.stopPropagation()">`;
+}
+
+// ── NAVEGAÇÃO ──
+function showSection(sec) {
+  secaoAtual=sec;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('nav-'+sec).classList.add('active');
+  renderPanel(sec);
+  updateLaudo();
+}
+
+function renderPanel(sec) {
+  const p=document.getElementById('main-panel');
+  const titles={tecnica:'Técnica',testiculoD:'Testículo Direito',testiculoE:'Testículo Esquerdo',
+    epididimos:'Epidídimos',plexos:'Plexos Pampiniformes',liquido:'Líquido Livre',achados:'Achados Adicionais'};
+  let html=`<div class="sec-title">${titles[sec]}</div>`;
+  if(sec==='tecnica') html+=renderTecnica();
+  else if(sec==='testiculoD') html+=renderTesticulo('D');
+  else if(sec==='testiculoE') html+=renderTesticulo('E');
+  else if(sec==='epididimos') html+=renderEpididimos();
+  else if(sec==='plexos') html+=renderPlexos();
+  else if(sec==='liquido') html+=renderLiquido();
+  else if(sec==='achados') html+=renderAchados();
+  p.innerHTML=html;
+}
+
+// ── TÉCNICA ──
+function renderTecnica() {
+  const e=estado.tecnica;
+  return `
+  <div class="block"><div class="block-title">Caráter do exame</div>
+    ${chk('urgencia','Exame realizado em caráter de urgência','tecnica','urgencia')}
+  </div>
+  <div class="block"><div class="block-title">Indicação clínica</div>
+    ${radio('ind-nc','nc','não citar','tecnica','indicacao')}
+    ${radio('ind-ede','edema','Edema escrotal','tecnica','indicacao')}
+    ${radio('ind-dor','dor','Dor testicular','tecnica','indicacao')}
+    ${radio('ind-tor','torcao','Suspeita de torção testicular','tecnica','indicacao')}
+    ${radio('ind-mas','massa','Massa palpável','tecnica','indicacao')}
+    ${radio('ind-inf','infertilidade','Investigação de infertilidade','tecnica','indicacao')}
+    ${radio('ind-var','varicocele','Investigação de varicocele','tecnica','indicacao')}
+    ${radio('ind-out','outros',`Outra indicação: <input class="dim-input" style="width:150px;margin-left:4px" type="text" placeholder="descreva…" value="${e.indicacaoOutros}" oninput="sv('tecnica','indicacaoOutros',this.value)" onclick="event.stopPropagation()">`, 'tecnica','indicacao')}
+  </div>
+  <div class="block"><div class="block-title">Limitações técnicas</div>
+    ${chk('lim-ede','Edema escrotal significativo','tecnica','limEdema')}
+    ${chk('lim-bio','Biotipo desfavorável (obesidade)','tecnica','limBiotipo')}
+  </div>
+  <div class="dim-nota">Exame realizado com transdutor linear de alta frequência, em modo B, com avaliação pelo Doppler colorido e espectral (Power Doppler quando necessário).</div>`;
+}
+
+// ── TESTÍCULO ──
+function renderTesticulo(lado) {
+  const k='testiculo'+lado;
+  const e=estado[k];
+  const vol=calcVol(e.dim1,e.dim2,e.dim3);
+  let volBadge='';
+  if(vol!==null){
+    const v=parseFloat(vol);
+    if(v<7) volBadge=`<span class="vol-badge alert">Vol: ${vol.replace('.',',')} cm³ ↓ (VR 7–23 cm³)</span>`;
+    else if(v>23) volBadge=`<span class="vol-badge warn">Vol: ${vol.replace('.',',')} cm³ ↑ (VR 7–23 cm³)</span>`;
+    else volBadge=`<span class="vol-badge">Vol: ${vol.replace('.',',')} cm³ ✓</span>`;
+  }
+  const isOrq=e.sit==='orquiectomia';
+
+  // Alerta de Doppler
+  let dopplerAlert='';
+  if(e.doppler==='reduzido') dopplerAlert=`<div class="alert-box orange">⚠ Fluxo reduzido — considerar processo isquêmico/torção incompleta. Correlacionar clinicamente.</div>`;
+  if(e.doppler==='indetectavel') dopplerAlert=`<div class="alert-box red">🚨 Fluxo indetectável — achado sugestivo de torção testicular. URGÊNCIA CIRÚRGICA.</div>`;
+
+  return `
+  <div class="block"><div class="block-title">Situação</div>
+    ${radio('sit-hab','habitual','Habitual (escrotal)','testiculo'+lado,'sit')}
+    ${radio('sit-cri','criptorquidia','Criptorquidia — localizado: '
+      +selTag('cri-loc-'+lado,[{v:'canal',l:'no canal inguinal'},{v:'inguinal',l:'na região inguinal'},{v:'nao_id',l:'não identificado'}],'testiculo'+lado,'criLoc'),'testiculo'+lado,'sit')}
+    ${radio('sit-orq','orquiectomia',`Orquiectomia (ausência testicular) <label class="sub-opt-label" style="margin-left:8px" onclick="event.stopPropagation()"><input type="checkbox" ${e.protese?'checked':''} onchange="sv('testiculo${lado}','protese',this.checked)"> com prótese</label>`,'testiculo'+lado,'sit')}
+  </div>
+  ${isOrq?'':`
+  <div class="block"><div class="block-title">Parênquima</div>
+    ${radio('par-hom','homogeneo','Homogêneo, sem lesões focais','testiculo'+lado,'parenquima')}
+    ${radio('par-het','heterogeneo','Heterogêneo difuso, sem lesões focais','testiculo'+lado,'parenquima')}
+    ${radio('par-mic','microlitiase','Microlitíase testicular (≥ 5 microcálculos/campo)','testiculo'+lado,'parenquima')}
+  </div>
+  <div class="block"><div class="block-title">Dimensões e Volume</div>
+    <div class="dim-rows">
+      ${dimInput('dim1-'+lado,'Comprimento (eixo longitudinal)','testiculo'+lado,'dim1')}
+      ${dimInput('dim2-'+lado,'Largura (eixo transverso)','testiculo'+lado,'dim2')}
+      ${dimInput('dim3-'+lado,'Espessura (eixo AP)','testiculo'+lado,'dim3')}
+      <div class="dim-row"><span class="dim-lbl">Volume calculado</span>${volBadge||'<span style="color:var(--text-3);font-size:12px;">aguardando medidas…</span>'}</div>
+    </div>
+    <div class="dim-nota">Fórmula elipsoide: V = C × L × E × 0,71 &nbsp;|&nbsp; VR adulto: 7–23 cm³</div>
+  </div>
+  <div class="block">
+    <div class="block-title-doppler">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:12px;height:12px"><path d="M2 8c0-3.3 2.7-6 6-6s6 2.7 6 6-2.7 6-6 6"/><path d="M8 5v3l2 2"/></svg>
+      Doppler de Fluxo Testicular
+    </div>
+    ${radio('dop-hab-'+lado,'habitual','Fluxo vascular com características habituais','testiculo'+lado,'doppler','')}
+    ${radio('dop-aum-'+lado,'aumentado','Fluxo vascular aumentado — padrão inflamatório/reativo','testiculo'+lado,'doppler','dop-warn')}
+    ${radio('dop-red-'+lado,'reduzido','Fluxo vascular reduzido','testiculo'+lado,'doppler','dop-alert')}
+    ${radio('dop-ind-'+lado,'indetectavel','Fluxo vascular indetectável — processo isquêmico','testiculo'+lado,'doppler','dop-crit')}
+    ${dopplerAlert}
+  </div>
+  <div class="block"><div class="block-title">Achados</div>
+    ${chk('ach-cis-'+lado,'Cisto testicular simples medindo: '
+      +inlineInput('cis1-'+lado,'testiculo'+lado,'achCistoDim1')+' x '
+      +inlineInput('cis2-'+lado,'testiculo'+lado,'achCistoDim2')+' x '
+      +inlineInput('cis3-'+lado,'testiculo'+lado,'achCistoDim3')
+      +' <span style="font-size:11px;color:var(--text-3)">cm</span>','testiculo'+lado,'achCisto')}
+    ${chk('ach-ect-'+lado,'Ectasia da rede testis, calibre de até: '
+      +inlineInput('ect1-'+lado,'testiculo'+lado,'achEctasiaCal')
+      +' <span style="font-size:11px;color:var(--text-3)">cm</span>','testiculo'+lado,'achEctasia')}
+    ${chk('ach-abs-'+lado,'Abscesso testicular medindo: '
+      +inlineInput('abs1-'+lado,'testiculo'+lado,'achAbscessoDim1')+' x '
+      +inlineInput('abs2-'+lado,'testiculo'+lado,'achAbscessoDim2')+' x '
+      +inlineInput('abs3-'+lado,'testiculo'+lado,'achAbscessoDim3')
+      +' <span style="font-size:11px;color:var(--text-3)">cm</span>','testiculo'+lado,'achAbscesso')}
+    ${chk('ach-epi-'+lado,'Cisto epidermoide ("casca de cebola") medindo: '
+      +inlineInput('epi1-'+lado,'testiculo'+lado,'achEpiCistoDim1')+' x '
+      +inlineInput('epi2-'+lado,'testiculo'+lado,'achEpiCistoDim2')+' x '
+      +inlineInput('epi3-'+lado,'testiculo'+lado,'achEpiCistoDim3')
+      +' <span style="font-size:11px;color:var(--text-3)">cm</span>','testiculo'+lado,'achEpiCisto')}
+  </div>`}`;
+}
+
+// ── EPIDÍDIMOS ──
+function renderEpididimos() {
+  const e=estado.epididimos;
+  return `
+  <div class="block"><div class="block-subtitle">Epidídimo Direito</div>
+    ${radio('epid-hab','habitual','Dimensões habituais e ecotextura habitual','epididimos','sitD')}
+    ${radio('epid-het','heterogenea','Dimensões habituais e ecotextura heterogênea','epididimos','sitD')}
+    ${radio('epid-cis','cisto','Cisto epididimário medindo: '
+      +inlineInput('cisD1','epididimos','cistoDDim1')+' x '
+      +inlineInput('cisD2','epididimos','cistoDDim2')
+      +' <span style="font-size:11px;color:var(--text-3)">cm</span>','epididimos','sitD')}
+    ${radio('epid-epi','epididimite','Dimensões aumentadas, ecotextura heterogênea e hipervascularização ao Doppler','epididimos','sitD')}
+    ${radio('epid-esp','espessamento','Espessamento focal da cabeça do epidídimo','epididimos','sitD')}
+  </div>
+  <div class="block"><div class="block-subtitle">Epidídimo Esquerdo</div>
+    ${radio('epie-hab','habitual','Dimensões habituais e ecotextura habitual','epididimos','sitE')}
+    ${radio('epie-het','heterogenea','Dimensões habituais e ecotextura heterogênea','epididimos','sitE')}
+    ${radio('epie-cis','cisto','Cisto epididimário medindo: '
+      +inlineInput('cisE1','epididimos','cistoEDim1')+' x '
+      +inlineInput('cisE2','epididimos','cistoEDim2')
+      +' <span style="font-size:11px;color:var(--text-3)">cm</span>','epididimos','sitE')}
+    ${radio('epie-epi','epididimite','Dimensões aumentadas, ecotextura heterogênea e hipervascularização ao Doppler','epididimos','sitE')}
+    ${radio('epie-esp','espessamento','Espessamento focal da cabeça do epidídimo','epididimos','sitE')}
+  </div>
+  <div class="dim-nota">Epididimite ao Doppler: aumento volumétrico + hipervascularização. Pode coexistir com orquite (orquiepididimite).</div>`;
+}
+
+// ── PLEXOS PAMPINIFORMES ──
+function renderPlexos() {
+  const e=estado.plexos;
+  const optsRefD=e.sitD==='ectasia';
+  const optsRefE=e.sitE==='ectasia';
+
+  function blocoPleD() {
+    if(e.sitD==='habitual') {
+      return `
+      ${radio('pled-hab','habitual','Calibre habitual e fluxo venoso anterógrado típico','plexos','sitD')}
+      ${e.sitD==='habitual'?`
+        <div class="check-row ${e.habRefluxoD?'selected':''}" onclick="toggleChk('plexos','habRefluxoD')">
+          <label class="check-label" style="padding-left:32px;font-size:11.5px;color:var(--text-3)">
+            <span class="check-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.8"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg></span>
+            citar ausência de refluxo ao Doppler (Valsalva negativo)
+          </label>
+        </div>`:''}
+      ${radio('pled-ect','ectasia','Veias ectasiadas (≥ 3 mm)','plexos','sitD')}`;
+    }
+    // ectasia
+    return `
+    ${radio('pled-hab','habitual','Calibre habitual e fluxo venoso anterógrado típico','plexos','sitD')}
+    ${radio('pled-ect','ectasia',`Veias ectasiadas (≥ 3 mm) — calibre máx.: `
+      +inlineInput('calD','plexos','calibreD','54px')
+      +' <span style="font-size:11px;color:var(--text-3)">mm</span>','plexos','sitD')}
+    ${e.sitD==='ectasia'?`
+    <div style="padding:10px 14px 10px 32px;background:#f5f8ff;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px;">
+      <div style="font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;">Manobra de Valsalva</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        ${selTag('refluxoD',[{v:'nc',l:'não avaliada'},{v:'sem',l:'sem refluxo ao Doppler'},{v:'com',l:'com refluxo ao Doppler'}],'plexos','refluxoD')}
+        ${e.refluxoD==='com'?selTag('duracaoD',[{v:'0',l:'duração não citada'},{v:'menor',l:'< 3 segundos'},{v:'maior',l:'≥ 3 segundos'}],'plexos','duracaoD'):''}
+      </div>
+    </div>`:''}`;
+  }
+
+  function blocoPleE() {
+    if(e.sitE==='habitual') {
+      return `
+      ${radio('plee-hab','habitual','Calibre habitual e fluxo venoso anterógrado típico','plexos','sitE')}
+      ${e.sitE==='habitual'?`
+        <div class="check-row ${e.habRefluxoE?'selected':''}" onclick="toggleChk('plexos','habRefluxoE')">
+          <label class="check-label" style="padding-left:32px;font-size:11.5px;color:var(--text-3)">
+            <span class="check-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.8"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg></span>
+            citar ausência de refluxo ao Doppler (Valsalva negativo)
+          </label>
+        </div>`:''}
+      ${radio('plee-ect','ectasia','Veias ectasiadas (≥ 3 mm)','plexos','sitE')}`;
+    }
+    return `
+    ${radio('plee-hab','habitual','Calibre habitual e fluxo venoso anterógrado típico','plexos','sitE')}
+    ${radio('plee-ect','ectasia',`Veias ectasiadas (≥ 3 mm) — calibre máx.: `
+      +inlineInput('calE','plexos','calibreE','54px')
+      +' <span style="font-size:11px;color:var(--text-3)">mm</span>','plexos','sitE')}
+    ${e.sitE==='ectasia'?`
+    <div style="padding:10px 14px 10px 32px;background:#f5f8ff;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px;">
+      <div style="font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;">Manobra de Valsalva</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        ${selTag('refluxoE',[{v:'nc',l:'não avaliada'},{v:'sem',l:'sem refluxo ao Doppler'},{v:'com',l:'com refluxo ao Doppler'}],'plexos','refluxoE')}
+        ${e.refluxoE==='com'?selTag('duracaoE',[{v:'0',l:'duração não citada'},{v:'menor',l:'< 3 segundos'},{v:'maior',l:'≥ 3 segundos'}],'plexos','duracaoE'):''}
+      </div>
+    </div>`:''}`;
+  }
+
+  return `
+  <div class="block"><div class="block-subtitle">Plexo Pampiniforme Direito</div>${blocoPleD()}</div>
+  <div class="block"><div class="block-subtitle">Plexo Pampiniforme Esquerdo</div>${blocoPleE()}</div>
+  <div class="dim-nota">Critério Doppler: refluxo venoso ≥ 3s à Valsalva = varicocele hemodinamicamente significativa. Calibre ≥ 3 mm em repouso = ectasia. CBR recomenda avaliação espectral e colorida.</div>`;
+}
+
+// ── LÍQUIDO LIVRE ──
+function renderLiquido() {
+  const e=estado.liquido;
+  const optsQtd=[{v:'discreta',l:'discreta'},{v:'pequena',l:'pequena'},{v:'moderada',l:'moderada'},{v:'acentuada',l:'acentuada'}];
+  const optsAsp=[{v:'anecoico',l:'anecoico'},{v:'septacoes',l:'com septações'},{v:'debris',l:'com debris'},{v:'septdebris',l:'com septações e debris'}];
+  return `
+  <div class="block"><div class="block-subtitle">Hemibolsa Direita</div>
+    ${radio('liqd-fis','fisio','Líquido em quantidade fisiológica','liquido','sitD')}
+    ${radio('liqd-hid','hidrocele','Hidrocele — quantidade: '
+      +selTag('qtdD',optsQtd,'liquido','qtdD')
+      +' aspecto: '+selTag('aspD',optsAsp,'liquido','aspD'),'liquido','sitD')}
+  </div>
+  <div class="block"><div class="block-subtitle">Hemibolsa Esquerda</div>
+    ${radio('liqe-fis','fisio','Líquido em quantidade fisiológica','liquido','sitE')}
+    ${radio('liqe-hid','hidrocele','Hidrocele — quantidade: '
+      +selTag('qtdE',optsQtd,'liquido','qtdE')
+      +' aspecto: '+selTag('aspE',optsAsp,'liquido','aspE'),'liquido','sitE')}
+  </div>
+  <div class="dim-nota">Hidrocele com debris/septações: considerar hematocele ou piocele. Ao Doppler: ausência de fluxo interno confirma natureza avascular do conteúdo.</div>`;
+}
+
+// ── ACHADOS ADICIONAIS ──
+function renderAchados() {
+  return `
+  <div class="block"><div class="block-title">Achados adicionais / observações</div>
+    <div style="padding:12px 14px;">
+      <textarea style="width:100%;height:180px;resize:vertical;border:1px solid var(--border-strong);border-radius:8px;padding:10px;font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--text);background:var(--white);line-height:1.5;"
+        placeholder="Descreva achados complementares não contemplados nas seções anteriores…"
+        oninput="sv('achados','texto',this.value)">${estado.achados.texto}</textarea>
+    </div>
+  </div>
+  <div class="dim-nota">Exemplos: nódulos extratesticulares, torção de apêndice testicular (ponto doloroso + massa avascular ao Doppler), hérnia inguinal associada, espermocele.</div>`;
+}
+
+// ── GERAÇÃO DO LAUDO ──
+function updateLaudo() {
+  const hd=[];
+  const tec=estado.tecnica, tD=estado.testiculoD, tE=estado.testiculoE;
+  const epi=estado.epididimos, ple=estado.plexos, liq=estado.liquido, ach=estado.achados;
+
+  // Técnica
+  let fraseTec='Exame realizado em aparelho dinâmico com transdutor linear de alta frequência, com avaliação pelos modos B e Doppler (colorido e espectral).';
+  const lims=[];
+  if(tec.limEdema) lims.push('limitado parcialmente pelo acentuado edema escrotal');
+  if(tec.limBiotipo) lims.push('limitado parcialmente pela intensa atenuação do feixe acústico inerente ao biotipo');
+  if(lims.length) fraseTec='Exame realizado em aparelho dinâmico com transdutor linear de alta frequência, '+lims.join(' e ')+'.';
+
+  // Testículo D
+  let fraseTestD='', fraseTestE='';
+  fraseTestD=buildTesticulo('D',tD,hd);
+  fraseTestE=buildTesticulo('E',tE,hd);
+
+  // Bilaterais testiculares
+  mergeBilateral(hd,'Criptorquidia à direita.','Criptorquidia à esquerda.','Criptorquidia bilateral.');
+  mergeBilateral(hd,'Microlitíase testicular à direita.','Microlitíase testicular à esquerda.','Microlitíase testicular bilateral.');
+  mergeBilateral(hd,'Cisto testicular à direita.','Cisto testicular à esquerda.','Cistos testiculares bilaterais.');
+  mergeBilateral(hd,'Ectasia da rede testis à direita.','Ectasia da rede testis à esquerda.','Ectasia da rede testis bilateral.');
+  mergeBilateral(hd,'Abscesso testicular à direita.','Abscesso testicular à esquerda.','Abscesso testicular bilateral.');
+  mergeBilateral(hd,'Cisto epidermoide à direita.','Cisto epidermoide à esquerda.','Cistos epidermoides bilaterais.');
+
+  // Epidídimos
+  let fraseEpi=buildEpididimos(epi,hd);
+  mergeBilateral(hd,'Sinais de epididimite à direita.','Sinais de epididimite à esquerda.','Sinais de epididimite bilateral.');
+  mergeBilateral(hd,'Cisto no epidídimo direito.','Cisto no epidídimo esquerdo.','Cistos nos epidídimos bilateralmente.');
+
+  // Plexos
+  let frasePle=buildPlexos(ple,hd);
+  mergeBilateral(hd,'Sinais de varicocele à direita.','Sinais de varicocele à esquerda.','Sinais de varicocele bilateral.');
+  mergeBilateral(hd,'Sinais de varicocele à direita com refluxo ao Doppler.','Sinais de varicocele à esquerda com refluxo ao Doppler.','Sinais de varicocele bilateral com refluxo ao Doppler.');
+
+  // Líquido
+  let fraseLiq=buildLiquido(liq,hd);
+  mergeBilateral(hd,'Hidrocele à direita.','Hidrocele à esquerda.','Hidrocele bilateral.');
+
+  // Indicação
+  let indicacaoHtml='';
+  if(tec.indicacao!=='nc'){
+    const mapInd={edema:'Edema escrotal.',dor:'Dor testicular.',torcao:'Suspeita de torção testicular.',
+      massa:'Massa palpável.',infertilidade:'Investigação de infertilidade.',varicocele:'Investigação de varicocele.',
+      outros:tec.indicacaoOutros||'—'};
+    indicacaoHtml=`<div class="doc-secao"><span class="doc-label">INDICAÇÃO:</span><div class="doc-p">${mapInd[tec.indicacao]}</div></div>`;
+  }
+
+  // Conclusão
+  let conclusao='';
+  if(hd.length===0){
+    conclusao='Estudo ecográfico sem evidentes anormalidades apreciáveis ao método.';
+  } else {
+    conclusao=hd.join('<br>')+'<br>Demais estruturas avaliadas sem evidentes anormalidades apreciáveis ao método.';
+  }
+
+  const achadosHtml=ach.texto?`<div class="doc-secao"><span class="doc-label">ACHADOS ADICIONAIS:</span><div class="doc-p">${ach.texto}</div></div>`:'';
+  const urgHtml=tec.urgencia?`<div class="doc-p" style="color:#9b1c1c;font-weight:700;">⚠ Exame realizado em caráter de urgência.</div>`:'';
+  const limHtml=(tec.limEdema||tec.limBiotipo)?`<div class="doc-p" style="color:#b45309;font-style:italic;">${fraseTec}</div>`:'';
+
+  document.getElementById('laudo-doc').innerHTML=`
+    <div class="doc-titulo">ULTRASSONOGRAFIA DE BOLSA ESCROTAL COM DOPPLER</div>
+    ${urgHtml}
+    <div class="doc-secao">
+      <span class="doc-label">TÉCNICA:</span>
+      ${limHtml||`<div class="doc-p">${fraseTec}</div>`}
+    </div>
+    ${indicacaoHtml}
+    <div class="doc-secao">
+      <span class="doc-label">ANÁLISE:</span>
+      <div class="doc-p">${fraseTestD}</div>
+      <div class="doc-p">${fraseTestE}</div>
+      <div class="doc-p">${fraseEpi}</div>
+      <div class="doc-p">${frasePle}</div>
+      <div class="doc-p">${fraseLiq}</div>
+    </div>
+    ${achadosHtml}
+    <div class="doc-secao">
+      <span class="doc-label">OPINIÃO DO RELATÓRIO:</span>
+      <div class="doc-p">${conclusao}</div>
+    </div>`;
+}
+
+// ── BUILDERS ──
+function buildTesticulo(lado, t, hd) {
+  const lat=lado==='D'?'direito':'esquerdo';
+  const latPrep=lado==='D'?'à direita':'à esquerda';
+
+  if(t.sit==='criptorquidia'){
+    const loc={canal:'no canal inguinal',inguinal:'na região inguinal',nao_id:'não identificado ao presente estudo'}[t.criLoc];
+    hd.push(`Criptorquidia ${latPrep}.`);
+    return `Testículo ${lat} não identificado na bolsa escrotal, sugerindo criptorquidia, localizado ${loc}.`;
+  }
+  if(t.sit==='orquiectomia'){
+    hd.push(`Ausência do testículo ${lat} — status pós-orquiectomia.`);
+    let fr=`Ausência do testículo ${lat}, compatível com status pós-orquiectomia.`;
+    if(t.protese) fr+=` Observa-se presença de prótese testicular em topografia esperada.`;
+    return fr;
+  }
+
+  // Parênquima + achados
+  const achados=[];
+  if(t.achCisto){
+    const m=fmtDims(t.achCistoDim1,t.achCistoDim2,t.achCistoDim3);
+    achados.push(`imagem cística, de paredes finas e conteúdo anecoico, sem septos${m?' medindo '+m:''}`);
+    hd.push(`Cisto testicular ${latPrep}.`);
+  }
+  if(t.achEctasia){
+    const c=t.achEctasiaCal?parseFloat(t.achEctasiaCal).toFixed(1).replace('.',',')+' cm':'—';
+    achados.push(`múltiplas estruturas tubulares anecoicas no mediastino testicular (ectasia da rede testis), com calibre de até ${c}`);
+    hd.push(`Ectasia da rede testis ${latPrep}.`);
+  }
+  if(t.achAbscesso){
+    const m=fmtDims(t.achAbscessoDim1,t.achAbscessoDim2,t.achAbscessoDim3);
+    achados.push(`coleção com conteúdo heterogêneo, de paredes espessadas, compatível com abscesso${m?' medindo '+m:''}`);
+    hd.push(`Abscesso testicular ${latPrep}.`);
+  }
+  if(t.achEpiCisto){
+    const m=fmtDims(t.achEpiCistoDim1,t.achEpiCistoDim2,t.achEpiCistoDim3);
+    achados.push(`lesão com aspecto em camadas concêntricas ("casca de cebola"), sugestivo de cisto epidermoide${m?' medindo '+m:''}`);
+    hd.push(`Cisto epidermoide ${latPrep}.`);
+  }
+
+  let parFrase='';
+  if(t.parenquima==='homogeneo'){
+    if(achados.length===0) parFrase=`\nParênquima testicular ${lat} de ecotextura homogênea, sem lesões focais.`;
+    else if(achados.length===1) parFrase=`\nParênquima testicular ${lat} de ecotextura homogênea, exceto por ${achados[0]}.`;
+    else parFrase=`\nParênquima testicular ${lat} de ecotextura homogênea, com presença dos seguintes achados:\n- ${achados.join(';\n- ')}.`;
+  } else if(t.parenquima==='heterogeneo'){
+    hd.push(`Parênquima testicular ${lat} difusamente heterogêneo.`);
+    if(achados.length===0) parFrase=`\nParênquima testicular ${lat} apresentando ecotextura difusamente heterogênea, sem lesões focais definidas.`;
+    else if(achados.length===1) parFrase=`\nParênquima testicular ${lat} apresentando ecotextura difusamente heterogênea, com presença de ${achados[0]}.`;
+    else parFrase=`\nParênquima testicular ${lat} apresentando ecotextura difusamente heterogênea, com presença de:\n- ${achados.join(';\n- ')}.`;
+  } else if(t.parenquima==='microlitiase'){
+    hd.push(`Microlitíase testicular ${latPrep}.`);
+    parFrase=`\nParênquima testicular ${lat} apresentando ecotextura heterogênea às custas de múltiplas calcificações puntiformes hiperecogênicas distribuídas pelo parênquima (microlitíase testicular).`;
+    if(achados.length===1) parFrase+=` Além disso, ${achados[0]}.`;
+    else if(achados.length>1) parFrase+=` Achados adicionais:\n- ${achados.join(';\n- ')}.`;
+  }
+
+  // Dimensões
+  const m=fmtDims(t.dim1,t.dim2,t.dim3);
+  const vol=calcVol(t.dim1,t.dim2,t.dim3);
+  let dimFrase='';
+  if(m){
+    const volStr=vol?parseFloat(vol).toFixed(1).replace('.',',')+' cm³':'—';
+    dimFrase='\nDimensões testiculares';
+    if(vol!==null){
+      const v=parseFloat(vol);
+      if(v<7){dimFrase+=' reduzidas';hd.push(`Redução volumétrica do testículo ${lat}.`);}
+      else if(v>23){dimFrase+=' aumentadas';hd.push(`Aumento volumétrico do testículo ${lat}.`);}
+      else dimFrase+=' habituais';
+    } else dimFrase+=' habituais';
+    dimFrase+=`, medindo ${m}, com volume estimado de ${volStr} (VR: 7–23 cm³).`;
+  }
+
+  // Doppler — 4 opções
+  let dopplerFrase='';
+  if(t.doppler==='habitual'){
+    dopplerFrase=`\nFluxo vascular testicular ${lat} com características habituais.`;
+  } else if(t.doppler==='aumentado'){
+    hd.push(`Aumento do fluxo vascular testicular ${latPrep} — padrão inflamatório.`);
+    dopplerFrase=`\nFluxo vascular testicular ${lat} aumentado, sugerindo processo inflamatório/reativo.`;
+  } else if(t.doppler==='reduzido'){
+    hd.push(`Fluxo vascular testicular ${lat} reduzido ao Doppler.`);
+    dopplerFrase=`\nFluxo vascular testicular ${lat} reduzido ao mapeamento Doppler.`;
+  } else if(t.doppler==='indetectavel'){
+    hd.push(`⚠ Fluxo vascular testicular ${lat} indetectável — sugestivo de processo isquêmico (torção).`);
+    dopplerFrase=`\n<b>Fluxo vascular testicular ${lat} indetectável ao mapeamento Doppler colorido e espectral, achado sugestivo de processo isquêmico. Considerar torção testicular — correlacionar com quadro clínico com urgência.</b>`;
+  }
+
+  let base=`Testículo ${lat} em topografia, morfologia e contornos habituais.`;
+  return (base + parFrase + (dimFrase?'<br>'+dimFrase.trim():'') + '<br>' + dopplerFrase.trim()).replace(/\n/g,'<br>');
+}
+
+function buildEpididimos(epi, hd) {
+  if(epi.sitD==='habitual'&&epi.sitE==='habitual')
+    return 'Epidídimos de dimensões habituais e ecotextura habitual, sem sinais de hipervascularização ao Doppler.';
+
+  function fraseEpi(lat,sit,dim1,dim2,hd){
+    if(sit==='habitual') return `Epidídimo ${lat} de dimensões habituais e ecotextura habitual.`;
+    if(sit==='heterogenea'){hd.push(`Epidídimo ${lat} de ecotextura heterogênea.`);return `Epidídimo ${lat} de dimensões habituais e ecotextura heterogênea.`;}
+    if(sit==='cisto'){
+      const m=fmtDims(dim1,dim2,null)||'—';
+      hd.push(`Cisto no epidídimo ${lat}.`);
+      return `Epidídimo ${lat} de dimensões habituais e ecotextura heterogênea às custas de imagem cística de paredes finas e conteúdo anecoico, medindo aproximadamente ${m}.`;
+    }
+    if(sit==='epididimite'){
+      const lado=lat==='direito'?'à direita':'à esquerda';
+      hd.push(`Sinais de epididimite ${lado}.`);
+      return `Epidídimo ${lat} de dimensões aumentadas e ecotextura difusamente heterogênea, com hipervascularização ao mapeamento Doppler, sugestivo de epididimite.`;
+    }
+    if(sit==='espessamento'){hd.push(`Espessamento focal da cabeça do epidídimo ${lat}.`);return `Epidídimo ${lat} com espessamento focal da cabeça.`;}
+    return '';
+  }
+
+  const frD=fraseEpi('direito',epi.sitD,epi.cistoDDim1,epi.cistoDDim2,hd);
+  const frE=fraseEpi('esquerdo',epi.sitE,epi.cistoEDim1,epi.cistoEDim2,hd);
+  return [frD,frE].filter(Boolean).join('<br>');
+}
+
+function buildPlexos(ple, hd) {
+  function frasePle(lado, sit, cal, habRef, refluxo, duracao) {
+    const lat=lado==='D'?'direita':'esquerda';
+    const latPrep=`à ${lat}`;
+    if(sit==='habitual'){
+      let fr=`Plexo pampiniforme ${latPrep} com calibre habitual e fluxo venoso anterógrado típico`;
+      if(habRef) fr+=', sem refluxo detectável à manobra de Valsalva';
+      return fr+'.';
+    }
+    if(sit==='ectasia'){
+      let fr=`Plexo pampiniforme ${latPrep} com ectasia e tortuosidade das veias do plexo pampiniforme`;
+      if(cal&&parseFloat(cal)>0) fr+=`, calibre máximo de ${parseFloat(cal).toFixed(1).replace('.',',')} mm`;
+      if(refluxo==='sem'){
+        fr+=', sem refluxo detectável ao mapeamento Doppler à manobra de Valsalva.';
+        hd.push(`Sinais de varicocele ${latPrep}.`);
+      } else if(refluxo==='com'){
+        if(duracao==='menor') fr+=', com refluxo venoso de duração inferior a 3 segundos ao Doppler à manobra de Valsalva.';
+        else if(duracao==='maior') fr+=', com refluxo venoso de duração superior a 3 segundos ao Doppler à manobra de Valsalva.';
+        else fr+=', com refluxo venoso detectável ao mapeamento Doppler à manobra de Valsalva.';
+        hd.push(`Sinais de varicocele ${latPrep} com refluxo ao Doppler.`);
+      } else {
+        fr+='.';
+        hd.push(`Sinais de varicocele ${latPrep}.`);
+      }
+      return fr;
+    }
+    return '';
+  }
+
+  if(ple.sitD==='habitual'&&ple.sitE==='habitual'&&!ple.habRefluxoD&&!ple.habRefluxoE)
+    return 'Plexos pampiniformes com calibre habitual e fluxo venoso anterógrado típico.';
+
+  const frD=frasePle('D',ple.sitD,ple.calibreD,ple.habRefluxoD,ple.refluxoD,ple.duracaoD);
+  const frE=frasePle('E',ple.sitE,ple.calibreE,ple.habRefluxoE,ple.refluxoE,ple.duracaoE);
+
+  if(ple.sitD==='habitual'&&ple.sitE==='habitual')
+    return [frD,frE].filter(Boolean).join('<br>');
+  return [frD,frE].filter(Boolean).join('<br>');
+}
+
+function buildLiquido(liq, hd) {
+  const mapAsp={anecoico:'de aspecto anecoico',septacoes:'com septações',debris:'com debris',septdebris:'com septações e debris'};
+  if(liq.sitD==='fisio'&&liq.sitE==='fisio') return 'Líquido em quantidade fisiológica na bolsa testicular.';
+  let parts=[];
+  if(liq.sitD==='hidrocele'){parts.push(`presença de ${liq.qtdD} quantidade de líquido ${mapAsp[liq.aspD]} na hemibolsa direita`);hd.push('Hidrocele à direita.');}
+  if(liq.sitE==='hidrocele'){parts.push(`presença de ${liq.qtdE} quantidade de líquido ${mapAsp[liq.aspE]} na hemibolsa esquerda`);hd.push('Hidrocele à esquerda.');}
+  if(parts.length===1) return parts[0].charAt(0).toUpperCase()+parts[0].slice(1)+'.';
+  return 'Presença de '+parts[0].replace('presença de ','')+' e '+parts[1].replace('presença de ','')+'.';
+}
+
+function mergeBilateral(hd, itemD, itemE, itemBi) {
+  if(hd.includes(itemD)&&hd.includes(itemE)){
+    const iD=hd.indexOf(itemD),iE=hd.indexOf(itemE);
+    hd.splice(Math.max(iD,iE),1);
+    hd.splice(Math.min(iD,iE),1);
+    hd.push(itemBi);
+  }
+}
+
+// ── AÇÕES ──
+function toggleDark(){
+  const isDark=document.body.classList.toggle('dark');
+  const btn=document.getElementById('btn-dark-toggle');
+  btn.innerHTML=isDark
+    ?'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 8.5A5.5 5.5 0 0 1 6 3c0-.18.01-.36.03-.53A6 6 0 1 0 13.97 9.5c-.15.01-.31.01-.47 0z"/></svg>Modo claro'
+    :'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro';
+  localStorage.setItem('darkMode',isDark?'1':'0');
+}
+function copiar(){
+  const el=document.getElementById('laudo-doc');
+  navigator.clipboard.writeText(el.innerText)
+    .then(()=>alert('Laudo copiado para a área de transferência!'))
+    .catch(()=>alert('Use Ctrl+A e Ctrl+C no texto do laudo.'));
+}
+function imprimir(){
+  const h=document.getElementById('laudo-doc').innerHTML;
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+    body{font-family:Helvetica,Arial,sans-serif;font-size:10pt;padding:32px;color:#111;line-height:1.65;}
+    .doc-titulo{text-align:center;font-weight:700;text-transform:uppercase;margin-bottom:16px;}
+    .doc-label{font-weight:700;}.doc-p{margin-bottom:8px;}.doc-secao{margin-bottom:14px;}
+    *{color:#111 !important;}
+  </style></head><body>${h}</body></html>`);
+  w.document.close(); w.print();
+}
+function reiniciar(){
+  estado.tecnica={urgencia:false,indicacao:'nc',indicacaoOutros:'',limEdema:false,limBiotipo:false};
+  const defTest={sit:'habitual',criLoc:'canal',protese:false,parenquima:'homogeneo',dim1:'',dim2:'',dim3:'',doppler:'habitual',
+    achCisto:false,achCistoDim1:'',achCistoDim2:'',achCistoDim3:'',
+    achEctasia:false,achEctasiaCal:'',
+    achAbscesso:false,achAbscessoDim1:'',achAbscessoDim2:'',achAbscessoDim3:'',
+    achEpiCisto:false,achEpiCistoDim1:'',achEpiCistoDim2:'',achEpiCistoDim3:''};
+  estado.testiculoD={...defTest};
+  estado.testiculoE={...defTest};
+  estado.epididimos={sitD:'habitual',sitE:'habitual',cistoDDim1:'',cistoDDim2:'',cistoEDim1:'',cistoEDim2:''};
+  estado.plexos={sitD:'habitual',sitE:'habitual',calibreD:'',calibreE:'',habRefluxoD:false,habRefluxoE:false,refluxoD:'nc',refluxoE:'nc',duracaoD:'0',duracaoE:'0'};
+  estado.liquido={sitD:'fisio',sitE:'fisio',qtdD:'discreta',aspD:'anecoico',qtdE:'discreta',aspE:'anecoico'};
+  estado.achados={texto:''};
+  showSection('testiculoD');
+}
+
+// ── INIT ──
+(function(){if(localStorage.getItem('darkMode')==='1') toggleDark();})();
+showSection('testiculoD');
+</script>
+</body>
+</html>
