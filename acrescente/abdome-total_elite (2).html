@@ -272,7 +272,52 @@ function renderPorta(){const e=estado.porta;const isSit=v=>e.sit===v?'selected':
 
 function renderBiliares(){const e=estado.biliares;const isSit=v=>e.sit===v?'selected':'';return`<div class="block"><div class="block-title">Situação</div><div class="radio-opt ${isSit('habitual')}" onclick="setSit('habitual')"><input type="radio" name="sit_b"><label class="radio-label"><span class="radio-mark"></span>habitual</label></div><div class="radio-opt ${isSit('colecistectomia')}" onclick="setSit('colecistectomia')"><input type="radio" name="sit_b"><label class="radio-label"><span class="radio-mark"></span>pós-colecistectomia (DBC fisiológico)</label></div><div class="radio-opt ${isSit('dil_dbc_sem')}" onclick="setSit('dil_dbc_sem')"><input type="radio" name="sit_b"><label class="radio-label"><span class="radio-mark"></span>dilatação DBC sem fator obstrutivo</label></div><div class="radio-opt ${isSit('dil_dbc_calc')}" onclick="setSit('dil_dbc_calc')"><input type="radio" name="sit_b"><label class="radio-label"><span class="radio-mark"></span>dilatação DBC por cálculo</label></div></div>${e.sit!=='habitual'?`<div class="block"><div class="block-title">Medidas</div><div class="dim-rows">${dimRow('bil-dbc','ducto biliar comum',e.medDBC)}${e.sit==='dil_dbc_calc'?dimRow('bil-calc','cálculo distal',e.medCalc):''}</div></div>`:''}<div class="block"><div class="block-title">Vias Intra-hepáticas</div>${chkRow('chk-intra','dilatação das vias biliares intra-hepáticas',e.dilatacaoIntra,'',false)}</div>`;}
 
-function renderVesicula(){const e=estado.vesicula;const isSit=v=>e.sit===v?'selected':'';return`<div class="block"><div class="block-title">Situação</div><div class="radio-opt ${isSit('habitual')}" onclick="setSit('habitual')"><input type="radio" name="sit_ves"><label class="radio-label"><span class="radio-mark"></span>normodistendida (habitual)</label></div><div class="radio-opt ${isSit('hipo')}" onclick="setSit('hipo')"><input type="radio" name="sit_ves"><label class="radio-label"><span class="radio-mark"></span>hipodistendida</label></div><div class="radio-opt ${isSit('hiper')}" onclick="setSit('hiper')"><input type="radio" name="sit_ves"><label class="radio-label"><span class="radio-mark"></span>hiperdistendida</label></div><div class="radio-opt ${isSit('escleratrofica')}" onclick="setSit('escleratrofica')"><input type="radio" name="sit_ves"><label class="radio-label"><span class="radio-mark"></span>escleroatrófica</label></div><div class="radio-opt ${isSit('colecistite')}" onclick="setSit('colecistite')"><input type="radio" name="sit_ves"><label class="radio-label"><span class="radio-mark"></span>colecistite aguda</label></div><div class="radio-opt ${isSit('ausente')}" onclick="setSit('ausente')"><input type="radio" name="sit_ves"><label class="radio-label"><span class="radio-mark"></span>ausente (pós-colecistectomia)</label></div></div>${['hiper','colecistite'].includes(e.sit)?`<div class="block"><div class="block-title">Dimensões</div><div class="dim-rows">${dimRow('ves-diml','longitudinal',e.dimL)}${dimRow('ves-dimt','transverso',e.dimT)}</div></div>`:''}<div class="block"><div class="block-title">Cálculos</div><div class="radio-opt ${e.calculos==='nenhum'?'selected':''}" onclick="setVesCalc('nenhum')"><input type="radio" name="calc_ves"><label class="radio-label"><span class="radio-mark"></span>sem cálculos</label></div><div class="radio-opt ${e.calculos==='unico'?'selected':''}" onclick="setVesCalc('unico')"><input type="radio" name="calc_ves"><label class="radio-label"><span class="radio-mark"></span>cálculo único</label></div><div class="radio-opt ${e.calculos==='mult_sub'?'selected':''}" onclick="setVesCalc('mult_sub')"><input type="radio" name="calc_ves"><label class="radio-label"><span class="radio-mark"></span>múltiplos subcentimétricos</label></div><div class="radio-opt ${e.calculos==='mult_maior'?'selected':''}" onclick="setVesCalc('mult_maior')"><input type="radio" name="calc_ves"><label class="radio-label"><span class="radio-mark"></span>múltiplos, o maior medindo</label></div></div>${['unico','mult_maior'].includes(e.calculos)?`<div class="block"><div class="block-title">Medida do cálculo</div><div class="dim-rows">${dimRow('calc-med',e.calculos==='unico'?'cálculo único':'maior cálculo',e.calcMedida)}</div></div>`:''}`;}
+function renderVesicula(){
+  const e=estado.vesicula;
+  const isSit=v=>e.sit===v?'selected':'';
+  const CAUSAS_REAC=['cirrose hepática','hepatite','insuficiência cardíaca direita','ascite/edema','pancreatite aguda'];
+  return `
+  <div class="block"><div class="block-title">Situação</div>
+    <div class="radio-opt ${isSit('habitual')}" onclick="setSit('habitual')"><input type="radio" name="sit_ves"><label class="radio-label"><span class="radio-mark"></span>normodistendida (habitual)</label></div>
+    <div class="radio-opt ${isSit('hipo')}" onclick="setSit('hipo')"><input type="radio" name="sit_ves"><label class="radio-label"><span class="radio-mark"></span>hipodistendida</label></div>
+    <div class="radio-opt ${isSit('hiper')}" onclick="setSit('hiper')"><input type="radio" name="sit_ves"><label class="radio-label"><span class="radio-mark"></span>hiperdistendida</label></div>
+  </div>
+  <div class="block"><div class="block-title">Alterações</div>
+    <div class="radio-opt ${isSit('escleratrofica')}" onclick="setSit('escleratrofica')"><input type="radio" name="sit_ves"><label class="radio-label"><span class="radio-mark"></span>escleroatrófica</label></div>
+    <div class="radio-opt ${isSit('colecistite')}" onclick="setSit('colecistite')"><input type="radio" name="sit_ves"><label class="radio-label"><span class="radio-mark"></span>colecistite aguda</label></div>
+    <div class="radio-opt ${isSit('parede_eco')}" onclick="setSit('parede_eco')"><input type="radio" name="sit_ves"><label class="radio-label"><span class="radio-mark"></span>complexo parede-eco-sombra</label></div>
+    <div class="radio-opt ${isSit('adenomiose_focal')}" onclick="setSit('adenomiose_focal')"><input type="radio" name="sit_ves"><label class="radio-label"><span class="radio-mark"></span>adenomiomatose focal</label></div>
+    <div class="radio-opt ${isSit('adenomiose_difusa')}" onclick="setSit('adenomiose_difusa')"><input type="radio" name="sit_ves"><label class="radio-label"><span class="radio-mark"></span>adenomiomatose difusa</label></div>
+    <div class="radio-opt ${isSit('colesterolose')}" onclick="setSit('colesterolose')"><input type="radio" name="sit_ves"><label class="radio-label"><span class="radio-mark"></span>colesterolose</label></div>
+    <div class="radio-opt ${isSit('porcelana')}" onclick="setSit('porcelana')"><input type="radio" name="sit_ves"><label class="radio-label"><span class="radio-mark"></span>vesícula em porcelana</label></div>
+    <div class="radio-opt ${isSit('esp_reacional')}" onclick="setSit('esp_reacional')"><input type="radio" name="sit_ves"><label class="radio-label"><span class="radio-mark"></span>espessamento reacional</label></div>
+    <div class="radio-opt ${isSit('ausente')}" onclick="setSit('ausente')"><input type="radio" name="sit_ves"><label class="radio-label"><span class="radio-mark"></span>ausente (pós-colecistectomia)</label></div>
+  </div>
+  ${['hiper','colecistite'].includes(e.sit)?`<div class="block"><div class="block-title">Dimensões</div><div class="dim-rows">${dimRow('ves-diml','longitudinal',e.dimL)}${dimRow('ves-dimt','transverso',e.dimT)}</div></div>`:''}
+  ${e.sit==='colecistite'?`<div class="block"><div class="block-title">Murphy ultrassonográfico</div>${chkRow('chk-murphy-ves','Murphy ultrassonográfico presente',e.murphy,'',false)}</div>`:''}
+  ${e.sit==='esp_reacional'?`<div class="block"><div class="block-title">Espessura parietal</div><div class="dim-rows">${dimRow('ves-esp','espessura parietal',e.espParede,'cm')}</div></div>
+  <div class="block"><div class="block-title">Causa do espessamento reacional</div>
+    ${CAUSAS_REAC.map(c=>`<div class="radio-opt ${e.espReacionalCausa===c?'selected':''}" onclick="setVal('vesicula','espReacionalCausa','${c}');updateLaudo()"><input type="radio" name="causa_reac"><label class="radio-label"><span class="radio-mark"></span>${c}</label></div>`).join('')}
+  </div>`:''}
+  ${!['escleratrofica','parede_eco','adenomiose_focal','adenomiose_difusa','colesterolose','porcelana','esp_reacional','ausente'].includes(e.sit)?`
+  <div class="block"><div class="block-title">Cálculos</div>
+    <div class="radio-opt ${e.calculos==='nenhum'?'selected':''}" onclick="setVesCalc('nenhum')"><input type="radio" name="calc_ves"><label class="radio-label"><span class="radio-mark"></span>sem cálculos</label></div>
+    <div class="radio-opt ${e.calculos==='unico'?'selected':''}" onclick="setVesCalc('unico')"><input type="radio" name="calc_ves"><label class="radio-label"><span class="radio-mark"></span>cálculo único</label></div>
+    <div class="radio-opt ${e.calculos==='mult_sub'?'selected':''}" onclick="setVesCalc('mult_sub')"><input type="radio" name="calc_ves"><label class="radio-label"><span class="radio-mark"></span>múltiplos subcentimétricos</label></div>
+    <div class="radio-opt ${e.calculos==='mult_maior'?'selected':''}" onclick="setVesCalc('mult_maior')"><input type="radio" name="calc_ves"><label class="radio-label"><span class="radio-mark"></span>múltiplos, o maior medindo</label></div>
+    <div class="radio-opt ${e.calculos==='lama'?'selected':''}" onclick="setVesCalc('lama')"><input type="radio" name="calc_ves"><label class="radio-label"><span class="radio-mark"></span>lama biliar</label></div>
+  </div>
+  ${['unico','mult_maior'].includes(e.calculos)?`<div class="block"><div class="block-title">Medida do cálculo</div><div class="dim-rows">${dimRow('calc-med',e.calculos==='unico'?'cálculo único':'maior cálculo',e.calcMedida)}</div></div>`:''}
+  ${['unico','mult_sub','mult_maior'].includes(e.calculos)?`<div class="block"><div class="block-title">Localização</div>${chkRow('chk-infundibulo','impactado no infundíbulo',e.infundibulo,'',false)}</div>`:''}
+  <div class="block"><div class="block-title">Pólipos</div>
+    <div class="radio-opt ${e.polipos==='nenhum'?'selected':''}" onclick="setVesPol('nenhum')"><input type="radio" name="pol_ves"><label class="radio-label"><span class="radio-mark"></span>sem pólipos</label></div>
+    <div class="radio-opt ${e.polipos==='unico'?'selected':''}" onclick="setVesPol('unico')"><input type="radio" name="pol_ves"><label class="radio-label"><span class="radio-mark"></span>pólipo único</label></div>
+    <div class="radio-opt ${e.polipos==='multiplos'?'selected':''}" onclick="setVesPol('multiplos')"><input type="radio" name="pol_ves"><label class="radio-label"><span class="radio-mark"></span>múltiplos pólipos</label></div>
+  </div>
+  ${e.polipos==='unico'?`<div class="block"><div class="block-title">Pólipo — detalhes</div><div class="dim-rows">${dimRow('pol-med','medida',e.polipMed)}</div><div style="padding:4px 14px 8px"><label style="font-size:10px;color:var(--text-3);font-weight:600;text-transform:uppercase;">Localização</label><select class="sel-tag" style="margin-left:8px" onchange="setVal('vesicula','polipLoc',this.value);updateLaudo()"><option value="" ${e.polipLoc===''?'selected':''}>não citar</option><option value="parede anterior" ${e.polipLoc==='parede anterior'?'selected':''}>parede anterior</option><option value="parede posterior" ${e.polipLoc==='parede posterior'?'selected':''}>parede posterior</option><option value="fundo" ${e.polipLoc==='fundo'?'selected':''}>fundo</option><option value="infundíbulo" ${e.polipLoc==='infundíbulo'?'selected':''}>infundíbulo</option></select></div></div>`:''}
+  ${e.polipos==='multiplos'?`<div class="block"><div class="block-title">Maior pólipo</div><div class="dim-rows">${dimRow('pol-maior-med','medida do maior',e.polipMaiorMed)}</div><div style="padding:4px 14px 8px"><label style="font-size:10px;color:var(--text-3);font-weight:600;text-transform:uppercase;">Localização do maior</label><select class="sel-tag" style="margin-left:8px" onchange="setVal('vesicula','polipLoc',this.value);updateLaudo()"><option value="" ${e.polipLoc===''?'selected':''}>não citar</option><option value="parede anterior" ${e.polipLoc==='parede anterior'?'selected':''}>parede anterior</option><option value="parede posterior" ${e.polipLoc==='parede posterior'?'selected':''}>parede posterior</option><option value="fundo" ${e.polipLoc==='fundo'?'selected':''}>fundo</option><option value="infundíbulo" ${e.polipLoc==='infundíbulo'?'selected':''}>infundíbulo</option></select></div></div>`:''}
+  `:''}`;
+}
 
 function renderPancreas(){const e=estado.pancreas;const isSit=v=>e.sit===v?'selected':'';return`<div class="block"><div class="block-title">Situação</div><div class="radio-opt ${isSit('habitual')}" onclick="setSit('habitual')"><input type="radio" name="sit_panc"><label class="radio-label"><span class="radio-mark"></span>normal</label></div><div class="radio-opt ${isSit('parcial')}" onclick="setSit('parcial')"><input type="radio" name="sit_panc"><label class="radio-label"><span class="radio-mark"></span>parcialmente caracterizado</label></div><div class="radio-opt ${isSit('nao_car')}" onclick="setSit('nao_car')"><input type="radio" name="sit_panc"><label class="radio-label"><span class="radio-mark"></span>não caracterizado</label></div><div class="radio-opt ${isSit('aguda')}" onclick="setSit('aguda')"><input type="radio" name="sit_panc"><label class="radio-label"><span class="radio-mark"></span>pancreatopatia aguda</label></div><div class="radio-opt ${isSit('cronica')}" onclick="setSit('cronica')"><input type="radio" name="sit_panc"><label class="radio-label"><span class="radio-mark"></span>pancreatopatia crônica</label></div><div class="radio-opt ${isSit('lipossub')}" onclick="setSit('lipossub')"><input type="radio" name="sit_panc"><label class="radio-label"><span class="radio-mark"></span>lipossubstituído</label></div></div><div class="block"><div class="block-title">Ducto Pancreático</div>${chkRow('chk-ducto','ducto pancreático principal dilatado',e.ducto,'',false)}${e.ducto?`<div class="dim-rows">${dimRow('ducto-med','calibre',e.medDucto)}</div>`:''}</div>`;}
 
@@ -469,6 +514,7 @@ function renderLiquido(){
 function setSit(v){ estado[secaoAtual].sit=v; renderPanel(secaoAtual); updateLaudo(); }
 function setVal(sec,field,val){ estado[sec][field]=val; updateLaudo(); }
 function setVesCalc(v){ estado.vesicula.calculos=v; renderPanel('vesicula'); updateLaudo(); }
+function setVesPol(v){ estado.vesicula.polipos=v; renderPanel('vesicula'); updateLaudo(); }
 function setApend(v){ estado.alcas.apendice=v; renderPanel('alcas'); updateLaudo(); }
 
 function setDim(id,val){
@@ -476,7 +522,7 @@ function setDim(id,val){
     'veias-med':['veias','medida'],'porta-med':['porta','medida'],
     'bil-dbc':['biliares','medDBC'],'bil-calc':['biliares','medCalc'],
     'ves-diml':['vesicula','dimL'],'ves-dimt':['vesicula','dimT'],
-    'calc-med':['vesicula','calcMedida'],
+    'calc-med':['vesicula','calcMedida'],'pol-med':['vesicula','polipMed'],'pol-maior-med':['vesicula','polipMaiorMed'],
     'baco-idx':['baco','medIdx'],'ducto-med':['pancreas','medDucto'],
     'rd1':['rins','dimRD1'],'rd2':['rins','dimRD2'],'rd3':['rins','dimRD3'],'par-rd':['rins','parRD'],
     're1':['rins','dimRE1'],'re2':['rins','dimRE2'],'re3':['rins','dimRE3'],'par-re':['rins','parRE'],
@@ -494,6 +540,7 @@ function setDim(id,val){
 const CHK_MAP={
   'chk-hm':['figado','hmAssoc'],'chk-pres':['figado','presCheck'],
   'chk-intra':['biliares','dilatacaoIntra'],'chk-ducto':['pancreas','ducto'],
+  'chk-murphy-ves':['vesicula','murphy'],'chk-infundibulo':['vesicula','infundibulo'],
   'chk-dil-dir':['rins','dilDir'],'chk-dil-esq':['rins','dilEsq'],
   'chk-debris':['bexiga','debris'],'chk-coagulo':['bexiga','coagulo'],
   'chk-calc-bex':['bexiga','calculo'],'chk-lesao-bex':['bexiga','lesao'],
@@ -590,13 +637,39 @@ function updateLaudo(){
   else if(vs.sit==='hiper') frVes=`Vesícula biliar hiperdistendida${vDist} com conteúdo anecóico. Não há imagens sugestivas de cálculos em seu interior.`;
   else if(vs.sit==='escleratrofica'){frVes='Vesícula biliar de dimensões reduzidas, com espessamento parietal e repleta de cálculos.';opVes='Vesícula biliar escleroatrófica.';}
   else if(vs.sit==='colecistite'){frVes=`Vesícula biliar hiperdistendida${vDist} apresentando espessamento parietal. Presença de hiperemia parietal ao estudo com Doppler complementar.${vs.murphy?' Murphy ultrassonográfico presente.':''} Não há imagens sugestivas de cálculos em seu interior.`;opVes='Achados ecográficos sugestivos de colecistite aguda.';}
+  else if(vs.sit==='parede_eco'){frVes='Em topografia de loja vesicular, observa-se o sinal "parede-eco-sombra" ao presente exame, sugestivo de vesícula biliar repleta de cálculos/com cálculo único preenchendo toda sua luz, limitando a adequada avaliação da sua parede posterior.';opVes='Colecistolitíase.';}
+  else if(vs.sit==='adenomiose_focal'){frVes='Vesícula biliar normodistendida, conteúdo anecóico, com espessamento parietal focal em região fúndica, associado à presença de focos ecogênicos puntiformes intramurais com formação de artefato de reverberação posterior. Não há imagens sugestivas de cálculos em seu interior.';opVes='Adenomiomatose da vesícula biliar.';}
+  else if(vs.sit==='adenomiose_difusa'){frVes='Vesícula biliar normodistendida, conteúdo anecóico, com espessamento parietal difuso em região fúndica, associado à presença de focos ecogênicos puntiformes intramurais com formação de artefato de reverberação posterior. Não há imagens sugestivas de cálculos em seu interior.';opVes='Adenomiomatose da vesícula biliar.';}
+  else if(vs.sit==='colesterolose'){frVes='Vesícula biliar normodistendida, com paredes finas e regulares, conteúdo anecóico, apresentando focos ecogênicos puntiformes intramurais com formação de artefato de reverberação posterior. Não há imagens sugestivas de cálculos em seu interior.';opVes='Colesterolose da vesícula biliar.';}
+  else if(vs.sit==='porcelana'){frVes='Vesícula biliar apresentando hiperrefringência difusa e linear da sua parede anterior, não sendo caracteriza o complexo "parede-eco-sombra", associado à extensa sombra acústica posterior, no qual limita a adequada avaliação do seu conteúdo e da parede posterior.';opVes='Achados ultrassonográficos sugestivos de vesícula em porcelana.';}
+  else if(vs.sit==='esp_reacional'){const causaR=vs.espReacionalCausa||'_';frVes=`A vesícula biliar apresenta espessamento das suas paredes, medindo ${vs.espParede||'_'} cm (VR ≤0,4 cm), conteúdo anecóide e homogêneo, achado que pode estar relacionado ao quadro de ${causaR}, na dependência de correlação com dados clínicos.`;opVes=`Espessamento parietal vesicular, podendo estar relacionado ao quadro ${causaR}.`;}
   else if(vs.sit==='ausente'){frVes='Vesícula biliar não caracterizada (status pós-operatório).';opVes='Status pós-colecistectomia.';}
-  if(!['escleratrofica','ausente'].includes(vs.sit)&&bi.sit!=='colecistectomia'){
+  let frCalc='',opCalc='';
+  if(!['escleratrofica','parede_eco','adenomiose_focal','adenomiose_difusa','colesterolose','porcelana','esp_reacional','ausente'].includes(vs.sit)&&bi.sit!=='colecistectomia'){
     const infStr=vs.infundibulo?', impactado no infundíbulo':'';
-    if(vs.calculos==='unico'){frVes=frVes.replace(' Não há imagens sugestivas de cálculos em seu interior.','')+` Em seu interior destaca-se cálculo único${vs.calcMedida?` medindo cerca de ${vs.calcMedida} cm`:''}${infStr}, promovendo sombra acústica posterior, móvel à mudança de decúbito.`;if(!opVes)opVes='Colecistolitíase.';}
-    else if(vs.calculos==='mult_sub'){frVes=frVes.replace(' Não há imagens sugestivas de cálculos em seu interior.','')+` Em seu interior destacam-se múltiplos cálculos subcentimétricos, promovendo sombra acústica posterior, móveis à mudança de decúbito.`;if(!opVes)opVes='Colecistolitíase.';}
-    else if(vs.calculos==='mult_maior'){frVes=frVes.replace(' Não há imagens sugestivas de cálculos em seu interior.','')+` Em seu interior destacam-se múltiplos cálculos${vs.calcMedida?`, o maior medindo ${vs.calcMedida} cm`:''}${infStr}, promovendo sombra acústica posterior, móveis à mudança de decúbito.`;if(!opVes)opVes='Colecistolitíase.';}
+    if(vs.calculos==='lama'){frCalc=' Em seu interior destacam-se conteúdo ecogênico formando nível líquido-debris e móvel às mudanças de decúbito.';opCalc='Lama biliar.';}
+    else if(vs.calculos==='unico'){frCalc=` Em seu interior destaca-se cálculo único${vs.calcMedida?` medindo cerca de ${vs.calcMedida} cm`:''}${infStr}, promovendo sombra acústica posterior, móvel à mudança de decúbito.`;opCalc='Colecistolitíase.';}
+    else if(vs.calculos==='mult_sub'){frCalc=` Em seu interior destacam-se múltiplos cálculos subcentimétricos${vs.infundibulo?', com um cálculo impactado no infundíbulo':''}, promovendo sombra acústica posterior, móveis à mudança de decúbito.`;opCalc='Colecistolitíase.';}
+    else if(vs.calculos==='mult_maior'){frCalc=` Em seu interior destacam-se múltiplos cálculos${vs.calcMedida?`, o maior medindo ${vs.calcMedida} cm`:''}${vs.infundibulo?', impactado no infundíbulo':''}, promovendo sombra acústica posterior, móveis à mudança de decúbito.`;opCalc='Colecistolitíase.';}
+    if(frCalc&&frVes) frVes=frVes.replace(' Não há imagens sugestivas de cálculos em seu interior.','').replace(' O conteúdo vesicular apresenta-se anecóide, sem cálculos no interior.','')+frCalc;
+    if(vs.polipos==='unico'){
+      const _prepPol=['fundo','infundíbulo'].includes(vs.polipLoc)?'no':'na';
+      const locPol=vs.polipLoc?`, ${_prepPol} ${vs.polipLoc}`:'';
+      const semCalcPol=vs.calculos==='nenhum'?' O conteúdo vesicular apresenta-se anecóide, sem cálculos no interior.':'';
+      frVes=`Vesícula biliar normodistendida e com paredes finas, apresentando formação nodular sólida${locPol}, hiperecogênica, de aspecto polipóide, medindo ${vs.polipMed||'_'} cm e contornos regulares, imóvel à mudança de decúbito, com pedículo vascularizado ao estudo complementar com Doppler.${semCalcPol}`;
+      if(frCalc) frVes+=frCalc;
+      if(!opVes)opVes='Formação nodular intra-vesicular, sugestiva de pólipo vesicular.';
+    } else if(vs.polipos==='multiplos'){
+      const _prepPolM=['fundo','infundíbulo'].includes(vs.polipLoc)?'no':'na';
+      const locPolM=vs.polipLoc?`, localizada ${_prepPolM} ${vs.polipLoc},`:'';
+      const semCalcPolM=vs.calculos==='nenhum'?' O conteúdo vesicular apresenta-se anecóide, sem cálculos no interior.':'';
+      frVes=`Vesícula biliar normodistendida e com paredes finas, apresentando múltiplas formações nodulares sólidas, hiperecogênicas, de aspecto polipóide, a maior medindo ${vs.polipMaiorMed||'_'} cm${locPolM} de contornos regulares, imóvel à mudança de decúbito, com pedículo vascularizado ao estudo complementar com Doppler.${semCalcPolM}`;
+      if(frCalc) frVes+=frCalc;
+      if(!opVes)opVes='Formações nodulares intra-vesicular, sugestivas de pólipos vesiculares.';
+    }
   }
+  if(opCalc&&!opVes)opVes=opCalc;
+  else if(opCalc&&opVes&&opCalc!==opVes)opVes=opVes+'\n'+opCalc;
 
   // ── PÂNCREAS ──
   let frPanc='',opPanc='';
@@ -853,7 +926,7 @@ function reiniciar(){
   estado.figado={sit:'habitual',grauEst:'nao_esp',hmAssoc:false,presCheck:false,presPeriv:false,presPortal:false,presSub:false,tipoHm:'difusa',dimLd:'',dimLe:'',dimLc:'',lesoes:[]};
   estado.veias={sit:'habitual',medida:''};estado.porta={sit:'habitual',medida:''};
   estado.biliares={sit:'habitual',medDBC:'',medCalc:'',dilatacaoIntra:false};
-  estado.vesicula={sit:'habitual',espParede:'',dimL:'',dimT:'',murphy:false,calculos:'nenhum',calcMedida:'',calcMaior:'',infundibulo:false,polipos:'nenhum',polipLoc:'',polipMed:'',polipMaiorMed:''};
+  estado.vesicula={sit:'habitual',espParede:'',dimL:'',dimT:'',murphy:false,calculos:'nenhum',calcMedida:'',calcMaior:'',infundibulo:false,polipos:'nenhum',polipLoc:'',polipMed:'',polipMaiorMed:'',espReacionalCausa:''};
   estado.pancreas={sit:'habitual',ducto:false,medDucto:''};
   estado.baco={sit:'habitual',eco:'homogenea',medIdx:'',lesoes:[]};
   estado.rins={sit:'habitual',lado:'bilateral',tercoMaior:'terço superior',rimMaior:'direito',medCisto:'',tipoCisto:'simples',localCisto:'terço superior cortical',ladoCisto:'direito',dimRD1:'',dimRD2:'',dimRD3:'',parRD:'',dimRE1:'',dimRE2:'',dimRE3:'',parRE:'',lesoes:[],dilDir:false,dilDirGrau:'discreta',dilDirUreter:false,dilEsq:false,dilEsqGrau:'discreta',dilEsqUreter:false};
