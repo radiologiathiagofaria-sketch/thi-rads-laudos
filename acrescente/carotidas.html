@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -129,6 +129,7 @@ body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
 .doc-secao{margin-bottom:14px;}
 .info-box{padding:8px 14px;font-size:11px;color:#1e40af;background:#eff6ff;border-top:1px solid #bfdbfe;line-height:1.6;}
 .amber-box{padding:8px 14px;font-size:11px;color:var(--amber);background:var(--amber-bg);border-top:1px solid var(--amber-border);line-height:1.6;}
+.laudo-doc:focus { outline: none; }
 </style>
 </head>
 <body>
@@ -169,7 +170,7 @@ body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
  
   <div class="laudo-panel">
     <div class="laudo-header"><span class="laudo-header-title">Pré-visualização do laudo</span></div>
-    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc"></div></div>
+    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc" contenteditable="true"></div></div>
   </div>
 </div>
  
@@ -759,14 +760,46 @@ function toggleDark() {
 }
  
 function copiar() {
+  const isDark = document.body.classList.contains('dark');
+  if (isDark) document.body.classList.remove('dark');
+  
   const el = document.getElementById('laudo-doc');
-  navigator.clipboard.writeText(el.innerText).then(() => alert('Laudo copiado!')).catch(() => alert('Use Ctrl+A e Ctrl+C no painel do laudo.'));
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+  
+  let success = false;
+  try {
+    success = document.execCommand('copy');
+  } catch (err) {
+  }
+  
+  selection.removeAllRanges();
+  if (isDark) document.body.classList.add('dark');
+  
+  if (success) {
+    showToast('Laudo copiado para a área de transferência!');
+  } else {
+    showToast('Falha ao copiar. Use Ctrl+A e Ctrl+C no texto do laudo.');
+  }
+}
+
+function showToast(msg) {
+  let t = document.getElementById('toast-notification');
+  t.innerText = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
 }
  
 function imprimir() {
   const h = document.getElementById('laudo-doc').innerHTML;
   const w = window.open('','_blank');
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Helvetica,Arial,sans-serif;font-size:10pt;padding:32px;color:#111;line-height:1.65;max-width:820px;margin:auto}.doc-titulo{text-align:center;font-weight:700;text-transform:uppercase;margin-bottom:16px}.doc-label{font-weight:700}.doc-p{margin-bottom:8px}.doc-secao{margin-bottom:14px}*{color:#111!important}table{border-collapse:collapse;width:100%;font-size:9pt}td,th{border:1px solid #ccc;padding:3px 8px}</style></head><body>${h}</body></html>`);
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Helvetica,Arial,sans-serif;font-size:10pt;padding:32px;color:#111;line-height:1.65;max-width:820px;margin:auto}.doc-titulo{text-align:center;font-weight:700;text-transform:uppercase;margin-bottom:16px}.doc-label{font-weight:700}.doc-p{margin-bottom:8px}.doc-secao{margin-bottom:14px}*{color:#111!important}table{border-collapse:collapse;width:100%;font-size:9pt}td,th{border:1px solid #ccc;padding:3px 8px}.laudo-doc:focus { outline: none; }
+</style></head><body>${h}
+<div id="toast-notification" class="toast-notification">Laudo copiado!</div>
+</body></html>`);
   w.document.close(); w.print();
 }
  
@@ -786,5 +819,7 @@ function reiniciar() {
   showSection('imt');
 })();
 </script>
+
+<div id="toast-notification" class="toast-notification">Laudo copiado!</div>
 </body>
 </html>

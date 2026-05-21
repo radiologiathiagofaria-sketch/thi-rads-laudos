@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -132,6 +132,7 @@ body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
 .toggle-switch{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--text-2);cursor:pointer;}
 .conclusao-lista { margin: 0; padding: 0; list-style: none; }
 .conclusao-lista li { margin: 0; padding: 0; line-height: 1.4; text-align: justify; }
+.laudo-doc:focus { outline: none; }
 </style>
 </head>
 <body>
@@ -169,7 +170,7 @@ body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
         <input type="checkbox" id="laudo-defensivo" onchange="updateLaudo()" style="accent-color: var(--blue); width: 14px; height: 14px;"> Laudo Defensivo
       </label>
     </div>
-    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc"></div></div>
+    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc" contenteditable="true"></div></div>
   </div>
 </div>
 
@@ -679,11 +680,48 @@ function updateLaudo(){
 // Funções utilitárias
 function toggleDark(){ const d=document.body.classList.toggle('dark'); localStorage.setItem('darkT',d?'1':'0'); }
 if(localStorage.getItem('darkT')==='1') toggleDark();
-function copiar(){ navigator.clipboard.writeText(document.getElementById('laudo-doc').innerText).then(()=>alert('Copiado!')).catch(()=>alert('Use Ctrl+A, Ctrl+C')); }
-function imprimir(){ const h=document.getElementById('laudo-doc').innerHTML; const w=window.open('','_blank'); w.document.write(`<html><head><style>body{font-family:Arial;font-size:10pt;color:#000;line-height:1.6} .doc-titulo{text-align:center;font-weight:bold;margin-bottom:15px} .doc-label{font-weight:bold} .doc-p{margin-bottom:10px;text-align:justify} .conclusao-lista { margin: 0; padding: 0; list-style: none; } .conclusao-lista li { margin: 0; padding: 0; line-height: 1.4; text-align: justify; }</style></head><body>${h}</body></html>`); w.document.close(); w.print(); }
+function copiar() {
+  const isDark = document.body.classList.contains('dark');
+  if (isDark) document.body.classList.remove('dark');
+  
+  const el = document.getElementById('laudo-doc');
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+  
+  let success = false;
+  try {
+    success = document.execCommand('copy');
+  } catch (err) {
+  }
+  
+  selection.removeAllRanges();
+  if (isDark) document.body.classList.add('dark');
+  
+  if (success) {
+    showToast('Laudo copiado para a área de transferência!');
+  } else {
+    showToast('Falha ao copiar. Use Ctrl+A e Ctrl+C no texto do laudo.');
+  }
+}
+
+function showToast(msg) {
+  let t = document.getElementById('toast-notification');
+  t.innerText = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+function imprimir(){ const h=document.getElementById('laudo-doc').innerHTML; const w=window.open('','_blank'); w.document.write(`<html><head><style>body{font-family:Arial;font-size:10pt;color:#000;line-height:1.6} .doc-titulo{text-align:center;font-weight:bold;margin-bottom:15px} .doc-label{font-weight:bold} .doc-p{margin-bottom:10px;text-align:justify} .conclusao-lista { margin: 0; padding: 0; list-style: none; } .conclusao-lista li { margin: 0; padding: 0; line-height: 1.4; text-align: justify; }.laudo-doc:focus { outline: none; }
+</style></head><body>${h}
+<div id="toast-notification" class="toast-notification">Laudo copiado!</div>
+</body></html>`); w.document.close(); w.print(); }
 function reiniciar(){ window.location.reload(); }
 
 showSection('clinico');
 </script>
+
+<div id="toast-notification" class="toast-notification">Laudo copiado!</div>
 </body>
 </html>

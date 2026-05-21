@@ -55,12 +55,12 @@ function gerarTextoDoppler(dados) {
   }
 
   // Tabela Borderless
-  let tableHtml = `<table style="border-collapse: collapse; border: none; font-size: 10pt;">`;
+  let tableHtml = `<table style="border-collapse: collapse; border: none; font-size: 10pt; line-height: 1;">`;
   
   const addRow = (label, val, perc) => {
-    let row = `<tr><td style="padding: 2px 20px 2px 0; border: none;">${label}</td><td style="padding: 2px 20px 2px 0; border: none;">${val ? val + ' mm' : '---'}</td>`;
+    let row = `<tr><td style="padding: 0px 12px 0px 0; border: none;">${label}</td><td style="padding: 0px 12px 0px 0; border: none;">${val ? val + ' mm' : '---'}</td>`;
     if (dados.exibir_percentis) {
-      row += `<td style="padding: 2px 0; border: none;">Percentil ${perc}</td>`;
+      row += `<td style="padding: 0px 0; border: none;">Percentil ${perc}</td>`;
     }
     row += `</tr>`;
     return row;

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -153,6 +153,7 @@ body.dark .alert-box.orange{background:#1a1000;color:#fbbf24;border-color:#78350
 .doc-label{font-weight:700;font-size:10pt;}
 .doc-p{margin-bottom:8px;font-size:10pt;}
 .doc-secao{margin-bottom:14px;}
+.laudo-doc:focus { outline: none; }
 </style>
 </head>
 <body>
@@ -191,7 +192,7 @@ body.dark .alert-box.orange{background:#1a1000;color:#fbbf24;border-color:#78350
       <span class="laudo-header-title">Pré-visualização do laudo</span>
       <span class="laudo-badge">com Doppler</span>
     </div>
-    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc"></div></div>
+    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc" contenteditable="true"></div></div>
   </div>
 </div>
 
@@ -813,11 +814,38 @@ function toggleDark(){
     :'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro';
   localStorage.setItem('darkMode',isDark?'1':'0');
 }
-function copiar(){
-  const el=document.getElementById('laudo-doc');
-  navigator.clipboard.writeText(el.innerText)
-    .then(()=>alert('Laudo copiado para a área de transferência!'))
-    .catch(()=>alert('Use Ctrl+A e Ctrl+C no texto do laudo.'));
+function copiar() {
+  const isDark = document.body.classList.contains('dark');
+  if (isDark) document.body.classList.remove('dark');
+  
+  const el = document.getElementById('laudo-doc');
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+  
+  let success = false;
+  try {
+    success = document.execCommand('copy');
+  } catch (err) {
+  }
+  
+  selection.removeAllRanges();
+  if (isDark) document.body.classList.add('dark');
+  
+  if (success) {
+    showToast('Laudo copiado para a área de transferência!');
+  } else {
+    showToast('Falha ao copiar. Use Ctrl+A e Ctrl+C no texto do laudo.');
+  }
+}
+
+function showToast(msg) {
+  let t = document.getElementById('toast-notification');
+  t.innerText = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
 }
 function imprimir(){
   const h=document.getElementById('laudo-doc').innerHTML;
@@ -827,7 +855,10 @@ function imprimir(){
     .doc-titulo{text-align:center;font-weight:700;text-transform:uppercase;margin-bottom:16px;}
     .doc-label{font-weight:700;}.doc-p{margin-bottom:8px;}.doc-secao{margin-bottom:14px;}
     *{color:#111 !important;}
-  </style></head><body>${h}</body></html>`);
+  .laudo-doc:focus { outline: none; }
+</style></head><body>${h}
+<div id="toast-notification" class="toast-notification">Laudo copiado!</div>
+</body></html>`);
   w.document.close(); w.print();
 }
 function reiniciar(){
@@ -850,5 +881,7 @@ function reiniciar(){
 (function(){if(localStorage.getItem('darkMode')==='1') toggleDark();})();
 showSection('testiculoD');
 </script>
+
+<div id="toast-notification" class="toast-notification">Laudo copiado!</div>
 </body>
 </html>

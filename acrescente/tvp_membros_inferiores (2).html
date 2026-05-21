@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -145,6 +145,7 @@ body.dark .doc-paciente{background:#1a2040;border-color:#2a3460;color:#c8cfe0;}
 .check-row.on .check-box{border-color:var(--blue);background:var(--blue);}
 .check-row:hover{background:var(--blue-light);}
 .badge-indicacao{display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;background:var(--blue-light);color:var(--blue);margin-left:4px;}
+.laudo-doc:focus { outline: none; }
 </style>
 </head>
 <body>
@@ -188,7 +189,7 @@ body.dark .doc-paciente{background:#1a2040;border-color:#2a3460;color:#c8cfe0;}
 
   <div class="laudo-panel">
     <div class="laudo-header"><span class="laudo-header-title">Pré-visualização</span></div>
-    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc"></div></div>
+    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc" contenteditable="true"></div></div>
   </div>
 </div>
 
@@ -843,13 +844,45 @@ function toggleDark() {
 
 // ── COPIAR / IMPRIMIR ──
 function copiar() {
-  navigator.clipboard.writeText(document.getElementById('laudo-doc').innerText)
-    .then(() => alert('Laudo copiado!')).catch(() => alert('Use Ctrl+A e Ctrl+C no texto do laudo.'));
+  const isDark = document.body.classList.contains('dark');
+  if (isDark) document.body.classList.remove('dark');
+  
+  const el = document.getElementById('laudo-doc');
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+  
+  let success = false;
+  try {
+    success = document.execCommand('copy');
+  } catch (err) {
+  }
+  
+  selection.removeAllRanges();
+  if (isDark) document.body.classList.add('dark');
+  
+  if (success) {
+    showToast('Laudo copiado para a área de transferência!');
+  } else {
+    showToast('Falha ao copiar. Use Ctrl+A e Ctrl+C no texto do laudo.');
+  }
+}
+
+function showToast(msg) {
+  let t = document.getElementById('toast-notification');
+  t.innerText = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
 }
 function imprimir() {
   const h = document.getElementById('laudo-doc').innerHTML;
   const w = window.open('','_blank');
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Helvetica,Arial,sans-serif;font-size:10pt;padding:32px;color:#111;line-height:1.65;}.doc-titulo{text-align:center;font-weight:700;text-transform:uppercase;margin-bottom:16px;}.doc-label{font-weight:700;}.doc-p{margin-bottom:8px;}.doc-secao{margin-bottom:14px;}.doc-paciente{margin-bottom:16px;padding:10px 14px;background:#f8f8f8;border:1px solid #ccc;border-radius:4px;font-size:9.5pt;line-height:1.7;}.doc-pac-label{font-weight:700;}*{color:#111 !important;}</style></head><body>${h}</body></html>`);
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Helvetica,Arial,sans-serif;font-size:10pt;padding:32px;color:#111;line-height:1.65;}.doc-titulo{text-align:center;font-weight:700;text-transform:uppercase;margin-bottom:16px;}.doc-label{font-weight:700;}.doc-p{margin-bottom:8px;}.doc-secao{margin-bottom:14px;}.doc-paciente{margin-bottom:16px;padding:10px 14px;background:#f8f8f8;border:1px solid #ccc;border-radius:4px;font-size:9.5pt;line-height:1.7;}.doc-pac-label{font-weight:700;}*{color:#111 !important;}.laudo-doc:focus { outline: none; }
+</style></head><body>${h}
+<div id="toast-notification" class="toast-notification">Laudo copiado!</div>
+</body></html>`);
   w.document.close(); w.print();
 }
 
@@ -869,5 +902,7 @@ function reiniciar() {
 
 showSection('paciente');
 </script>
+
+<div id="toast-notification" class="toast-notification">Laudo copiado!</div>
 </body>
 </html>

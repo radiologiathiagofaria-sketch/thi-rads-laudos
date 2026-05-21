@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -185,6 +185,7 @@ body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
 .tirads-table th{font-weight:700;background:#f0f4f8;}
 .tirads-table tr.hl{font-weight:700;}
 .tirads-table tr.hl td{background:#fff3cd;}
+.laudo-doc:focus { outline: none; }
 </style>
 </head>
 <body>
@@ -216,7 +217,7 @@ body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
  
   <div class="laudo-panel">
     <div class="laudo-header"><span class="laudo-header-title">Pré-visualização do laudo</span></div>
-    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc"></div></div>
+    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc" contenteditable="true"></div></div>
   </div>
 </div>
  
@@ -1096,9 +1097,38 @@ function toggleDark(){
   localStorage.setItem('darkMode', isDark?'1':'0');
 }
  
-function copiar(){
+function copiar() {
+  const isDark = document.body.classList.contains('dark');
+  if (isDark) document.body.classList.remove('dark');
+  
   const el = document.getElementById('laudo-doc');
-  navigator.clipboard.writeText(el.innerText).then(()=>alert('Laudo copiado para a área de transferência!')).catch(()=>alert('Use Ctrl+A e Ctrl+C no texto do laudo.'));
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+  
+  let success = false;
+  try {
+    success = document.execCommand('copy');
+  } catch (err) {
+  }
+  
+  selection.removeAllRanges();
+  if (isDark) document.body.classList.add('dark');
+  
+  if (success) {
+    showToast('Laudo copiado para a área de transferência!');
+  } else {
+    showToast('Falha ao copiar. Use Ctrl+A e Ctrl+C no texto do laudo.');
+  }
+}
+
+function showToast(msg) {
+  let t = document.getElementById('toast-notification');
+  t.innerText = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
 }
  
 function imprimir(){
@@ -1116,7 +1146,10 @@ function imprimir(){
     th{font-weight:700;background:#f0f4f8;}
     tr.hl{font-weight:700;}
     tr.hl td{background:#fff3cd;}
-  </style></head><body>${h}</body></html>`);
+  .laudo-doc:focus { outline: none; }
+</style></head><body>${h}
+<div id="toast-notification" class="toast-notification">Laudo copiado!</div>
+</body></html>`);
   w.document.close(); w.print();
 }
  
@@ -1136,5 +1169,7 @@ function reiniciar(){
 (function(){ if(localStorage.getItem('darkMode')==='1') toggleDark(); })();
 showSec('tireoide');
 </script>
+
+<div id="toast-notification" class="toast-notification">Laudo copiado!</div>
 </body>
 </html>
