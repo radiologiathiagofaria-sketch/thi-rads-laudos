@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -173,8 +173,8 @@ const estado = {
     ectopicoLoc: 'fossa ilíaca direita',
     nefrecDir: false, nefrecEsq: false,
     afeccaoLado: 'bilateral',
-    dimRD_L: '', dimRD_AP: '', dimRD_T: '', espRD: '',
-    dimRE_L: '', dimRE_AP: '', dimRE_T: '', espRE: '',
+    dimRD_L: '', espRD: '',
+    dimRE_L: '', espRE: '',
     hidroDir: 'ausente', hidroEsq: 'ausente',
     ureterDir: false, ureterEsq: false,
     lesoes: []
@@ -184,9 +184,10 @@ const estado = {
     espParede: '',
     diverticulos: false,
     conteudoDebris: false,
-    conteudoCoagulo: false, coaguloX: '', coaguloY: '', coaguloZ: '',
+    conteudoCoaguloMovel: false,
+    conteudoCoaguloAderido: false, coaguloAderidoParede: 'parede posterior',
     conteudoCalculo: false, calculoX: '', calculoY: '', calculoZ: '',
-    conteudoLesao: false, lesaoLoc: 'assoalho vesical', lesaoX: '', lesaoY: '', lesaoZ: '', lesaoFluxo: false,
+    conteudoLesao: false, lesaoLoc: 'parede lateral direita', lesaoX: '', lesaoY: '', lesaoZ: '', lesaoFluxo: false, lesaoEco: 'hipoecogênica',
     conteudoBalao: false,
     jatos: 'nao_citar'
   },
@@ -229,7 +230,7 @@ function chk(sec, field, label){
   return `<div class="check-row ${sel}" onclick="toggleChk('${sec}','${field}')"><input type="checkbox" ${estado[sec][field]?'checked':''}><label class="check-label"><span class="check-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.8"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg></span>${label}</label></div>`;
 }
 function dimInput(sec, field, label, unit='cm'){
-  return `<div class="dim-row"><span class="dim-lbl">${label}</span><input class="dim-input" type="text" value="${estado[sec][field]}" placeholder="—" oninput="setVal('${sec}','${field}',this.value)"><span class="dim-unit">${unit}</span></div>`;
+  return `<div class="dim-row"><span class="dim-lbl">${label}</span><input class="dim-input" type="text" value="${estado[sec][field]}" placeholder="—" oninput="setTextVal('${sec}','${field}',this.value)"><span class="dim-unit">${unit}</span></div>`;
 }
 function selTag(opts, val, onchangeStr){
   return `<select class="sel-tag" onchange="${onchangeStr}" onclick="event.stopPropagation()">${opts.map(o=>`<option value="${o.v}" ${val===o.v?'selected':''}>${o.l}</option>`).join('')}</select>`;
@@ -256,15 +257,11 @@ function renderRins(){
     <div class="radio-opt ${isSit('cronica')}" onclick="setSit('cronica')"><label class="radio-label"><span class="radio-mark"></span>Nefropatia crônica ${selTag([{v:'bilateral',l:'bilateral'},{v:'à direita',l:'à direita'},{v:'à esquerda',l:'à esquerda'}],e.afeccaoLado,"setVal('rins','afeccaoLado',this.value)")}</label></div>
   </div>
   ${!e.nefrecDir ? `<div class="block"><div class="block-title">Dimensões Rim Direito</div><div class="dim-rows">
-    ${dimInput('rins','dimRD_L','Comprimento')}
-    ${dimInput('rins','dimRD_AP','A-P')}
-    ${dimInput('rins','dimRD_T','Largura')}
+    ${dimInput('rins','dimRD_L','Longitudinal')}
     ${dimInput('rins','espRD','Espessura Parênquima')}
   </div></div>` : ''}
   ${!e.nefrecEsq ? `<div class="block"><div class="block-title">Dimensões Rim Esquerdo</div><div class="dim-rows">
-    ${dimInput('rins','dimRE_L','Comprimento')}
-    ${dimInput('rins','dimRE_AP','A-P')}
-    ${dimInput('rins','dimRE_T','Largura')}
+    ${dimInput('rins','dimRE_L','Longitudinal')}
     ${dimInput('rins','espRE','Espessura Parênquima')}
   </div></div>` : ''}
   
@@ -332,6 +329,7 @@ function renderBexiga(){
     ${radioVal('bexiga','sit','parcial','Distensão parcial','sit_bex')}
     ${radioVal('bexiga','sit','espessada','Paredes espessadas','sit_bex')}
     ${radioVal('bexiga','sit','vazia','Vazia','sit_bex')}
+    ${radioVal('bexiga','sit','baixa_replecao','Baixa repleção','sit_bex')}
   </div>
   ${e.sit==='espessada' ? `
   <div class="block"><div class="block-title">Paredes</div>
@@ -339,18 +337,21 @@ function renderBexiga(){
     ${chk('bexiga','diverticulos','Presença de divertículos')}
   </div>` : ''}
   
-  ${e.sit!=='vazia' ? `
+  ${(e.sit!=='vazia' && e.sit!=='baixa_replecao') ? `
   <div class="block"><div class="block-title">Conteúdo</div>
     ${chk('bexiga','conteudoDebris','Ecos em suspensão (debris)')}
-    ${chk('bexiga','conteudoCoagulo','Coágulo')}
-    ${e.conteudoCoagulo ? `<div class="dim-rows" style="background:#fafbff;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
-      ${dimInput('bexiga','coaguloX','Med 1')} ${dimInput('bexiga','coaguloY','Med 2')} ${dimInput('bexiga','coaguloZ','Med 3')}</div>`:''}
+    ${chk('bexiga','conteudoCoaguloMovel','Coágulo Móvel')}
+    ${chk('bexiga','conteudoCoaguloAderido','Coágulo Aderido')}
+    ${e.conteudoCoaguloAderido ? `<div class="dim-rows" style="background:#fafbff;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+      <div class="dim-row"><span class="dim-lbl">Parede</span>${selTag([{v:'parede lateral direita',l:'parede lateral direita'},{v:'parede lateral esquerda',l:'parede lateral esquerda'},{v:'parede anterior',l:'parede anterior'},{v:'parede posterior',l:'parede posterior'},{v:'assoalho vesical',l:'assoalho vesical'}],e.coaguloAderidoParede,"setVal('bexiga','coaguloAderidoParede',this.value)")}</div></div>`:''}
     ${chk('bexiga','conteudoCalculo','Cálculo')}
     ${e.conteudoCalculo ? `<div class="dim-rows" style="background:#fafbff;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
       ${dimInput('bexiga','calculoX','Med 1')} ${dimInput('bexiga','calculoY','Med 2')} ${dimInput('bexiga','calculoZ','Med 3')}</div>`:''}
     ${chk('bexiga','conteudoLesao','Lesão vegetante / exofítica')}
     ${e.conteudoLesao ? `<div class="dim-rows" style="background:#fafbff;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
-      ${dimInput('bexiga','lesaoLoc','Localização (texto)','')} ${dimInput('bexiga','lesaoX','Med 1')} ${dimInput('bexiga','lesaoY','Med 2')} ${dimInput('bexiga','lesaoZ','Med 3')}
+      <div class="dim-row"><span class="dim-lbl">Localização</span>${selTag([{v:'parede lateral direita',l:'parede lateral direita'},{v:'parede lateral esquerda',l:'parede lateral esquerda'},{v:'parede anterior',l:'parede anterior'},{v:'parede posterior',l:'parede posterior'},{v:'assoalho vesical',l:'assoalho vesical'}],e.lesaoLoc,"setVal('bexiga','lesaoLoc',this.value)")}</div>
+      <div class="dim-row"><span class="dim-lbl">Ecogenicidade</span>${selTag([{v:'hipoecogênica',l:'hipoecogênica'},{v:'hiperecogênica',l:'hiperecogênica'}],e.lesaoEco,"setVal('bexiga','lesaoEco',this.value)")}</div>
+      ${dimInput('bexiga','lesaoX','Med 1')} ${dimInput('bexiga','lesaoY','Med 2')} ${dimInput('bexiga','lesaoZ','Med 3')}
       ${chk('bexiga','lesaoFluxo','Com fluxo ao Doppler')}</div>`:''}
     ${chk('bexiga','conteudoBalao','Balão de sonda vesical')}
   </div>
@@ -392,7 +393,7 @@ function renderAdicionais(){
   <div class="sec-title">Achados Adicionais</div>
   <div class="block"><div class="block-title">Texto Livre</div>
     <div style="padding:14px;">
-      <textarea class="achados" id="txt-adicionais" oninput="setVal('adicionais','texto',this.value)" placeholder="Digite aqui...">${estado.adicionais.texto}</textarea>
+      <textarea class="achados" id="txt-adicionais" oninput="setTextVal('adicionais','texto',this.value)" placeholder="Digite aqui...">${estado.adicionais.texto}</textarea>
     </div>
   </div>
   `;
@@ -401,6 +402,7 @@ function renderAdicionais(){
 // ── CONTROLES ──
 function setSit(val){ estado.rins.sit = val; if(val==='drpad')estado.rins.lesoes=estado.rins.lesoes.filter(l=>l.tipo!=='cisto'); renderPanel(); updateLaudo(); }
 function setVal(sec, field, val){ estado[sec][field] = val; renderPanel(); updateLaudo(); }
+function setTextVal(sec, field, val){ estado[sec][field] = val; updateLaudo(); }
 function toggleChk(sec, field){ estado[sec][field] = !estado[sec][field]; renderPanel(); updateLaudo(); }
 
 function addLesaoRim(tipo){
@@ -490,16 +492,14 @@ function updateLaudo(){
     fraseRins = preRins + parenquima;
     
     // Dimensões opcionais
-    const cvR = (l,ap,t) => l&&ap&&t ? (parseFloat(l)*parseFloat(ap)*parseFloat(t)*0.52).toFixed(1).replace('.',',') : null;
+    let dimensoesStr = '';
     if(!eR.nefrecDir){
-      const volRD = cvR(eR.dimRD_L, eR.dimRD_AP, eR.dimRD_T);
-      if(volRD) fraseRins += ` Rim direito mede ${eR.dimRD_L} x ${eR.dimRD_AP} x ${eR.dimRD_T} cm, com volume de ${volRD} cm³.`;
-      if(eR.espRD) fraseRins += ` Espessura do parênquima à direita: ${eR.espRD} cm.`;
+      if(eR.dimRD_L) dimensoesStr += `<br>O rim direito mede no eixo longitudinal: ${eR.dimRD_L} cm.`;
+      if(eR.espRD) dimensoesStr += (eR.dimRD_L ? ' ' : '<br>') + `Espessura do parênquima do rim direito: ${eR.espRD} cm.`;
     }
     if(!eR.nefrecEsq){
-      const volRE = cvR(eR.dimRE_L, eR.dimRE_AP, eR.dimRE_T);
-      if(volRE) fraseRins += ` Rim esquerdo mede ${eR.dimRE_L} x ${eR.dimRE_AP} x ${eR.dimRE_T} cm, com volume de ${volRE} cm³.`;
-      if(eR.espRE) fraseRins += ` Espessura do parênquima à esquerda: ${eR.espRE} cm.`;
+      if(eR.dimRE_L) dimensoesStr += `<br>O rim esquerdo mede no eixo longitudinal: ${eR.dimRE_L} cm.`;
+      if(eR.espRE) dimensoesStr += (eR.dimRE_L ? ' ' : '<br>') + `Espessura do parênquima do rim esquerdo: ${eR.espRE} cm.`;
     }
 
     // Lesões
@@ -542,7 +542,11 @@ function updateLaudo(){
         }
       });
       const tds = [...descCalc, ...descCisto, ...descNod];
-      if(tds.length>0) fraseRins += ' Destaca-se: ' + tds.join('; ') + '.';
+      if(tds.length === 1) {
+        fraseRins += ' Destaca-se: ' + tds[0] + '.';
+      } else if (tds.length > 1) {
+        fraseRins += ' Destaca-se:<br>- ' + tds.join('<br>- ') + '.';
+      }
     } else {
       fraseRins += ' Não há evidências de cálculos calicinais.';
     }
@@ -586,7 +590,13 @@ function updateLaudo(){
         if(!calculosObstrutivosEsq) opinioes.push(`Dilatação do sistema coletor à esquerda.`);
       }
     }
-    fraseRins += strHidro;
+    if(strHidro) {
+      fraseRins += '<br>' + strHidro.trim();
+    }
+    
+    if(dimensoesStr) {
+      fraseRins += '<br>' + dimensoesStr;
+    }
   }
   
   if(opRins) opinioes.unshift(opRins); // coloca no topo das opiniões
@@ -594,50 +604,92 @@ function updateLaudo(){
   // BEXIGA
   let fraseBexiga = '';
   if(eB.sit==='vazia'){
-    fraseBexiga = 'Bexiga vazia.';
-    opinioes.push('Bexiga com repleção insuficiente.');
+    fraseBexiga = 'Bexiga vazia, limitando a sua adequada avaliação ecográfica.';
+  } else if (eB.sit==='baixa_replecao') {
+    fraseBexiga = 'Bexiga urinária com conteúdo anecóide de baixa repleção, limitando a sua adequada avaliação ecográfica.';
   } else {
-    const distStr = eB.sit==='habitual'?'distensão adequada':eB.sit==='parcial'?'distensão parcial':'distensão adequada';
-    let parStr = 'parede com espessura normal';
-    if(eB.sit==='espessada'){
-      parStr = `paredes com espessura aumentada${eB.espParede?', medindo até '+eB.espParede+' cm':''}`;
-      if(eB.diverticulos) {
-        parStr += '. Presença de divertículos parietais';
-        opinioes.push('Espessamento parietal vesical difuso (associado a divertículos).');
-      } else {
-        opinioes.push('Espessamento parietal vesical difuso.');
+    let hasEspecial = eB.conteudoCoaguloMovel || eB.conteudoCoaguloAderido || eB.conteudoLesao || eB.conteudoCalculo;
+    
+    if (!hasEspecial) {
+      const distStr = eB.sit==='habitual'?'distensão adequada':eB.sit==='parcial'?'distensão parcial':'distensão adequada';
+      let parStr = 'parede com espessura normal';
+      if(eB.sit==='espessada'){
+        parStr = `paredes com espessura aumentada${eB.espParede?', medindo até '+eB.espParede+' cm':''}`;
+        if(eB.diverticulos) {
+          parStr += '. Presença de divertículos parietais';
+          opinioes.push('Espessamento parietal vesical difuso (associado a divertículos).');
+        } else {
+          opinioes.push('Espessamento parietal vesical difuso.');
+        }
+      }
+      
+      let contBase = 'conteúdo homogêneo';
+      let destConteudo = [];
+      if(eB.conteudoDebris){
+        contBase = 'ecos em suspensão';
+        opinioes.push('Bexiga contendo debris em seu interior.');
+      }
+      if(eB.conteudoBalao){
+        destConteudo.push('balonete de sonda vesical');
+        opinioes.push('Bexiga contendo balonete de sonda em seu interior.');
+      }
+
+      fraseBexiga = `Bexiga com ${distStr}, apresentando contornos regulares, ${parStr} e ${contBase}.`;
+      if(destConteudo.length>0) fraseBexiga += ' Destaca-se em seu interior: ' + destConteudo.join('; ') + '.';
+    } else {
+      if (!eB.conteudoCoaguloMovel && !eB.conteudoCoaguloAderido) {
+        const distStr = eB.sit==='habitual'?'distensão adequada':eB.sit==='parcial'?'distensão parcial':'distensão adequada';
+        let parStr = 'parede com espessura normal';
+        if(eB.sit==='espessada'){
+          parStr = `paredes com espessura aumentada${eB.espParede?', medindo até '+eB.espParede+' cm':''}`;
+          if(eB.diverticulos) {
+            parStr += '. Presença de divertículos parietais';
+            opinioes.push('Espessamento parietal vesical difuso (associado a divertículos).');
+          } else {
+            opinioes.push('Espessamento parietal vesical difuso.');
+          }
+        }
+        let contBase = 'conteúdo homogêneo';
+        if(eB.conteudoDebris){
+          contBase = 'ecos em suspensão';
+          opinioes.push('Bexiga contendo debris em seu interior.');
+        }
+        fraseBexiga = `Bexiga com ${distStr}, apresentando contornos regulares, ${parStr} e ${contBase}. `;
+      }
+
+      if (eB.conteudoCoaguloMovel) {
+        fraseBexiga += 'Bexiga urinária de forma e capacidade conservadas, com presença de conteúdo hipoecogênico e amorfo no seu interior, móvel à mudança de decúbito, sem fluxo ao estudo complementar com Doppler, que pode corresponder a coágulos sanguíneos ou a sedimento de outra natureza. ';
+        opinioes.push('Achados sugestivos de coágulo vesical e/ou sedimento de outra natureza.');
+      }
+      if (eB.conteudoCoaguloAderido) {
+        let paredeCoagulo = eB.coaguloAderidoParede === 'assoalho vesical' ? 'ao seu assoalho vesical' : `à sua ${eB.coaguloAderidoParede || 'parede'}`;
+        fraseBexiga += `Bexiga de paredes levemente espessadas, apresentando material amorfo e heterogêneo, aderido ${paredeCoagulo}, imóvel a mudança de decúbito, sem fluxo ao estudo complementar com Doppler, sugestivo de coágulo aderido, na dependência de dados clínicos e laboratoriais. A critério correlacionar com cistoscopia. `;
+        opinioes.push('Achados sugestivos de coágulo vesical aderido à parede vesical.');
+      }
+      if (eB.conteudoCalculo) {
+        let medCalc = [eB.calculoX, eB.calculoY, eB.calculoZ].filter(m=>m).join(' x ');
+        let medStrCalc = medCalc ? `medindo ${medCalc} cm` : 'medindo * cm';
+        fraseBexiga += `Caracteriza-se no interior da bexiga formação arredondada, de limites precisos, contornos regulares, hiperecogênica, com sombra acústica posterior, móvel com a mudança de decúbito, ${medStrCalc}, sugestiva de cálculo. `;
+        opinioes.push('Litíase vesical.');
+      }
+      if (eB.conteudoLesao) {
+        const cvx = (l,ap,t) => l&&ap&&t ? (parseFloat(l)*parseFloat(ap)*parseFloat(t)*0.52).toFixed(1).replace('.',',') : null;
+        const volLesao = cvx(eB.lesaoX, eB.lesaoY, eB.lesaoZ);
+        const fluxo = eB.lesaoFluxo ? 'com fluxo' : 'sem fluxo';
+        let locLesao = eB.lesaoLoc === 'assoalho vesical' ? 'No assoalho vesical' : `Na ${eB.lesaoLoc || 'parede lateral direita'}`;
+        fraseBexiga += `${locLesao}, caracteriza-se formação nodular sólida, ${eB.lesaoEco}, de contornos arredondados, ${fluxo} ao estudo complementar com Doppler, imóvel às mudanças de decúbito, medindo ${eB.lesaoX || 'A'} x ${eB.lesaoY || 'B'} x ${eB.lesaoZ || 'C'} cm e volume de ${volLesao || 'x'} cm³. `;
+        opinioes.push('Achados sugestivos de massa/pólipo vesical, sendo conveniente prosseguir investigação diagnóstica.');
+      }
+      
+      let outrasCoisas = [];
+      if(eB.conteudoBalao){
+        outrasCoisas.push('balonete de sonda vesical');
+        opinioes.push('Bexiga contendo balonete de sonda em seu interior.');
+      }
+      if(outrasCoisas.length > 0) {
+        fraseBexiga += ' Destaca-se também: ' + outrasCoisas.join('; ') + '.';
       }
     }
-    
-    let contBase = 'conteúdo homogêneo';
-    let destConteudo = [];
-    if(eB.conteudoDebris){
-      contBase = 'ecos em suspensão';
-      opinioes.push('Bexiga contendo debris em seu interior.');
-    }
-    if(eB.conteudoCoagulo){
-      const ms = medStr({m1:eB.coaguloX,m2:eB.coaguloY,m3:eB.coaguloZ});
-      destConteudo.push(`coágulo móvel ${ms}`);
-      opinioes.push('Coágulo vesical.');
-    }
-    if(eB.conteudoCalculo){
-      const ms = medStr({m1:eB.calculoX,m2:eB.calculoY,m3:eB.calculoZ});
-      destConteudo.push(`cálculo ${ms}`);
-      opinioes.push('Litíase vesical.');
-    }
-    if(eB.conteudoLesao){
-      const ms = medStr({m1:eB.lesaoX,m2:eB.lesaoY,m3:eB.lesaoZ});
-      const fluxo = eB.lesaoFluxo ? 'caracterizando fluxo vascular interno' : 'não caracterizando fluxo vascular interno';
-      destConteudo.push(`lesão exofítica de contornos irregulares localizada ${eB.lesaoLoc} ${ms}, ${fluxo} ao estudo complementar com Doppler`);
-      opinioes.push('Lesão vesical de provável natureza neoplásica. Sugere-se, a critério clínico, complementação diagnóstica com cistoscopia.');
-    }
-    if(eB.conteudoBalao){
-      destConteudo.push('balonete de sonda vesical');
-      opinioes.push('Bexiga contendo balonete de sonda em seu interior.');
-    }
-
-    fraseBexiga = `Bexiga com ${distStr}, apresentando contornos regulares, ${parStr} e ${contBase}.`;
-    if(destConteudo.length>0) fraseBexiga += ' Destaca-se em seu interior: ' + destConteudo.join('; ') + '.';
 
     // Jatos
     if(eB.jatos==='simetricos') fraseBexiga += ' Jatos ureterais presentes e simétricos.';
@@ -748,8 +800,8 @@ function imprimir(){
   w.print(); 
 }
 function reiniciar(){
-  estado.rins = { sit: 'habitual', ectopicoLado: 'direito', ectopicoLoc: 'fossa ilíaca direita', nefrecDir: false, nefrecEsq: false, afeccaoLado: 'bilateral', dimRD_L: '', dimRD_AP: '', dimRD_T: '', espRD: '', dimRE_L: '', dimRE_AP: '', dimRE_T: '', espRE: '', hidroDir: 'ausente', hidroEsq: 'ausente', ureterDir: false, ureterEsq: false, lesoes: [] };
-  estado.bexiga = { sit: 'habitual', espParede: '', diverticulos: false, conteudoDebris: false, conteudoCoagulo: false, coaguloX: '', coaguloY: '', coaguloZ: '', conteudoCalculo: false, calculoX: '', calculoY: '', calculoZ: '', conteudoLesao: false, lesaoLoc: 'assoalho vesical', lesaoX: '', lesaoY: '', lesaoZ: '', lesaoFluxo: false, conteudoBalao: false, jatos: 'nao_citar' };
+  estado.rins = { sit: 'habitual', ectopicoLado: 'direito', ectopicoLoc: 'fossa ilíaca direita', nefrecDir: false, nefrecEsq: false, afeccaoLado: 'bilateral', dimRD_L: '', espRD: '', dimRE_L: '', espRE: '', hidroDir: 'ausente', hidroEsq: 'ausente', ureterDir: false, ureterEsq: false, lesoes: [] };
+  estado.bexiga = { sit: 'habitual', espParede: '', diverticulos: false, conteudoDebris: false, conteudoCoaguloMovel: false, conteudoCoaguloAderido: false, coaguloAderidoParede: 'parede posterior', conteudoCalculo: false, calculoX: '', calculoY: '', calculoZ: '', conteudoLesao: false, lesaoLoc: 'parede lateral direita', lesaoX: '', lesaoY: '', lesaoZ: '', lesaoFluxo: false, lesaoEco: 'hipoecogênica', conteudoBalao: false, jatos: 'nao_citar' };
   estado.volume = { preL: '', preAP: '', preT: '', posL: '', posAP: '', posT: '' };
   estado.adicionais = { texto: '' };
   showSection('rins');
