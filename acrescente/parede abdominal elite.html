@@ -783,7 +783,7 @@ function updateLaudo(){
   if(hd.length===0) op='Estudo ecográfico sem evidentes anormalidades apreciáveis ao método.';
   else op=hd.join('<br>')+'<br>Demais estruturas sem evidentes anormalidades apreciáveis ao método.';
  
-  html+=`<div class="doc-secao"><span class="doc-label">OPINIÃO DO RELATÓRIO:</span><div class="doc-p">${op}</div></div>`;
+  html+=`<div class="doc-secao"><span class="doc-label">IMPRESSÃO DIAGNÓSTICA:</span><div class="doc-p">${op}</div></div>`;
  
   if(estado.achados.texto) html+=`<div class="doc-secao"><span class="doc-label">ACHADOS ADICIONAIS:</span><div class="doc-p">${estado.achados.texto}</div></div>`;
  
