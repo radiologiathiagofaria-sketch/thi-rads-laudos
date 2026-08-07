@@ -454,7 +454,7 @@ function updateLaudo(){
       const outroLado = eR.ectopicoLado==='direito'?'esquerdo':'direito';
       if((eR.ectopicoLado==='direito'&&eR.nefrecEsq)||(eR.ectopicoLado==='esquerdo'&&eR.nefrecDir)){
         preRins = `Rim ${outroLado} não caracterizado (status pós-operatório). Rim ${eR.ectopicoLado} localizado em ${eR.ectopicoLoc}, com dimensões usuais e contornos regulares.`;
-        opRins = `Rim ${eR.ectopicoLado} ectópico. Status pós-nefrectomia ${outroLado}.`;
+        opRins = `Rim ${eR.ectopicoLado} ectópico. Status pós-nefrectomia ${outroLado === 'direito' ? 'direita' : 'esquerda'}.`;
       } else {
         preRins = `Rim ${eR.ectopicoLado} localizado em ${eR.ectopicoLoc}. Rim ${outroLado} em topografia habitual. Rins com dimensões usuais e contornos regulares.`;
         opRins = `Rim ${eR.ectopicoLado} ectópico.`;
@@ -508,7 +508,7 @@ function updateLaudo(){
     if(eR.lesoes.length > 0){
       const descCalc = []; const descCisto = []; const descNod = [];
       eR.lesoes.forEach(l => {
-        const ladoTxt = l.lado==='bilateral'?'bilateralmente':`à ${l.lado}`;
+        const ladoTxt = l.lado==='bilateral'?'bilateralmente':(l.lado==='direito'?'à direita':'à esquerda');
         if(l.tipo==='calculo'){
           const obs = ['junção ureteropiélica','junção ureterovesical','ureter proximal','ureter médio','ureter distal'].includes(l.loc);
           if(obs && ['direito','bilateral'].includes(l.lado)) calculosObstrutivosDir = true;
@@ -527,7 +527,7 @@ function updateLaudo(){
             descCisto.push(`cisto ${l.comp} em ${l.loc} ${l.topo} ${ladoTxt}${medStrAprox(l)?', '+medStrAprox(l):''}`);
             opinioes.push(`Cisto renal ${ladoTxt}.`);
           } else {
-            descCisto.push(`múltiplos cistos ${l.comp}s, o maior localizado em ${l.loc} ${l.topo} ${ladoTxt}${medStrAprox(l)?', '+medStrAprox(l):''}`);
+            descCisto.push(`múltiplos cistos ${l.comp === 'simples' ? 'simples' : 'complexos'}, o maior localizado em ${l.loc} ${l.topo} ${ladoTxt}${medStrAprox(l)?', '+medStrAprox(l):''}`);
             opinioes.push(`Cistos renais ${ladoTxt}.`);
           }
         }

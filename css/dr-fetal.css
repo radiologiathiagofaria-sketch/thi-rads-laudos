@@ -1,0 +1,575 @@
+/* ============================================================
+   DR. FETAL — Assistente de Medicina Fetal
+   CSS 100% independente. Não altera nenhum estilo existente.
+   Todos os seletores usam prefixo "drfetal-" para isolamento.
+   ============================================================ */
+
+/* ---- Container Floating (Canto Superior Direito) ---- */
+.drfetal-container {
+  position: fixed;
+  top: 32px;
+  right: 50px;
+  z-index: 9990;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  pointer-events: auto;
+  transition: opacity 0.4s ease;
+}
+
+/* ---- Avatar ---- */
+.drfetal-avatar-wrapper {
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+.drfetal-avatar-wrapper:hover {
+  transform: scale(1.08);
+}
+
+.drfetal-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(0, 242, 255, 0.4);
+  box-shadow: 0 0 12px rgba(0, 242, 255, 0.15), 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.5s ease;
+}
+
+.drfetal-avatar.drfetal-alert {
+  border-color: rgba(255, 193, 7, 0.7);
+  box-shadow: 0 0 16px rgba(255, 193, 7, 0.3), 0 4px 12px rgba(0, 0, 0, 0.3);
+  animation: drfetal-pulse-border 2s ease-in-out infinite;
+}
+
+@keyframes drfetal-pulse-border {
+  0%, 100% { box-shadow: 0 0 12px rgba(255, 193, 7, 0.2), 0 4px 12px rgba(0, 0, 0, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(255, 193, 7, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3); }
+}
+
+/* ---- Status Indicator ---- */
+.drfetal-status-dot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #22c55e;
+  border: 2px solid #0a192f;
+  transition: background 0.4s ease;
+}
+.drfetal-status-dot.drfetal-status-warning {
+  background: #f59e0b;
+  animation: drfetal-dot-pulse 1.5s ease-in-out infinite;
+}
+@keyframes drfetal-dot-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+body.light-mode .drfetal-status-dot {
+  border-color: #f1f5f9;
+}
+
+/* ---- Balão de Alerta ---- */
+.drfetal-balloon {
+  display: none;
+  max-width: 280px;
+  padding: 12px 16px;
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 12px rgba(255, 193, 7, 0.1);
+  color: #f8fafc;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateX(10px);
+  transition: all 0.4s ease;
+  pointer-events: auto;
+}
+.drfetal-balloon.drfetal-visible {
+  display: block;
+  opacity: 1;
+  transform: translateX(0);
+}
+body.light-mode .drfetal-balloon {
+  background: rgba(255, 255, 255, 0.95);
+  color: #0f172a;
+  border-color: rgba(255, 193, 7, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1), 0 0 12px rgba(255, 193, 7, 0.08);
+}
+.drfetal-balloon-icon {
+  display: inline;
+  margin-right: 4px;
+}
+.drfetal-balloon-link {
+  display: block;
+  margin-top: 6px;
+  color: #00f2ff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+body.light-mode .drfetal-balloon-link {
+  color: #0ea5e9;
+}
+.drfetal-balloon-link:hover {
+  text-decoration: underline;
+}
+
+/* Seta do balão (apontando para a direita, em direção ao avatar) */
+.drfetal-balloon::after {
+  content: '';
+  position: absolute;
+  top: 18px;
+  right: -7px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 7px 0 7px 7px;
+  border-color: transparent transparent transparent rgba(15, 23, 42, 0.92);
+}
+body.light-mode .drfetal-balloon::after {
+  border-color: transparent transparent transparent rgba(255, 255, 255, 0.95);
+}
+
+/* ---- Modal Overlay ---- */
+.drfetal-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 10000;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.drfetal-modal-overlay.drfetal-visible {
+  display: flex;
+  opacity: 1;
+}
+
+/* ---- Modal Panel ---- */
+.drfetal-modal {
+  background: rgba(15, 23, 42, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 242, 255, 0.25);
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(0, 242, 255, 0.1), 0 20px 60px rgba(0, 0, 0, 0.5);
+  width: 92%;
+  max-width: 700px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(20px) scale(0.95);
+  opacity: 0;
+  transition: all 0.35s ease;
+}
+.drfetal-modal-overlay.drfetal-visible .drfetal-modal {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+body.light-mode .drfetal-modal {
+  background: rgba(255, 255, 255, 0.97);
+  border-color: rgba(14, 165, 233, 0.25);
+  box-shadow: 0 0 30px rgba(14, 165, 233, 0.08), 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+/* ---- Modal Header ---- */
+.drfetal-modal-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+body.light-mode .drfetal-modal-header {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+.drfetal-modal-header-content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.drfetal-modal-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(0, 242, 255, 0.3);
+}
+.drfetal-modal-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
+  color: #00f2ff;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(0, 242, 255, 0.3);
+}
+body.light-mode .drfetal-modal-title {
+  color: #0ea5e9;
+  text-shadow: none;
+}
+.drfetal-modal-subtitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.82rem;
+  color: #94a3b8;
+  margin-top: 3px;
+  font-style: italic;
+}
+.drfetal-modal-close {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 1.2rem;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f8fafc;
+  transition: 0.3s;
+  flex-shrink: 0;
+}
+body.light-mode .drfetal-modal-close {
+  color: #0f172a;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+.drfetal-modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ---- Modal Body (Scrollable) ---- */
+.drfetal-modal-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  flex: 1;
+  font-family: 'Inter', sans-serif;
+  color: #f8fafc;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+body.light-mode .drfetal-modal-body {
+  color: #0f172a;
+}
+
+/* ---- Seção de Narrativa do Dr. Fetal ---- */
+.drfetal-narrative {
+  padding: 16px;
+  background: rgba(0, 242, 255, 0.04);
+  border-left: 3px solid rgba(0, 242, 255, 0.4);
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 20px;
+  font-style: italic;
+  line-height: 1.65;
+}
+body.light-mode .drfetal-narrative {
+  background: rgba(14, 165, 233, 0.04);
+  border-left-color: rgba(14, 165, 233, 0.4);
+}
+
+/* ---- Dados Analisados (Mini-Tabela) ---- */
+.drfetal-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-size: 0.88rem;
+}
+.drfetal-data-table th {
+  text-align: left;
+  padding: 8px 10px;
+  color: #94a3b8;
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+body.light-mode .drfetal-data-table th {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+.drfetal-data-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+body.light-mode .drfetal-data-table td {
+  border-bottom-color: rgba(0, 0, 0, 0.04);
+}
+.drfetal-data-table .drfetal-val-normal {
+  color: #22c55e;
+}
+.drfetal-data-table .drfetal-val-warning {
+  color: #f59e0b;
+}
+.drfetal-data-table .drfetal-val-danger {
+  color: #ef4444;
+}
+
+/* ---- Badge de Classificação ---- */
+.drfetal-classification {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin: 16px 0;
+}
+.drfetal-class-adequado {
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #22c55e;
+}
+.drfetal-class-grande {
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #3b82f6;
+}
+.drfetal-class-sga {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #f59e0b;
+}
+.drfetal-class-fgr {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+.drfetal-class-indeterminado {
+  background: rgba(148, 163, 184, 0.12);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  color: #94a3b8;
+}
+
+/* ---- Lista de Critérios ---- */
+.drfetal-criteria-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.78rem;
+  color: #00f2ff;
+  font-weight: 600;
+  margin: 20px 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+body.light-mode .drfetal-criteria-title {
+  color: #0ea5e9;
+}
+
+.drfetal-criteria-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px 0;
+}
+.drfetal-criteria-list li {
+  padding: 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+}
+.drfetal-criteria-list li .drfetal-check {
+  color: #22c55e;
+  font-weight: 700;
+}
+.drfetal-criteria-list li .drfetal-uncheck {
+  color: #475569;
+  font-weight: 400;
+}
+
+/* ---- Diretrizes ---- */
+.drfetal-guidelines {
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 20px;
+}
+body.light-mode .drfetal-guidelines {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+.drfetal-guidelines-title {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.drfetal-guidelines-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.drfetal-guidelines-list li {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  padding: 2px 0;
+}
+.drfetal-guidelines-list li::before {
+  content: '•';
+  margin-right: 6px;
+  color: #00f2ff;
+}
+body.light-mode .drfetal-guidelines-list li::before {
+  color: #0ea5e9;
+}
+
+/* ---- Conclusão Sugerida ---- */
+.drfetal-conclusion-section {
+  margin-top: 20px;
+}
+.drfetal-conclusion-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.78rem;
+  color: #00f2ff;
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+body.light-mode .drfetal-conclusion-label {
+  color: #0ea5e9;
+}
+.drfetal-conclusion-box {
+  width: 100%;
+  min-height: 80px;
+  padding: 12px 14px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #f8fafc;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.3s;
+}
+body.light-mode .drfetal-conclusion-box {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.12);
+  color: #0f172a;
+}
+.drfetal-conclusion-box:focus {
+  border-color: rgba(0, 242, 255, 0.5);
+}
+
+/* ---- Checkbox de Referências ---- */
+.drfetal-ref-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  font-size: 0.85rem;
+  color: #94a3b8;
+  cursor: pointer;
+}
+.drfetal-ref-check input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #00f2ff;
+  cursor: pointer;
+}
+body.light-mode .drfetal-ref-check input[type="checkbox"] {
+  accent-color: #0ea5e9;
+}
+
+/* ---- Modal Footer ---- */
+.drfetal-modal-footer {
+  padding: 16px 24px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+body.light-mode .drfetal-modal-footer {
+  border-top-color: rgba(0, 0, 0, 0.08);
+}
+
+.drfetal-btn {
+  padding: 10px 20px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+.drfetal-btn-secondary {
+  color: #94a3b8;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+body.light-mode .drfetal-btn-secondary {
+  color: #475569;
+  border-color: rgba(0, 0, 0, 0.12);
+}
+.drfetal-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.drfetal-btn-primary {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #000;
+  background: linear-gradient(135deg, #00f2ff, #00ff88);
+  box-shadow: 0 4px 15px rgba(0, 242, 255, 0.3);
+  letter-spacing: 0.5px;
+}
+.drfetal-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 242, 255, 0.5);
+}
+
+/* ---- Separator ---- */
+.drfetal-separator {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  margin: 16px 0;
+  border: none;
+}
+body.light-mode .drfetal-separator {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .drfetal-container {
+    top: 16px;
+    right: 16px;
+  }
+  .drfetal-avatar {
+    width: 48px;
+    height: 48px;
+  }
+  .drfetal-balloon {
+    max-width: 220px;
+    font-size: 0.8rem;
+  }
+  .drfetal-modal {
+    width: 96%;
+    max-height: 92vh;
+  }
+}

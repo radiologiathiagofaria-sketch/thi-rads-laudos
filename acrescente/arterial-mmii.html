@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THI-RADS | US Doppler Arterial de Membros Inferiores</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#1a56db;--blue-dark:#1140a6;--blue-light:#e8f0fe;--blue-mid:#dbeafe;
+  --surface:#f4f6fb;--border:#e2e6ef;--border-strong:#c8cfe0;
+  --text:#1a1f2e;--text-2:#4b5570;--text-3:#8892a4;
+  --white:#ffffff;--green:#059669;--red:#dc2626;--amber:#b45309;--amber-bg:#fffbeb;--amber-border:#fde68a;
+  --radius:8px;--radius-lg:12px;
+}
+body.dark{
+  --blue:#4d86f5;--blue-dark:#3a6fd4;--blue-light:#1e2d4a;--blue-mid:#1e2d4a;
+  --surface:#141820;--border:#2a2f3d;--border-strong:#3a4155;
+  --text:#e2e6f0;--text-2:#9aa3b8;--text-3:#5d6680;
+  --white:#1e2230;--green:#34d399;--red:#f87171;--amber:#fbbf24;--amber-bg:#1c1810;--amber-border:#78350f;
+}
+body.dark .laudo-doc{color:#e2e6f0;}
+body.dark .laudo-panel{background:#1e2230;border-left-color:var(--border);}
+body.dark .laudo-body{background:#1e2230;}
+body.dark .laudo-header{background:#1e2230;border-bottom-color:var(--border);}
+body.dark .info-box{background:#1e2a1e;border-color:#2a4a2a;}
+@media print{body.dark .laudo-doc,body.dark .laudo-doc *{color:#111 !important;}}
+.btn-dark{margin-left:auto;}
+body.dark .btn-dark{background:#2a2f3d;border-color:#3a4155;color:#e2e6f0;}
+body.dark .btn-dark:hover{background:#343a4d;color:#fff;}
+body.dark .dim-input,body.dark .vel-input,body.dark .ff select,body.dark .ff input[type=text]{background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .radio-mark{background:var(--white);}
+body.dark .check-box{background:var(--white);}
+body.dark .sub-opts{background:#1a2040;border-bottom-color:#2a3460;}
+body.dark .sub-opt-label{background:var(--white);color:var(--text-2);}
+body.dark .toolbar{background:var(--white);border-bottom-color:var(--border);}
+body.dark .sidebar{background:var(--white);border-right-color:var(--border);}
+body.dark .sidebar-hd{border-bottom-color:var(--border);}
+body.dark .block{background:var(--white);border-color:var(--border);}
+body.dark .block-title{background:var(--white);border-bottom-color:var(--border);}
+body.dark .radio-opt:hover{background:#1e2d4a;}
+body.dark .radio-opt.selected{background:#1e2d4a;}
+body.dark .check-row{background:#1a1f2e;}
+body.dark .check-row:hover{background:#1e2d4a;}
+body.dark .check-row.selected{background:#1e2d4a;}
+body.dark .btn-add{background:var(--white);color:var(--text-2);border-color:var(--border-strong);}
+body.dark .sel-tag{background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .plaq-details{background:#1a2040;border-color:#2a3460;}
+body.dark .info-box{background:#1a2040;border-color:#2a4460;color:#a0b4d0;}
+body.dark .laudo-doc table{background:#1e2230;}
+body.dark .laudo-doc table thead tr,
+body.dark .laudo-doc table th[style*="background"]{background:#2a2f3d !important;}
+body.dark .laudo-doc table th,
+body.dark .laudo-doc table td{border-color:#3a4155 !important;color:#e2e6f0 !important;}
+body.dark .amber-box{background:#1c1810;border-color:#78350f;color:#fbbf24;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',system-ui,sans-serif;font-size:13px;background:var(--surface);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+.toolbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:10px;height:48px;flex-shrink:0;}
+.logo{display:flex;align-items:baseline;gap:6px;margin-right:12px;}
+.logo-name{font-size:17px;font-weight:600;color:var(--blue);letter-spacing:-.3px;}
+.logo-sub{font-size:11px;color:var(--text-3);font-weight:400;letter-spacing:.2px;}
+.tb-sep{width:1px;height:20px;background:var(--border);margin:0 4px;}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid var(--border);font-weight:500;transition:all .13s;background:var(--white);color:var(--text-2);}
+.btn:hover{background:var(--surface);border-color:var(--border-strong);color:var(--text);}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue);}
+.btn-primary:hover{background:var(--blue-dark);border-color:var(--blue-dark);color:#fff;}
+.btn-danger{background:#fff5f5;color:var(--red);border-color:#fecaca;}
+body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
+.btn-danger:hover{background:#fee2e2;border-color:#fca5a5;}
+.btn svg{width:13px;height:13px;flex-shrink:0;}
+.body{display:flex;flex:1;overflow:hidden;}
+.sidebar{width:158px;background:var(--white);border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;}
+.sidebar-hd{padding:10px 12px 8px;border-bottom:1px solid var(--border);}
+.sidebar-tipo{font-size:9px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;}
+.sidebar-titulo{font-size:11px;font-weight:600;color:var(--text);}
+.nav-group{padding:4px 0 8px;}
+.nav-group-hd{padding:8px 12px 3px;font-size:9px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;margin-top:2px;}
+.nav-item{display:flex;align-items:center;gap:7px;padding:6px 12px;font-size:11.5px;color:var(--text-2);cursor:pointer;transition:all .12s;border-left:2px solid transparent;}
+.nav-item:hover{background:var(--blue-light);color:var(--blue);}
+.nav-item.active{background:var(--blue-light);color:var(--blue);border-left-color:var(--blue);font-weight:600;}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.4;flex-shrink:0;}
+.nav-item.active .nav-dot{opacity:1;}
+.panel{width:490px;flex-shrink:0;overflow-y:auto;padding:14px 14px 20px;background:var(--surface);}
+.sec-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.sec-title::before{content:'';display:block;width:3px;height:16px;background:var(--blue);border-radius:2px;}
+.block{margin-bottom:10px;background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden;}
+.block-title{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.7px;padding:8px 14px 7px;border-bottom:1px solid var(--border);background:var(--white);}
+.radio-opt{display:flex;align-items:flex-start;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;position:relative;}
+.radio-opt:last-child{border-bottom:none;}
+.radio-opt:hover{background:#f5f8ff;}
+.radio-opt.selected{background:var(--blue-light);}
+.radio-opt input[type=radio]{position:absolute;opacity:0;pointer-events:none;}
+.radio-label{display:flex;align-items:center;gap:10px;width:100%;padding:9px 14px;font-size:12.5px;color:var(--text-2);line-height:1.4;cursor:pointer;}
+.radio-opt.selected .radio-label{color:var(--blue);font-weight:500;}
+.radio-mark{width:16px;height:16px;border-radius:50%;border:2px solid var(--border-strong);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.radio-opt:hover .radio-mark{border-color:var(--blue);}
+.radio-opt.selected .radio-mark{border-color:var(--blue);background:var(--blue);}
+.radio-mark::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff;opacity:0;transition:opacity .15s;}
+.radio-opt.selected .radio-mark::after{opacity:1;}
+.check-row{display:flex;align-items:center;border-bottom:1px solid var(--border);cursor:pointer;background:#fafbff;}
+.check-row:last-child{border-bottom:none;}
+.check-row:hover{background:#f0f5ff;}
+.check-row.selected{background:#e6eeff;}
+.check-row input[type=checkbox]{position:absolute;opacity:0;pointer-events:none;}
+.check-label{display:flex;align-items:center;gap:10px;width:100%;padding:8px 14px;font-size:12px;color:var(--text-2);cursor:pointer;}
+.check-row.selected .check-label{color:var(--blue);font-weight:500;}
+.check-box{width:15px;height:15px;border-radius:4px;border:2px solid var(--border-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.check-row:hover .check-box{border-color:var(--blue);}
+.check-row.selected .check-box{border-color:var(--blue);background:var(--blue);}
+.check-box svg{display:none;width:9px;height:9px;}
+.check-row.selected .check-box svg{display:block;}
+.dim-rows{padding:8px 14px;display:flex;flex-direction:column;gap:6px;}
+.dim-row{display:flex;align-items:center;gap:10px;}
+.dim-lbl{flex:1;font-size:12px;color:var(--text-2);}
+.dim-input{width:65px;padding:5px 8px;border:1px solid var(--border-strong);border-radius:6px;font-size:12.5px;font-family:'DM Sans',sans-serif;text-align:center;color:var(--text);background:var(--white);transition:border .12s;}
+.dim-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,.08);}
+.dim-unit{font-size:12px;color:var(--text-3);min-width:30px;}
+.sel-tag{font-size:11px;border:1px solid var(--border-strong);border-radius:5px;padding:3px 6px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);cursor:pointer;}
+.ff-grid{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;padding:10px 14px 0;}
+.ff{display:flex;flex-direction:column;gap:2px;}
+.ff label{font-size:9px;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
+.ff select,.ff input[type=text]{font-size:11px;padding:4px 7px;border:1px solid var(--border-strong);border-radius:5px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);}
+.ff select:focus,.ff input:focus{outline:none;border-color:var(--blue);}
+.ff input[type=text]{width:70px;text-align:center;}
+.ff select{min-width:150px;}
+.plaq-details{padding:4px 0 10px;background:#eef3ff;border-top:1px solid #d0dcff;display:flex;flex-direction:column;gap:4px;}
+.laudo-panel{flex:1;min-width:0;background:var(--white);display:flex;flex-direction:column;border-left:1px solid var(--border);}
+.laudo-header{padding:9px 20px 8px;border-bottom:1px solid var(--border);background:var(--white);display:flex;align-items:center;}
+.laudo-header-title{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.6px;}
+.laudo-body{flex:1;overflow-y:auto;padding:22px 28px;}
+.laudo-doc{font-family:Helvetica,Arial,sans-serif;font-size:10pt;line-height:1.65;color:#111;max-width:740px;}
+.doc-titulo{text-align:center;font-weight:700;font-size:10pt;margin-bottom:16px;text-transform:uppercase;letter-spacing:.3px;}
+.doc-label{font-weight:700;font-size:10pt;display:block;margin-bottom:2px;}
+.doc-p{margin-bottom:8px;font-size:10pt;}
+.doc-secao{margin-bottom:14px;}
+.info-box{padding:8px 14px;font-size:11px;color:#1e40af;background:#eff6ff;border-top:1px solid #bfdbfe;line-height:1.6;}
+.amber-box{padding:8px 14px;font-size:11px;color:var(--amber);background:var(--amber-bg);border-top:1px solid var(--amber-border);line-height:1.6;}
+.laudo-doc:focus { outline: none; }
+.toast-notification{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a1f2e;color:#fff;padding:10px 20px;border-radius:8px;font-size:12.5px;font-weight:500;opacity:0;pointer-events:none;transition:all .25s;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,.2);}
+.toast-notification.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="logo" style="cursor:pointer" onclick="window.location.href='../laudo-thirads.html'"><span class="logo-name">THI-RADS</span><span class="logo-sub">laudo estruturado</span></div>
+  <button class="btn" onclick="window.location.href='../laudo-thirads.html'"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 2L4 8l6 6"/></svg>Voltar</button>
+  <div class="tb-sep"></div>
+  <button class="btn" onclick="copiar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>Copiar laudo</button>
+  <button class="btn btn-primary" onclick="imprimir()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6V2h8v4M4 12H2V7h12v5h-2M4 9h8M4 12v2h8v-2"/></svg>Imprimir</button>
+  <button class="btn btn-dark" id="btn-dark-toggle" onclick="toggleDark()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro</button>
+  <button class="btn btn-danger" onclick="reiniciar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8a6 6 0 1 0 1.5-3.9M2 4v4h4"/></svg>Reiniciar</button>
+</div>
+
+<div class="body">
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-hd"><div class="sidebar-tipo">US Doppler</div><div class="sidebar-titulo">Arterial de MMII</div></div>
+    <div id="nav-container"></div>
+  </div>
+
+  <div class="panel" id="main-panel"></div>
+
+  <div class="laudo-panel">
+    <div class="laudo-header"><span class="laudo-header-title">Pré-visualização do laudo</span></div>
+    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc" contenteditable="true"></div></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// ESTADO GLOBAL
+// ══════════════════════════════════════════════════════════════════
+function defaultSegmento() {
+  return {
+    sit: 'habitual', // habitual | placas | estenose | oclusao | aneurisma | monofasico
+    estLocal: 'terço proximal',
+    estGrau: 'menor que 50%',
+    estTardusParvus: false,
+    oclLocal: 'terço proximal',
+    oclSombra: false,
+    oclColaterais: false,
+    aneurLocal: 'origem',
+    aneurCalibre: '',
+    aneurExtensao: '',
+    aneurTrombo: false,
+    monoLocal: 'origem',
+  };
+}
+
+const SEGMENTOS = ['femCom','femSup','femProf','popl','tibAnt','tibPost','fib'];
+const NOME_SEG = {
+  femCom:'artéria femoral comum', femSup:'artéria femoral superficial', femProf:'artéria femoral profunda',
+  popl:'artéria poplítea', tibAnt:'artéria tibial anterior', tibPost:'artéria tibial posterior', fib:'artéria fibular'
+};
+const TITULO_SEG = {
+  femCom:'A. Femoral Comum', femSup:'A. Femoral Superficial', femProf:'A. Femoral Profunda',
+  popl:'A. Poplítea', tibAnt:'A. Tibial Anterior', tibPost:'A. Tibial Posterior', fib:'A. Fibular'
+};
+
+function estadoInicial() {
+  const e = {
+    tecnica: { lado:'bilateral', limitBiotipo:false, limitMobilidade:false },
+    achados: { baker:false, bakerMedida:'' },
+  };
+  SEGMENTOS.forEach(base => {
+    e[base+'D'] = defaultSegmento();
+    e[base+'E'] = defaultSegmento();
+  });
+  return e;
+}
+
+let estado = estadoInicial();
+let secaoAtual = 'tecnica';
+
+// ══════════════════════════════════════════════════════════════════
+// NAVEGAÇÃO / SIDEBAR
+// ══════════════════════════════════════════════════════════════════
+function ladoAtivo(letra) {
+  const l = estado.tecnica.lado;
+  if (l === 'bilateral') return true;
+  if (l === 'direito') return letra === 'D';
+  if (l === 'esquerdo') return letra === 'E';
+  return true;
+}
+
+function renderSidebar() {
+  const nav = document.getElementById('nav-container');
+  let html = `<div class="nav-group">
+    <div class="nav-group-hd">Geral</div>
+    <div class="nav-item" id="nav-tecnica" onclick="showSection('tecnica')"><span class="nav-dot"></span>Técnica</div>
+  </div>`;
+
+  if (ladoAtivo('D')) {
+    html += `<div class="nav-group"><div class="nav-group-hd">Membro Direito</div>`;
+    SEGMENTOS.forEach(base => {
+      html += `<div class="nav-item" id="nav-${base}D" onclick="showSection('${base}D')"><span class="nav-dot"></span>${TITULO_SEG[base]} D</div>`;
+    });
+    html += `</div>`;
+  }
+  if (ladoAtivo('E')) {
+    html += `<div class="nav-group"><div class="nav-group-hd">Membro Esquerdo</div>`;
+    SEGMENTOS.forEach(base => {
+      html += `<div class="nav-item" id="nav-${base}E" onclick="showSection('${base}E')"><span class="nav-dot"></span>${TITULO_SEG[base]} E</div>`;
+    });
+    html += `</div>`;
+  }
+
+  html += `<div class="nav-group">
+    <div class="nav-group-hd">Achados Adicionais</div>
+    <div class="nav-item" id="nav-achados" onclick="showSection('achados')"><span class="nav-dot"></span>Cisto de Baker</div>
+  </div>`;
+
+  nav.innerHTML = html;
+  const el = document.getElementById('nav-' + secaoAtual);
+  if (el) el.classList.add('active');
+}
+
+function showSection(sec) {
+  // Se a seção não está mais disponível (ex.: lado foi trocado), volta para técnica
+  if (!secaoDisponivel(sec)) sec = 'tecnica';
+  secaoAtual = sec;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const el = document.getElementById('nav-' + sec);
+  if (el) el.classList.add('active');
+  renderPanel(sec);
+  updateLaudo();
+}
+
+function secaoDisponivel(sec) {
+  if (sec === 'tecnica' || sec === 'achados') return true;
+  const letra = sec.slice(-1);
+  return ladoAtivo(letra);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RENDER DO PAINEL PRINCIPAL
+// ══════════════════════════════════════════════════════════════════
+function renderPanel(sec) {
+  const p = document.getElementById('main-panel');
+  let titulo, corpo;
+  if (sec === 'tecnica') { titulo = 'Técnica e Lado do Exame'; corpo = renderTecnica(); }
+  else if (sec === 'achados') { titulo = 'Achados Adicionais'; corpo = renderAchados(); }
+  else {
+    const base = sec.slice(0, -1);
+    const letra = sec.slice(-1);
+    titulo = TITULO_SEG[base] + ' ' + (letra === 'D' ? 'Direita' : 'Esquerda');
+    corpo = renderSegmento(sec);
+  }
+  p.innerHTML = `<div class="sec-title">${titulo}</div>${corpo}`;
+}
+
+// ── TÉCNICA ──
+function renderTecnica() {
+  const e = estado.tecnica;
+  const isLado = v => e.lado === v ? 'selected' : '';
+  return `
+  <div class="block"><div class="block-title">Lado do Exame</div>
+    <div class="radio-opt ${isLado('direito')}" onclick="setLado('direito')"><input type="radio"><label class="radio-label"><span class="radio-mark"></span>membro inferior direito</label></div>
+    <div class="radio-opt ${isLado('esquerdo')}" onclick="setLado('esquerdo')"><input type="radio"><label class="radio-label"><span class="radio-mark"></span>membro inferior esquerdo</label></div>
+    <div class="radio-opt ${isLado('bilateral')}" onclick="setLado('bilateral')"><input type="radio"><label class="radio-label"><span class="radio-mark"></span>bilateral</label></div>
+  </div>
+  <div class="block"><div class="block-title">Técnica</div>
+    <div class="info-box" style="border-top:none">Estudo realizado com transdutor linear de alta frequência, utilizando modos B, Doppler colorido e Doppler espectral.</div>
+  </div>
+  <div class="block"><div class="block-title">Limitações Técnicas</div>
+    ${chkRow('tc-biotipo','limitação relacionada ao biotipo',e.limitBiotipo,'tecnica','limitBiotipo')}
+    ${chkRow('tc-mobilidade','mobilidade restrita do paciente',e.limitMobilidade,'tecnica','limitMobilidade')}
+  </div>`;
+}
+
+function setLado(val) {
+  estado.tecnica.lado = val;
+  renderSidebar();
+  if (!secaoDisponivel(secaoAtual)) showSection('tecnica');
+  else { renderPanel(secaoAtual); updateLaudo(); }
+}
+
+// ── ACHADOS ADICIONAIS ──
+function renderAchados() {
+  const e = estado.achados;
+  return `
+  <div class="block"><div class="block-title">Fossa Poplítea</div>
+    ${chkRow('ac-baker','cisto de Baker',e.baker,'achados','baker')}
+    ${e.baker ? `<div class="ff-grid" style="padding-bottom:10px">
+      <div class="ff"><label>Medida (cm)</label><input type="text" class="dim-input" value="${e.bakerMedida}" data-sec="achados" data-key="bakerMedida" oninput="handleInput(this)"></div>
+    </div>` : ''}
+  </div>
+  <div class="info-box">Formação cística de paredes finas e lobuladas, com conteúdo líquido, anecogênico e homogêneo, com colo de comunicação articular entre o tendão do semi-membranoso e o músculo gastrocnêmio medial — descrita nos achados adicionais, após a conclusão.</div>`;
+}
+
+// ── SEGMENTOS ARTERIAIS ──
+function renderSegmento(segKey) {
+  const e = estado[segKey];
+  const nome = NOME_SEG[segKey.slice(0, -1)];
+  let html = `<div class="block"><div class="block-title">Situação</div>
+    ${sitOpt(segKey,'habitual','habitual (trajeto e calibre preservados, paredes regulares, sem placas)')}
+    ${sitOpt(segKey,'placas','placas ateromatosas parietais calcificadas difusas')}
+    ${sitOpt(segKey,'estenose','estenose focal')}
+    ${sitOpt(segKey,'oclusao','oclusão / sem fluxo detectável ao Doppler')}
+    ${sitOpt(segKey,'aneurisma','dilatação aneurismática')}
+    ${sitOpt(segKey,'monofasico','padrão de onda monofásico (sugere estenose à montante)')}
+  </div>`;
+
+  if (e.sit === 'estenose') {
+    html += `<div class="block"><div class="block-title">Dados da Estenose</div>
+      <div class="ff-grid">
+        <div class="ff"><label>Segmento</label>${selInline(segKey,'estLocal',[
+          {v:'terço proximal',l:'terço proximal'},{v:'terço médio',l:'terço médio'},{v:'terço distal',l:'terço distal'},{v:'origem',l:'origem'}
+        ],e.estLocal)}</div>
+      </div>
+      <div class="ff-grid" style="padding-top:0">
+        <div class="ff"><label>Grau de estenose</label>${selInline(segKey,'estGrau',[
+          {v:'menor que 50%',l:'menor que 50%'},
+          {v:'entre 50% e 69%',l:'entre 50% e 69%'},
+          {v:'maior que 70%',l:'maior que 70%'},
+          {v:'maior que 75%',l:'maior que 75%'},
+          {v:'maior que 90% (suboclusão)',l:'maior que 90% (suboclusão)'}
+        ],e.estGrau)}</div>
+      </div>
+      <div style="padding:2px 14px 10px">
+        ${chkRow(segKey+'-tardus','determina padrão de fluxo tardus parvus nos segmentos distais',e.estTardusParvus,segKey,'estTardusParvus')}
+      </div>
+    </div>`;
+  }
+  if (e.sit === 'oclusao') {
+    html += `<div class="block"><div class="block-title">Dados da Oclusão</div>
+      <div class="ff-grid">
+        <div class="ff"><label>Segmento</label>${selInline(segKey,'oclLocal',[
+          {v:'terço proximal',l:'terço proximal'},{v:'terço médio',l:'terço médio'},{v:'terço distal',l:'terço distal'},{v:'origem',l:'origem'}
+        ],e.oclLocal)}</div>
+      </div>
+      <div>
+        ${chkRow(segKey+'-sombra','placas ateromatosas com forte sombra acústica posterior',e.oclSombra,segKey,'oclSombra')}
+        ${chkRow(segKey+'-colat','sinais de reenchimento por colaterais',e.oclColaterais,segKey,'oclColaterais')}
+      </div>
+    </div>`;
+  }
+  if (e.sit === 'aneurisma') {
+    html += `<div class="block"><div class="block-title">Dados da Dilatação Aneurismática</div>
+      <div class="ff-grid">
+        <div class="ff"><label>Localização</label>${selInline(segKey,'aneurLocal',[
+          {v:'origem',l:'origem'},{v:'terço proximal',l:'terço proximal'},{v:'terço médio',l:'terço médio'},{v:'terço distal',l:'terço distal'}
+        ],e.aneurLocal)}</div>
+      </div>
+      <div class="ff-grid" style="padding-top:0">
+        <div class="ff"><label>Calibre (cm)</label><input type="text" class="dim-input" value="${e.aneurCalibre}" data-sec="${segKey}" data-key="aneurCalibre" oninput="handleInput(this)"></div>
+        <div class="ff"><label>Extensão (cm)</label><input type="text" class="dim-input" value="${e.aneurExtensao}" data-sec="${segKey}" data-key="aneurExtensao" oninput="handleInput(this)"></div>
+      </div>
+      <div style="padding:2px 14px 10px">
+        ${chkRow(segKey+'-trombo','trombo parietal',e.aneurTrombo,segKey,'aneurTrombo')}
+      </div>
+    </div>`;
+  }
+  if (e.sit === 'monofasico') {
+    html += `<div class="block"><div class="block-title">Padrão de Onda Monofásico</div>
+      <div class="ff-grid">
+        <div class="ff"><label>Localização</label>${selInline(segKey,'monoLocal',[
+          {v:'origem',l:'origem'},{v:'terço proximal',l:'terço proximal'},{v:'terço médio',l:'terço médio'},{v:'terço distal',l:'terço distal'}
+        ],e.monoLocal)}</div>
+      </div>
+      <div class="info-box" style="border-top:none">Achado que sugere estenose à montante. A conclusão orientará prosseguir investigação com estudo direcionado para os segmentos aortoilíacos.</div>
+    </div>`;
+  }
+  return html;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// HELPERS DE UI
+// ══════════════════════════════════════════════════════════════════
+function sitOpt(segKey, val, label) {
+  const sel = estado[segKey].sit === val ? 'selected' : '';
+  return `<div class="radio-opt ${sel}" onclick="setSit('${segKey}','${val}')"><input type="radio"><label class="radio-label"><span class="radio-mark"></span>${label}</label></div>`;
+}
+function setSit(segKey, val) { estado[segKey].sit = val; renderPanel(secaoAtual); updateLaudo(); }
+function chkRow(id, label, checked, sec, key) {
+  const sel = checked ? 'selected' : '';
+  return `<div class="check-row ${sel}" id="crow-${id}" onclick="toggleChk('${id}','${sec}','${key}')"><input type="checkbox" id="${id}" ${checked?'checked':''}><label class="check-label"><span class="check-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.8"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg></span>${label}</label></div>`;
+}
+function toggleChk(id, sec, key) {
+  estado[sec][key] = !estado[sec][key];
+  renderPanel(secaoAtual);
+  updateLaudo();
+}
+function selInline(sec, key, opts, val) {
+  const options = opts.map(o=>`<option value="${o.v}" ${val===o.v?'selected':''}>${o.l}</option>`).join('');
+  return `<select class="sel-tag" data-sec="${sec}" data-key="${key}" onchange="handleInput(this)">${options}</select>`;
+}
+function handleInput(el) {
+  const sec = el.dataset.sec; const key = el.dataset.key;
+  if (sec && key && estado[sec] !== undefined) {
+    estado[sec][key] = el.value;
+    updateLaudo();
+    if (el.tagName === 'SELECT') renderPanel(secaoAtual);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CONSTRUÇÃO DO LAUDO
+// ══════════════════════════════════════════════════════════════════
+function updateLaudo() {
+  document.getElementById('laudo-doc').innerHTML = buildLaudo();
+}
+
+function capitaliza(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+function nomeSegCompleto(segKey) {
+  const base = segKey.slice(0, -1);
+  const letra = segKey.slice(-1);
+  return NOME_SEG[base] + (letra === 'D' ? ' direita' : ' esquerda');
+}
+
+// Retorna { analise, conclusao, placasDifusas } ou null se habitual
+function textoSegmento(segKey) {
+  const e = estado[segKey];
+  const nome = nomeSegCompleto(segKey);
+  const Nome = capitaliza(nome);
+  if (e.sit === 'habitual') return null;
+
+  if (e.sit === 'placas') {
+    return {
+      analise: `${Nome}, com placas ateromatosas parietais calcificadas difusas.`,
+      conclusao: null,
+      placasDifusas: true
+    };
+  }
+
+  if (e.sit === 'estenose') {
+    const tardus = e.estTardusParvus ? ' e determinando padrão de fluxo tardus parvus nos segmentos distais' : '';
+    return {
+      analise: `${Nome} no ${e.estLocal}, com aumento do pico de velocidade sistólica, inferindo estenose ${e.estGrau}${tardus}.`,
+      conclusao: `${Nome} com sinais de estenose ${e.estGrau}.`,
+      placasDifusas: false
+    };
+  }
+
+  if (e.sit === 'oclusao') {
+    const sombraTxt = e.oclSombra ? `, apresenta placas ateromatosas com forte sombra acústica posterior,` : ',';
+    const colatTxt = e.oclColaterais ? ', com sinais de reenchimento por colaterais' : '';
+    const analise = `${Nome} no seu ${e.oclLocal}${sombraTxt} sem fluxo detectável ao estudo Doppler${colatTxt}.`;
+    let conclusao;
+    if (e.oclSombra) {
+      conclusao = `${Nome} sem fluxo detectável ao estudo Doppler, como consequência dos artefatos de sombra acústica posterior, que podem corresponder também à oclusões/suboclusões críticas ou fluxo lento não detectável.`;
+    } else {
+      conclusao = `${Nome} sem fluxo detectável ao estudo Doppler, compatível com oclusão${colatTxt}.`;
+    }
+    return { analise, conclusao, placasDifusas: false };
+  }
+
+  if (e.sit === 'aneurisma') {
+    const trombo = e.aneurTrombo ? 'com trombo parietal' : 'sem trombo parietal';
+    const calibre = e.aneurCalibre || '_';
+    const extensao = e.aneurExtensao || '_';
+    return {
+      analise: `${Nome} com dilatação aneurismática na sua ${e.aneurLocal}, com calibre de ${calibre} cm e extensão de ${extensao} cm, ${trombo}.`,
+      conclusao: `${Nome} com dilatação aneurismática na ${e.aneurLocal}, calibre de ${calibre} cm${e.aneurTrombo ? ', com trombo parietal' : ''}.`,
+      placasDifusas: false
+    };
+  }
+
+  if (e.sit === 'monofasico') {
+    const local = e.monoLocal === 'origem' ? 'na origem' : `no ${e.monoLocal}`;
+    return {
+      analise: `${Nome} com padrão de onda monofásico ${local}, achado que sugere estenose à montante.`,
+      conclusao: `${Nome} com padrão de onda monofásico ${local}. A critério clínico, prosseguir investigação com estudo direcionado para os segmentos aortoilíacos.`,
+      placasDifusas: false
+    };
+  }
+
+  return null;
+}
+
+function segmentosIncluidos() {
+  const lista = [];
+  SEGMENTOS.forEach(base => {
+    if (ladoAtivo('D')) lista.push(base + 'D');
+    if (ladoAtivo('E')) lista.push(base + 'E');
+  });
+  return lista;
+}
+
+function buildLaudo() {
+  const ladoTitulo = { direito:'DIREITO', esquerdo:'ESQUERDO', bilateral:'BILATERAL' }[estado.tecnica.lado];
+  let html = `<div class="doc-titulo">ULTRASSONOGRAFIA DOPPLER ARTERIAL DO MEMBRO INFERIOR ${ladoTitulo}</div>`;
+
+  // ── TÉCNICA ──
+  let tecnicaTxt = 'Estudo realizado com transdutor linear de alta frequência, utilizando modos B, Doppler colorido e Doppler espectral.';
+  const lims = [];
+  if (estado.tecnica.limitBiotipo) lims.push('Avaliação limitada de algumas estruturas devido a limitações relacionadas ao biotipo.');
+  if (estado.tecnica.limitMobilidade) lims.push('Exame parcialmente limitado devido à mobilidade restrita.');
+  if (lims.length) tecnicaTxt += '<br>' + lims.join('<br>');
+  html += `<div class="doc-secao"><span class="doc-label">Técnica</span>
+    <div class="doc-p">${tecnicaTxt}</div>
+  </div>`;
+
+  // ── ANÁLISE ──
+  const segs = segmentosIncluidos();
+  const introTxt = estado.tecnica.lado === 'bilateral'
+    ? 'Foram avaliados os segmentos fêmoro-poplíteo-tíbio-fibulares arteriais, bilateralmente.'
+    : 'Foi avaliado o segmento fêmoro-poplíteo-tíbio-fibular arterial.';
+
+  const alteracoes = [];
+  const conclusoes = [];
+  let temPlacasDifusas = false;
+  let temNormais = false;
+
+  segs.forEach(segKey => {
+    const r = textoSegmento(segKey);
+    if (!r) { temNormais = true; return; }
+    alteracoes.push(r.analise);
+    if (r.conclusao) conclusoes.push(r.conclusao);
+    if (r.placasDifusas) temPlacasDifusas = true;
+  });
+
+  let analiseBody;
+  if (alteracoes.length === 0) {
+    analiseBody = 'As artérias avaliadas mostram trajeto e calibre preservados. Paredes regulares, sem placas.<br>Ao estudo com Doppler observou-se fluxo com velocidades e padrão multifásico habituais nos segmentos supracitados.';
+  } else {
+    analiseBody = alteracoes.join('<br>');
+    if (temNormais) {
+      analiseBody += '<br>Demais artérias avaliadas apresentam trajetos preservados. Os demais segmentos arteriais avaliados ao Doppler mostram fluxo arterial multifásico com velocidade de pico sistólico preservado.';
+    }
+  }
+
+  html += `<div class="doc-secao"><span class="doc-label">Análise:</span>
+    <div class="doc-p">${introTxt}</div>
+    <div class="doc-p">${analiseBody}</div>
+  </div>`;
+
+  // ── CONCLUSÃO ──
+  let conclusaoTxt;
+  if (alteracoes.length === 0) {
+    conclusaoTxt = 'Ultrassonografia Doppler arterial dentro dos limites de normalidade.';
+  } else {
+    const linhas = [...conclusoes];
+    if (temPlacasDifusas) linhas.push('Ateromatose difusa.');
+    conclusaoTxt = linhas.length ? linhas.join('<br>') : 'Ateromatose difusa.';
+  }
+  html += `<div class="doc-secao"><span class="doc-label">Conclusão:</span>
+    <div class="doc-p">${conclusaoTxt}</div>
+  </div>`;
+
+  // ── ACHADOS ADICIONAIS (após a conclusão) ──
+  if (estado.achados.baker) {
+    const medida = estado.achados.bakerMedida || '_';
+    html += `<div class="doc-secao"><span class="doc-label">Achados adicionais:</span>
+      <div class="doc-p">Caracteriza-se na fossa poplítea, formação cística de paredes finas e lobuladas, com conteúdo líquido, anecogênico e homogêneo, com colo de comunicação articular entre o tendão do semi-membranoso e o músculo gastrocnêmio medial, medindo ${medida} cm, sugestiva de cisto de Baker.</div>
+    </div>`;
+  }
+
+  return html;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// TOOLBAR
+// ══════════════════════════════════════════════════════════════════
+function toggleDark() {
+  const isDark = document.body.classList.toggle('dark');
+  const btn = document.getElementById('btn-dark-toggle');
+  btn.innerHTML = isDark
+    ? '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 8.5A5.5 5.5 0 0 1 6 3c0-.18.01-.36.03-.53A6 6 0 1 0 13.97 9.5c-.15.01-.31.01-.47 0z"/></svg>Modo claro'
+    : '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro';
+  localStorage.setItem('darkModeArterialMMII', isDark ? '1' : '0');
+}
+
+function copiar() {
+  const isDark = document.body.classList.contains('dark');
+  if (isDark) document.body.classList.remove('dark');
+
+  const el = document.getElementById('laudo-doc');
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+
+  let success = false;
+  try { success = document.execCommand('copy'); } catch (err) {}
+
+  selection.removeAllRanges();
+  if (isDark) document.body.classList.add('dark');
+
+  if (success) showToast('Laudo copiado para a área de transferência!');
+  else showToast('Falha ao copiar. Use Ctrl+A e Ctrl+C no texto do laudo.');
+}
+
+function showToast(msg) {
+  let t = document.getElementById('toast-notification');
+  t.innerText = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function imprimir() {
+  const h = document.getElementById('laudo-doc').innerHTML;
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Helvetica,Arial,sans-serif;font-size:10pt;padding:32px;color:#111;line-height:1.65;max-width:820px;margin:auto}.doc-titulo{text-align:center;font-weight:700;text-transform:uppercase;margin-bottom:16px}.doc-label{font-weight:700;display:block;margin-bottom:2px}.doc-p{margin-bottom:8px}.doc-secao{margin-bottom:14px}*{color:#111!important}</style></head><body>${h}</body></html>`);
+  w.document.close(); w.print();
+}
+
+function reiniciar() {
+  estado = estadoInicial();
+  showSection('tecnica');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+(function(){
+  if (localStorage.getItem('darkModeArterialMMII') === '1') toggleDark();
+  renderSidebar();
+  showSection('tecnica');
+})();
+</script>
+
+<div id="toast-notification" class="toast-notification">Laudo copiado!</div>
+</body>
+</html>

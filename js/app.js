@@ -116,32 +116,77 @@ function calcularDopplerAutomatico() {
   }
 
   if (sem > 0) {
-    if (utd > 0) document.getElementById('p_utd').value = window.calculos.getPercentilUtA(sem, dias, utd);
-    else document.getElementById('p_utd').value = '';
+    if (utd > 0) {
+      document.getElementById('p_utd').value = window.calculos.getPercentilUtA(sem, dias, utd);
+    } else {
+      document.getElementById('p_utd').value = '';
+    }
     
-    if (ute > 0) document.getElementById('p_ute').value = window.calculos.getPercentilUtA(sem, dias, ute);
-    else document.getElementById('p_ute').value = '';
+    if (ute > 0) {
+      document.getElementById('p_ute').value = window.calculos.getPercentilUtA(sem, dias, ute);
+    } else {
+      document.getElementById('p_ute').value = '';
+    }
     
-    if (utm > 0) document.getElementById('p_ut_medio').value = window.calculos.getPercentilUtA(sem, dias, utm);
-    else document.getElementById('p_ut_medio').value = '';
+    if (utm > 0) {
+      document.getElementById('p_ut_medio').value = window.calculos.getPercentilUtA(sem, dias, utm);
+      document.getElementById('p_ut_medio_raw').value = window.calculos.getPercentilUtARaw(sem, dias, utm);
+    } else {
+      document.getElementById('p_ut_medio').value = '';
+      if(document.getElementById('p_ut_medio_raw')) document.getElementById('p_ut_medio_raw').value = '';
+    }
     
     let ipDv = parseFloat(document.getElementById('ip_dv').value.replace(',', '.')) || 0;
-    if (ipDv > 0) document.getElementById('p_dv').value = window.calculos.getPercentilDV(sem, dias, ipDv);
-    else document.getElementById('p_dv').value = '';
+    if (ipDv > 0) {
+      document.getElementById('p_dv').value = window.calculos.getPercentilDV(sem, dias, ipDv);
+      document.getElementById('p_dv_raw').value = window.calculos.getPercentilDVRaw(sem, dias, ipDv);
+    } else {
+      document.getElementById('p_dv').value = '';
+      if(document.getElementById('p_dv_raw')) document.getElementById('p_dv_raw').value = '';
+    }
   }
 
-  if (ipU > 0 && ipC > 0 && sem > 0) {
-    let rcp = (ipC / ipU).toFixed(2);
-    document.getElementById('relacao').value = rcp;
+  if (sem > 0) {
+    if (ipU > 0) {
+      let pUmb = window.calculos.getPercentilUmb(sem, dias, ipU);
+      document.getElementById('p_umb').value = "p" + pUmb;
+      document.getElementById('p_umb_raw').value = window.calculos.getPercentilUmbRaw(sem, dias, ipU);
+    } else {
+      document.getElementById('p_umb').value = "";
+      if(document.getElementById('p_umb_raw')) document.getElementById('p_umb_raw').value = "";
+    }
 
-    let pUmb = window.calculos.getPercentilUmb(sem, dias, ipU);
-    document.getElementById('p_umb').value = "p" + pUmb;
+    if (ipC > 0) {
+      let pAcm = window.calculos.getPercentilACM(sem, dias, ipC);
+      document.getElementById('p_cer').value = "p" + pAcm;
+      document.getElementById('p_cer_raw').value = window.calculos.getPercentilACMRaw(sem, dias, ipC);
+    } else {
+      document.getElementById('p_cer').value = "";
+      if(document.getElementById('p_cer_raw')) document.getElementById('p_cer_raw').value = "";
+    }
 
-    let pAcm = window.calculos.getPercentilACM(sem, dias, ipC);
-    document.getElementById('p_cer').value = "p" + pAcm;
+    if (ipU > 0 && ipC > 0) {
+      let rcp = (ipC / ipU).toFixed(2);
+      document.getElementById('relacao').value = rcp;
 
-    let pRcp = window.calculos.getPercentilRCP(sem, dias, ipC, ipU);
-    document.getElementById('p_rcp').value = "p" + pRcp;
+      let pRcp = window.calculos.getPercentilRCP(sem, dias, ipC, ipU);
+      document.getElementById('p_rcp').value = "p" + pRcp;
+      document.getElementById('p_rcp_raw').value = window.calculos.getPercentilRCPRaw(sem, dias, ipC, ipU);
+    } else {
+      document.getElementById('relacao').value = "";
+      document.getElementById('p_rcp').value = "";
+      if(document.getElementById('p_rcp_raw')) document.getElementById('p_rcp_raw').value = "";
+    }
+  } else {
+    document.getElementById('p_umb').value = "";
+    document.getElementById('p_cer').value = "";
+    document.getElementById('relacao').value = "";
+    document.getElementById('p_rcp').value = "";
+    if(document.getElementById('p_umb_raw')) document.getElementById('p_umb_raw').value = "";
+    if(document.getElementById('p_cer_raw')) document.getElementById('p_cer_raw').value = "";
+    if(document.getElementById('p_rcp_raw')) document.getElementById('p_rcp_raw').value = "";
+    if(document.getElementById('p_ut_medio_raw')) document.getElementById('p_ut_medio_raw').value = "";
+    if(document.getElementById('p_dv_raw')) document.getElementById('p_dv_raw').value = "";
   }
   updatePreview();
 }
@@ -154,6 +199,7 @@ const p = (id) => {
 function getFormDadosDoppler() {
   let dados = {
     modo: modoAtual,
+    dum_disp: p('dum_disp_doppler'),
     origem_ig: p('origem_ig'),
     dum: p('dum'),
     exame_previo_data: p('exame_previo_data'),
@@ -214,6 +260,12 @@ function getFormDadosDoppler() {
       dppDate.setDate(dppDate.getDate() + 280);
       dpp_texto = dppDate.toLocaleDateString('pt-BR');
     }
+  } else if (sem > 0) {
+    let totalDiasIG = (sem * 7) + dias;
+    let diasRestantes = 280 - totalDiasIG;
+    let hoje = new Date();
+    hoje.setDate(hoje.getDate() + diasRestantes);
+    dpp_texto = hoje.toLocaleDateString('pt-BR');
   }
   
   dados.ig_calc_sem = sem;
@@ -318,6 +370,7 @@ function getFormDadosInicial() {
   if (dados.tem_emb === "sim") {
     let ccn = parseFloat(dados.ccn) || 0;
     let totalDias = Math.round(8.052 * Math.sqrt(ccn * 1.037) + 23.73);
+    dados.idade_calc_total_dias = totalDias;
     dados.idade_calc_sem = Math.floor(totalDias / 7); 
     dados.idade_calc_dias = totalDias % 7;
   }
@@ -381,6 +434,9 @@ function copyRichText() {
   selection.removeAllRanges();
   selection.addRange(range);
 
+  const wasDark = document.body.classList.contains('dark-mode');
+  if (wasDark) document.body.classList.remove('dark-mode');
+
   try {
     // Execute the copy command (copies HTML + Text)
     const successful = document.execCommand('copy');
@@ -393,6 +449,8 @@ function copyRichText() {
     console.error('Falha ao copiar', err);
     alert('Erro ao copiar o laudo.');
   }
+
+  if (wasDark) document.body.classList.add('dark-mode');
 
   // Remove selection
   selection.removeAllRanges();
@@ -533,10 +591,17 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Lógica Doppler - Origem IG e Checkboxes
+  const dumDispSelect = document.getElementById('dum_disp_doppler');
+  if (dumDispSelect) {
+    dumDispSelect.addEventListener('change', function() {
+      document.getElementById('div_dum_doppler').style.display = (this.value === 'nao') ? 'none' : 'block';
+      updatePreview();
+    });
+  }
+
   const origemSelect = document.getElementById('origem_ig');
   if (origemSelect) {
     origemSelect.addEventListener('change', function() {
-      document.getElementById('div_origem_dum').style.display = (this.value === 'DUM') ? 'block' : 'none';
       document.getElementById('div_origem_exame_previo').style.display = (this.value === 'exame_previo') ? 'block' : 'none';
       atualizarIGDoppler();
       updatePreview();
@@ -547,8 +612,31 @@ document.addEventListener('DOMContentLoaded', () => {
     let origem = document.getElementById('origem_ig').value;
     let sem = 0, dias = 0, dpp = "";
     
+    // Atualiza o display da DUM independente do método
+    let dumVal = document.getElementById('dum') ? document.getElementById('dum').value : '';
+    if (dumVal.length === 10) {
+      let p = dumVal.split('/');
+      let d = new Date(p[2], p[1] - 1, p[0]);
+      let diffMs = new Date() - d;
+      if (diffMs >= 0) {
+        let diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        let dumSem = Math.floor(diffDias / 7);
+        let dumDias = diffDias % 7;
+        let dppDate = new Date(d);
+        dppDate.setDate(dppDate.getDate() + 280);
+        let dumDpp = dppDate.toLocaleDateString('pt-BR');
+        let dumDisplay = document.getElementById('dum_doppler_calc_display');
+        if(dumDisplay) dumDisplay.innerText = `IG: ${dumSem}s ${dumDias}d | DPP: ${dumDpp}`;
+      } else {
+        let dumDisplay = document.getElementById('dum_doppler_calc_display');
+        if(dumDisplay) dumDisplay.innerText = `Data futura inválida.`;
+      }
+    } else {
+      let dumDisplay = document.getElementById('dum_doppler_calc_display');
+      if(dumDisplay) dumDisplay.innerText = `Aguardando data...`;
+    }
+
     if (origem === 'DUM') {
-      let dumVal = document.getElementById('dum').value;
       if (dumVal.length === 10) {
         let p = dumVal.split('/');
         let d = new Date(p[2], p[1] - 1, p[0]);
@@ -560,12 +648,12 @@ document.addEventListener('DOMContentLoaded', () => {
           let dppDate = new Date(d);
           dppDate.setDate(dppDate.getDate() + 280);
           dpp = dppDate.toLocaleDateString('pt-BR');
-          document.getElementById('ig_calc_display').innerText = `Calculado: ${sem}s ${dias}d | DPP: ${dpp}`;
+          document.getElementById('ig_calc_display').innerText = `Usando a IG da DUM: ${sem}s ${dias}d`;
         } else {
-          document.getElementById('ig_calc_display').innerText = `Data futura inválida.`;
+          document.getElementById('ig_calc_display').innerText = `Data da DUM inválida.`;
         }
       } else {
-        document.getElementById('ig_calc_display').innerText = `Aguardando data...`;
+        document.getElementById('ig_calc_display').innerText = `Aguardando data da DUM...`;
       }
     } else if (origem === 'exame_previo') {
       let dataVal = document.getElementById('exame_previo_data').value;
@@ -580,7 +668,11 @@ document.addEventListener('DOMContentLoaded', () => {
           let totalDias = (semAnt * 7) + diasAnt + diffDias;
           sem = Math.floor(totalDias / 7);
           dias = totalDias % 7;
-          document.getElementById('ig_calc_display').innerText = `Calculado pelo exame prévio: ${sem}s ${dias}d`;
+          let dppUsg = new Date();
+          let diasRestantes = 280 - totalDias;
+          dppUsg.setDate(dppUsg.getDate() + diasRestantes);
+          dpp = dppUsg.toLocaleDateString('pt-BR');
+          document.getElementById('ig_calc_display').innerText = `Calculado pelo exame prévio: ${sem}s ${dias}d | DPP: ${dpp}`;
         } else {
           document.getElementById('ig_calc_display').innerText = `Data futura inválida.`;
         }
@@ -619,3 +711,78 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+// ------------------------------------
+// NOVO EXAME LOGIC
+// ------------------------------------
+function abrirModalNovoExame() {
+  const modal = document.getElementById('modal-novo-exame');
+  if (modal) {
+    modal.style.display = 'flex';
+    void modal.offsetWidth;
+    modal.classList.add('show');
+  }
+}
+
+function fecharModalNovoExame() {
+  const modal = document.getElementById('modal-novo-exame');
+  if (modal) {
+    modal.classList.remove('show');
+    setTimeout(() => { modal.style.display = 'none'; }, 300);
+  }
+}
+
+function limparNovoExame() {
+  fecharModalNovoExame();
+  
+  document.querySelectorAll('input[type="text"], input[type="number"], input[type="hidden"]').forEach(el => {
+    el.value = '';
+  });
+  
+  document.querySelectorAll('select').forEach(el => {
+    el.selectedIndex = 0;
+  });
+  
+  document.querySelectorAll('input[type="checkbox"]').forEach(el => {
+    el.checked = (el.id === 'exibir_percentis');
+  });
+  
+  document.querySelectorAll('.feedback-text').forEach(el => {
+    if (el.id === 'dum_doppler_calc_display' || el.id === 'dum_calc_display') {
+      el.innerText = 'Aguardando data...';
+    } else if (el.id === 'ig_calc_display') {
+      el.innerText = 'Insira os dados ou digite a idade manualmente.';
+    } else if (el.id === 'exame_ant_calc_display') {
+      el.innerText = 'Aguardando dados do exame anterior...';
+    } else {
+      el.innerText = '';
+    }
+  });
+
+  document.querySelectorAll('.hud-val').forEach(el => {
+    el.innerText = '---';
+  });
+  
+  const displayMedio = document.getElementById('display_medio_inic');
+  if (displayMedio) displayMedio.innerText = 'MÉDIO: 0.0 mm';
+  
+  ['div_origem_exame_previo', 'div_umero', 'div_uterinas', 'div_ducto', 'div_exame_ant', 'div_hematoma', 'div_espessura_restos'].forEach(id => {
+    let el = document.getElementById(id);
+    if(el) el.style.display = 'none';
+  });
+  
+  ['div_dum_doppler', 'div_dum_inic', 'div_vv_inic', 'div_emb_inic'].forEach(id => {
+    let el = document.getElementById(id);
+    if(el) el.style.display = 'block';
+  });
+
+  updatePreview();
+
+  const formAtual = document.querySelector('.view.active');
+  if (formAtual) {
+    const firstInput = formAtual.querySelector('input:not([type="hidden"]), select');
+    if (firstInput) {
+      firstInput.focus();
+    }
+  }
+}

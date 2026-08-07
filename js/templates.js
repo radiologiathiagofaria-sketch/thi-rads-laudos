@@ -21,14 +21,25 @@ function gerarTextoDoppler(dados) {
   
   // DADOS CLÍNICOS
   html += `<b>DADOS CLÍNICOS:</b><br>`;
+  
+  if (dados.dum_disp !== 'nao' && dados.dum && dados.dum.length === 10) {
+    html += `Data da última menstruação (DUM): ${dados.dum}.<br>`;
+  } else {
+    html += `Data da última menstruação (DUM): incerta.<br>`;
+  }
+
   if (dados.origem_ig === 'DUM') {
-    html += `Data da última menstruação (DUM): ${dados.dum || '---'}.<br>Idade gestacional pela DUM de ${formatarIdade(dados.ig_calc_sem || dados.ig_sem, dados.ig_calc_dias || dados.ig_dias)}.<br>`;
+    html += `Idade gestacional pela DUM de ${formatarIdade(dados.ig_calc_sem || dados.ig_sem, dados.ig_calc_dias || dados.ig_dias)}.<br>`;
   } else if (dados.origem_ig === 'referida') {
     html += `Idade gestacional cronológica relatada de ${formatarIdade(dados.ig_sem, dados.ig_dias)}.<br>`;
   } else if (dados.origem_ig === 'exame_previo') {
     html += `Idade gestacional corrigida pelo exame ultrassonográfico do dia ${dados.exame_previo_data || '---'} de ${formatarIdade(dados.ig_calc_sem || dados.ig_sem, dados.ig_calc_dias || dados.ig_dias)}.<br>`;
   } else {
     html += `Idade Gestacional: ${formatarIdade(dados.ig_sem, dados.ig_dias)}.<br>`;
+  }
+  
+  if (dados.dpp_texto) {
+    html += `Data Provável do Parto (DPP): ${dados.dpp_texto}<br>`;
   }
   html += `<br>`;
   
@@ -155,22 +166,27 @@ function gerarTextoDoppler(dados) {
   
   imp += `- Biometria fetal de ${formatarIdade(dados.biometria_sem, dados.biometria_dias)}.`;
   
+  imp += `<br><span id="drfetal-conclusion-container">`;
+  
   if (isDoppler) {
-    imp += `<br>- Estudo dopplervelocimétrico dentro da normalidade para idade gestacional.`;
+    imp += `- Estudo dopplervelocimétrico dentro da normalidade para idade gestacional.`;
   }
   
   let percPeso = parseFloat(dados.p_peso_raw);
   if (!isNaN(percPeso)) {
+    if (isDoppler) imp += `<br>`;
     if (percPeso >= 10 && percPeso <= 90) {
-      imp += `<br>- Crescimento fetal adequado para idade gestacional segundo Hadlock IV.`;
+      imp += `- Crescimento fetal adequado para idade gestacional segundo Hadlock IV.`;
     } else if (percPeso > 90) {
-      imp += `<br>- Feto grande para idade gestacional.`;
-    } else if (percPeso < 10 && percPeso > 2.9) {
-      imp += `<br>- Feto pequeno para idade gestacional.`;
-    } else if (percPeso <= 2.9) {
-      imp += `<br>- Restrição de crescimento intrauterino (percentil do peso abaixo do p3 para idade gestacional).`;
+      imp += `- Feto grande para idade gestacional.`;
+    } else if (percPeso < 10 && percPeso >= 3.0) {
+      imp += `- Feto pequeno para idade gestacional.`;
+    } else if (percPeso < 3.0) {
+      imp += `- Restrição de crescimento intrauterino (percentil do peso abaixo do p3 para idade gestacional).`;
     }
   }
+  
+  imp += `</span>`;
 
   html += imp + `<br><br>`;
   html += `<span style="font-size: 8pt;">Nota: O objetivo do ultrassom obstétrico é avaliar o crescimento e vitalidade fetais. Não tem finalidade de rastreamento e diagnóstico de doenças genéticas e/ou malformações fetais.</span>`;
@@ -197,6 +213,20 @@ function gerarTextoInicial(dados) {
     embTexto = `Embrião único com comprimento cabeça-nádega (CCN) medindo ${dados.ccn || '---'} mm.`;
     bcfTexto = `Movimentos embrionários e batimentos cardíacos presentes (BCF = ${dados.bcf || '---'} bpm).`;
     impEmb = `- Gestação tópica, com embrião único e vivo.<br>- Idade gestacional de ${formatarIdade(dados.idade_calc_sem || 'X', dados.idade_calc_dias || 'Y')} (+/- 5 dias) pelo CCN.`;
+
+    // DPP pela USG quando IG pelo CCN difere >5 dias da IG pela DUM
+    if (dados.ig_dum_sem !== undefined && dados.idade_calc_total_dias) {
+      let igDumTotalDias = (dados.ig_dum_sem * 7) + (dados.ig_dum_dias || 0);
+      let diffDias = Math.abs(dados.idade_calc_total_dias - igDumTotalDias);
+      if (diffDias > 5) {
+        let hoje = new Date();
+        let diasRestantes = 280 - dados.idade_calc_total_dias;
+        let dppUsg = new Date(hoje);
+        dppUsg.setDate(dppUsg.getDate() + diasRestantes);
+        let dppUsgTexto = dppUsg.toLocaleDateString('pt-BR');
+        impEmb += `<br>- Data provável do parto (DPP) pela ultrassonografia atual: ${dppUsgTexto}`;
+      }
+    }
   } else {
     embTexto = `Embrião não caracterizado.`;
     bcfTexto = ``;
@@ -226,7 +256,7 @@ function gerarTextoInicial(dados) {
   let dadosClinicos = `<b>DADOS CLÍNICOS:</b><br>`;
   
   if (dados.dum_disp === 'sim' && dados.dum_data && dados.dum_data.length === 10 && dados.dpp_texto) {
-    dadosClinicos += `Data da última menstruação (DUM): ${dados.dum_data}<br>Idade gestacional pela DUM: ${formatarIdade(dados.ig_dum_sem, dados.ig_dum_dias)}.<br>Data provável do parto (DPP): ${dados.dpp_texto}<br>`;
+    dadosClinicos += `Data da última menstruação (DUM): ${dados.dum_data}<br>Idade gestacional pela DUM: ${formatarIdade(dados.ig_dum_sem, dados.ig_dum_dias)}.<br>Data provável do parto (DPP) pela DUM: ${dados.dpp_texto}<br>`;
   } else {
     dadosClinicos += `Data da última menstruação não disponível.<br>`;
   }
@@ -241,8 +271,21 @@ function gerarTextoInicial(dados) {
   html += `<b>ANÁLISE:</b><br>Bexiga urinária vazia.<br><br>`;
   
   html += `Útero ${posUtero}.<br>Dimensões uterinas gravídicas.<br>Miométrio com ecotextura homogênea.<br><br>`;
+  html += `Colo uterino e canal endocervical de aspecto habitual.<br><br>`;
   
-  html += `Saco gestacional em localização fúndica na cavidade uterina, de contornos regulares e medindo ${diametrosSG} mm (diâmetro médio do saco gestacional de ${sgMedio} mm).<br><br>`;
+  // Calcular IG pelo diâmetro médio do SG quando sem embrião (fórmula de Hellman: dias = SG(mm) + 30)
+  let sgCompativel = '';
+  if (dados.tem_emb !== 'sim') {
+    let sgMedioNum = parseFloat(sgMedio);
+    if (!isNaN(sgMedioNum) && sgMedioNum > 0) {
+      let totalDiasSG = Math.round(sgMedioNum + 30);
+      let semSG = Math.floor(totalDiasSG / 7);
+      let diasSG = totalDiasSG % 7;
+      sgCompativel = `, compatível com idade gestacional de ${formatarIdade(semSG, diasSG)}`;
+    }
+  }
+
+  html += `Saco gestacional em localização fúndica na cavidade uterina, de contornos regulares e medindo ${diametrosSG} mm (diâmetro médio do saco gestacional de ${sgMedio} mm${sgCompativel}).<br><br>`;
   
   html += hemTexto;
   

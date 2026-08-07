@@ -18,11 +18,25 @@ function zToPercentileReal(z) {
   return p;
 }
 
+function zToPercentileFloat(z) {
+  let cdf = 0.5 * (1 + erf(z / Math.sqrt(2)));
+  let p = cdf * 100;
+  if (p < 0.1) p = 0.1; 
+  if (p > 99.9) p = 99.9;
+  return p;
+}
+
 // Barcelona References
 function calcUmbilicalBarcelona(igSem, igDias, ip) {
   let GA = Number(igSem) + (Number(igDias) * 0.14);
   let z = (ip - (3.55219 - 0.13558 * GA + 0.00174 * GA * GA)) / 0.299;
   return zToPercentileReal(z);
+}
+
+function calcUmbilicalBarcelonaRaw(igSem, igDias, ip) {
+  let GA = Number(igSem) + (Number(igDias) * 0.14);
+  let z = (ip - (3.55219 - 0.13558 * GA + 0.00174 * GA * GA)) / 0.299;
+  return zToPercentileFloat(z);
 }
 
 function calcACMBarcelona(igSem, igDias, ip) {
@@ -31,11 +45,24 @@ function calcACMBarcelona(igSem, igDias, ip) {
   return zToPercentileReal(z);
 }
 
+function calcACMBarcelonaRaw(igSem, igDias, ip) {
+  let GA = Number(igSem) + (Number(igDias) * 0.14);
+  let z = (ip - ((-2.7317 + 0.3335 * GA) - 0.0058 * GA * GA)) / ((-0.88005 + 0.08182 * GA) - 0.00133 * GA * GA);
+  return zToPercentileFloat(z);
+}
+
 function calcRCPBarcelona(igSem, igDias, ipAcm, ipUmb) {
   let GA = Number(igSem) + (Number(igDias) * 0.14);
   let rcp = ipAcm / ipUmb;
   let z = (rcp - ((-4.0636 + 0.383 * GA) - 0.0059 * GA * GA)) / ((-0.9664 + 0.09027 * GA) - 0.0014 * GA * GA);
   return zToPercentileReal(z);
+}
+
+function calcRCPBarcelonaRaw(igSem, igDias, ipAcm, ipUmb) {
+  let GA = Number(igSem) + (Number(igDias) * 0.14);
+  let rcp = ipAcm / ipUmb;
+  let z = (rcp - ((-4.0636 + 0.383 * GA) - 0.0059 * GA * GA)) / ((-0.9664 + 0.09027 * GA) - 0.0014 * GA * GA);
+  return zToPercentileFloat(z);
 }
 
 // ILA Moore Table
@@ -85,6 +112,37 @@ function calcPercentilParametro(tipo, mm, semanas, dias) {
   return (p < 3) ? "< p3" : (p > 97) ? "> p97" : "p" + p;
 }
 
+function calcPercentilParametroRaw(tipo, mm, semanas, dias) {
+  if (!mm || mm <= 0 || semanas < 12) return null;
+  
+  let ga = Number(semanas) + (Number(dias) / 7);
+  let mean = 0;
+  let sd = 0;
+  let valCm = mm / 10;
+  
+  if (tipo === 'dbp') {
+    mean = -3.08 + (0.41 * ga) - (0.000061 * Math.pow(ga, 3)); 
+    sd = 0.30;
+  } else if (tipo === 'cc') {
+    mean = -11.48 + (1.56 * ga) - (0.0002548 * Math.pow(ga, 3)); 
+    sd = 1.00;
+  } else if (tipo === 'ca') {
+    mean = -13.3 + (1.61 * ga) - (0.00998 * Math.pow(ga, 2));
+    sd = 1.34;
+  } else if (tipo === 'cf') {
+    mean = -3.91 + (0.427 * ga) - (0.0034 * Math.pow(ga, 2));
+    sd = 0.30;
+  } else if (tipo === 'umero') {
+    mean = -3.08 + (0.323 * ga);
+    sd = 0.08 * mean;
+  }
+  
+  if (mean <= 0) return null;
+  
+  let z = (valCm - mean) / sd;
+  return zToPercentileFloat(z);
+}
+
 // Percentis Uterinas e Ducto
 function getPercentilUtA(sem, dias, ip) {
   if (!ip || ip <= 0 || sem < 11 || sem > 44) return '';
@@ -97,6 +155,16 @@ function getPercentilUtA(sem, dias, ip) {
   return (perc < 3) ? "< p3" : (perc > 97) ? "> p97" : "p" + perc;
 }
 
+function getPercentilUtARaw(sem, dias, ip) {
+  if (!ip || ip <= 0 || sem < 11 || sem > 44) return null;
+  let totalDias = (sem * 7) + dias;
+  let Utamlog = Math.log(ip);
+  let meanLog = (1.39 - (0.012 * totalDias)) + (1.98E-5 * Math.pow(totalDias, 2));
+  let sdLog = 0.272 - (0.000259 * totalDias);
+  let z = (Utamlog - meanLog) / sdLog;
+  return zToPercentileFloat(z);
+}
+
 function getPercentilDV(sem, dias, ip) {
   if (!ip || ip <= 0 || sem < 20 || sem > 44) return '';
   let decSem = sem + (dias / 7);
@@ -107,15 +175,31 @@ function getPercentilDV(sem, dias, ip) {
   return (perc < 3) ? "< p3" : (perc > 97) ? "> p97" : "p" + perc;
 }
 
+function getPercentilDVRaw(sem, dias, ip) {
+  if (!ip || ip <= 0 || sem < 20 || sem > 44) return null;
+  let decSem = sem + (dias / 7);
+  let meanDV = 0.903 - (0.0116 * decSem);
+  let sdDV = 0.1483;
+  let z = (ip - meanDV) / sdDV;
+  return zToPercentileFloat(z);
+}
+
 // Export to window to be accessible
 window.calculos = {
   getPercentilUmb: calcUmbilicalBarcelona,
+  getPercentilUmbRaw: calcUmbilicalBarcelonaRaw,
   getPercentilACM: calcACMBarcelona,
+  getPercentilACMRaw: calcACMBarcelonaRaw,
   getPercentilRCP: calcRCPBarcelona,
+  getPercentilRCPRaw: calcRCPBarcelonaRaw,
   getPercentilUtA: getPercentilUtA,
+  getPercentilUtARaw: getPercentilUtARaw,
   getPercentilDV: getPercentilDV,
+  getPercentilDVRaw: getPercentilDVRaw,
   calcPercentilParametro: calcPercentilParametro,
+  calcPercentilParametroRaw: calcPercentilParametroRaw,
   tabelaMoore: tabelaMoore,
   erf: erf,
-  zToPercentileReal: zToPercentileReal
+  zToPercentileReal: zToPercentileReal,
+  zToPercentileFloat: zToPercentileFloat
 };

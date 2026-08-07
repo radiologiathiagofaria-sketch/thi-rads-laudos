@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THI-RADS | US Doppler Venoso</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#1a56db;--blue-dark:#1140a6;--blue-light:#e8f0fe;--blue-mid:#dbeafe;
+  --surface:#f4f6fb;--border:#e2e6ef;--border-strong:#c8cfe0;
+  --text:#1a1f2e;--text-2:#4b5570;--text-3:#8892a4;
+  --white:#ffffff;--green:#059669;--red:#dc2626;--amber:#b45309;--amber-bg:#fffbeb;--amber-border:#fde68a;
+  --radius:8px;--radius-lg:12px;
+}
+body.dark{
+  --blue:#4d86f5;--blue-dark:#3a6fd4;--blue-light:#1e2d4a;--blue-mid:#1e2d4a;
+  --surface:#141820;--border:#2a2f3d;--border-strong:#3a4155;
+  --text:#e2e6f0;--text-2:#9aa3b8;--text-3:#5d6680;
+  --white:#1e2230;--green:#34d399;--red:#f87171;--amber:#fbbf24;--amber-bg:#1c1810;--amber-border:#78350f;
+}
+body.dark .laudo-doc{color:#e2e6f0;}
+body.dark .laudo-panel{background:#1e2230;border-left-color:var(--border);}
+body.dark .laudo-body{background:#1e2230;}
+body.dark .laudo-header{background:#1e2230;border-bottom-color:var(--border);}
+body.dark .info-box{background:#1a2040;border-color:#2a4460;color:#a0b4d0;}
+@media print{body.dark .laudo-doc,body.dark .laudo-doc *{color:#111 !important;}}
+.btn-dark{margin-left:auto;}
+body.dark .btn-dark{background:#2a2f3d;border-color:#3a4155;color:#e2e6f0;}
+body.dark .btn-dark:hover{background:#343a4d;color:#fff;}
+body.dark .dim-input,body.dark .ff select,body.dark .ff input[type=text]{background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .radio-mark{background:var(--white);}
+body.dark .check-box{background:var(--white);}
+body.dark .toolbar{background:var(--white);border-bottom-color:var(--border);}
+body.dark .sidebar{background:var(--white);border-right-color:var(--border);}
+body.dark .sidebar-hd{border-bottom-color:var(--border);}
+body.dark .block{background:var(--white);border-color:var(--border);}
+body.dark .block-title{background:var(--white);border-bottom-color:var(--border);}
+body.dark .radio-opt:hover{background:#1e2d4a;}
+body.dark .radio-opt.selected{background:#1e2d4a;}
+body.dark .check-row{background:#1a1f2e;}
+body.dark .check-row:hover{background:#1e2d4a;}
+body.dark .check-row.selected{background:#1e2d4a;}
+body.dark .module-btn{background:#1a1f2e;border-color:var(--border-strong);color:var(--text-2);}
+body.dark .module-btn.active{background:var(--blue);color:#fff;}
+body.dark .amber-box{background:#1c1810;border-color:#78350f;color:#fbbf24;}
+body.dark .nav-group-hd{color:var(--text-3);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',system-ui,sans-serif;font-size:13px;background:var(--surface);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+.toolbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:10px;height:48px;flex-shrink:0;}
+.logo{display:flex;align-items:baseline;gap:6px;margin-right:12px;}
+.logo-name{font-size:17px;font-weight:600;color:var(--blue);letter-spacing:-.3px;}
+.logo-sub{font-size:11px;color:var(--text-3);font-weight:400;letter-spacing:.2px;}
+.tb-sep{width:1px;height:20px;background:var(--border);margin:0 4px;}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid var(--border);font-weight:500;transition:all .13s;background:var(--white);color:var(--text-2);}
+.btn:hover{background:var(--surface);border-color:var(--border-strong);color:var(--text);}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue);}
+.btn-primary:hover{background:var(--blue-dark);border-color:var(--blue-dark);color:#fff;}
+.btn-danger{background:#fff5f5;color:var(--red);border-color:#fecaca;}
+body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
+.btn-danger:hover{background:#fee2e2;border-color:#fca5a5;}
+.btn svg{width:13px;height:13px;flex-shrink:0;}
+.body{display:flex;flex:1;overflow:hidden;}
+.sidebar{width:190px;background:var(--white);border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;}
+.sidebar-hd{padding:10px 12px 8px;border-bottom:1px solid var(--border);}
+.sidebar-tipo{font-size:9px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;}
+.sidebar-titulo{font-size:11px;font-weight:600;color:var(--text);}
+.module-switch{display:flex;gap:5px;padding:9px 10px;border-bottom:1px solid var(--border);}
+.module-btn{flex:1;padding:7px 4px;text-align:center;font-size:10.3px;font-weight:600;border-radius:6px;cursor:pointer;color:var(--text-2);background:var(--surface);border:1px solid var(--border);transition:all .12s;line-height:1.3;}
+.module-btn:hover{border-color:var(--blue);color:var(--blue);}
+.module-btn.active{background:var(--blue);color:#fff;border-color:var(--blue);}
+.nav-group{padding:4px 0 8px;}
+.nav-group-hd{padding:8px 12px 3px;font-size:9px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;margin-top:2px;}
+.nav-item{display:flex;align-items:center;gap:7px;padding:6px 12px;font-size:11.5px;color:var(--text-2);cursor:pointer;transition:all .12s;border-left:2px solid transparent;}
+.nav-item:hover{background:var(--blue-light);color:var(--blue);}
+.nav-item.active{background:var(--blue-light);color:var(--blue);border-left-color:var(--blue);font-weight:600;}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.4;flex-shrink:0;}
+.nav-item.active .nav-dot{opacity:1;}
+.nav-dot.alert{background:var(--red);opacity:1;}
+.panel{width:490px;flex-shrink:0;overflow-y:auto;padding:14px 14px 20px;background:var(--surface);}
+.sec-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.sec-title::before{content:'';display:block;width:3px;height:16px;background:var(--blue);border-radius:2px;}
+.block{margin-bottom:10px;background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden;}
+.block-title{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.7px;padding:8px 14px 7px;border-bottom:1px solid var(--border);background:var(--white);}
+.radio-opt{display:flex;align-items:flex-start;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;position:relative;}
+.radio-opt:last-child{border-bottom:none;}
+.radio-opt:hover{background:#f5f8ff;}
+.radio-opt.selected{background:var(--blue-light);}
+.radio-opt input[type=radio]{position:absolute;opacity:0;pointer-events:none;}
+.radio-label{display:flex;align-items:center;gap:10px;width:100%;padding:9px 14px;font-size:12.5px;color:var(--text-2);line-height:1.4;cursor:pointer;}
+.radio-opt.selected .radio-label{color:var(--blue);font-weight:500;}
+.radio-mark{width:16px;height:16px;border-radius:50%;border:2px solid var(--border-strong);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.radio-opt:hover .radio-mark{border-color:var(--blue);}
+.radio-opt.selected .radio-mark{border-color:var(--blue);background:var(--blue);}
+.radio-mark::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff;opacity:0;transition:opacity .15s;}
+.radio-opt.selected .radio-mark::after{opacity:1;}
+.check-row{display:flex;align-items:center;border-bottom:1px solid var(--border);cursor:pointer;background:#fafbff;}
+.check-row:last-child{border-bottom:none;}
+.check-row:hover{background:#f0f5ff;}
+.check-row.selected{background:#e6eeff;}
+.check-row input[type=checkbox]{position:absolute;opacity:0;pointer-events:none;}
+.check-label{display:flex;align-items:center;gap:10px;width:100%;padding:8px 14px;font-size:12px;color:var(--text-2);cursor:pointer;}
+.check-row.selected .check-label{color:var(--blue);font-weight:500;}
+.check-box{width:15px;height:15px;border-radius:4px;border:2px solid var(--border-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.check-row:hover .check-box{border-color:var(--blue);}
+.check-row.selected .check-box{border-color:var(--blue);background:var(--blue);}
+.check-box svg{display:none;width:9px;height:9px;}
+.check-row.selected .check-box svg{display:block;}
+.ff-grid{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;padding:0 14px;}
+.ff{display:flex;flex-direction:column;gap:2px;}
+.ff label{font-size:9px;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
+.ff select,.ff input[type=text]{font-size:11px;padding:4px 7px;border:1px solid var(--border-strong);border-radius:5px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);}
+.ff select:focus,.ff input:focus{outline:none;border-color:var(--blue);}
+.ff input[type=text]{width:100%;}
+.info-box{padding:8px 14px;font-size:11px;color:#1e40af;background:#eff6ff;border-top:1px solid #bfdbfe;line-height:1.6;}
+.amber-box{padding:8px 14px;font-size:11px;color:var(--amber);background:var(--amber-bg);border-top:1px solid var(--amber-border);line-height:1.6;}
+.laudo-panel{flex:1;min-width:0;background:var(--white);display:flex;flex-direction:column;border-left:1px solid var(--border);}
+.laudo-header{padding:9px 20px 8px;border-bottom:1px solid var(--border);background:var(--white);display:flex;align-items:center;}
+.laudo-header-title{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.6px;}
+.laudo-body{flex:1;overflow-y:auto;padding:22px 28px;}
+.laudo-doc{font-family:Helvetica,Arial,sans-serif;font-size:10pt;line-height:1.65;color:#111;max-width:740px;}
+.doc-titulo{text-align:center;font-weight:700;font-size:10pt;margin-bottom:16px;text-transform:uppercase;letter-spacing:.3px;}
+.doc-label{font-weight:700;font-size:10pt;display:block;margin-bottom:2px;}
+.doc-p{margin-bottom:8px;font-size:10pt;}
+.doc-secao{margin-bottom:14px;}
+.laudo-doc:focus{outline:none;}
+.toast-notification{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:#fff;padding:10px 18px;border-radius:8px;font-size:12px;font-weight:500;opacity:0;pointer-events:none;transition:all .25s;z-index:999;box-shadow:0 6px 18px rgba(0,0,0,.18);}
+.toast-notification.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="logo" style="cursor: pointer;" onclick="window.location.href='../laudo-thirads.html'"><span class="logo-name">THI-RADS</span><span class="logo-sub">Doppler Venoso</span></div>
+  <button class="btn" onclick="window.location.href='../laudo-thirads.html'"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 2L4 8l6 6"/></svg>Voltar</button>
+  <div class="tb-sep"></div>
+  <button class="btn" onclick="copiar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>Copiar laudo</button>
+  <button class="btn btn-primary" onclick="imprimir()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6V2h8v4M4 12H2V7h12v5h-2M4 9h8M4 12v2h8v-2"/></svg>Imprimir</button>
+  <button class="btn btn-dark" id="btn-dark-toggle" onclick="toggleDark()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro</button>
+  <button class="btn btn-danger" onclick="reiniciar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8a6 6 0 1 0 1.5-3.9M2 4v4h4"/></svg>Reiniciar</button>
+</div>
+
+<div class="body">
+  <div class="sidebar">
+    <div class="sidebar-hd"><div class="sidebar-tipo">US Doppler Venoso</div><div class="sidebar-titulo" id="sidebar-titulo">Membro Superior</div></div>
+    <div class="module-switch">
+      <div class="module-btn" id="mod-superior" onclick="setModulo('superior')">Membro<br>Superior</div>
+      <div class="module-btn" id="mod-inferior" onclick="setModulo('inferior')">Membro<br>Inferior</div>
+    </div>
+    <div id="sidebar-nav"></div>
+  </div>
+
+  <div class="panel" id="main-panel"></div>
+
+  <div class="laudo-panel">
+    <div class="laudo-header"><span class="laudo-header-title">Pré-visualização do laudo</span></div>
+    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc" contenteditable="true"></div></div>
+  </div>
+</div>
+
+<div id="toast-notification" class="toast-notification">Laudo copiado!</div>
+
+<script>
+/* =====================================================================
+   THI-RADS · US DOPPLER VENOSO — Membros Superiores e Inferiores
+   Estrutura: estado global -> configuração de veias -> componentes de
+   UI reutilizáveis -> geração do laudo -> eventos -> tema/copiar/imprimir
+   ===================================================================== */
+
+// ── CONFIGURAÇÃO DE VEIAS (dado, não código duplicado) ──
+const VEINS = {
+  superior: {
+    profundo:    [ ['subclavia','Subclávia'], ['axilar','Axilar'], ['braquiais','Braquial'], ['radiais','Radial'], ['ulnares','Ulnar'] ],
+    superficial: [ ['cefalica','Cefálica'], ['basilica','Basílica'] ]
+  },
+  inferior: {
+    profundo:    [ ['femoralComum','Femoral comum'], ['femoral','Femoral'], ['femoralProfunda','Femoral profunda'], ['poplitea','Poplítea'], ['tibialAnterior','Tibial anterior'], ['tibialPosterior','Tibial posterior'], ['fibulares','Fibular'] ],
+    superficial: [ ['safenaMagna','Safena magna'], ['safenaParva','Safena parva'] ]
+  }
+};
+
+const STATUS_OPTS = {
+  superior: [ ['normal','Normal'], ['tvp','TVP'] ],
+  inferior: [ ['normal','Normal'], ['tvp','TVP'] ]
+};
+
+const ACHADOS_LABELS = {
+  linfonodos:'Linfonodomegalias reacionais de aspecto inflamatório',
+  colecoes:'Coleção líquida de permeio às estruturas avaliadas',
+  hematomas:'Hematoma de partes moles',
+  edemaSubcutaneo:'Edema subcutâneo difuso',
+  varizes:'Varizes de sistema venoso superficial',
+  cistoBaker:'Cisto de Baker'
+};
+
+// ── FÁBRICAS DE ESTADO ──
+function defaultVeia(){
+  return { status:'normal', compress:'normal', fluxo:'normal', materialEcogenico:false, colaterais:false, duplicidade:false, temporalidade:'' };
+}
+function defaultVeiasSide(modulo){
+  const obj = {};
+  VEINS[modulo].profundo.concat(VEINS[modulo].superficial).forEach(([k]) => obj[k] = defaultVeia());
+  return obj;
+}
+function defaultLimitacoes(){
+  return { biotipo:false, curativos:false, dorIntensa:false, mobilidadeReduzida:false, gesso:false, edemaImportante:false };
+}
+function defaultModuloState(modulo){
+  return {
+    indicacao:'tvp', indicacaoOutro:'',
+    lateralidade:'direito',
+    urgencia:'ambulatorial',
+    limitacoes: defaultLimitacoes(),
+    veias: { D: defaultVeiasSide(modulo), E: defaultVeiasSide(modulo) },
+    achados: { linfonodos:false, colecoes:false, hematomas:false, edemaSubcutaneo:false, varizes:false, cistoBaker:false }
+  };
+}
+
+let estado = {
+  moduloAtual: 'superior',
+  superior: defaultModuloState('superior'),
+  inferior: defaultModuloState('inferior')
+};
+
+let secaoAtual = 'geral';
+
+// ── HELPERS DE ACESSO AO ESTADO ──
+function modState(m){ return estado[m || estado.moduloAtual]; }
+function getVeia(side, key){ return modState().veias[side][key]; }
+function veinLabel(modulo, key){
+  const found = VEINS[modulo].profundo.concat(VEINS[modulo].superficial).find(v => v[0] === key);
+  return found ? found[1] : key;
+}
+function isProfunda(modulo, key){ return VEINS[modulo].profundo.some(v => v[0] === key); }
+
+// ── SIDEBAR / NAVEGAÇÃO ──
+function setModulo(m){
+  estado.moduloAtual = m;
+  document.getElementById('mod-superior').classList.toggle('active', m === 'superior');
+  document.getElementById('mod-inferior').classList.toggle('active', m === 'inferior');
+  document.getElementById('sidebar-titulo').innerText = m === 'superior' ? 'Membro Superior' : 'Membro Inferior';
+  buildSidebar();
+  showSection('geral');
+}
+
+function algumaAlteracao(side, key){
+  return getVeia(side, key).status !== 'normal';
+}
+
+function buildSidebar(){
+  const m = estado.moduloAtual;
+  const st = modState(m);
+  const lat = st.lateralidade;
+  const sides = lat === 'bilateral' ? ['D','E'] : (lat === 'direito' ? ['D'] : ['E']);
+  const sideLabel = { D:'Direito', E:'Esquerdo' };
+
+  let html = `<div class="nav-group">
+    <div class="nav-group-hd">Geral</div>
+    <div class="nav-item" id="nav-geral" onclick="showSection('geral')"><span class="nav-dot"></span>Indicação / Lateralidade</div>
+    <div class="nav-item" id="nav-limitacoes" onclick="showSection('limitacoes')"><span class="nav-dot"></span>Limitações e Urgência</div>
+  </div>`;
+
+  html += `<div class="nav-group"><div class="nav-group-hd">Sistema Venoso Profundo</div>`;
+  sides.forEach(side => {
+    if(sides.length > 1) html += `<div class="nav-group-hd" style="padding-top:4px;font-size:8.5px;opacity:.75">${sideLabel[side]}</div>`;
+    VEINS[m].profundo.forEach(([key,label]) => {
+      const alerta = algumaAlteracao(side,key) ? '<span class="nav-dot alert"></span>' : '<span class="nav-dot"></span>';
+      html += `<div class="nav-item" id="nav-v_${side}_${key}" onclick="showSection('v_${side}_${key}')">${alerta}${label}${sides.length>1?' '+side:''}</div>`;
+    });
+  });
+  html += `</div>`;
+
+  html += `<div class="nav-group"><div class="nav-group-hd">Sistema Venoso Superficial</div>`;
+  sides.forEach(side => {
+    if(sides.length > 1) html += `<div class="nav-group-hd" style="padding-top:4px;font-size:8.5px;opacity:.75">${sideLabel[side]}</div>`;
+    VEINS[m].superficial.forEach(([key,label]) => {
+      const alerta = algumaAlteracao(side,key) ? '<span class="nav-dot alert"></span>' : '<span class="nav-dot"></span>';
+      html += `<div class="nav-item" id="nav-v_${side}_${key}" onclick="showSection('v_${side}_${key}')">${alerta}${label}${sides.length>1?' '+side:''}</div>`;
+    });
+  });
+  html += `</div>`;
+
+  html += `<div class="nav-group">
+    <div class="nav-group-hd">Achados</div>
+    <div class="nav-item" id="nav-achados" onclick="showSection('achados')"><span class="nav-dot"></span>Achados Adicionais</div>
+  </div>`;
+
+  document.getElementById('sidebar-nav').innerHTML = html;
+}
+
+function showSection(sec){
+  secaoAtual = sec;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const el = document.getElementById('nav-' + sec);
+  if(el) el.classList.add('active');
+  renderPanel(sec);
+  updateLaudo();
+}
+
+function renderPanel(sec){
+  const p = document.getElementById('main-panel');
+  let html = '';
+  if(sec === 'geral'){ html = '<div class="sec-title">Indicação e Lateralidade</div>' + renderGeral(); }
+  else if(sec === 'limitacoes'){ html = '<div class="sec-title">Limitações Técnicas e Urgência</div>' + renderLimitacoes(); }
+  else if(sec === 'achados'){ html = '<div class="sec-title">Achados Adicionais</div>' + renderAchados(); }
+  else if(sec.startsWith('v_')){
+    const [, side, key] = sec.split('_');
+    const label = veinLabel(estado.moduloAtual, key);
+    const sideLabel = side === 'D' ? ' Direita' : side === 'E' ? ' Esquerda' : '';
+    html = `<div class="sec-title">Veia ${label}${sideLabel}</div>` + renderVeiaPanel(side, key);
+  }
+  p.innerHTML = html;
+}
+
+// ── COMPONENTES REUTILIZÁVEIS ──
+function radioOpt(id, label, selected, onclickCall){
+  return `<div class="radio-opt ${selected?'selected':''}" id="ro-${id}" onclick="${onclickCall}"><input type="radio"><label class="radio-label"><span class="radio-mark"></span>${label}</label></div>`;
+}
+function checkRow(id, label, checked, onclickCall){
+  return `<div class="check-row ${checked?'selected':''}" id="cr-${id}" onclick="${onclickCall}"><input type="checkbox" ${checked?'checked':''}><label class="check-label"><span class="check-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.8"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg></span>${label}</label></div>`;
+}
+
+// ── SEÇÃO: GERAL ──
+function renderGeral(){
+  const st = modState();
+  const inds = [
+    ['tvp','Pesquisa de trombose venosa profunda'],
+    ['posop','Acompanhamento pós-operatório venoso'],
+    ['edema','Investigação de edema unilateral de membro'],
+    ['dor','Investigação de dor / empastamento muscular'],
+    ['outro','Outra indicação']
+  ];
+  let html = `<div class="block"><div class="block-title">Indicação Clínica</div>`;
+  inds.forEach(([v,l]) => html += radioOpt('ind-'+v, l, st.indicacao===v, `setGeral('indicacao','${v}')`));
+  if(st.indicacao === 'outro'){
+    html += `<div class="ff-grid" style="padding:10px 14px"><div class="ff" style="flex:1"><label>Especificar</label><input type="text" value="${st.indicacaoOutro}" oninput="setGeral('indicacaoOutro', this.value, true)"></div></div>`;
+  }
+  html += `</div>`;
+
+  html += `<div class="block"><div class="block-title">Lateralidade do Exame</div>`;
+  html += radioOpt('lat-direito','Membro direito', st.lateralidade==='direito', `setGeral('lateralidade','direito')`);
+  html += radioOpt('lat-esquerdo','Membro esquerdo', st.lateralidade==='esquerdo', `setGeral('lateralidade','esquerdo')`);
+  html += radioOpt('lat-bilateral','Bilateral', st.lateralidade==='bilateral', `setGeral('lateralidade','bilateral')`);
+  html += `</div>`;
+  html += `<div class="info-box">A alteração da lateralidade reorganiza automaticamente as veias disponíveis para avaliação na barra lateral.</div>`;
+  return html;
+}
+
+function setGeral(field, value, isText){
+  const st = modState();
+  st[field] = value;
+  if(field === 'lateralidade') buildSidebar();
+  if(!isText) renderPanel(secaoAtual);
+  updateLaudo();
+}
+
+// ── SEÇÃO: LIMITAÇÕES E URGÊNCIA ──
+const LIMIT_LABELS = {
+  biotipo:'Biotipo do paciente (obesidade / panículo adiposo espesso)',
+  curativos:'Presença de curativos / bandagens',
+  dorIntensa:'Dor intensa referida pelo paciente',
+  mobilidadeReduzida:'Mobilidade reduzida do paciente',
+  gesso:'Presença de imobilização gessada',
+  edemaImportante:'Edema importante de subcutâneo'
+};
+const URGENCIA_OPTS = [ ['ambulatorial','Ambulatorial'], ['pronto-socorro','Pronto-Socorro'], ['internacao','Internação'], ['uti','UTI'] ];
+
+function renderLimitacoes(){
+  const st = modState();
+  let html = `<div class="block"><div class="block-title">Limitações Técnicas</div>`;
+  Object.keys(LIMIT_LABELS).forEach(k => {
+    html += checkRow('lim-'+k, LIMIT_LABELS[k], st.limitacoes[k], `toggleLimitacao('${k}')`);
+  });
+  html += `</div>`;
+  html += `<div class="block"><div class="block-title">Contexto / Urgência</div>`;
+  URGENCIA_OPTS.forEach(([v,l]) => html += radioOpt('urg-'+v, l, st.urgencia===v, `setGeral('urgencia','${v}')`));
+  html += `</div>`;
+  return html;
+}
+function toggleLimitacao(k){
+  const st = modState();
+  st.limitacoes[k] = !st.limitacoes[k];
+  renderPanel(secaoAtual);
+  updateLaudo();
+}
+
+// ── SEÇÃO: PAINEL DE VEIA (COMPONENTE REUTILIZÁVEL) ──
+function renderVeiaPanel(side, key){
+  const modulo = estado.moduloAtual;
+  const v = getVeia(side, key);
+  const opts = STATUS_OPTS[modulo];
+  let html = `<div class="block"><div class="block-title">Status da Veia</div>`;
+  opts.forEach(([val,label]) => html += radioOpt('st-'+val, label, v.status===val, `setVeiaField('${side}','${key}','status','${val}')`));
+  html += `</div>`;
+
+  if(v.status === 'normal'){
+    html += `<div class="info-box">Veia pérvia, compressível, com fluxo fásico preservado ao Doppler. Sem evidência de trombos.</div>`;
+    return html;
+  }
+
+  const sistemaVeia = isProfunda(modulo, key) ? 'profundo' : 'superficial';
+
+  if(v.status === 'tvp' && sistemaVeia === 'profundo'){
+    html += `<div class="block"><div class="block-title">Temporalidade</div>`;
+    html += radioOpt('tp-none','Não especificada', !v.temporalidade, `setVeiaField('${side}','${key}','temporalidade','')`);
+    html += radioOpt('tp-aguda','Aguda', v.temporalidade==='aguda', `setVeiaField('${side}','${key}','temporalidade','aguda')`);
+    html += radioOpt('tp-cronica','Crônica', v.temporalidade==='cronica', `setVeiaField('${side}','${key}','temporalidade','cronica')`);
+    html += `</div>`;
+
+    html += `<div class="block"><div class="block-title">Achados Associados</div>`;
+    html += checkRow('cl','Colaterais venosos', v.colaterais, `toggleVeiaBool('${side}','${key}','colaterais')`);
+    if(modulo === 'inferior'){
+      html += checkRow('dp','Duplicidade venosa', v.duplicidade, `toggleVeiaBool('${side}','${key}','duplicidade')`);
+    }
+    html += `</div>`;
+
+    return html;
+  }
+
+  html += `<div class="block"><div class="block-title">Compressibilidade</div>`;
+  html += radioOpt('cp-normal','Normal', v.compress==='normal', `setVeiaField('${side}','${key}','compress','normal')`);
+  html += radioOpt('cp-reduzida','Reduzida', v.compress==='reduzida', `setVeiaField('${side}','${key}','compress','reduzida')`);
+  html += radioOpt('cp-ausente','Ausente', v.compress==='ausente', `setVeiaField('${side}','${key}','compress','ausente')`);
+  html += `</div>`;
+
+  html += `<div class="block"><div class="block-title">Fluxo ao Doppler</div>`;
+  html += radioOpt('fl-normal','Normal', v.fluxo==='normal', `setVeiaField('${side}','${key}','fluxo','normal')`);
+  html += radioOpt('fl-reduzido','Reduzido', v.fluxo==='reduzido', `setVeiaField('${side}','${key}','fluxo','reduzido')`);
+  html += radioOpt('fl-ausente','Ausente', v.fluxo==='ausente', `setVeiaField('${side}','${key}','fluxo','ausente')`);
+  html += `</div>`;
+
+  html += `<div class="block"><div class="block-title">Achados Associados</div>`;
+  html += checkRow('me','Material ecogênico no interior do lúmen', v.materialEcogenico, `toggleVeiaBool('${side}','${key}','materialEcogenico')`);
+  html += checkRow('cl','Colaterais venosos', v.colaterais, `toggleVeiaBool('${side}','${key}','colaterais')`);
+  if(modulo === 'inferior'){
+    html += checkRow('dp','Duplicidade venosa', v.duplicidade, `toggleVeiaBool('${side}','${key}','duplicidade')`);
+  }
+  html += `</div>`;
+
+  return html;
+}
+
+function setVeiaField(side, key, field, value){
+  getVeia(side, key)[field] = value;
+  buildSidebar();
+  document.getElementById('nav-v_'+side+'_'+key) && document.getElementById('nav-v_'+side+'_'+key).classList.add('active');
+  renderPanel(secaoAtual);
+  updateLaudo();
+}
+function toggleVeiaBool(side, key, field){
+  const v = getVeia(side, key);
+  v[field] = !v[field];
+  renderPanel(secaoAtual);
+  updateLaudo();
+}
+
+// ── SEÇÃO: ACHADOS ADICIONAIS ──
+function renderAchados(){
+  const st = modState();
+  const modulo = estado.moduloAtual;
+  let html = `<div class="block"><div class="block-title">Achados Adicionais</div>`;
+  Object.keys(ACHADOS_LABELS).forEach(k => {
+    if(k === 'cistoBaker' && modulo !== 'inferior') return;
+    html += checkRow('ach-'+k, ACHADOS_LABELS[k], st.achados[k], `toggleAchado('${k}')`);
+  });
+  html += `</div>`;
+  html += `<div class="info-box">A tromboflebite superficial não precisa ser marcada aqui — é identificada automaticamente sempre que uma veia do sistema superficial apresentar status de trombose.</div>`;
+  return html;
+}
+function toggleAchado(k){
+  modState().achados[k] = !modState().achados[k];
+  renderPanel(secaoAtual);
+  updateLaudo();
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  GERAÇÃO DO LAUDO
+// ══════════════════════════════════════════════════════════════════
+
+function sidesFor(st){
+  return st.lateralidade === 'bilateral' ? ['D','E'] : [st.lateralidade === 'direito' ? 'D' : 'E'];
+}
+
+function tituloExame(modulo, lat){
+  if(modulo === 'superior'){
+    if(lat === 'bilateral') return 'ULTRASSONOGRAFIA COM DOPPLER VENOSO DOS MEMBROS SUPERIORES';
+    return 'ULTRASSONOGRAFIA COM DOPPLER VENOSO DO MEMBRO SUPERIOR ' + (lat === 'direito' ? 'DIREITO' : 'ESQUERDO');
+  }
+  if(lat === 'bilateral') return 'ULTRASSONOGRAFIA COM DOPPLER VENOSO DOS MEMBROS INFERIORES';
+  return 'ULTRASSONOGRAFIA COM DOPPLER VENOSO DO MEMBRO INFERIOR ' + (lat === 'direito' ? 'DIREITO' : 'ESQUERDO');
+}
+
+function textIndicacao(st){
+  const map = {
+    tvp:'Exame direcionado para pesquisa de trombose venosa profunda.',
+    posop:'Acompanhamento pós-operatório venoso.',
+    edema:'Investigação de edema unilateral de membro.',
+    dor:'Investigação de dor e/ou empastamento muscular no membro avaliado.',
+    outro: st.indicacaoOutro ? st.indicacaoOutro : 'Indicação clínica não especificada.'
+  };
+  return map[st.indicacao] || map.tvp;
+}
+
+function textTecnica(st){
+  let txt = 'Exame realizado com transdutor linear de alta frequência, utilizando imagens em modo B, Doppler colorido e Doppler espectral, com avaliação da compressibilidade, permeabilidade e do padrão de fluxo venoso';
+  const frases = {
+    biotipo:'pelo biotipo do paciente', curativos:'pela presença de curativos/bandagens',
+    dorIntensa:'por dor intensa referida pelo paciente', mobilidadeReduzida:'pela mobilidade reduzida do paciente',
+    gesso:'pela presença de imobilização gessada', edemaImportante:'pelo edema importante de subcutâneo'
+  };
+  const ativos = Object.keys(frases).filter(k => st.limitacoes[k]).map(k => frases[k]);
+  if(ativos.length) txt += `, com limitação técnica parcial ${ativos.join(' e ')}`;
+  txt += '.';
+  if(st.urgencia !== 'ambulatorial'){
+    const urgLabel = { 'pronto-socorro':'Pronto-Socorro', internacao:'Internação', uti:'Unidade de Terapia Intensiva' }[st.urgencia];
+    txt += ` Exame realizado em caráter de urgência (${urgLabel}).`;
+  }
+  return txt;
+}
+
+// agrupa veias por "assinatura" de achados para evitar frases repetidas
+function assinatura(v){
+  return [v.status, v.compress, v.fluxo, v.materialEcogenico, v.colaterais, v.duplicidade, v.temporalidade].join('|');
+}
+
+function listaComE(labels){
+  if(labels.length === 1) return labels[0];
+  if(labels.length === 2) return labels.join(' e ');
+  return labels.slice(0,-1).join(', ') + ' e ' + labels[labels.length-1];
+}
+
+function verboEstado(status, plural, sistema){
+  if(status !== 'tvp') return '';
+  const ser = plural ? 'apresentam' : 'apresenta';
+  return sistema === 'superficial' ? `${ser} trombose venosa` : `${ser} trombose venosa profunda`;
+}
+
+function sideAdj(side, plural){
+  if(side === 'D') return plural ? 'direitas' : 'direita';
+  return plural ? 'esquerdas' : 'esquerda';
+}
+
+// agrupa por temporalidade (aguda/crônica/não especificada) para não repetir uma frase por veia
+function frasesAlteracoesProfundas(alteradas, side){
+  if(!alteradas.length) return [];
+  const grupos = {};
+  alteradas.forEach(item => {
+    const chave = item.v.temporalidade || '';
+    if(!grupos[chave]) grupos[chave] = [];
+    grupos[chave].push(item);
+  });
+
+  return Object.entries(grupos).map(([temporalidade, itens]) => {
+    const labels = itens.map(i => i.label.toLowerCase());
+    const plural = labels.length > 1;
+    const adj = sideAdj(side, plural);
+
+    let frase = plural
+      ? `Observa-se material ecogênico intraluminal envolvendo as veias ${listaComE(labels)} ${adj}, determinando ausência de compressibilidade e ausência de fluxo ao estudo Doppler colorido, compatível com trombose venosa profunda`
+      : `Observa-se material ecogênico intraluminal na veia ${labels[0]} ${adj}, determinando ausência de compressibilidade e ausência de fluxo ao estudo Doppler colorido, compatível com trombose venosa profunda`;
+
+    if(temporalidade === 'aguda') frase += ' aguda';
+    else if(temporalidade === 'cronica') frase += ' crônica';
+    frase += '.';
+
+    if(itens.some(i => i.v.colaterais)) frase += ` Observam-se colaterais venosos associados.`;
+    if(itens.some(i => i.v.duplicidade)) frase += ` Duplicidade venosa identificada n${plural?'as veias avaliadas':'a veia avaliada'}.`;
+
+    return frase;
+  });
+}
+
+function frasesAlteracoesSuperficiais(alteradas, side){
+  if(!alteradas.length) return [];
+  const labels = alteradas.map(i => i.label.toLowerCase());
+  const plural = labels.length > 1;
+  const adj = sideAdj(side, plural);
+
+  let frase = plural
+    ? `Observa-se material ecogênico intraluminal envolvendo as veias ${listaComE(labels)} ${adj}, determinando ausência de compressibilidade e ausência de fluxo ao estudo Doppler colorido, compatível com tromboflebite superficial.`
+    : `Observa-se material ecogênico intraluminal na veia ${labels[0]} ${adj}, determinando ausência de compressibilidade e ausência de fluxo ao estudo Doppler colorido, compatível com tromboflebite superficial.`;
+
+  if(alteradas.some(i => i.v.colaterais)) frase += ` Observam-se colaterais venosos associados.`;
+  if(alteradas.some(i => i.v.duplicidade)) frase += ` Duplicidade venosa identificada n${plural?'as veias avaliadas':'a veia avaliada'}.`;
+
+  return [frase];
+}
+
+function veiasAlteradas(modulo, side, tipoLista){
+  const out = [];
+  VEINS[modulo][tipoLista].forEach(([key,label]) => {
+    const v = getVeia(side, key);
+    if(v.status !== 'normal') out.push({ label, v });
+  });
+  return out;
+}
+
+function fraseSegmentosPreservados(side, houveAlteracaoNoLado){
+  const sideTxt = side ? ` no membro ${side==='D'?'direito':'esquerdo'}` : '';
+  const sujeito = houveAlteracaoNoLado
+    ? 'Os demais segmentos venosos profundos e superficiais avaliados'
+    : 'Os segmentos venosos profundos e superficiais avaliados';
+  return `${sujeito}${sideTxt} apresentam trajeto, calibre e contornos preservados, compressibilidade conservada às manobras habituais e fluxo venoso característico ao estudo Doppler, sem evidências de trombose.`;
+}
+
+function todasVeiasNormais(modulo, sides){
+  return sides.every(side =>
+    VEINS[modulo].profundo.concat(VEINS[modulo].superficial).every(([key]) => getVeia(side, key).status === 'normal')
+  );
+}
+
+// Texto fixo da máscara oficial, usado sempre que o exame estiver 100% normal
+function textAnaliseMascara(modulo){
+  if(modulo === 'superior'){
+    return `<div class="doc-p">Avaliados os sistemas venosos profundo (veias subclávia, axilar, braquiais, radiais e ulnares) e superficial (veias cefálica e basílica).</div>`
+      + `<div class="doc-p">Os segmentos venosos avaliados mostram trajeto, calibre e contornos preservados.</div>`
+      + `<div class="doc-p">Compressibilidade conservada às manobras habituais.</div>`
+      + `<div class="doc-p">Ao ecodoppler nota-se fluxo venoso característico, observando-se variações fásicas com a respiração.</div>`
+      + `<div class="doc-p">Não há evidência de trombos.</div>`;
+  }
+  return `<div class="doc-p">Avaliados os segmentos fêmoro-poplíteo-tíbio-fibular venosos.</div>`
+    + `<div class="doc-p">Os segmentos venosos avaliados mostram trajeto, calibre e contornos preservados.</div>`
+    + `<div class="doc-p">Compressibilidade conservada às manobras habituais.</div>`
+    + `<div class="doc-p">Ao ecodoppler nota-se fluxo venoso característico, observando-se variações fásicas com a respiração.</div>`
+    + `<div class="doc-p">Crossa da veia safena magna pérvia.</div>`
+    + `<div class="doc-p">Não há evidência de trombos.</div>`;
+}
+
+function textAnalise(modulo, st){
+  const sides = sidesFor(st);
+  const sideLabel = { D:'direito', E:'esquerdo' };
+
+  if(todasVeiasNormais(modulo, sides)){
+    return textAnaliseMascara(modulo);
+  }
+
+  const nomesProfundo = VEINS[modulo].profundo.map(v=>v[1].toLowerCase()).join(', ');
+  const nomesSuperficial = VEINS[modulo].superficial.map(v=>v[1].toLowerCase()).join(' e ');
+  const regiao = modulo === 'superior' ? 'membro superior' : 'membro inferior';
+  const regiaoPlural = modulo === 'superior' ? 'membros superiores' : 'membros inferiores';
+
+  let html = `<div class="doc-p">Avaliados os sistemas venosos profundo (veias ${nomesProfundo}) e superficial (veias ${nomesSuperficial}) do${st.lateralidade==='bilateral'?'s':''} ${st.lateralidade==='bilateral' ? regiaoPlural + ', bilateralmente' : regiao + ' ' + sideLabel[sides[0]]}.</div>`;
+
+  const frasesAlteracoes = [];
+  const frasesNormais = [];
+
+  sides.forEach(side => {
+    const profAlt = veiasAlteradas(modulo, side, 'profundo');
+    const supAlt = veiasAlteradas(modulo, side, 'superficial');
+
+    frasesAlteracoes.push(...frasesAlteracoesProfundas(profAlt, side));
+    frasesAlteracoes.push(...frasesAlteracoesSuperficiais(supAlt, side));
+
+    const totalVeias = VEINS[modulo].profundo.length + VEINS[modulo].superficial.length;
+    const normaisCount = totalVeias - profAlt.length - supAlt.length;
+    if(normaisCount > 0){
+      frasesNormais.push(fraseSegmentosPreservados(sides.length>1?side:null, (profAlt.length+supAlt.length) > 0));
+    }
+  });
+
+  if(frasesAlteracoes.length) html += `<div class="doc-p">${frasesAlteracoes.join(' ')}</div>`;
+  if(frasesNormais.length) html += `<div class="doc-p">${frasesNormais.join(' ')}</div>`;
+
+  return html;
+}
+
+function textAchadosAdicionaisSecao(st){
+  const ativos = Object.keys(ACHADOS_LABELS).filter(k => st.achados[k]);
+  if(!ativos.length) return '';
+  const frases = ativos.map(k => ACHADOS_LABELS[k] + '.');
+  return `<div class="doc-secao"><span class="doc-label">ACHADOS ADICIONAIS:</span><div class="doc-p">${frases.join(' ')}</div></div>`;
+}
+
+// monta a frase diagnóstica de um sistema (profundo ou superficial), unindo os lados quando necessário
+function fraseDiagnostico(titulo, labelsBySide, incluirLadoUnilateral){
+  const sidesComAlteracao = Object.keys(labelsBySide).filter(s => labelsBySide[s] && labelsBySide[s].length);
+  if(!sidesComAlteracao.length) return '';
+
+  if(sidesComAlteracao.length === 1){
+    const side = sidesComAlteracao[0];
+    const labels = labelsBySide[side];
+    const plural = labels.length > 1;
+    const ladoTxt = incluirLadoUnilateral ? ' ' + sideAdj(side, plural) : '';
+    return plural
+      ? `${titulo} envolvendo as veias ${listaComE(labels)}${ladoTxt}`
+      : `${titulo} da veia ${labels[0]}${ladoTxt}`;
+  }
+
+  const labelsD = labelsBySide.D || [];
+  const labelsE = labelsBySide.E || [];
+  const mesmasVeias = labelsD.length && labelsE.length && labelsD.length === labelsE.length
+    && labelsD.every((l,i) => l === labelsE[i]);
+
+  if(mesmasVeias){
+    const plural = labelsD.length > 1;
+    return plural
+      ? `${titulo} bilateral envolvendo as veias ${listaComE(labelsD)}`
+      : `${titulo} bilateral da veia ${labelsD[0]}`;
+  }
+
+  const partes = sidesComAlteracao.map(side => {
+    const labels = labelsBySide[side];
+    const plural = labels.length > 1;
+    const artigo = side === 'D' ? 'à direita' : 'à esquerda';
+    return `${plural ? listaComE(labels) : labels[0]} ${artigo}`;
+  });
+  return `${titulo} bilateral envolvendo as veias ${partes.join(' e ')}`;
+}
+
+function textConclusao(modulo, st){
+  const sides = sidesFor(st);
+  const labelsProfundo = { D:[], E:[] };
+  const labelsSuperficial = { D:[], E:[] };
+
+  sides.forEach(side => {
+    VEINS[modulo].profundo.forEach(([key,label]) => {
+      if(getVeia(side, key).status === 'tvp') labelsProfundo[side].push(label.toLowerCase());
+    });
+    VEINS[modulo].superficial.forEach(([key,label]) => {
+      if(getVeia(side, key).status === 'tvp') labelsSuperficial[side].push(label.toLowerCase());
+    });
+  });
+
+  const fraseProfunda = fraseDiagnostico('Trombose venosa profunda', labelsProfundo, true);
+  const fraseSuperficial = fraseDiagnostico('Tromboflebite', labelsSuperficial, false);
+
+  const frases = [];
+
+  if(fraseProfunda && fraseSuperficial){
+    frases.push(`${fraseProfunda}, associada à ${fraseSuperficial.charAt(0).toLowerCase() + fraseSuperficial.slice(1)}.`);
+  } else if(fraseProfunda){
+    frases.push(fraseProfunda + '.');
+  } else if(fraseSuperficial){
+    frases.push(fraseSuperficial + '.');
+  } else {
+    frases.push('Ausência de sinais de trombose venosa profunda.');
+  }
+
+  if(modulo === 'inferior' && st.achados.cistoBaker && !fraseProfunda){
+    frases.push('Presença de cisto de Baker, diagnóstico diferencial clínico a ser considerado.');
+  }
+
+  return frases.join(' ');
+}
+
+function buildLaudo(){
+  const modulo = estado.moduloAtual;
+  const st = modState(modulo);
+  let html = `<div class="doc-titulo">${tituloExame(modulo, st.lateralidade)}</div>`;
+  html += `<div class="doc-secao"><span class="doc-label">INDICAÇÃO:</span><div class="doc-p">${textIndicacao(st)}</div></div>`;
+  html += `<div class="doc-secao"><span class="doc-label">TÉCNICA:</span><div class="doc-p">${textTecnica(st)}</div></div>`;
+  html += `<div class="doc-secao"><span class="doc-label">ANÁLISE:</span>${textAnalise(modulo, st)}</div>`;
+  html += textAchadosAdicionaisSecao(st);
+  html += `<br><div class="doc-secao"><span class="doc-label">CONCLUSÃO:</span><div class="doc-p">${textConclusao(modulo, st)}</div></div>`;
+  return html;
+}
+
+function updateLaudo(){
+  document.getElementById('laudo-doc').innerHTML = buildLaudo();
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  TOOLBAR: TEMA, COPIAR, IMPRIMIR, REINICIAR
+// ══════════════════════════════════════════════════════════════════
+function toggleDark(){
+  const isDark = document.body.classList.toggle('dark');
+  const btn = document.getElementById('btn-dark-toggle');
+  btn.innerHTML = isDark
+    ? '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 8.5A5.5 5.5 0 0 1 6 3c0-.18.01-.36.03-.53A6 6 0 1 0 13.97 9.5c-.15.01-.31.01-.47 0z"/></svg>Modo claro'
+    : '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro';
+  localStorage.setItem('darkModeVenoso', isDark ? '1' : '0');
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast-notification');
+  t.innerText = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function copiar(){
+  const isDark = document.body.classList.contains('dark');
+  if(isDark) document.body.classList.remove('dark');
+
+  const el = document.getElementById('laudo-doc');
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+
+  let success = false;
+  try { success = document.execCommand('copy'); } catch(err) {}
+
+  selection.removeAllRanges();
+  if(isDark) document.body.classList.add('dark');
+
+  showToast(success ? 'Laudo copiado para a área de transferência!' : 'Falha ao copiar. Use Ctrl+A e Ctrl+C no texto do laudo.');
+}
+
+function imprimir(){
+  const h = document.getElementById('laudo-doc').innerHTML;
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Helvetica,Arial,sans-serif;font-size:10pt;padding:32px;color:#111;line-height:1.65;max-width:820px;margin:auto}.doc-titulo{text-align:center;font-weight:700;text-transform:uppercase;margin-bottom:16px}.doc-label{font-weight:700;display:block;margin-bottom:2px}.doc-p{margin-bottom:8px}.doc-secao{margin-bottom:14px}*{color:#111!important}</style></head><body>${h}</body></html>`);
+  w.document.close();
+  w.print();
+}
+
+function reiniciar(){
+  estado.superior = defaultModuloState('superior');
+  estado.inferior = defaultModuloState('inferior');
+  buildSidebar();
+  showSection('geral');
+}
+
+// ── INIT ──
+(function(){
+  if(localStorage.getItem('darkModeVenoso') === '1') toggleDark();
+  document.getElementById('mod-superior').classList.add('active');
+  buildSidebar();
+  showSection('geral');
+})();
+</script>
+</body>
+</html>

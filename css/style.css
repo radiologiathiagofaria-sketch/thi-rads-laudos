@@ -171,19 +171,18 @@ select option { background: var(--card-bg); color: var(--text-main); }
 
 /* Editor de Laudo (Rich Text) */
 .editor-header {
-  display: flex; justify-content: space-between; align-items: center;
+  display: flex; justify-content: flex-start; align-items: center; gap: 1.5rem;
   background: var(--card-bg); padding: 0.8rem 1.2rem;
   border-radius: 12px; border: 1px solid var(--card-border);
 }
 
 .copy-btn {
-  background: var(--primary); color: #fff; padding: 0.6rem 1.2rem;
-  border-radius: 8px; border: none; font-family: 'Orbitron'; cursor: pointer;
-  font-weight: bold; transition: 0.3s; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-  box-shadow: 0 4px 10px var(--primary-glow);
+  background: transparent; color: var(--text-muted); padding: 0.5rem 1rem;
+  border-radius: 8px; border: 1px solid var(--card-border); font-family: 'Orbitron'; cursor: pointer;
+  font-weight: 500; font-size: 0.85rem; transition: 0.3s;
 }
-body.light-mode .copy-btn { text-shadow: none; }
-.copy-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px var(--primary-glow); }
+body.light-mode .copy-btn { color: var(--text-muted); }
+.copy-btn:hover { background: var(--card-border); color: var(--text-main); transform: translateY(-1px); }
 
 .editor-container {
   flex: 1;
@@ -229,3 +228,32 @@ body.light-mode .editor-container { background: rgba(0,0,0,0.05); }
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 4px; }
+
+/* Modal Novo Exame */
+.modal-overlay {
+  display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  z-index: 10000; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease;
+}
+.modal-overlay.show { display: flex; opacity: 1; }
+.modal-content {
+  background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--card-border);
+  border-radius: 12px; padding: 24px; max-width: 400px; text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+body.light-mode .modal-content { background: rgba(255, 255, 255, 0.95); }
+.modal-content h3 { color: var(--primary); font-family: 'Orbitron', sans-serif; margin-bottom: 10px; }
+.modal-content p { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; }
+.modal-actions { display: flex; justify-content: center; gap: 15px; }
+.btn-danger {
+  background: rgba(239, 68, 68, 0.2); color: #ef4444; padding: 0.5rem 1rem;
+  border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.5); font-family: 'Inter', sans-serif; cursor: pointer;
+  font-weight: 600; font-size: 0.85rem; transition: 0.3s;
+}
+.btn-danger:hover { background: rgba(239, 68, 68, 0.4); color: #fff; }
+.btn-novo-exame {
+  background: transparent; color: var(--text-muted); padding: 0.5rem 1rem;
+  border-radius: 8px; border: 1px solid var(--card-border); font-family: 'Orbitron'; cursor: pointer;
+  font-weight: 500; font-size: 0.8rem; transition: 0.3s; opacity: 0.7;
+}
+.btn-novo-exame:hover { opacity: 1; background: var(--card-border); color: var(--text-main); transform: translateY(-1px); }

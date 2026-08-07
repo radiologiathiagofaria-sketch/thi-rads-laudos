@@ -28,7 +28,7 @@ body.dark .info-box{background:#1e2a1e;border-color:#2a4a2a;}
 .btn-dark{margin-left:auto;}
 body.dark .btn-dark{background:#2a2f3d;border-color:#3a4155;color:#e2e6f0;}
 body.dark .btn-dark:hover{background:#343a4d;color:#fff;}
-body.dark .dim-input,body.dark .ff select,body.dark .ff input[type=text]{background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .dim-input,body.dark .vel-input,body.dark .ff select,body.dark .ff input[type=text]{background:var(--white);color:var(--text);border-color:var(--border-strong);}
 body.dark .radio-mark{background:var(--white);}
 body.dark .check-box{background:var(--white);}
 body.dark .sub-opts{background:#1a2040;border-bottom-color:#2a3460;}
@@ -47,6 +47,13 @@ body.dark .btn-add{background:var(--white);color:var(--text-2);border-color:var(
 body.dark .sel-tag{background:var(--white);color:var(--text);border-color:var(--border-strong);}
 body.dark .plaq-details{background:#1a2040;border-color:#2a3460;}
 body.dark .info-box{background:#1a2040;border-color:#2a4460;color:#a0b4d0;}
+/* Apenas visual, na pré-visualização em modo escuro — não afeta cópia nem impressão,
+   pois copiar()/imprimir() já ignoram a classe "dark" ao gerar a saída. */
+body.dark .laudo-doc table{background:#1e2230;}
+body.dark .laudo-doc table thead tr,
+body.dark .laudo-doc table th[style*="background"]{background:#2a2f3d !important;}
+body.dark .laudo-doc table th,
+body.dark .laudo-doc table td{border-color:#3a4155 !important;color:#e2e6f0 !important;}
 body.dark .amber-box{background:#1c1810;border-color:#78350f;color:#fbbf24;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'DM Sans',system-ui,sans-serif;font-size:13px;background:var(--surface);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
@@ -110,6 +117,13 @@ body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
 .dim-input{width:65px;padding:5px 8px;border:1px solid var(--border-strong);border-radius:6px;font-size:12.5px;font-family:'DM Sans',sans-serif;text-align:center;color:var(--text);background:var(--white);transition:border .12s;}
 .dim-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,.08);}
 .dim-unit{font-size:12px;color:var(--text-3);min-width:30px;}
+.vel-grid{padding:8px 14px;display:flex;flex-direction:column;gap:6px;}
+.vel-row{display:flex;align-items:center;gap:10px;}
+.vel-row-head{padding-bottom:2px;border-bottom:1px solid var(--border);margin-bottom:2px;}
+.vel-lbl{flex:1;font-size:12px;color:var(--text-2);}
+.vel-col-head{width:70px;text-align:center;font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--text-3);}
+.vel-input{width:70px;padding:5px 8px;border:1px solid var(--border-strong);border-radius:6px;font-size:12.5px;font-family:'DM Sans',sans-serif;text-align:center;color:var(--text);background:var(--white);transition:border .12s;}
+.vel-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,.08);}
 .sel-tag{font-size:11px;border:1px solid var(--border-strong);border-radius:5px;padding:3px 6px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);cursor:pointer;}
 .ff-grid{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;}
 .ff{display:flex;flex-direction:column;gap:2px;}
@@ -124,7 +138,7 @@ body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
 .laudo-body{flex:1;overflow-y:auto;padding:22px 28px;}
 .laudo-doc{font-family:Helvetica,Arial,sans-serif;font-size:10pt;line-height:1.65;color:#111;max-width:740px;}
 .doc-titulo{text-align:center;font-weight:700;font-size:10pt;margin-bottom:16px;text-transform:uppercase;letter-spacing:.3px;}
-.doc-label{font-weight:700;font-size:10pt;}
+.doc-label{font-weight:700;font-size:10pt;display:block;margin-bottom:2px;}
 .doc-p{margin-bottom:8px;font-size:10pt;}
 .doc-secao{margin-bottom:14px;}
 .info-box{padding:8px 14px;font-size:11px;color:#1e40af;background:#eff6ff;border-top:1px solid #bfdbfe;line-height:1.6;}
@@ -150,7 +164,8 @@ body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
     <div class="nav-group">
       <div class="nav-group-hd">Geral</div>
       <div class="nav-item" id="nav-tecnica" onclick="showSection('tecnica')"><span class="nav-dot"></span>Técnica</div>
-      <div class="nav-item" id="nav-imt" onclick="showSection('imt')"><span class="nav-dot"></span>C. Miointimal</div>
+      <div class="nav-item" id="nav-imt" onclick="showSection('imt')"><span class="nav-dot"></span>C. Médio-Intimal</div>
+      <div class="nav-item" id="nav-vel" onclick="showSection('vel')"><span class="nav-dot"></span>Velocidades</div>
       <div class="nav-group-hd">Sistema Direito</div>
       <div class="nav-item" id="nav-accd" onclick="showSection('accd')"><span class="nav-dot"></span>ACC Direita</div>
       <div class="nav-item" id="nav-bulboD" onclick="showSection('bulboD')"><span class="nav-dot"></span>Bulbo Direito</div>
@@ -177,10 +192,10 @@ body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
 <script>
 // ── ESTADO GLOBAL ──
 function defaultArteria() {
-  return { sit:'habitual', kinkSeg:'proximal', kinkVPS1:'', kinkVPS2:'', plaqSit:'sem', plaqTipo:'fibrocalcificada', plaqSup:'nc', plaqVPS1:'', plaqVPS2:'', plaqExt:'', plaqEsp:'', velVPS:'', velVDF:'' };
+  return { sit:'habitual', kinkSeg:'proximal', kinkVPS1:'', kinkVPS2:'', plaqSit:'sem', plaqComp:'homog_hiper', plaqCalc:'ausente', plaqSup:'nc', plaqMovel:false, plaqMovelTam:'', plaqVPS1:'', plaqVPS2:'', plaqExt:'', plaqEsp:'', velVPS:'', velVDF:'' };
 }
 function defaultBulbo() {
-  return { plaqSit:'sem', plaqTipo:'fibrocalcificada', plaqSup:'nc', plaqVPS1:'', plaqVPS2:'', plaqExt:'', plaqEsp:'' };
+  return { plaqSit:'sem', plaqComp:'homog_hiper', plaqCalc:'ausente', plaqSup:'nc', plaqMovel:false, plaqMovelTam:'', plaqExtensaoPara:'nenhuma', plaqVPS1:'', plaqVPS2:'', plaqExt:'', plaqEsp:'' };
 }
 function defaultAV() {
   return { sit:'anterogrado', velVPS:'', velVDF:'' };
@@ -217,7 +232,7 @@ function showSection(sec) {
 function renderPanel(sec) {
   const p = document.getElementById('main-panel');
   const titles = {
-    tecnica:'Técnica e Indicação', imt:'Complexo Miointimal (IMT)',
+    tecnica:'Técnica e Indicação', imt:'Complexo Médio-Intimal (IMT)', vel:'Velocidades — Doppler Pulsado',
     accd:'A. Carótida Comum Direita', bulboD:'Bulbo Carotídeo Direito',
     acid:'A. Carótida Interna Direita', aced:'A. Carótida Externa Direita', avd:'A. Vertebral Direita',
     acce:'A. Carótida Comum Esquerda', bulboE:'Bulbo Carotídeo Esquerdo',
@@ -226,6 +241,7 @@ function renderPanel(sec) {
   let html = `<div class="sec-title">${titles[sec]||sec}</div>`;
   if(sec==='tecnica') html += renderTecnica();
   else if(sec==='imt') html += renderIMT();
+  else if(sec==='vel') html += renderVelocidadesTab();
   else if(sec==='accd') html += renderACC('accd','direita');
   else if(sec==='bulboD') html += renderBulbo('bulboD','direito');
   else if(sec==='acid') html += renderACI('acid','direita');
@@ -289,11 +305,11 @@ function renderIMT() {
   const dAlerta = !isNaN(dVal) && dVal > 0.9;
   const eAlerta = !isNaN(eVal) && eVal > 0.9;
   return `
-  <div class="block"><div class="block-title">Avaliar Complexo Miointimal</div>
+  <div class="block"><div class="block-title">Avaliar Complexo Médio-Intimal</div>
     <div class="radio-opt ${!e.citar?'selected':''}" onclick="setIMTCitar(false)"><input type="radio"><label class="radio-label"><span class="radio-mark"></span>não citar</label></div>
     <div class="radio-opt ${e.citar?'selected':''}" onclick="setIMTCitar(true)"><input type="radio"><label class="radio-label"><span class="radio-mark"></span>citar com medidas</label></div>
   </div>
-  ${e.citar ? `<div class="block"><div class="block-title">Espessuras do Complexo Miointimal</div>
+  ${e.citar ? `<div class="block"><div class="block-title">Espessuras do Complexo Médio-Intimal</div>
     <div class="dim-rows">
       ${dimInput('imt-medD','à direita',e.medD,'mm','imt','medD')}
       ${dimInput('imt-medE','à esquerda',e.medE,'mm','imt','medE')}
@@ -308,19 +324,43 @@ function renderIMT() {
 // ── HELPER: DETALHES PLACA ──
 function renderPlaqDetails(artKey) {
   const e = estado[artKey];
-  const tipoOpts = [
-    {v:'fibrocalcificada',l:'Fibrocalcificada'},{v:'calcificada',l:'Calcificada'},{v:'hipoecogenica',l:'Lipídica (hipoecogênica)'}
+  const isBulbo = artKey === 'bulboD' || artKey === 'bulboE';
+  const compOpts = [
+    {v:'homog_hiper',l:'Homogênea hiperecogênica'},
+    {v:'homog_hipo',l:'Homogênea hipoecogênica'},
+    {v:'homog_iso',l:'Homogênea isoecogênica'},
+    {v:'calcificada',l:'Calcificada'},
+    {v:'heterog_hipo',l:'Heterogênea, predom. hipoecogênica'},
+    {v:'heterog_hiper',l:'Heterogênea, predom. hiperecogênica'}
+  ];
+  const calcOpts = [
+    {v:'ausente',l:'ausente'},{v:'focal',l:'focal'},{v:'extensa',l:'extensa'}
   ];
   const supOpts = [
-    {v:'nc',l:'não citar'},{v:'lisa',l:'lisa e regular'},{v:'irregular',l:'irregular'},{v:'ulcerada',l:'ulcerada'}
+    {v:'nc',l:'não citar'},{v:'regular',l:'regular'},{v:'irregular',l:'irregular'},{v:'ulcerada',l:'ulcerada'}
   ];
-  const tipoOptions = tipoOpts.map(o=>`<option value="${o.v}" ${e.plaqTipo===o.v?'selected':''}>${o.l}</option>`).join('');
+  const extOpts = [
+    {v:'nenhuma',l:'sem extensão'},
+    {v:'aci',l:'estende-se para a artéria carótida interna'},
+    {v:'ace',l:'estende-se para a artéria carótida externa'},
+    {v:'ambas',l:'estende-se para as artérias carótidas interna e externa'}
+  ];
+  const compOptions = compOpts.map(o=>`<option value="${o.v}" ${e.plaqComp===o.v?'selected':''}>${o.l}</option>`).join('');
+  const calcOptions = calcOpts.map(o=>`<option value="${o.v}" ${e.plaqCalc===o.v?'selected':''}>${o.l}</option>`).join('');
   const supOptions = supOpts.map(o=>`<option value="${o.v}" ${e.plaqSup===o.v?'selected':''}>${o.l}</option>`).join('');
+  const extOptions = extOpts.map(o=>`<option value="${o.v}" ${e.plaqExtensaoPara===o.v?'selected':''}>${o.l}</option>`).join('');
+  const movelSel = e.plaqMovel ? 'selected' : '';
   return `<div class="plaq-details">
     <div class="ff-grid">
-      <div class="ff"><label>Tipo da placa</label><select data-sec="${artKey}" data-key="plaqTipo" onchange="handleInput(this)">${tipoOptions}</select></div>
+      <div class="ff"><label>Composição</label><select data-sec="${artKey}" data-key="plaqComp" onchange="handleInput(this)">${compOptions}</select></div>
+      <div class="ff"><label>Calcificação</label><select data-sec="${artKey}" data-key="plaqCalc" onchange="handleInput(this)">${calcOptions}</select></div>
+    </div>
+    <div class="ff-grid">
       <div class="ff"><label>Superfície</label><select data-sec="${artKey}" data-key="plaqSup" onchange="handleInput(this)">${supOptions}</select></div>
     </div>
+    ${isBulbo ? `<div class="ff-grid">
+      <div class="ff" style="flex:1"><label>Extensão da placa</label><select data-sec="${artKey}" data-key="plaqExtensaoPara" onchange="handleInput(this)">${extOptions}</select></div>
+    </div>` : ''}
     <div class="ff-grid">
       <div class="ff"><label>VPS pré-lesão (cm/s)</label><input type="text" class="dim-input" value="${e.plaqVPS1}" data-sec="${artKey}" data-key="plaqVPS1" oninput="handleInput(this)"></div>
       <div class="ff"><label>VPS na lesão (cm/s)</label><input type="text" class="dim-input" value="${e.plaqVPS2}" data-sec="${artKey}" data-key="plaqVPS2" oninput="handleInput(this)"></div>
@@ -329,6 +369,10 @@ function renderPlaqDetails(artKey) {
       <div class="ff"><label>Extensão (mm)</label><input type="text" class="dim-input" value="${e.plaqExt}" data-sec="${artKey}" data-key="plaqExt" oninput="handleInput(this)"></div>
       <div class="ff"><label>Espessura (mm)</label><input type="text" class="dim-input" value="${e.plaqEsp}" data-sec="${artKey}" data-key="plaqEsp" oninput="handleInput(this)"></div>
     </div>
+    <div class="check-row ${movelSel}" onclick="toggleMovel('${artKey}')"><input type="checkbox" ${e.plaqMovel?'checked':''}><label class="check-label"><span class="check-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.8"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg></span>Componente móvel na placa</label></div>
+    ${e.plaqMovel ? `<div class="ff-grid" style="padding-top:8px">
+      <div class="ff"><label>Medida do componente móvel (mm)</label><input type="text" class="dim-input" value="${e.plaqMovelTam||''}" data-sec="${artKey}" data-key="plaqMovelTam" oninput="handleInput(this)"></div>
+    </div>` : ''}
     <div style="font-size:10.5px;color:#1e40af;margin-top:2px">A estenose é calculada automaticamente pela razão VPS lesão/pré-lesão.</div>
   </div>`;
 }
@@ -382,12 +426,36 @@ function renderKinkHemDetails(artKey) {
   </div>`;
 }
  
-function renderVelocidades(artKey) {
-  const e = estado[artKey];
-  return `<div class="block"><div class="block-title">Velocidades — Doppler Pulsado</div>
-    <div class="dim-rows">
-      ${dimInput(artKey+'-velVPS','VPS',e.velVPS,'cm/s',artKey,'velVPS')}
-      ${dimInput(artKey+'-velVDF','VDF',e.velVDF,'cm/s',artKey,'velVDF')}
+function velPairRow(label, secD, secE, key, unit) {
+  const idD = secD+'-'+key, idE = secE+'-'+key;
+  return `<div class="vel-row">
+    <span class="vel-lbl">${label}</span>
+    <input class="vel-input" type="text" id="${idD}" placeholder="—" value="${estado[secD][key]||''}" data-sec="${secD}" data-key="${key}" oninput="handleInput(this)">
+    <input class="vel-input" type="text" id="${idE}" placeholder="—" value="${estado[secE][key]||''}" data-sec="${secE}" data-key="${key}" oninput="handleInput(this)">
+  </div>`;
+}
+
+function renderVelocidadesTab() {
+  const head = `<div class="vel-row vel-row-head"><span class="vel-lbl"></span><span class="vel-col-head">Direita</span><span class="vel-col-head">Esquerda</span></div>`;
+  return `
+  <div class="block">
+    <div class="block-title">Velocidades principais (compõem a tabela de referência)</div>
+    <div class="vel-grid">
+      ${head}
+      ${velPairRow('VPS ACI (cm/s)','acid','acie','velVPS')}
+      ${velPairRow('VDF ACI (cm/s)','acid','acie','velVDF')}
+      ${velPairRow('VPS ACC (cm/s)','accd','acce','velVPS')}
+    </div>
+    <div class="info-box">A relação VPS ACI / ACC e o grau de estenose são calculados automaticamente a partir destes valores.</div>
+  </div>
+  <div class="block">
+    <div class="block-title">Outras velocidades</div>
+    <div class="vel-grid">
+      ${head}
+      ${velPairRow('VPS ACE (cm/s)','aced','acee','velVPS')}
+      ${velPairRow('VDF ACE (cm/s)','aced','acee','velVDF')}
+      ${velPairRow('VPS A. Vertebral (cm/s)','avd','ave','velVPS')}
+      ${velPairRow('VDF A. Vertebral (cm/s)','avd','ave','velVDF')}
     </div>
   </div>`;
 }
@@ -404,7 +472,7 @@ function renderACC(artKey, lado) {
   ${e.sit==='kink_ana' ? renderKinkSeg(artKey) : ''}
   ${e.sit==='kink_hem' ? renderKinkHemDetails(artKey) : ''}
   ${renderPlacas(artKey)}
-  ${renderVelocidades(artKey)}`;
+  <div class="info-box" style="border-top:none">As velocidades (VPS/VDF) desta artéria são preenchidas na aba <b>Velocidades</b>.</div>`;
 }
  
 function renderBulbo(artKey, lado) {
@@ -427,14 +495,14 @@ function renderACI(artKey, lado) {
   ${e.sit==='kink_ana' ? renderKinkSeg(artKey) : ''}
   ${e.sit==='kink_hem' ? renderKinkHemDetails(artKey) : ''}
   ${e.sit!=='oclusao' ? renderPlacas(artKey) : ''}
-  ${e.sit!=='oclusao' ? renderVelocidades(artKey) : ''}
-  ${e.sit!=='oclusao' ? `<div class="block"><div class="block-title">Critérios NASCET / CBR — Estenose ACI</div>
+  ${e.sit!=='oclusao' ? `<div class="block"><div class="block-title">Critérios de Estenose — Consensus Conference (ACI)</div>
     <div class="amber-box" style="border-top:none">
-      <b>Classificação automática pela VPS (Critérios SBC/CBR):</b><br>
-      VPS &lt;125 cm/s → normal / &lt;50% (sem estenose significativa)<br>
-      VPS 125–230 cm/s → estenose moderada (50–69%)<br>
-      VPS &gt;230 cm/s + VDF &gt;100 cm/s → estenose grave (≥70%)<br>
-      VPS &gt;400 cm/s → estenose crítica (≥90%)
+      <b>Classificação automática (VPS + VDF + razão sistólica ACI/ACC):</b><br>
+      VPS &lt;125 cm/s → normal / &lt;50%<br>
+      VPS 125–230 cm/s, VDF 40–100 cm/s, razão 2–4 → estenose moderada (50–69%)<br>
+      VPS &gt;230 cm/s, VDF &gt;100 cm/s ou razão &gt;4 → estenose grave (≥70%)<br>
+      VPS &gt;400 cm/s ou razão &gt;8 → estenose crítica / suboclusão (≥90%)<br>
+      <span style="font-size:10px">Preencha as velocidades (VPS/VDF ACI e VPS ACC) na aba <b>Velocidades</b> para o cálculo automático.</span>
     </div>
   </div>` : ''}`;
 }
@@ -447,7 +515,7 @@ function renderACE(artKey, lado) {
     ${radioOpt(artKey,'alterada','com alterações / descrição específica')}
   </div>
   ${renderPlacas(artKey)}
-  ${renderVelocidades(artKey)}`;
+  <div class="info-box" style="border-top:none">As velocidades (VPS/VDF) desta artéria são preenchidas na aba <b>Velocidades</b>.</div>`;
 }
  
 function renderAV(artKey, lado) {
@@ -460,12 +528,13 @@ function renderAV(artKey, lado) {
     ${radioOpt(artKey,'ausente','ausente — compatível com oclusão')}
     ${radioOpt(artKey,'nao_car','não caracterizada ao presente exame')}
   </div>
-  ${e.sit!=='ausente' && e.sit!=='nao_car' ? renderVelocidades(artKey) : ''}`;
+  ${e.sit!=='ausente' && e.sit!=='nao_car' ? `<div class="info-box" style="border-top:none">As velocidades (VPS/VDF) desta artéria são preenchidas na aba <b>Velocidades</b>.</div>` : ''}`;
 }
  
 // ── EVENT HANDLERS ──
 function setSit(artKey, val) { estado[artKey].sit = val; renderPanel(secaoAtual); updateLaudo(); }
 function setPlaqSit(artKey, val) { estado[artKey].plaqSit = val; renderPanel(secaoAtual); updateLaudo(); }
+function toggleMovel(artKey) { estado[artKey].plaqMovel = !estado[artKey].plaqMovel; renderPanel(secaoAtual); updateLaudo(); }
 function setInd(val) { estado.tecnica.indicacao = val; renderPanel('tecnica'); updateLaudo(); }
 function setIMTCitar(val) { estado.imt.citar = val; renderPanel('imt'); updateLaudo(); }
  
@@ -474,8 +543,20 @@ function handleInput(el) {
   if (sec && key && estado[sec] !== undefined) {
     estado[sec][key] = el.value;
     updateLaudo();
-    if(key==='medD'||key==='medE') renderPanel(secaoAtual);
-    if(key==='kinkVPS1'||key==='kinkVPS2') renderPanel(secaoAtual);
+    if(key==='medD'||key==='medE'||key==='kinkVPS1'||key==='kinkVPS2') {
+      // Re-render precisa acontecer (para atualizar o alerta), mas isso recria o
+      // input do zero e o navegador perde o foco/cursor. Guardamos a posição
+      // antes e restauramos no elemento novo depois, para não travar a digitação.
+      const id = el.id;
+      const selStart = el.selectionStart;
+      const selEnd = el.selectionEnd;
+      renderPanel(secaoAtual);
+      const novoEl = document.getElementById(id);
+      if (novoEl) {
+        novoEl.focus();
+        try { novoEl.setSelectionRange(selStart, selEnd); } catch(e) {}
+      }
+    }
   }
 }
  
@@ -492,10 +573,25 @@ function toggleChk(id, sec, key) {
 function updateLaudo() {
   hd = [];
   document.getElementById('laudo-doc').innerHTML = buildLaudo();
+  sincronizarLarguraTabelaReferencia();
+}
+
+// Faz a tabela de referência ficar exatamente com a mesma largura da tabela
+// de velocidades (que muda de tamanho conforme os dados preenchidos).
+function sincronizarLarguraTabelaReferencia() {
+  const tabVel = document.getElementById('tab-vel-principal');
+  const tabRef = document.getElementById('tab-referencia');
+  if (!tabRef) return;
+  if (!tabVel) { tabRef.style.width = ''; return; }
+  // requestAnimationFrame garante que o layout já foi calculado antes de medir
+  requestAnimationFrame(() => {
+    const largura = tabVel.getBoundingClientRect().width;
+    if (largura > 0) tabRef.style.width = largura + 'px';
+  });
 }
  
 function buildLaudo() {
-  let html = '<div class="doc-titulo">DOPPLER DE CARÓTIDAS E VERTEBRAIS</div>';
+  let html = '<div class="doc-titulo">ULTRASSONOGRAFIA COM DOPPLER DAS ARTÉRIAS CARÓTIDAS EXTRACRANIANAS E ARTÉRIAS VERTEBRAIS</div>';
  
   // TÉCNICA
   html += `<div class="doc-secao"><span class="doc-label">TÉCNICA:</span>
@@ -507,13 +603,15 @@ function buildLaudo() {
     <div class="doc-p">Foram avaliadas as artérias carótidas comuns, internas e externas bilaterais, assim como as artérias vertebrais.</div>`;
  
   const imtTxt = textIMT();
-  if (imtTxt) html += `<div class="doc-p">${imtTxt}</div>`;
+  if (imtTxt) html += `<div class="doc-p"><b>Complexo médio-intimal:</b><br>${imtTxt}</div>`;
  
-  html += `<div class="doc-p"><b>SISTEMA CAROTÍDEO DIREITO:</b></div>`;
-  html += textSistemaD();
+  html += `<div class="doc-p" style="margin-bottom:0"><b>Sistema Carotídeo:</b></div>
+  <div class="doc-p">${textTrajetoSistema()}</div>
+  <div class="doc-p">${textPlacasSistema()}</div>
+  <div class="doc-p">${textFluxoSistema()}</div>`;
  
-  html += `<div class="doc-p"><b>SISTEMA CAROTÍDEO ESQUERDO:</b></div>`;
-  html += textSistemaE();
+  html += `<div class="doc-p" style="margin-bottom:0"><b>Artérias vertebrais:</b></div>
+  <div class="doc-p">${textArteriaVertebralSistema()}</div>`;
  
   const velTabela = textVelocidades();
   if (velTabela) html += velTabela;
@@ -521,10 +619,12 @@ function buildLaudo() {
   html += `</div>`;
  
   // OPINIÃO
-  html += `<div class="doc-secao"><span class="doc-label">IMPRESSÃO DIAGNÓSTICA:</span>
+  html += `<br><div class="doc-secao"><span class="doc-label">OPINIÃO:</span>
     <div class="doc-p">${textConclusao()}</div>
   </div>`;
- 
+
+  html += `<br><br>${textValoresNormais()}`;
+
   return html;
 }
  
@@ -534,9 +634,11 @@ function textTecnica() {
   if (e.limitBifalta) lims.push('por bifurcação alta das artérias carótidas comuns');
   if (e.limitBiotipo) lims.push('pela intensa atenuação do feixe acústico inerente ao biotipo');
  
-  let txt = 'Exame realizado em aparelho dinâmico com transdutor linear de alta frequência, utilizando as modalidades Doppler colorido e Doppler pulsado';
-  if (lims.length > 0) txt += `, limitado parcialmente ${lims.join(' e ')}`;
-  txt += ', para avaliação morfológica e hemodinâmica das artérias carótidas e vertebrais.';
+  let txt = 'Exame realizado com transdutor linear de alta frequência, utilizando imagens em modo B, Doppler colorido e Doppler espectral';
+  if (lims.length > 0) {
+    txt += `, limitado parcialmente ${lims.join(' e ')},`;
+  }
+  txt += ' para avaliação morfológica e hemodinâmica das artérias carótidas extracranianas e vertebrais.';
  
   const inds = { risco:'Avaliação de risco cardiovascular.', aterosclerose:'Aterosclerose.', posop:'Acompanhamento pós-operatório.', enxaqueca:'Enxaqueca / cefaleia.', postavc:'Protocolo pós-AVC isquêmico.', outro:e.indicacaoOutro||'—' };
   if (e.indicacao !== 'nc') txt += `<br><b>INDICAÇÃO:</b> ${inds[e.indicacao]||''}`;
@@ -547,20 +649,20 @@ function textIMT() {
   const e = estado.imt;
   if (!e.citar) return '';
   const d = parseFloat((e.medD||'').replace(',','.')); const esq = parseFloat((e.medE||'').replace(',','.'));
-  let txt = 'A espessura do complexo miointimal foi avaliada em ambas as carótidas comuns, medindo:';
-  txt += `<br>- ${e.medD||'_'} mm à direita (normal até 0,9 mm);`;
-  txt += `<br>- ${e.medE||'_'} mm à esquerda (normal até 0,9 mm).`;
+  let txt = 'Espessura do complexo médio-intimal da parede posterior das artérias carótidas comuns distais:';
+  txt += `<br>- ${e.medD||'_'} mm à direita;`;
+  txt += `<br>- ${e.medE||'_'} mm à esquerda.`;
   const dA = !isNaN(d) && d > 0.9; const eA = !isNaN(esq) && esq > 0.9;
   const dP = !isNaN(d) && d > 1.2; const eP = !isNaN(esq) && esq > 1.2;
   if (dA && eA) {
-    if (dP || eP) hd.push('Placa ateromatosa (espessamento focal do complexo miointimal >1,2 mm) nas carótidas comuns bilateralmente.');
-    else hd.push('Espessamento do complexo miointimal nas carótidas comuns bilateralmente, compatível com ateromatose incipiente.');
+    if (dP || eP) hd.push('Placa ateromatosa (espessamento focal do complexo médio-intimal >1,2 mm) nas carótidas comuns bilateralmente.');
+    else hd.push('Espessamento do complexo médio-intimal nas carótidas comuns bilateralmente, compatível com ateromatose incipiente.');
   } else if (dA) {
-    if (dP) hd.push('Placa ateromatosa (espessamento focal do complexo miointimal >1,2 mm) na carótida comum direita.');
-    else hd.push('Espessamento do complexo miointimal na carótida comum direita, compatível com ateromatose incipiente.');
+    if (dP) hd.push('Placa ateromatosa (espessamento focal do complexo médio-intimal >1,2 mm) na carótida comum direita.');
+    else hd.push('Espessamento do complexo médio-intimal na carótida comum direita, compatível com ateromatose incipiente.');
   } else if (eA) {
-    if (eP) hd.push('Placa ateromatosa (espessamento focal do complexo miointimal >1,2 mm) na carótida comum esquerda.');
-    else hd.push('Espessamento do complexo miointimal na carótida comum esquerda, compatível com ateromatose incipiente.');
+    if (eP) hd.push('Placa ateromatosa (espessamento focal do complexo médio-intimal >1,2 mm) na carótida comum esquerda.');
+    else hd.push('Espessamento do complexo médio-intimal na carótida comum esquerda, compatível com ateromatose incipiente.');
   }
   return txt;
 }
@@ -573,20 +675,57 @@ function calcKinkGrau(ratio) {
   return 'repercussão hemodinâmica crítica';
 }
  
-function textPlacas(artKey, nomeHD) {
+function nomeVaso(artKey) {
+  const map = {
+    accd: 'artéria carótida comum direita', acce: 'artéria carótida comum esquerda',
+    acid: 'artéria carótida interna direita', acie: 'artéria carótida interna esquerda',
+    aced: 'artéria carótida externa direita', acee: 'artéria carótida externa esquerda',
+    bulboD: 'bulbo carotídeo direito', bulboE: 'bulbo carotídeo esquerdo',
+  };
+  return map[artKey] || artKey;
+}
+
+// "artéria" é feminina, mas "bulbo" é masculino — usado para concordar
+// corretamente as preposições ("na"/"no", "da"/"do") com nomeVaso().
+function generoMasc(artKey) {
+  return artKey === 'bulboD' || artKey === 'bulboE';
+}
+function prepEm(artKey) { return generoMasc(artKey) ? 'no' : 'na'; }
+function prepDe(artKey) { return generoMasc(artKey) ? 'do' : 'da'; }
+
+// ── PLACAS: descrição individual (usada dentro do parágrafo único "Sistema Carotídeo") ──
+function textPlacaIndividual(artKey) {
   const e = estado[artKey];
-  if (e.plaqSit === 'sem') return '';
+  const nome = nomeVaso(artKey);
+  if (e.plaqSit === 'sem') return null;
   if (e.plaqSit === 'min') {
-    hd.push(`Ateromatose difusa incipiente / placas mínimas ${nomeHD}, sem repercussão hemodinâmica significativa.`);
-    return ' Presença de raras placas ateromatosas delgadas esparsas, de contornos regulares, sem repercussão hemodinâmica significativa.';
+    hd.push(`Ateromatose difusa incipiente / placas mínimas ${prepEm(artKey)} ${nome}, sem repercussão hemodinâmica significativa.`);
+    return `Raras placas ateromatosas delgadas, esparsas, de contornos regulares, ${prepEm(artKey)} ${nome}, sem repercussão hemodinâmica significativa.`;
   }
   // plaqSit === 'pre'
-  const tipos = { fibrocalcificada:'fibrocalcificada', calcificada:'calcificada', hipoecogenica:'lipídica (hipoecogênica)' };
-  const tipo = tipos[e.plaqTipo] || e.plaqTipo;
-  const sups = { lisa:'lisa e regular', irregular:'irregular', ulcerada:'ulcerada' };
+  const comps = {
+    homog_hiper: 'homogênea, predominantemente hiperecogênica',
+    homog_hipo: 'homogênea, predominantemente hipoecogênica',
+    homog_iso: 'homogênea, isoecogênica',
+    calcificada: 'calcificada, de avaliação limitada pela presença de sombra acústica posterior',
+    heterog_hipo: 'heterogênea, predominantemente hipoecogênica',
+    heterog_hiper: 'heterogênea, predominantemente hiperecogênica',
+  };
+  const comp = comps[e.plaqComp] || comps.homog_hiper;
+  const calcs = { ausente:'', focal:', com calcificação focal', extensa:', com calcificação extensa' };
+  const calc = calcs[e.plaqCalc] || '';
+  const compCalc = comp + calc;
+  const sups = { regular:'regular', irregular:'irregular', ulcerada:'ulcerada' };
   const sup = e.plaqSup !== 'nc' ? `, de superfície ${sups[e.plaqSup]||e.plaqSup}` : '';
   const ext = e.plaqExt ? `, com extensão de ${e.plaqExt} mm` : '';
   const esp = e.plaqEsp ? ` e espessura de ${e.plaqEsp} mm` : '';
+  const movel = e.plaqMovel ? `, com componente móvel aderido à superfície da placa${e.plaqMovelTam ? `, medindo ${e.plaqMovelTam} mm` : ''}` : '';
+  const extensaoBulboMap = {
+    aci: ', estendendo-se para a artéria carótida interna',
+    ace: ', estendendo-se para a artéria carótida externa',
+    ambas: ', estendendo-se para as artérias carótidas interna e externa',
+  };
+  const extensaoBulbo = (artKey==='bulboD'||artKey==='bulboE') ? (extensaoBulboMap[e.plaqExtensaoPara]||'') : '';
   let estenose = '';
   const vps1 = parseFloat(e.plaqVPS1); const vps2 = parseFloat(e.plaqVPS2);
   if (!isNaN(vps1) && !isNaN(vps2) && vps1 > 0) {
@@ -596,157 +735,203 @@ function textPlacas(artKey, nomeHD) {
     else if (ratio >= 3.0 && ratio < 4.0) estenose = ', determinando estenose luminal importante';
     else if (ratio >= 4.0) estenose = ', determinando estenose luminal crítica';
   }
-  hd.push(`Placa ateromatosa ${tipo} ${nomeHD}${estenose||''}.`);
-  return ` Nota-se placa ateromatosa ${tipo}${sup}${ext}${esp}${estenose}.`;
+  let hdExtra = '';
+  if (movel) hdExtra += ', com componente móvel associado (risco embólico)';
+  if (extensaoBulbo) hdExtra += extensaoBulbo;
+  hd.push(`Placa ateromatosa ${compCalc}, ${prepEm(artKey)} ${nome}${estenose||''}${hdExtra}.`);
+  return `Placa ateromatosa ${compCalc}${sup}${ext}${esp}${extensaoBulbo}${movel}${estenose}, ${prepEm(artKey)} ${nome}.`;
 }
- 
-function textACC(artKey, lado) {
+
+// ── TRAJETO: parágrafo 1 do "Sistema Carotídeo" ──
+function calcKinkGrauSit(artKey) {
   const e = estado[artKey];
-  const nomeHD = `na artéria carótida comum ${lado}`;
-  let txt = '';
-  if (e.sit === 'habitual') {
-    txt = `Artéria carótida comum ${lado} com trajeto, calibre e contornos habituais, com paredes regulares e fluxo laminar.`;
-  } else if (e.sit === 'kink_ana') {
-    txt = `Artéria carótida comum ${lado} com tortuosidade do tipo kinking anatômico em segmento ${e.kinkSeg}, sem repercussão hemodinâmica.`;
-  } else if (e.sit === 'kink_hem') {
-    const vps1 = parseFloat(e.kinkVPS1); const vps2 = parseFloat(e.kinkVPS2);
-    let rep = '';
-    if (!isNaN(vps1) && !isNaN(vps2) && vps1 > 0) {
-      const ratio = vps2 / vps1;
-      const grau = calcKinkGrau(ratio);
-      rep = `, com ${grau} (razão VPS: ${ratio.toFixed(1)})`;
-      if (ratio >= 1.5) hd.push(`Kinking hemodinâmico da artéria carótida comum ${lado}, com ${grau}.`);
-    }
-    txt = `Artéria carótida comum ${lado} com tortuosidade do tipo kinking hemodinâmico em segmento ${e.kinkSeg}${rep}.`;
-  }
-  txt += textPlacas(artKey, nomeHD);
-  return txt;
+  const vps1 = parseFloat(e.kinkVPS1); const vps2 = parseFloat(e.kinkVPS2);
+  if (isNaN(vps1) || isNaN(vps2) || vps1 <= 0) return '';
+  const ratio = vps2 / vps1;
+  const grau = calcKinkGrau(ratio);
+  if (ratio >= 1.5) hd.push(`Kinking hemodinâmico da ${nomeVaso(artKey)}, com ${grau}.`);
+  return `, com ${grau} (razão VPS: ${ratio.toFixed(1)})`;
 }
- 
-function textBulbo(artKey, lado) {
+
+function situacaoAlteracaoTexto(artKey) {
   const e = estado[artKey];
-  const nomeHD = `no bulbo carotídeo ${lado}`;
-  let txt = `Bulbo carotídeo ${lado} com conformação habitual, pérvio, com fluxo turbilhonar e hipercinético.`;
-  txt += textPlacas(artKey, nomeHD);
-  return txt;
-}
- 
-function textACI(artKey, lado) {
-  const e = estado[artKey];
-  const nomeHD = `na artéria carótida interna ${lado}`;
+  if (e.sit === 'habitual') return null;
   if (e.sit === 'oclusao') {
-    hd.push(`Oclusão da artéria carótida interna ${lado}.`);
-    return `<div class="doc-p">Artéria carótida interna ${lado} com ausência completa de fluxo ao Doppler colorido e pulsado, compatível com oclusão.</div>`;
+    hd.push(`Oclusão da ${nomeVaso(artKey)}.`);
+    return 'encontra-se ocluída, com ausência completa de fluxo ao Doppler colorido e pulsado';
   }
-  let txt = '';
-  if (e.sit === 'habitual') {
-    txt = `Artéria carótida interna ${lado} com trajeto, calibre e contornos habituais, com paredes regulares e fluxo laminar.`;
-  } else if (e.sit === 'kink_ana') {
-    txt = `Artéria carótida interna ${lado} com tortuosidade do tipo kinking anatômico em segmento ${e.kinkSeg}, sem repercussão hemodinâmica.`;
-  } else if (e.sit === 'kink_hem') {
-    const vps1 = parseFloat(e.kinkVPS1); const vps2 = parseFloat(e.kinkVPS2);
-    let rep = '';
-    if (!isNaN(vps1) && !isNaN(vps2) && vps1 > 0) {
-      const ratio = vps2 / vps1;
-      const grau = calcKinkGrau(ratio);
-      rep = `, com ${grau} (razão VPS: ${ratio.toFixed(1)})`;
-      if (ratio >= 1.5) hd.push(`Kinking hemodinâmico da artéria carótida interna ${lado}, com ${grau}.`);
-    }
-    txt = `Artéria carótida interna ${lado} com tortuosidade do tipo kinking hemodinâmico em segmento ${e.kinkSeg}${rep}.`;
-  }
-  txt += textPlacas(artKey, nomeHD);
-  // Estenose por critérios NASCET/CBR (VPS)
-  const vps = parseFloat(e.velVPS); const vdf = parseFloat(e.velVDF);
-  if (!isNaN(vps)) {
-    if (vps >= 400) {
-      txt += ' Os achados velocimétricos são compatíveis com <b>estenose crítica (≥90%)</b> da artéria carótida interna, pelos critérios NASCET/CBR.';
-      hd.push(`Estenose crítica (≥90%) da artéria carótida interna ${lado} pelos critérios NASCET/CBR.`);
-    } else if (vps >= 230 && (!isNaN(vdf) ? vdf >= 100 : true)) {
-      txt += ' Os achados velocimétricos são compatíveis com <b>estenose grave (≥70%)</b> da artéria carótida interna, pelos critérios NASCET/CBR.';
-      hd.push(`Estenose grave (≥70%) da artéria carótida interna ${lado} pelos critérios NASCET/CBR.`);
-    } else if (vps >= 125) {
-      txt += ' Os achados velocimétricos são compatíveis com <b>estenose moderada (50–69%)</b> da artéria carótida interna, pelos critérios NASCET/CBR.';
-      hd.push(`Estenose moderada (50–69%) da artéria carótida interna ${lado} pelos critérios NASCET/CBR.`);
-    }
-  }
-  return `<div class="doc-p">${txt}</div>`;
+  if (e.sit === 'kink_ana') return `apresenta tortuosidade do tipo kinking anatômico em segmento ${e.kinkSeg}, sem repercussão hemodinâmica`;
+  if (e.sit === 'kink_hem') return `apresenta tortuosidade do tipo kinking hemodinâmico em segmento ${e.kinkSeg}${calcKinkGrauSit(artKey)}`;
+  if (e.sit === 'alterada') return 'apresenta alterações ao exame (correlacionar com dados clínicos)';
+  return null;
 }
- 
-function textACE(artKey, lado) {
-  const e = estado[artKey];
-  const nomeHD = `na artéria carótida externa ${lado}`;
-  let txt = '';
-  if (e.sit === 'habitual') {
-    txt = `Artéria carótida externa ${lado} com trajeto, calibre e contornos habituais, com paredes regulares e fluxo laminar.`;
-  } else {
-    txt = `Artéria carótida externa ${lado} com alterações ao exame (correlacionar com dados clínicos).`;
-  }
-  txt += textPlacas(artKey, nomeHD);
+
+function textTrajetoSistema() {
+  const vasos = ['accd','acid','aced','acce','acie','acee'];
+  const alteracoes = [];
+  vasos.forEach(k => {
+    const txt = situacaoAlteracaoTexto(k);
+    if (txt) alteracoes.push(`a ${nomeVaso(k)}, que ${txt}`);
+  });
+  if (alteracoes.length === 0) return 'Artérias carótidas comuns, internas e externas com trajeto normal.';
+  return `Artérias carótidas comuns, internas e externas com trajeto normal, exceto ${alteracoes.join('; ')}.`;
+}
+
+// ── PLACAS: parágrafo 2 do "Sistema Carotídeo" ──
+function textPlacasSistema() {
+  const vasos = ['accd','bulboD','acid','aced','acce','bulboE','acie','acee'];
+  const achados = [];
+  vasos.forEach(k => {
+    const t = textPlacaIndividual(k);
+    if (t) achados.push(t);
+  });
+  if (achados.length === 0) return 'Ausência de placas parietais ateromatosas.';
+  let txt = achados.join(' ');
+  if (achados.length < vasos.length) txt += ' Demais segmentos sem placas parietais ateromatosas.';
   return txt;
 }
- 
-function textAV(artKey, lado) {
+
+// ── FLUXO/HEMODINÂMICA: parágrafo 3 do "Sistema Carotídeo" ──
+function gradeEstenoseACI(artKey, accKey, lado) {
   const e = estado[artKey];
-  const ladoAb = lado === 'direita' ? 'direita' : 'esquerda';
-  if (e.sit === 'invertido') hd.push(`Síndrome do roubo da subclávia à ${ladoAb} — fluxo vertebral ${ladoAb} invertido.`);
+  if (e.sit === 'oclusao') return null;
+  const vps = parseFloat(e.velVPS); const vdf = parseFloat(e.velVDF);
+  const vpsACC = parseFloat(estado[accKey] ? estado[accKey].velVPS : '');
+  const razao = (!isNaN(vps) && !isNaN(vpsACC) && vpsACC > 0) ? vps / vpsACC : NaN;
+  const razaoTxt = !isNaN(razao) ? ` e razão sistólica ACI/ACC de ${razao.toFixed(2)}` : '';
+  if (isNaN(vps)) return null;
+  if (vps >= 400 || razao >= 8) {
+    hd.push(`Estenose crítica / suboclusão (≥90%) da artéria carótida interna ${lado} pelos critérios do Consensus Conference on Carotid Ultrasound.`);
+    return `Observam-se achados velocimétricos (VPS ${vps} cm/s${razaoTxt}) compatíveis com estenose crítica / suboclusão (≥90%) da artéria carótida interna ${lado}.`;
+  } else if (vps > 230 && ((!isNaN(vdf) && vdf > 100) || razao > 4)) {
+    hd.push(`Estenose grave (≥70%) da artéria carótida interna ${lado} pelos critérios do Consensus Conference on Carotid Ultrasound.`);
+    return `Observam-se achados velocimétricos (VPS ${vps} cm/s${razaoTxt}) compatíveis com estenose grave (≥70%) da artéria carótida interna ${lado}.`;
+  } else if (vps >= 125 && vps <= 230 && ((!isNaN(vdf) && vdf >= 40 && vdf <= 100) || (razao >= 2 && razao <= 4) || isNaN(vdf))) {
+    hd.push(`Estenose moderada (50–69%) da artéria carótida interna ${lado} pelos critérios do Consensus Conference on Carotid Ultrasound.`);
+    return `Observam-se achados velocimétricos (VPS ${vps} cm/s${razaoTxt}) compatíveis com estenose moderada (50–69%) da artéria carótida interna ${lado}.`;
+  }
+  return null;
+}
+
+function textFluxoSistema() {
+  const estenoseD = gradeEstenoseACI('acid','accd','direita');
+  const estenoseE = gradeEstenoseACI('acie','acce','esquerda');
+  const partes = [estenoseD, estenoseE].filter(Boolean);
+  if (partes.length === 0) {
+    return 'Fluxo ao Doppler colorido preservado e Doppler espectral demonstrando velocidades dentro dos limites de referência, sem evidências de repercussão hemodinâmica nos segmentos carotídeos analisados.';
+  }
+  return partes.join(' ') + ' Demais segmentos carotídeos sem evidências de repercussão hemodinâmica.';
+}
+
+// ── ARTÉRIAS VERTEBRAIS ──
+function textAVIndividual(artKey, ladoAb) {
+  const e = estado[artKey];
+  const ladoM = ladoAb === 'direita' ? 'direito' : 'esquerdo';
+  if (e.sit === 'invertido') hd.push(`Síndrome do roubo da subclávia à ${ladoAb} — fluxo vertebral ${ladoM} invertido.`);
   if (e.sit === 'ausente') hd.push(`Oclusão da artéria vertebral ${ladoAb}.`);
   if (e.sit === 'reduzido') hd.push(`Velocidades reduzidas na artéria vertebral ${ladoAb}, sugerindo estenose proximal não caracterizada ao método.`);
   const texts = {
-    anterogrado: `Artéria vertebral ${ladoAb} pérvia, com fluxo anterógrado, sem alterações.`,
-    reduzido: `Artéria vertebral ${ladoAb} pérvia, com fluxo anterógrado e velocidades reduzidas, sugerindo estenose proximal não completamente caracterizada ao método.`,
+    anterogrado: `Artéria vertebral ${ladoAb} com calibre preservado, fluxo anterógrado e padrão espectral habitual.`,
+    reduzido: `Artéria vertebral ${ladoAb} com calibre preservado, fluxo anterógrado e velocidades reduzidas, sugerindo estenose proximal não completamente caracterizada ao método.`,
     invertido: `Artéria vertebral ${ladoAb} com fluxo invertido (fluxo reverso), achado sugestivo de síndrome do roubo da subclávia à ${ladoAb}.`,
     ausente: `Artéria vertebral ${ladoAb} com ausência completa de fluxo ao Doppler, compatível com oclusão.`,
     nao_car: `Artéria vertebral ${ladoAb} não caracterizada ao presente exame.`,
   };
   return texts[e.sit] || texts.anterogrado;
 }
- 
-function textSistemaD() {
-  let html = '';
-  html += `<div class="doc-p">${textACC('accd','direita')}</div>`;
-  html += `<div class="doc-p">${textBulbo('bulboD','direito')}</div>`;
-  html += textACI('acid','direita');
-  html += `<div class="doc-p">${textACE('aced','direita')}</div>`;
-  html += `<div class="doc-p">${textAV('avd','direita')}</div>`;
-  return html;
+
+function textArteriaVertebralSistema() {
+  if (estado.avd.sit === 'anterogrado' && estado.ave.sit === 'anterogrado') {
+    return 'Artérias vertebrais com calibre preservado, fluxo anterógrado bilateral e padrão espectral habitual.';
+  }
+  return `${textAVIndividual('avd','direita')} ${textAVIndividual('ave','esquerda')}`;
 }
  
-function textSistemaE() {
-  let html = '';
-  html += `<div class="doc-p">${textACC('acce','esquerda')}</div>`;
-  html += `<div class="doc-p">${textBulbo('bulboE','esquerdo')}</div>`;
-  html += textACI('acie','esquerda');
-  html += `<div class="doc-p">${textACE('acee','esquerda')}</div>`;
-  html += `<div class="doc-p">${textAV('ave','esquerda')}</div>`;
-  return html;
+function calcRazao(vpsACI, vpsACC) {
+  const a = parseFloat(vpsACI); const c = parseFloat(vpsACC);
+  if (isNaN(a) || isNaN(c) || c === 0) return '';
+  return (a / c).toFixed(2);
 }
- 
+
 function textVelocidades() {
-  const arts = [
-    {key:'accd',label:'ACC Direita'}, {key:'acid',label:'ACI Direita'},
-    {key:'aced',label:'ACE Direita'}, {key:'avd', label:'AV Direita'},
-    {key:'acce',label:'ACC Esquerda'},{key:'acie',label:'ACI Esquerda'},
-    {key:'acee',label:'ACE Esquerda'},{key:'ave', label:'AV Esquerda'},
-  ];
-  const rows = arts.filter(a => estado[a.key] && (estado[a.key].velVPS || estado[a.key].velVDF));
-  if (rows.length === 0) return '';
-  let trs = rows.map(a => {
-    const e = estado[a.key];
-    return `<tr><td style="border:1px solid #ccc;padding:3px 8px">${a.label}</td><td style="border:1px solid #ccc;padding:3px 8px;text-align:center">${e.velVPS||'—'}</td><td style="border:1px solid #ccc;padding:3px 8px;text-align:center">${e.velVDF||'—'}</td></tr>`;
-  }).join('');
-  return `<div class="doc-p"><b>VELOCIDADES DOPPLER (VPS / VDF em cm/s):</b><br>
-    <table style="border-collapse:collapse;width:100%;font-size:9.5pt;margin-top:4px">
-      <thead><tr style="background:#f0f0f0">
-        <th style="border:1px solid #ccc;padding:3px 8px;text-align:left">Artéria</th>
-        <th style="border:1px solid #ccc;padding:3px 8px">VPS (cm/s)</th>
-        <th style="border:1px solid #ccc;padding:3px 8px">VDF (cm/s)</th>
-      </tr></thead><tbody>${trs}</tbody>
+  const acid = estado.acid, accd = estado.accd, acie = estado.acie, acce = estado.acce;
+  const temD = acid.velVPS || acid.velVDF || accd.velVPS;
+  const temE = acie.velVPS || acie.velVDF || acce.velVPS;
+  if (!temD && !temE) return '';
+
+  const razaoD = calcRazao(acid.velVPS, accd.velVPS);
+  const razaoE = calcRazao(acie.velVPS, acce.velVPS);
+
+  const linha = (label, vD, vE) =>
+    `<tr><td style="border:1px solid #000;padding:1.5px 5px">${label}</td><td style="border:1px solid #000;padding:1.5px 5px;text-align:center">${vD||'—'}</td><td style="border:1px solid #000;padding:1.5px 5px;text-align:center">${vE||'—'}</td></tr>`;
+
+  let table = `<div class="doc-p" style="margin-bottom:0"><b>VELOCIDADES AO DOPPLER ESPECTRAL:</b><br>
+    <table id="tab-vel-principal" style="border-collapse:collapse;width:auto;font-family:Helvetica,Arial,sans-serif;font-size:9pt;margin-top:4px;white-space:nowrap">
+      <thead><tr style="background:#ffffff">
+        <th style="border:1px solid #000;padding:1.5px 5px;text-align:left">Parâmetros</th>
+        <th style="border:1px solid #000;padding:1.5px 5px">Direita</th>
+        <th style="border:1px solid #000;padding:1.5px 5px">Esquerda</th>
+      </tr></thead><tbody>
+        ${linha('Velocidade sistólica máxima na artéria carótida interna (cm/s)', acid.velVPS, acie.velVPS)}
+        ${linha('Velocidade diastólica final na artéria carótida interna (cm/s)', acid.velVDF, acie.velVDF)}
+        ${linha('Velocidade sistólica máxima na artéria carótida comum (cm/s)', accd.velVPS, acce.velVPS)}
+        ${linha('Razão sistólica (carótida interna / carótida comum)', razaoD, razaoE)}
+      </tbody>
     </table></div>`;
+
+  // Velocidades adicionais (ACE / vertebrais), se preenchidas
+  const extras = [
+    {key:'aced',label:'ACE Direita'}, {key:'avd', label:'AV Direita'},
+    {key:'acee',label:'ACE Esquerda'},{key:'ave', label:'AV Esquerda'},
+  ].filter(a => estado[a.key] && (estado[a.key].velVPS || estado[a.key].velVDF));
+  if (extras.length > 0) {
+    const trsExtra = extras.map(a => {
+      const e = estado[a.key];
+      return `<tr><td style="border:1px solid #000;padding:1.5px 5px">${a.label}</td><td style="border:1px solid #000;padding:1.5px 5px;text-align:center">${e.velVPS||'—'}</td><td style="border:1px solid #000;padding:1.5px 5px;text-align:center">${e.velVDF||'—'}</td></tr>`;
+    }).join('');
+    table += `<div class="doc-p" style="margin-bottom:0"><b>Velocidades adicionais (VPS / VDF em cm/s):</b><br>
+      <table style="border-collapse:collapse;width:auto;font-family:Helvetica,Arial,sans-serif;font-size:9pt;margin-top:4px;white-space:nowrap">
+        <thead><tr style="background:#ffffff">
+          <th style="border:1px solid #000;padding:1.5px 5px;text-align:left">Artéria</th>
+          <th style="border:1px solid #000;padding:1.5px 5px">VPS</th>
+          <th style="border:1px solid #000;padding:1.5px 5px">VDF</th>
+        </tr></thead><tbody>${trsExtra}</tbody>
+      </table></div>`;
+  }
+  return table;
+}
+
+function textValoresNormais() {
+  return `<div class="doc-secao">
+    <table id="tab-referencia" style="border-collapse:collapse;width:auto;table-layout:fixed;font-family:Helvetica,Arial,sans-serif;font-size:8pt;margin-top:6px;white-space:normal">
+      <thead>
+        <tr><th colspan="4" style="border:1px solid #000;padding:1.5px 5px;text-align:left">Tabela de referência</th></tr>
+        <tr style="background:#ffffff">
+          <th style="border:1px solid #000;padding:1.5px 5px">Grau de estenose</th>
+          <th style="border:1px solid #000;padding:1.5px 5px">VPS ACI<br>(cm/s)</th>
+          <th style="border:1px solid #000;padding:1.5px 5px">VDF ACI<br>(cm/s)</th>
+          <th style="border:1px solid #000;padding:1.5px 5px">Relação<br>VPS ACI / ACC</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td style="border:1px solid #000;padding:1.5px 5px"><b>Normal</b></td><td style="border:1px solid #000;padding:1.5px 5px;text-align:center">&lt; 125</td><td style="border:1px solid #000;padding:1.5px 5px;text-align:center">&lt; 40</td><td style="border:1px solid #000;padding:1.5px 5px;text-align:center">&lt; 2,0</td></tr>
+        <tr><td style="border:1px solid #000;padding:1.5px 5px"><b>&lt; 50%</b></td><td style="border:1px solid #000;padding:1.5px 5px;text-align:center">&lt; 125</td><td style="border:1px solid #000;padding:1.5px 5px;text-align:center">&lt; 40</td><td style="border:1px solid #000;padding:1.5px 5px;text-align:center">&lt; 2,0</td></tr>
+        <tr><td style="border:1px solid #000;padding:1.5px 5px"><b>50 – 69%</b></td><td style="border:1px solid #000;padding:1.5px 5px;text-align:center">125 – 230</td><td style="border:1px solid #000;padding:1.5px 5px;text-align:center">40 – 100</td><td style="border:1px solid #000;padding:1.5px 5px;text-align:center">2,0 – 4,0</td></tr>
+        <tr><td style="border:1px solid #000;padding:1.5px 5px"><b>≥ 70%</b></td><td style="border:1px solid #000;padding:1.5px 5px;text-align:center">&gt; 230</td><td style="border:1px solid #000;padding:1.5px 5px;text-align:center">&gt; 100</td><td style="border:1px solid #000;padding:1.5px 5px;text-align:center">&gt; 4,0</td></tr>
+      </tbody>
+    </table>
+    <div class="doc-p" style="font-family:Helvetica,Arial,sans-serif;font-size:7pt;line-height:1.3;margin-top:6px">A graduação da estenose é realizada por análise multiparamétrica, baseada na avaliação em modo B, Doppler colorido, Doppler espectral, relação ACI/ACC e características morfológicas da placa aterosclerótica, conforme os critérios do consenso da Society of Radiologists in Ultrasound (SRU) e as diretrizes da Society for Vascular Surgery (SVS) e da European Society for Vascular Surgery (ESVS).</div>
+    <div style="font-family:Helvetica,Arial,sans-serif;font-size:7pt;line-height:1.3;margin-top:4px">
+      1. Grant EG, Benson CB, Moneta GL, et al. Carotid artery stenosis: gray-scale and Doppler US diagnosis—Society of Radiologists in Ultrasound Consensus Conference. Radiology. 2003;229(2):340-346.<br>
+      2. AbuRahma AF, Avgerinos ED, Chang RW, et al. Society for Vascular Surgery clinical practice guidelines for management of extracranial cerebrovascular disease. J Vasc Surg. 2022;75(1S):4S-22S.<br>
+      3. Naylor AR, Ricco JB, de Borst GJ, et al. Editor's Choice – European Society for Vascular Surgery (ESVS) 2023 Clinical Practice Guidelines on the Management of Atherosclerotic Carotid and Vertebral Artery Disease. Eur J Vasc Endovasc Surg. 2023;65(1):7-111.
+    </div>
+  </div>`;
 }
  
 function textConclusao() {
-  if (hd.length === 0) return 'Estudo ecográfico sem evidentes anormalidades apreciáveis ao método.';
-  return hd.join('<br>') + '<br>Demais estruturas avaliadas sem evidentes anormalidades apreciáveis ao método.';
+  if (hd.length === 0) return 'Ultrassonografia das artérias carótidas e vertebrais dentro dos padrões de normalidade.';
+  return hd.join('<br>') + '<br>Demais segmentos avaliados dentro dos padrões de normalidade.';
 }
  
 // ── TOOLBAR ──
@@ -796,7 +981,7 @@ function showToast(msg) {
 function imprimir() {
   const h = document.getElementById('laudo-doc').innerHTML;
   const w = window.open('','_blank');
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Helvetica,Arial,sans-serif;font-size:10pt;padding:32px;color:#111;line-height:1.65;max-width:820px;margin:auto}.doc-titulo{text-align:center;font-weight:700;text-transform:uppercase;margin-bottom:16px}.doc-label{font-weight:700}.doc-p{margin-bottom:8px}.doc-secao{margin-bottom:14px}*{color:#111!important}table{border-collapse:collapse;width:100%;font-size:9pt}td,th{border:1px solid #ccc;padding:3px 8px}.laudo-doc:focus { outline: none; }
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Helvetica,Arial,sans-serif;font-size:10pt;padding:32px;color:#111;line-height:1.65;max-width:820px;margin:auto}.doc-titulo{text-align:center;font-weight:700;text-transform:uppercase;margin-bottom:16px}.doc-label{font-weight:700;display:block;margin-bottom:2px}.doc-p{margin-bottom:8px}.doc-secao{margin-bottom:14px}*{color:#111!important}table{border-collapse:collapse;width:100%;font-size:9pt}td,th{border:1px solid #ccc;padding:3px 8px}.laudo-doc:focus { outline: none; }
 </style></head><body>${h}
 <div id="toast-notification" class="toast-notification">Laudo copiado!</div>
 </body></html>`);

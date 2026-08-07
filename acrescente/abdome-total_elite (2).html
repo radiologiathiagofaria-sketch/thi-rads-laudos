@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -575,7 +575,7 @@ function addLesaoRim(tipo){
   estado.rins.lesoes.push(b);renderPanel('rins');updateLaudo();
 }
 function remLesaoRim(id){estado.rins.lesoes=estado.rins.lesoes.filter(l=>l.id!==id);renderPanel('rins');updateLaudo();}
-function updLesaoRim(id,f,v){const l=estado.rins.lesoes.find(l=>l.id===id);if(l){l[f]=v;renderPanel('rins');updateLaudo();}}
+function updLesaoRim(id,f,v){const l=estado.rins.lesoes.find(l=>l.id===id);if(l){l[f]=v;if(f!=='m1'&&f!=='m2'&&f!=='m3')renderPanel('rins');updateLaudo();}}
 
 function medStr(l){const p=[l.m1,l.m2,l.m3].filter(m=>m&&m.trim()!=='');return p.length?`, medindo ${p.join(' x ')} cm`:''}
 function vol(a,b,c){const v=parseFloat(a)*parseFloat(b)*parseFloat(c)*0.523;return isNaN(v)?null:v.toFixed(1);}
@@ -615,8 +615,8 @@ function updateLaudo(){
 
   // ── PORTA ──
   let frPorta='',opPorta='';
-  if(po.sit==='habitual') frPorta='Veia porta pérvia, de calibre e trajeto habituais.';
-  else if(po.sit==='aumentado'){frPorta=`Veia porta pérvia, de calibre aumentado, medindo cerca de ${po.medida||'_'} cm na região do hilo hepático (VR até 1,2 cm).`;opPorta='Veia porta de calibre aumentado. Sugere-se, a critério clínico, complementação do exame com Doppler hepático.';}
+  if(po.sit==='habitual') frPorta='Veia porta de calibre e trajeto habituais.';
+  else if(po.sit==='aumentado'){frPorta=`Veia porta de calibre aumentado, medindo cerca de ${po.medida||'_'} cm na região do hilo hepático (VR até 1,2 cm).`;opPorta='Veia porta de calibre aumentado. Sugere-se, a critério clínico, complementação do exame com Doppler hepático.';}
   else if(po.sit==='trombose'){frPorta='Veia porta de calibre normal, apresentando material hipoecoico preenchendo a sua luz, sem fluxo vascular caracterizado ao Doppler colorido.';opPorta='Trombose da veia porta. Sugere-se, a critério clínico, complementação do exame com Doppler hepático.';}
   else if(po.sit==='nao_car') frPorta='Veia porta não caracterizada.';
   else if(po.sit==='nao_car_gas') frPorta='Veia porta não caracterizada devido interposição gasosa de alças intestinais.';
