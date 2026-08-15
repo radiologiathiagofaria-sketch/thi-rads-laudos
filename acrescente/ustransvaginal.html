@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -125,20 +125,20 @@ body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
 .laudo-doc{font-family:Helvetica,Arial,sans-serif;font-size:10pt;line-height:1.6;color:#111;max-width:750px;}
 .doc-titulo{text-align:center;font-weight:700;font-size:10pt;margin-bottom:18px;text-transform:uppercase;letter-spacing:.5px;}
 .doc-label{font-weight:700;font-size:10pt;}
-.doc-p{margin-bottom:8px;font-size:10pt; text-align: justify;}
+.doc-p{margin-bottom:8px;font-size:10pt;}
 .doc-secao{margin-bottom:16px;}
 .text-area{width:100%;height:80px;border:1px solid var(--border-strong);border-radius:6px;padding:10px;font-family:'DM Sans',sans-serif;font-size:12.5px;background:var(--white);color:var(--text);resize:vertical;}
 .text-area:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,.1);}
 .toggle-switch{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--text-2);cursor:pointer;}
 .conclusao-lista { margin: 0; padding: 0; list-style: none; }
-.conclusao-lista li { margin: 0; padding: 0; line-height: 1.4; text-align: justify; }
+.conclusao-lista li { margin: 0; padding: 0; line-height: 1.4; }
 .laudo-doc:focus { outline: none; }
 </style>
 </head>
 <body>
 
 <div class="toolbar">
-  <div class="logo" style="cursor:pointer" onclick="window.location.href='../laudo-thirads.html'"><span class="logo-name">THI-RADS</span><span class="logo-sub">Pelvic Flow</span></div>
+  <div class="logo" style="cursor:pointer" onclick="window.location.href='../laudo-thirads.html'"><span class="logo-name">THI-RADS</span><span class="logo-sub">Laudo estruturado</span></div>
   <button class="btn" onclick="window.location.href='../laudo-thirads.html'"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 2L4 8l6 6"/></svg>Voltar</button>
   <div class="tb-sep"></div>
   <button class="btn" onclick="copiar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>Copiar Laudo</button>
@@ -647,15 +647,16 @@ function updateLaudo(){
   const uniqueOp = [...new Set(opFinal)]; 
 
   if(uniqueOp.length===0) {
-    oTxt = '<ul class="conclusao-lista"><li>Estudo ecográfico sem evidentes anormalidades apreciáveis ao método.</li></ul>';
+    oTxt = '<div class="doc-p" style="margin-bottom:0">Estudo ecográfico sem evidentes anormalidades apreciáveis ao método.</div>';
   } else {
+    let listStr = uniqueOp.map(item => `${item}`).join('<br>');
     if(isDefensivo) {
-      oTxt = '<span style="line-height:1.2;">Estudo ecográfico com achados que podem corresponder a:</span><br>' + 
-             '<ul class="conclusao-lista" style="margin-top:2px; margin-bottom:4px;">' + uniqueOp.map(item => `<li>${item}</li>`).join('') + '</ul>' +
-             '<span style="line-height:1.2;">Demais estruturas sem evidentes anormalidades apreciáveis ao método.</span>';
+      oTxt = '<div class="doc-p" style="margin-bottom:0"><span style="line-height:1.2;">Estudo ecográfico com achados que podem corresponder a:</span><br>' + 
+             listStr + '<br>' +
+             '<span style="line-height:1.2;">Demais estruturas sem evidentes anormalidades apreciáveis ao método.</span></div>';
     } else {
-      oTxt = '<ul class="conclusao-lista" style="margin-bottom:4px;">' + uniqueOp.map(item => `<li>${item}</li>`).join('') + '</ul>' +
-             '<span style="line-height:1.2;">Demais estruturas sem evidentes anormalidades apreciáveis ao método.</span>';
+      oTxt = '<div class="doc-p" style="margin-bottom:0">' + listStr + '<br>' +
+             '<span style="line-height:1.2;">Demais estruturas sem evidentes anormalidades apreciáveis ao método.</span></div>';
     }
   }
 
@@ -706,6 +707,15 @@ function copiar() {
     showToast('Falha ao copiar. Use Ctrl+A e Ctrl+C no texto do laudo.');
   }
 }
+// Intercepta copy manual no dark mode para remover fundo escuro
+document.getElementById('laudo-doc').addEventListener('copy', function(e) {
+  if (!document.body.classList.contains('dark')) return;
+  document.body.classList.remove('dark');
+  document.body.offsetHeight;
+  setTimeout(function() {
+    document.body.classList.add('dark');
+  }, 0);
+});
 
 function showToast(msg) {
   let t = document.getElementById('toast-notification');
@@ -713,7 +723,7 @@ function showToast(msg) {
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3000);
 }
-function imprimir(){ const h=document.getElementById('laudo-doc').innerHTML; const w=window.open('','_blank'); w.document.write(`<html><head><style>body{font-family:Arial;font-size:10pt;color:#000;line-height:1.6} .doc-titulo{text-align:center;font-weight:bold;margin-bottom:15px} .doc-label{font-weight:bold} .doc-p{margin-bottom:10px;text-align:justify} .conclusao-lista { margin: 0; padding: 0; list-style: none; } .conclusao-lista li { margin: 0; padding: 0; line-height: 1.4; text-align: justify; }.laudo-doc:focus { outline: none; }
+function imprimir(){ const h=document.getElementById('laudo-doc').innerHTML; const w=window.open('','_blank'); w.document.write(`<html><head><style>body{font-family:Arial;font-size:10pt;color:#000;line-height:1.6} .doc-titulo{text-align:center;font-weight:bold;margin-bottom:15px} .doc-label{font-weight:bold} .doc-p{margin-bottom:10px;} .conclusao-lista { margin: 0; padding: 0; list-style: none; } .conclusao-lista li { margin: 0; padding: 0; line-height: 1.4; }.laudo-doc:focus { outline: none; }
 </style></head><body>${h}
 <div id="toast-notification" class="toast-notification">Laudo copiado!</div>
 </body></html>`); w.document.close(); w.print(); }

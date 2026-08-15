@@ -1,248 +1,161 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THI-RADS - Login</title>
-    <style>
-        /* Variáveis de tema */
-        :root {
-            --bg: linear-gradient(135deg, #1e3c72, #2a5298);
-            --box-bg: white;
-            --text-color: #1e3c72;
-            --subtext-color: #555;
-            --input-bg: white;
-            --input-border: #ddd;
-            --input-focus: #2a5298;
-            --btn-bg: #1e3c72;
-            --btn-hover: #2a5298;
-            --erro-color: red;
-            --toggle-color: white;
-            /* cores da barra */
-            --bar-bg: #ffffff;
-            --bar-text: #1e3c72;
-            --bar-subtext: #555;
-        }
-
-        body.dark-mode {
-            --bg: linear-gradient(135deg, #0f1a2e, #152b44);
-            --box-bg: #1e2a3a;
-            --text-color: #e0e0e0;
-            --subtext-color: #b0b0b0;
-            --input-bg: #2a3547;
-            --input-border: #3a4a5a;
-            --input-focus: #5b8cbf;
-            --btn-bg: #3a5f8a;
-            --btn-hover: #4f7ab5;
-            --erro-color: #ff6b6b;
-            --toggle-color: #ffd700;
-            /* barra escura */
-            --bar-bg: #1e2a3a;
-            --bar-text: #e0e6f0;
-            --bar-subtext: #b0b8c8;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            padding-top: 60px;
-            transition: background 0.4s;
-            position: relative;
-        }
-
-        /* Barra de logo fixa (texto) */
-        .top-logo {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 60px;
-            background: var(--bar-bg);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            transition: background 0.4s;
-            gap: 6px;
-        }
-        .logo-texto {
-            font-size: 1.8em;
-            font-weight: 700;
-            color: var(--bar-text);
-            letter-spacing: 2px;
-            transition: color 0.4s;
-        }
-        .logo-sub {
-            font-size: 0.9em;
-            font-weight: 400;
-            color: var(--bar-subtext);
-            margin-left: 4px;
-            transition: color 0.4s;
-            white-space: nowrap;
-        }
-
-        /* Botão de tema */
-        .theme-toggle {
-            position: fixed;
-            top: 80px;
-            right: 20px;
-            background: var(--box-bg);
-            border: none;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            font-size: 22px;
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-color);
-            transition: background 0.3s, color 0.3s;
-            z-index: 1000;
-        }
-        .theme-toggle:hover {
-            opacity: 0.9;
-        }
-
-        .login-box {
-            background: var(--box-bg);
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            width: 350px;
-            text-align: center;
-            transition: background 0.4s, color 0.4s;
-            color: var(--text-color);
-            margin-top: 20px;
-        }
-
-        .login-box h1 {
-            color: var(--text-color);
-            margin-bottom: 5px;
-            font-size: 28px;
-        }
-
-        .login-box h2 {
-            color: var(--subtext-color);
-            font-weight: normal;
-            font-size: 16px;
-            margin-bottom: 30px;
-        }
-
-        .login-box input {
-            width: 100%;
-            padding: 12px 15px;
-            margin: 10px 0;
-            border: 2px solid var(--input-border);
-            border-radius: 8px;
-            font-size: 16px;
-            outline: none;
-            background: var(--input-bg);
-            color: var(--text-color);
-            transition: border 0.3s, background 0.3s, color 0.3s;
-        }
-
-        .login-box input:focus {
-            border-color: var(--input-focus);
-        }
-
-        .login-box button {
-            width: 100%;
-            padding: 12px;
-            background: var(--btn-bg);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: background 0.3s;
-        }
-
-        .login-box button:hover {
-            background: var(--btn-hover);
-        }
-
-        .erro {
-            color: var(--erro-color);
-            font-size: 14px;
-            margin-top: 10px;
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>THI-RADS — Laudos Estruturados em Ultrassonografia</title>
+<meta name="description" content="THI-RADS — laudos estruturados para ultrassonografia.">
+<style>
+:root{--bg:#07111f;--surface:rgba(15,29,48,.86);--text:#f4f8fc;--muted:#aab8c8;--accent:#4fc3f7;--border:rgba(130,190,225,.18);--glow:rgba(79,195,247,.25)}
+body.light{--bg:#f4f8fb;--surface:rgba(255,255,255,.9);--text:#10233b;--muted:#5d6e80;--accent:#087fb2;--border:rgba(16,70,105,.14);--glow:rgba(8,127,178,.14)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;color:var(--text);background:radial-gradient(circle at 80% 10%,var(--glow),transparent 28%),var(--bg);transition:.3s}
+a{text-decoration:none;color:inherit}.container{width:min(1160px,calc(100% - 32px));margin:auto}
+header{position:fixed;top:0;left:0;right:0;z-index:10;background:rgba(7,17,31,.78);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+body.light header{background:rgba(244,248,251,.84)}
+nav{height:74px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.brand{display:flex;align-items:center;max-width:760px}.brand-svg{display:block;width:min(455px,52vw);height:auto;flex:none;overflow:visible}
+.name{font-size:1.45rem;font-weight:400;letter-spacing:4px}.tag{font-size:.56rem;letter-spacing:1.5px;color:var(--muted);white-space:nowrap}
+.links{display:flex;gap:26px;color:var(--muted);font-size:.88rem}.links a:hover{color:var(--accent)}
+.actions{display:flex;gap:9px;align-items:center}.theme{width:40px;height:40px;border:1px solid var(--border);border-radius:50%;background:var(--surface);color:var(--accent);display:grid;place-items:center;cursor:pointer}.theme svg{width:18px}
+.login,.primary{background:var(--accent);color:#03111b;font-weight:700;border-radius:10px;padding:11px 18px;box-shadow:0 10px 28px var(--glow)}
+.hero{padding:150px 0 90px}.hero-grid{display:grid;grid-template-columns:1fr .95fr;gap:70px;align-items:center}
+.kicker{font-size:.7rem;letter-spacing:2px;color:var(--accent);font-weight:700;text-transform:uppercase}
+h1{font-size:clamp(2.8rem,5vw,4.8rem);font-weight:300;line-height:1.02;letter-spacing:-2px;margin:18px 0}h1 strong{color:var(--accent);font-weight:650}
+.lead{font-size:1.1rem;color:var(--muted);max-width:650px;margin-bottom:28px}.actions2{display:flex;gap:12px;flex-wrap:wrap}.secondary{padding:11px 18px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font-weight:700}
+.mock{border:1px solid var(--border);border-radius:20px;background:var(--surface);overflow:hidden;box-shadow:0 25px 70px rgba(0,0,0,.28)}.mockbar{height:45px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;padding:0 15px}.dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}.mocktitle{margin-left:7px;font-size:.7rem;color:var(--muted);letter-spacing:1px}.mockbody{display:grid;grid-template-columns:130px 1fr;min-height:320px}.side{padding:18px 12px;border-right:1px solid var(--border)}.line{height:8px;border-radius:5px;background:var(--border);margin-bottom:12px}.line.active{background:var(--accent);opacity:.6;width:75%}.main{padding:22px}.main h3{font-weight:500;margin:0 0 16px}.boxes{display:grid;grid-template-columns:1fr 1fr;gap:10px}.box{border:1px solid var(--border);border-radius:10px;padding:13px}.box small{display:block;color:var(--muted);font-size:.65rem;margin-bottom:5px}.box b{font-size:.82rem;font-weight:500}.conclusion{margin-top:14px;border-left:2px solid var(--accent);padding:12px;color:var(--muted);font-size:.75rem;background:rgba(79,195,247,.05)}
+section{padding:85px 0}.head{max-width:700px;margin-bottom:35px}.head h2{font-size:clamp(2rem,3.5vw,3rem);font-weight:350;line-height:1.1;margin:8px 0 12px}.head p{color:var(--muted)}
+.features{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.feature,.step,.exam{background:var(--surface);border:1px solid var(--border);border-radius:16px}.feature{padding:24px}.feature svg{width:40px;height:40px;color:var(--accent);margin-bottom:16px}.feature h3{margin:0 0 7px;font-size:1rem}.feature p{margin:0;color:var(--muted);font-size:.85rem}
+.exams{display:grid;grid-template-columns:repeat(8,1fr);gap:10px}.exam{text-align:center;padding:18px 8px}.exam svg{width:32px;height:32px;color:var(--accent);margin-bottom:7px}.exam span{display:block;color:var(--muted);font-size:.7rem}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.step{padding:26px}.num{color:var(--accent);font-size:.7rem;letter-spacing:2px;font-weight:700}.step h3{margin:10px 0 7px}.step p{margin:0;color:var(--muted);font-size:.88rem}
+.cta{padding:52px 25px;text-align:center;border:1px solid var(--border);border-radius:22px;background:radial-gradient(circle at 50% 0,var(--glow),transparent 50%),var(--surface)}.cta h2{font-size:clamp(2rem,4vw,3rem);font-weight:350;margin:8px 0}.cta p{color:var(--muted);max-width:650px;margin:0 auto 25px}
+footer{border-top:1px solid var(--border);padding:32px 0;color:var(--muted);font-size:.76rem}.foot{display:flex;justify-content:space-between;gap:20px}.foot strong{color:var(--text);letter-spacing:3px}
+@media(max-width:900px){.links{display:none}.hero-grid{grid-template-columns:1fr}.features{grid-template-columns:1fr 1fr}.exams{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:600px){.brand-svg{width:285px;height:auto;max-width:76vw}.tag{display:none}.hero{padding-top:120px}.features,.steps{grid-template-columns:1fr}.exams{grid-template-columns:1fr 1fr}.mockbody{grid-template-columns:85px 1fr}.foot{flex-direction:column}}
+</style>
 </head>
 <body>
-    <!-- Barra de logo (texto) -->
-    <header class="top-logo">
-        <span class="logo-texto">THI-RADS</span>
-        <span class="logo-sub">Laudos Estruturados</span>
-    </header>
+<header><div class="container"><nav>
+<a class="brand" href="#" aria-label="THI-RADS">
+<svg class="brand-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 913 248" width="455" height="124" role="img" aria-labelledby="thiRadsTitle thiRadsDesc">
+<title id="thiRadsTitle">THI-RADS</title>
+<desc id="thiRadsDesc">THI-RADS — Laudos Estruturados em Ultrassonografia</desc>
+<defs>
+ <linearGradient id="thiRadsCyanGrad" x1="0" y1="0" x2="1" y2="0">
+  <stop offset="0" stop-color="#13ddff"/>
+  <stop offset="1" stop-color="#00a7ee"/>
+ </linearGradient>
+ <filter id="thiRadsSoftGlow" x="-20%" y="-30%" width="140%" height="160%">
+   <feGaussianBlur stdDeviation="1.6" result="b"/>
+   <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+ </filter>
+</defs>
+<g filter="url(#thiRadsSoftGlow)" fill-rule="evenodd" clip-rule="evenodd">
+<path d="M 36.00 188.00 L 36.00 190.00 L 41.00 195.00 L 41.00 196.00 L 42.00 196.00 L 48.00 202.00 L 49.00 202.00 L 52.00 205.00 L 55.00 206.00 L 57.00 208.00 L 67.00 213.00 L 69.00 213.00 L 73.00 215.00 L 76.00 215.00 L 77.00 216.00 L 80.00 216.00 L 81.00 217.00 L 87.00 217.00 L 88.00 218.00 L 98.00 218.00 L 99.00 217.00 L 106.00 217.00 L 107.00 216.00 L 111.00 216.00 L 112.00 215.00 L 117.00 214.00 L 120.00 212.00 L 122.00 212.00 L 130.00 208.00 L 132.00 206.00 L 136.00 204.00 L 139.00 201.00 L 140.00 201.00 L 151.00 190.00 L 151.00 188.00 L 150.00 188.00 L 148.00 186.00 L 138.00 196.00 L 137.00 196.00 L 134.00 199.00 L 133.00 199.00 L 128.00 203.00 L 113.00 210.00 L 105.00 211.00 L 104.00 212.00 L 83.00 212.00 L 82.00 211.00 L 79.00 211.00 L 78.00 210.00 L 72.00 209.00 L 69.00 207.00 L 67.00 207.00 L 59.00 203.00 L 57.00 201.00 L 53.00 199.00 L 49.00 195.00 L 48.00 195.00 L 39.00 186.00 L 38.00 186.00 Z" fill="url(#thiRadsCyanGrad)"/>
+<path d="M 51.00 177.00 L 56.00 182.00 L 57.00 182.00 L 61.00 186.00 L 64.00 187.00 L 66.00 189.00 L 70.00 191.00 L 72.00 191.00 L 75.00 193.00 L 77.00 193.00 L 78.00 194.00 L 81.00 194.00 L 82.00 195.00 L 87.00 195.00 L 88.00 196.00 L 99.00 196.00 L 100.00 195.00 L 105.00 195.00 L 106.00 194.00 L 112.00 193.00 L 124.00 187.00 L 135.00 178.00 L 134.00 174.00 L 132.00 174.00 L 124.00 181.00 L 121.00 182.00 L 119.00 184.00 L 113.00 187.00 L 111.00 187.00 L 107.00 189.00 L 104.00 189.00 L 103.00 190.00 L 84.00 190.00 L 80.00 188.00 L 77.00 188.00 L 65.00 182.00 L 56.00 174.00 L 53.00 174.00 Z" fill="url(#thiRadsCyanGrad)"/>
+<path d="M 65.00 158.00 L 72.00 166.00 L 83.00 172.00 L 86.00 172.00 L 87.00 173.00 L 100.00 173.00 L 101.00 172.00 L 104.00 172.00 L 113.00 167.00 L 121.00 159.00 L 121.00 157.00 L 119.00 155.00 L 118.00 155.00 L 110.00 163.00 L 102.00 167.00 L 100.00 167.00 L 99.00 168.00 L 89.00 168.00 L 88.00 167.00 L 85.00 167.00 L 79.00 164.00 L 77.00 162.00 L 76.00 162.00 L 69.00 155.00 L 66.00 156.00 Z" fill="url(#thiRadsCyanGrad)"/>
+<path d="M 60.00 118.00 L 60.00 121.00 L 62.00 123.00 L 64.00 123.00 L 71.00 119.00 L 74.00 119.00 L 78.00 117.00 L 83.00 117.00 L 84.00 116.00 L 87.00 117.00 L 90.00 120.00 L 91.00 122.00 L 91.00 154.00 L 92.00 155.00 L 95.00 155.00 L 96.00 154.00 L 96.00 122.00 L 97.00 120.00 L 100.00 117.00 L 109.00 117.00 L 110.00 118.00 L 118.00 120.00 L 124.00 123.00 L 125.00 123.00 L 127.00 120.00 L 126.00 118.00 L 118.00 114.00 L 116.00 114.00 L 112.00 112.00 L 108.00 112.00 L 107.00 111.00 L 99.00 111.00 L 98.00 110.00 L 78.00 111.00 L 77.00 112.00 L 74.00 112.00 L 73.00 113.00 L 68.00 114.00 Z" fill="url(#thiRadsCyanGrad)"/>
+<path d="M 36.00 110.00 L 36.00 112.00 L 38.00 114.00 L 39.00 114.00 L 53.00 103.00 L 58.00 101.00 L 60.00 99.00 L 62.00 99.00 L 67.00 96.00 L 69.00 96.00 L 73.00 94.00 L 76.00 94.00 L 77.00 93.00 L 80.00 93.00 L 81.00 92.00 L 105.00 92.00 L 106.00 93.00 L 110.00 93.00 L 111.00 94.00 L 117.00 95.00 L 120.00 97.00 L 122.00 97.00 L 134.00 103.00 L 136.00 105.00 L 140.00 107.00 L 148.00 114.00 L 151.00 111.00 L 151.00 110.00 L 147.00 106.00 L 146.00 106.00 L 142.00 102.00 L 141.00 102.00 L 138.00 99.00 L 135.00 98.00 L 133.00 96.00 L 127.00 93.00 L 125.00 93.00 L 122.00 91.00 L 120.00 91.00 L 117.00 89.00 L 114.00 89.00 L 113.00 88.00 L 110.00 88.00 L 109.00 87.00 L 105.00 87.00 L 104.00 86.00 L 82.00 86.00 L 81.00 87.00 L 73.00 88.00 L 72.00 89.00 L 64.00 91.00 L 52.00 97.00 L 50.00 99.00 L 46.00 101.00 Z" fill="url(#thiRadsCyanGrad)"/>
+<path d="M 191.00 83.00 L 191.00 194.00 L 192.00 195.00 L 194.00 195.00 L 194.00 83.00 Z" fill="url(#thiRadsCyanGrad)"/>
+<path d="M 38.00 83.00 L 38.00 84.00 L 41.00 87.00 L 55.00 77.00 L 65.00 72.00 L 67.00 72.00 L 68.00 71.00 L 70.00 71.00 L 74.00 69.00 L 77.00 69.00 L 78.00 68.00 L 82.00 68.00 L 83.00 67.00 L 104.00 67.00 L 105.00 68.00 L 113.00 69.00 L 114.00 70.00 L 122.00 72.00 L 127.00 75.00 L 129.00 75.00 L 131.00 77.00 L 134.00 78.00 L 136.00 80.00 L 143.00 84.00 L 146.00 87.00 L 149.00 84.00 L 149.00 83.00 L 146.00 80.00 L 145.00 80.00 L 142.00 77.00 L 141.00 77.00 L 136.00 73.00 L 133.00 72.00 L 131.00 70.00 L 127.00 68.00 L 125.00 68.00 L 122.00 66.00 L 114.00 64.00 L 113.00 63.00 L 110.00 63.00 L 109.00 62.00 L 104.00 62.00 L 103.00 61.00 L 84.00 61.00 L 83.00 62.00 L 78.00 62.00 L 77.00 63.00 L 70.00 64.00 L 67.00 66.00 L 65.00 66.00 L 62.00 68.00 L 60.00 68.00 L 54.00 71.00 L 52.00 73.00 L 45.00 77.00 Z" fill="url(#thiRadsCyanGrad)"/>
+<path d="M245.25 84.2109375H272.4375V166.0H275.04296875V84.2109375H302.23046875V81.60546875H245.25Z" fill="#f2f2f4"/>
+<path d="M334.62109375 166.0H337.2265625V124.19921875H390.921875V166.0H393.52734375V81.60546875H390.921875V121.59375H337.2265625V81.60546875H334.62109375Z" fill="#f2f2f4"/>
+<path d="M434.4140625 81.60546875H431.80859375V166.0H434.4140625Z" fill="#f2f2f4"/>
+<path d="M500.7890625 128.50390625H469.296875V131.109375H500.7890625Z" fill="#f2f2f4"/>
+<path d="M535.55859375 166.0H538.1640625V129.63671875H560.3671875C562.1796875 129.63671875 563.935546875 129.466796875 565.634765625 129.18359375L585.515625 166.0H588.4609375L568.240234375 128.560546875C578.0390625 125.671875 584.49609375 117.232421875 584.49609375 105.734375C584.49609375 91.234375 574.470703125 81.60546875 560.3671875 81.60546875H535.55859375ZM538.1640625 127.03125V84.2109375H560.3671875C572.94140625 84.2109375 581.890625 92.763671875 581.890625 105.734375C581.890625 118.53515625 572.94140625 127.03125 560.3671875 127.03125Z" fill="url(#thiRadsCyanGrad)"/>
+<path d="M609.5234375 166.0H612.298828125L622.77734375 137.90625H662.935546875L673.470703125 166.0H676.24609375L644.640625 81.60546875H641.072265625ZM623.740234375 135.30078125 636.654296875 100.63671875C638.75 95.029296875 640.7890625 89.478515625 642.828125 83.927734375C644.8671875 89.478515625 646.90625 95.029296875 649.001953125 100.63671875L661.97265625 135.30078125Z" fill="url(#thiRadsCyanGrad)"/>
+<path d="M727.21484375 166.0C752.0234375 166.0 766.41015625 150.423828125 766.41015625 123.51953125C766.41015625 97.23828125 752.646484375 81.60546875 729.3671875 81.60546875H705.125V166.0ZM707.73046875 163.39453125V84.2109375H729.3671875C751.287109375 84.2109375 763.8046875 98.880859375 763.8046875 123.51953125C763.8046875 148.498046875 750.6640625 163.39453125 727.21484375 163.39453125Z" fill="url(#thiRadsCyanGrad)"/>
+<path d="M822.0234375 167.359375C838.052734375 167.359375 848.87109375 157.787109375 848.87109375 144.58984375C848.87109375 134.224609375 842.244140625 127.654296875 827.6875 123.1796875L818.05859375 120.234375C805.994140625 116.552734375 800.2734375 110.662109375 800.2734375 102.109375C800.2734375 91.0078125 809.845703125 82.96484375 822.703125 82.96484375C835.787109375 82.96484375 844.283203125 91.177734375 845.1328125 102.67578125H847.73828125C846.9453125 89.705078125 837.146484375 80.359375 822.703125 80.359375C808.31640625 80.359375 797.66796875 89.6484375 797.66796875 102.109375C797.66796875 111.8515625 804.181640625 118.705078125 817.4921875 122.83984375L827.0078125 125.78515625C840.658203125 130.033203125 846.265625 135.52734375 846.265625 144.58984375C846.265625 156.541015625 836.580078125 164.640625 822.0234375 164.640625C808.146484375 164.640625 799.140625 157.1640625 798.34765625 146.17578125H795.7421875C796.53515625 158.63671875 806.673828125 167.359375 822.0234375 167.359375Z" fill="url(#thiRadsCyanGrad)"/>
+<path d="M251.5390625 194.0H258.1875V193.0078125H252.65625V182.359375H251.5390625Z" fill="#e8eaee"/>
+<path d="M264.9765625 194.0H266.15625L267.390625 190.5390625H272.4296875L273.6875 194.0H274.859375L270.5546875 182.359375H269.2421875ZM267.7421875 189.5546875 268.875 186.390625C269.1328125 185.65625 269.46875 184.65625 269.890625 183.2578125C270.3125 184.640625 270.640625 185.6171875 270.921875 186.390625L272.0703125 189.5546875Z" fill="#e8eaee"/>
+<path d="M286.6953125 194.1796875C289.3203125 194.1796875 291.1171875 192.4375 291.1171875 190.046875V182.359375H290.0078125V189.96875C290.0078125 191.8046875 288.6953125 193.1484375 286.6953125 193.1484375C284.6953125 193.1484375 283.375 191.8046875 283.375 189.96875V182.359375H282.265625V190.046875C282.265625 192.4296875 284.0625 194.1796875 286.6953125 194.1796875Z" fill="#e8eaee"/>
+<path d="M303.0546875 194.0C306.5625 194.0 308.5625 191.8125 308.5625 188.1484375C308.5625 184.5390625 306.59375 182.359375 303.2578125 182.359375H299.6171875V194.0ZM300.7265625 193.0078125V183.3515625H303.1875C305.9921875 183.3515625 307.484375 185.15625 307.484375 188.1484375C307.484375 191.1875 305.9609375 193.0078125 302.9921875 193.0078125Z" fill="#e8eaee"/>
+<path d="M321.1640625 194.15625C324.109375 194.15625 326.203125 191.828125 326.203125 188.1875C326.203125 184.5390625 324.109375 182.203125 321.1640625 182.203125C318.21875 182.203125 316.109375 184.5390625 316.109375 188.1875C316.109375 191.828125 318.2109375 194.15625 321.1640625 194.15625ZM321.1640625 193.1171875C318.875 193.1171875 317.1875 191.2734375 317.1875 188.1875C317.1875 185.078125 318.890625 183.2421875 321.1640625 183.2421875C323.4296875 183.2421875 325.125 185.078125 325.125 188.1875C325.125 191.28125 323.4296875 193.1171875 321.1640625 193.1171875Z" fill="#e8eaee"/>
+<path d="M337.765625 194.1953125C340.296875 194.1953125 341.8203125 192.78125 341.8203125 190.8984375C341.8203125 188.9765625 340.1484375 188.203125 338.6484375 187.7734375L337.4296875 187.421875C336.3046875 187.09375 335.1328125 186.5390625 335.1328125 185.3359375C335.1328125 184.09375 336.2421875 183.1953125 337.8359375 183.1953125C339.359375 183.1953125 340.4453125 184.0 340.578125 185.2890625H341.6640625C341.578125 183.515625 340.0625 182.1953125 337.8671875 182.1953125C335.703125 182.1953125 334.046875 183.4921875 334.046875 185.3828125C334.046875 186.859375 335.078125 187.8125 336.9375 188.359375L338.3125 188.7578125C339.7734375 189.1875 340.734375 189.71875 340.734375 190.8828125C340.734375 192.265625 339.4921875 193.1875 337.765625 193.1875C336.21875 193.1875 334.9921875 192.4453125 334.875 191.0546875H333.7421875C333.8671875 192.9296875 335.3828125 194.1953125 337.765625 194.1953125Z" fill="#e8eaee"/>
+<path d="M359.875 194.0H366.78125V193.0078125H360.984375V188.640625H366.3125V187.6484375H360.984375V183.3515625H366.671875V182.359375H359.875Z" fill="#e8eaee"/>
+<path d="M378.3984375 194.1953125C380.9296875 194.1953125 382.453125 192.78125 382.453125 190.8984375C382.453125 188.9765625 380.78125 188.203125 379.28125 187.7734375L378.0625 187.421875C376.9375 187.09375 375.765625 186.5390625 375.765625 185.3359375C375.765625 184.09375 376.875 183.1953125 378.46875 183.1953125C379.9921875 183.1953125 381.078125 184.0 381.2109375 185.2890625H382.296875C382.2109375 183.515625 380.6953125 182.1953125 378.5 182.1953125C376.3359375 182.1953125 374.6796875 183.4921875 374.6796875 185.3828125C374.6796875 186.859375 375.7109375 187.8125 377.5703125 188.359375L378.9453125 188.7578125C380.40625 189.1875 381.3671875 189.71875 381.3671875 190.8828125C381.3671875 192.265625 380.125 193.1875 378.3984375 193.1875C376.8515625 193.1875 375.625 192.4453125 375.5078125 191.0546875H374.375C374.5 192.9296875 376.015625 194.1953125 378.3984375 194.1953125Z" fill="#e8eaee"/>
+<path d="M389.8125 183.3515625H393.5078125V194.0H394.6171875V183.3515625H398.296875V182.359375H389.8125Z" fill="#e8eaee"/>
+<path d="M406.1796875 194.0H407.2890625V189.3203125H409.984375C410.1328125 189.3203125 410.2734375 189.3125 410.4140625 189.3046875L412.9375 194.0H414.21875L411.546875 189.0859375C412.984375 188.609375 413.734375 187.421875 413.734375 185.8671875C413.734375 183.8125 412.4375 182.359375 409.9765625 182.359375H406.1796875ZM407.2890625 188.3203125V183.3515625H409.9296875C411.7421875 183.3515625 412.6328125 184.34375 412.6328125 185.8671875C412.6328125 187.3671875 411.7421875 188.3203125 409.9375 188.3203125Z" fill="#e8eaee"/>
+<path d="M426.1796875 194.1796875C428.8046875 194.1796875 430.6015625 192.4375 430.6015625 190.046875V182.359375H429.4921875V189.96875C429.4921875 191.8046875 428.1796875 193.1484375 426.1796875 193.1484375C424.1796875 193.1484375 422.859375 191.8046875 422.859375 189.96875V182.359375H421.75V190.046875C421.75 192.4296875 423.546875 194.1796875 426.1796875 194.1796875Z" fill="#e8eaee"/>
+<path d="M438.40625 183.3515625H442.1015625V194.0H443.2109375V183.3515625H446.890625V182.359375H438.40625Z" fill="#e8eaee"/>
+<path d="M459.125 194.1796875C461.75 194.1796875 463.546875 192.4375 463.546875 190.046875V182.359375H462.4375V189.96875C462.4375 191.8046875 461.125 193.1484375 459.125 193.1484375C457.125 193.1484375 455.8046875 191.8046875 455.8046875 189.96875V182.359375H454.6953125V190.046875C454.6953125 192.4296875 456.4921875 194.1796875 459.125 194.1796875Z" fill="#e8eaee"/>
+<path d="M472.046875 194.0H473.15625V189.3203125H475.8515625C476.0 189.3203125 476.140625 189.3125 476.28125 189.3046875L478.8046875 194.0H480.0859375L477.4140625 189.0859375C478.8515625 188.609375 479.6015625 187.421875 479.6015625 185.8671875C479.6015625 183.8125 478.3046875 182.359375 475.84375 182.359375H472.046875ZM473.15625 188.3203125V183.3515625H475.796875C477.609375 183.3515625 478.5 184.34375 478.5 185.8671875C478.5 187.3671875 477.609375 188.3203125 475.8046875 188.3203125Z" fill="#e8eaee"/>
+<path d="M486.6015625 194.0H487.78125L489.015625 190.5390625H494.0546875L495.3125 194.0H496.484375L492.1796875 182.359375H490.8671875ZM489.3671875 189.5546875 490.5 186.390625C490.7578125 185.65625 491.09375 184.65625 491.515625 183.2578125C491.9375 184.640625 492.265625 185.6171875 492.546875 186.390625L493.6953125 189.5546875Z" fill="#e8eaee"/>
+<path d="M507.40625 194.0C510.9140625 194.0 512.9140625 191.8125 512.9140625 188.1484375C512.9140625 184.5390625 510.9453125 182.359375 507.609375 182.359375H503.96875V194.0ZM505.078125 193.0078125V183.3515625H507.5390625C510.34375 183.3515625 511.8359375 185.15625 511.8359375 188.1484375C511.8359375 191.1875 510.3125 193.0078125 507.34375 193.0078125Z" fill="#e8eaee"/>
+<path d="M525.515625 194.15625C528.4609375 194.15625 530.5546875 191.828125 530.5546875 188.1875C530.5546875 184.5390625 528.4609375 182.203125 525.515625 182.203125C522.5703125 182.203125 520.4609375 184.5390625 520.4609375 188.1875C520.4609375 191.828125 522.5625 194.15625 525.515625 194.15625ZM525.515625 193.1171875C523.2265625 193.1171875 521.5390625 191.2734375 521.5390625 188.1875C521.5390625 185.078125 523.2421875 183.2421875 525.515625 183.2421875C527.78125 183.2421875 529.4765625 185.078125 529.4765625 188.1875C529.4765625 191.28125 527.78125 193.1171875 525.515625 193.1171875Z" fill="#e8eaee"/>
+<path d="M542.1171875 194.1953125C544.6484375 194.1953125 546.171875 192.78125 546.171875 190.8984375C546.171875 188.9765625 544.5 188.203125 543.0 187.7734375L541.78125 187.421875C540.65625 187.09375 539.484375 186.5390625 539.484375 185.3359375C539.484375 184.09375 540.59375 183.1953125 542.1875 183.1953125C543.7109375 183.1953125 544.796875 184.0 544.9296875 185.2890625H546.015625C545.9296875 183.515625 544.4140625 182.1953125 542.21875 182.1953125C540.0546875 182.1953125 538.3984375 183.4921875 538.3984375 185.3828125C538.3984375 186.859375 539.4296875 187.8125 541.2890625 188.359375L542.6640625 188.7578125C544.125 189.1875 545.0859375 189.71875 545.0859375 190.8828125C545.0859375 192.265625 543.84375 193.1875 542.1171875 193.1875C540.5703125 193.1875 539.34375 192.4453125 539.2265625 191.0546875H538.09375C538.21875 192.9296875 539.734375 194.1953125 542.1171875 194.1953125Z" fill="#e8eaee"/>
+<path d="M564.2265625 194.0H571.1328125V193.0078125H565.3359375V188.640625H570.6640625V187.6484375H565.3359375V183.3515625H571.0234375V182.359375H564.2265625Z" fill="#e8eaee"/>
+<path d="M579.25 194.0H580.3125V186.609375C580.3125 185.765625 580.2890625 184.578125 580.2734375 183.5859375C580.6875 184.765625 581.09375 185.921875 581.375 186.609375L584.421875 194.0H585.3984375L588.421875 186.609375C588.703125 185.90625 589.1328125 184.7265625 589.515625 183.578125C589.5 184.6328125 589.484375 185.7890625 589.484375 186.609375V194.0H590.578125V182.359375H589.0L585.7734375 190.34375C585.53125 190.9453125 585.1953125 191.953125 584.921875 192.78125C584.65625 191.9296875 584.3125 190.9296875 584.078125 190.34375L580.828125 182.359375H579.25Z" fill="#e8eaee"/>
+<path d="M613.5078125 194.1796875C616.1328125 194.1796875 617.9296875 192.4375 617.9296875 190.046875V182.359375H616.8203125V189.96875C616.8203125 191.8046875 615.5078125 193.1484375 613.5078125 193.1484375C611.5078125 193.1484375 610.1875 191.8046875 610.1875 189.96875V182.359375H609.078125V190.046875C609.078125 192.4296875 610.875 194.1796875 613.5078125 194.1796875Z" fill="#e8eaee"/>
+<path d="M626.4296875 194.0H633.078125V193.0078125H627.546875V182.359375H626.4296875Z" fill="#e8eaee"/>
+<path d="M640.265625 183.3515625H643.9609375V194.0H645.0703125V183.3515625H648.75V182.359375H640.265625Z" fill="#e8eaee"/>
+<path d="M656.6328125 194.0H657.7421875V189.3203125H660.4375C660.5859375 189.3203125 660.7265625 189.3125 660.8671875 189.3046875L663.390625 194.0H664.671875L662.0 189.0859375C663.4375 188.609375 664.1875 187.421875 664.1875 185.8671875C664.1875 183.8125 662.890625 182.359375 660.4296875 182.359375H656.6328125ZM657.7421875 188.3203125V183.3515625H660.3828125C662.1953125 183.3515625 663.0859375 184.34375 663.0859375 185.8671875C663.0859375 187.3671875 662.1953125 188.3203125 660.390625 188.3203125Z" fill="#e8eaee"/>
+<path d="M671.1875 194.0H672.3671875L673.6015625 190.5390625H678.640625L679.8984375 194.0H681.0703125L676.765625 182.359375H675.453125ZM673.953125 189.5546875 675.0859375 186.390625C675.34375 185.65625 675.6796875 184.65625 676.1015625 183.2578125C676.5234375 184.640625 676.8515625 185.6171875 677.1328125 186.390625L678.28125 189.5546875Z" fill="#e8eaee"/>
+<path d="M692.0546875 194.1953125C694.5859375 194.1953125 696.109375 192.78125 696.109375 190.8984375C696.109375 188.9765625 694.4375 188.203125 692.9375 187.7734375L691.71875 187.421875C690.59375 187.09375 689.421875 186.5390625 689.421875 185.3359375C689.421875 184.09375 690.53125 183.1953125 692.125 183.1953125C693.6484375 183.1953125 694.734375 184.0 694.8671875 185.2890625H695.953125C695.8671875 183.515625 694.3515625 182.1953125 692.15625 182.1953125C689.9921875 182.1953125 688.3359375 183.4921875 688.3359375 185.3828125C688.3359375 186.859375 689.3671875 187.8125 691.2265625 188.359375L692.6015625 188.7578125C694.0625 189.1875 695.0234375 189.71875 695.0234375 190.8828125C695.0234375 192.265625 693.78125 193.1875 692.0546875 193.1875C690.5078125 193.1875 689.28125 192.4453125 689.1640625 191.0546875H688.03125C688.15625 192.9296875 689.671875 194.1953125 692.0546875 194.1953125Z" fill="#e8eaee"/>
+<path d="M707.6640625 194.1953125C710.1953125 194.1953125 711.71875 192.78125 711.71875 190.8984375C711.71875 188.9765625 710.046875 188.203125 708.546875 187.7734375L707.328125 187.421875C706.203125 187.09375 705.03125 186.5390625 705.03125 185.3359375C705.03125 184.09375 706.140625 183.1953125 707.734375 183.1953125C709.2578125 183.1953125 710.34375 184.0 710.4765625 185.2890625H711.5625C711.4765625 183.515625 709.9609375 182.1953125 707.765625 182.1953125C705.6015625 182.1953125 703.9453125 183.4921875 703.9453125 185.3828125C703.9453125 186.859375 704.9765625 187.8125 706.8359375 188.359375L708.2109375 188.7578125C709.671875 189.1875 710.6328125 189.71875 710.6328125 190.8828125C710.6328125 192.265625 709.390625 193.1875 707.6640625 193.1875C706.1171875 193.1875 704.890625 192.4453125 704.7734375 191.0546875H703.640625C703.765625 192.9296875 705.28125 194.1953125 707.6640625 194.1953125Z" fill="#e8eaee"/>
+<path d="M724.3125 194.15625C727.2578125 194.15625 729.3515625 191.828125 729.3515625 188.1875C729.3515625 184.5390625 727.2578125 182.203125 724.3125 182.203125C721.3671875 182.203125 719.2578125 184.5390625 719.2578125 188.1875C719.2578125 191.828125 721.359375 194.15625 724.3125 194.15625ZM724.3125 193.1171875C722.0234375 193.1171875 720.3359375 191.2734375 720.3359375 188.1875C720.3359375 185.078125 722.0390625 183.2421875 724.3125 183.2421875C726.578125 183.2421875 728.2734375 185.078125 728.2734375 188.1875C728.2734375 191.28125 726.578125 193.1171875 724.3125 193.1171875Z" fill="#e8eaee"/>
+<path d="M737.4140625 194.0H738.53125V186.6328125C738.53125 186.0078125 738.484375 184.96875 738.4375 183.71875C739.234375 185.0625 739.703125 185.8359375 740.2421875 186.640625L745.1953125 194.0H746.484375V182.359375H745.375V190.0625C745.375 190.734375 745.390625 191.6640625 745.453125 192.6796875C744.921875 191.703125 744.3828125 190.8515625 744.0 190.265625L738.6953125 182.359375H737.4140625Z" fill="#e8eaee"/>
+<path d="M759.6015625 194.15625C762.546875 194.15625 764.640625 191.828125 764.640625 188.1875C764.640625 184.5390625 762.546875 182.203125 759.6015625 182.203125C756.65625 182.203125 754.546875 184.5390625 754.546875 188.1875C754.546875 191.828125 756.6484375 194.15625 759.6015625 194.15625ZM759.6015625 193.1171875C757.3125 193.1171875 755.625 191.2734375 755.625 188.1875C755.625 185.078125 757.328125 183.2421875 759.6015625 183.2421875C761.8671875 183.2421875 763.5625 185.078125 763.5625 188.1875C763.5625 191.28125 761.8671875 193.1171875 759.6015625 193.1171875Z" fill="#e8eaee"/>
+<path d="M777.28125 194.15625C780.03125 194.15625 781.9609375 192.2578125 781.9609375 189.3125V188.3515625H777.515625V189.3359375H780.875C780.8359375 191.65625 779.4140625 193.1171875 777.28125 193.1171875C774.9375 193.1171875 773.265625 191.2734375 773.265625 188.1875C773.265625 185.0703125 774.953125 183.2421875 777.2109375 183.2421875C779.1015625 183.2421875 780.328125 184.484375 780.734375 186.0078125H781.875C781.5 183.9453125 779.75 182.203125 777.203125 182.203125C774.25 182.203125 772.1875 184.53125 772.1875 188.1875C772.1875 191.828125 774.2265625 194.15625 777.28125 194.15625Z" fill="#e8eaee"/>
+<path d="M790.1015625 194.0H791.2109375V189.3203125H793.90625C794.0546875 189.3203125 794.1953125 189.3125 794.3359375 189.3046875L796.859375 194.0H798.140625L795.46875 189.0859375C796.90625 188.609375 797.65625 187.421875 797.65625 185.8671875C797.65625 183.8125 796.359375 182.359375 793.8984375 182.359375H790.1015625ZM791.2109375 188.3203125V183.3515625H793.8515625C795.6640625 183.3515625 796.5546875 184.34375 796.5546875 185.8671875C796.5546875 187.3671875 795.6640625 188.3203125 793.859375 188.3203125Z" fill="#e8eaee"/>
+<path d="M804.65625 194.0H805.8359375L807.0703125 190.5390625H812.109375L813.3671875 194.0H814.5390625L810.234375 182.359375H808.921875ZM807.421875 189.5546875 808.5546875 186.390625C808.8125 185.65625 809.1484375 184.65625 809.5703125 183.2578125C809.9921875 184.640625 810.3203125 185.6171875 810.6015625 186.390625L811.75 189.5546875Z" fill="#e8eaee"/>
+<path d="M822.0234375 194.0H823.1328125V188.765625H828.2578125V187.7734375H823.1328125V183.3515625H828.796875V182.359375H822.0234375Z" fill="#e8eaee"/>
+<path d="M838.046875 182.359375H836.9375V194.0H838.046875Z" fill="#e8eaee"/>
+<path d="M845.5390625 194.0H846.71875L847.953125 190.5390625H852.9921875L854.25 194.0H855.421875L851.1171875 182.359375H849.8046875ZM848.3046875 189.5546875 849.4375 186.390625C849.6953125 185.65625 850.03125 184.65625 850.453125 183.2578125C850.875 184.640625 851.203125 185.6171875 851.484375 186.390625L852.6328125 189.5546875Z" fill="#e8eaee"/>
+</g>
+</svg>
+</a>
+<div class="links"><a href="#funcionalidades">Funcionalidades</a><a href="#exames">Exames</a><a href="#como-funciona">Como funciona</a></div>
+<div class="actions"><button class="theme" id="theme" title="Alternar tema"></button><a class="login" href="login.html">ENTRAR</a></div>
+</nav></div></header>
 
-    <!-- Botão de alternar tema -->
-    <button class="theme-toggle" id="themeBtn" onclick="alternarTema()" title="Alternar tema">🌙</button>
+<main>
+<section class="hero"><div class="container hero-grid"><div>
+<div class="kicker">Ultrassonografia estruturada</div>
+<h1>Laudos mais <strong>rápidos</strong>, estruturados e consistentes.</h1>
+<p class="lead">O THI-RADS reúne máscaras estruturadas e ferramentas de apoio para otimizar a elaboração de laudos de ultrassonografia, mantendo o radiologista no controle da interpretação.</p>
+<div class="actions2"><a class="primary" href="login.html">ENTRAR NO SISTEMA</a><a class="secondary" href="#funcionalidades">CONHECER A PLATAFORMA</a></div>
+</div>
+<div class="mock"><div class="mockbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="mocktitle">THI-RADS / LAUDO ESTRUTURADO</span></div><div class="mockbody"><div class="side"><div class="line active"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div><div class="main"><h3>Ultrassonografia de Tireoide</h3><div class="boxes"><div class="box"><small>Lobo direito</small><b>4,2 × 1,7 × 1,5 cm</b></div><div class="box"><small>Lobo esquerdo</small><b>3,9 × 1,5 × 1,4 cm</b></div></div><div class="box" style="margin-top:10px"><small>Achados</small><div class="line"></div><div class="line" style="width:65%"></div></div><div class="conclusion">Conclusão estruturada a partir dos achados preenchidos.</div></div></div></div>
+</div></section>
 
-    <div class="login-box">
-        <h1>THI-RADS</h1>
-        <h2>Laudos Estruturados em Ultrassonografia</h2>
-        
-        <input type="text" id="usuario" placeholder="Usuário" autocomplete="off">
-        <input type="password" id="senha" placeholder="Senha">
-        <button onclick="fazerLogin()">Entrar</button>
-        
-        <p id="mensagemErro" class="erro"></p>
-    </div>
+<section id="funcionalidades"><div class="container"><div class="head"><div class="kicker">Por que THI-RADS</div><h2>Menos tarefas repetitivas. Mais foco na interpretação.</h2><p>Uma plataforma pensada para organizar informações, medidas e descrições em um fluxo de laudo mais consistente.</p></div>
+<div class="features">
+<div class="feature"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="17" stroke="currentColor" stroke-width="1.8"/><path d="M24 15v18M15 24h18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg><h3>Mais agilidade</h3><p>Reduza tarefas repetitivas com máscaras estruturadas e campos organizados por exame.</p></div>
+<div class="feature"><svg viewBox="0 0 48 48" fill="none"><rect x="10" y="8" width="28" height="32" rx="4" stroke="currentColor" stroke-width="2"/><path d="m16 25 5 5 11-12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><h3>Padronização</h3><p>Organize achados, medidas e descrições de forma sistemática e reproduzível.</p></div>
+<div class="feature"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="13" stroke="currentColor" stroke-width="2.2"/><path d="M24 17v14M17 24h14" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg><h3>Ferramentas de apoio</h3><p>Cálculos e geração de texto ajudam a transformar dados preenchidos em um laudo organizado.</p></div>
+<div class="feature"><svg viewBox="0 0 48 48" fill="none"><path d="M24 7 39 13v11c0 9-6 15-15 17-9-2-15-8-15-17V13L24 7Z" stroke="currentColor" stroke-width="2"/><path d="m17 24 5 5 10-11" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><h3>Feito para radiologistas</h3><p>Interface focada no fluxo de trabalho e na documentação dos principais achados ultrassonográficos.</p></div>
+</div></div></section>
 
-    <script>
-        // ========== GERENCIAMENTO DE TEMA ==========
-        const body = document.body;
-        const themeBtn = document.getElementById("themeBtn");
+<section id="exames"><div class="container"><div class="head"><div class="kicker">Biblioteca de exames</div><h2>Estrutura para diferentes áreas da ultrassonografia.</h2><p>Uma plataforma que pode reunir máscaras para diferentes áreas da rotina ultrassonográfica.</p></div>
+<div class="exams">
+<div class="exam"><svg viewBox="0 0 48 48" fill="none"><path d="M9 23c4-9 10-14 15-14s11 5 15 14c-4 9-10 14-15 14S13 32 9 23Z" stroke="currentColor" stroke-width="2"/></svg><span>Abdome</span></div>
+<div class="exam"><svg viewBox="0 0 48 48" fill="none"><path d="M15 10c-5 3-7 10-5 16 2 7 8 11 14 12-1-8-1-16-9-28ZM33 10c5 3 7 10 5 16-2 7-8 11-14 12 1-8 1-16 9-28Z" stroke="currentColor" stroke-width="2"/></svg><span>Tireoide</span></div>
+<div class="exam"><svg viewBox="0 0 48 48" fill="none"><path d="M9 23c4-9 10-14 15-14s11 5 15 14c-4 9-10 14-15 14S13 32 9 23Z" stroke="currentColor" stroke-width="2"/><circle cx="24" cy="23" r="5" stroke="currentColor" stroke-width="2"/></svg><span>Mamas</span></div>
+<div class="exam"><svg viewBox="0 0 48 48" fill="none"><path d="M24 8c-8 0-14 7-14 15 0 9 6 15 14 17 8-2 14-8 14-17 0-8-6-15-14-15Z" stroke="currentColor" stroke-width="2"/></svg><span>Obstétrico</span></div>
+<div class="exam"><svg viewBox="0 0 48 48" fill="none"><path d="M24 8c-5 0-9 4-9 9v8c0 9 4 13 9 15 5-2 9-6 9-15v-8c0-5-4-9-9-9Z" stroke="currentColor" stroke-width="2"/></svg><span>Ginecológico</span></div>
+<div class="exam"><svg viewBox="0 0 48 48" fill="none"><path d="M24 8v32M24 14c-7 0-11 4-11 10s4 10 11 10M24 14c7 0 11 4 11 10s-4 10-11 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Carótidas</span></div>
+<div class="exam"><svg viewBox="0 0 48 48" fill="none"><path d="M24 8c-8 0-14 7-14 15v6c0 8 6 13 14 13s14-5 14-13v-6c0-8-6-15-14-15Z" stroke="currentColor" stroke-width="2"/></svg><span>Partes moles</span></div>
+<div class="exam"><svg viewBox="0 0 48 48" fill="none"><path d="M13 10c-4 7-4 18 1 28M35 10c4 7 4 18-1 28M13 24h22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="13" cy="24" r="3" stroke="currentColor" stroke-width="2"/><circle cx="35" cy="24" r="3" stroke="currentColor" stroke-width="2"/></svg><span>Vascular</span></div>
+</div></div></section>
 
-        if (localStorage.getItem("tema") === "dark") {
-            body.classList.add("dark-mode");
-            themeBtn.textContent = "☀️";
-        } else {
-            themeBtn.textContent = "🌙";
-        }
+<section id="como-funciona"><div class="container"><div class="head"><div class="kicker">Como funciona</div><h2>Um fluxo simples para chegar ao laudo.</h2></div><div class="steps">
+<div class="step"><div class="num">01 — ESCOLHA</div><h3>Selecione o exame</h3><p>Escolha a máscara estruturada correspondente ao estudo que está realizando.</p></div>
+<div class="step"><div class="num">02 — PREENCHA</div><h3>Registre os achados</h3><p>Informe medidas e características relevantes em uma interface organizada por exame.</p></div>
+<div class="step"><div class="num">03 — GERE</div><h3>Finalize seu laudo</h3><p>As informações preenchidas são organizadas em um texto estruturado para revisão.</p></div>
+</div></div></section>
 
-        function alternarTema() {
-            body.classList.toggle("dark-mode");
-            if (body.classList.contains("dark-mode")) {
-                localStorage.setItem("tema", "dark");
-                themeBtn.textContent = "☀️";
-            } else {
-                localStorage.setItem("tema", "light");
-                themeBtn.textContent = "🌙";
-            }
-        }
+<section><div class="container"><div class="cta"><div class="kicker">THI-RADS</div><h2>Pronto para conhecer a plataforma?</h2><p>Acesse o sistema e explore as máscaras estruturadas disponíveis para sua rotina de ultrassonografia.</p><a class="primary" href="login.html">ENTRAR NO THI-RADS</a></div></div></section>
+</main>
 
-        // ========== LOGIN ==========
-        function fazerLogin() {
-            var usuario = document.getElementById("usuario").value;
-            var senha = document.getElementById("senha").value;
-            var msgErro = document.getElementById("mensagemErro");
+<footer><div class="container foot"><strong>THI-RADS</strong><span>Laudos Estruturados em Ultrassonografia</span><span>© 2026</span></div></footer>
 
-            if (usuario === "residentesanta" && senha === "2026") {
-                window.location.href = "selecao.html";
-            } else {
-                msgErro.textContent = "Usuário ou senha incorretos.";
-                document.getElementById("senha").value = "";
-            }
-        }
-
-        document.getElementById("senha").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                fazerLogin();
-            }
-        });
-    </script>
+<script>
+const body=document.body,btn=document.getElementById("theme");
+const sun='<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+const moon='<svg viewBox="0 0 24 24" fill="none"><path d="M20 15.2A8.2 8.2 0 0 1 8.8 4 8.3 8.3 0 1 0 20 15.2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+if(localStorage.getItem("landingTema")==="light")body.classList.add("light");
+function icon(){btn.innerHTML=body.classList.contains("light")?moon:sun}
+icon();btn.onclick=()=>{body.classList.toggle("light");localStorage.setItem("landingTema",body.classList.contains("light")?"light":"dark");icon()};
+</script>
 </body>
 </html>

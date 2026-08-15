@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -93,7 +93,6 @@ body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
 .check-row:last-child{border-bottom:none;}
 .check-row:hover{background:#f0f5ff;}
 .check-row.selected{background:#e6eeff;}
-.check-row input[type=checkbox]{position:absolute;opacity:0;pointer-events:none;}
 .check-label{display:flex;align-items:center;gap:10px;width:100%;padding:8px 14px 8px 14px;font-size:12px;color:var(--text-2);cursor:pointer;}
 .check-row.selected .check-label{color:var(--blue);font-weight:500;}
 .check-box{width:15px;height:15px;border-radius:4px;border:2px solid var(--border-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
@@ -129,6 +128,9 @@ body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
 body.dark .textarea-field{background:var(--white);color:var(--text);border-color:var(--border-strong);}
 .ta-wrap{padding:10px 14px;}
 .laudo-doc:focus { outline: none; }
+.toast-notification{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(12px);background:var(--text);color:var(--white);font-size:12.5px;font-weight:500;padding:10px 18px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.18);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;z-index:999;}
+.toast-notification.show{opacity:1;transform:translateX(-50%) translateY(0);}
+body.dark .toast-notification{background:#3a4155;color:#e2e6f0;}
 </style>
 </head>
 <body>
@@ -151,6 +153,7 @@ body.dark .textarea-field{background:var(--white);color:var(--text);border-color
     </div>
     <div class="nav-group">
       <div class="nav-item" id="nav-area" onclick="showSection('area')"><span class="nav-dot"></span>Área Examinada</div>
+      <div class="nav-item" id="nav-tipo" onclick="showSection('tipo')"><span class="nav-dot"></span>Tipo de Achado</div>
       <div class="nav-item" id="nav-pele" onclick="showSection('pele')"><span class="nav-dot"></span>Pele e Subcutâneo</div>
       <div class="nav-item" id="nav-muscular" onclick="showSection('muscular')"><span class="nav-dot"></span>Plano Muscular</div>
       <div class="nav-item" id="nav-achados" onclick="showSection('achados')"><span class="nav-dot"></span>Achados Adicionais</div>
@@ -172,8 +175,16 @@ const estado = {
     tipo: 'queixa', // 'queixa' | 'pre' | 'outra'
     regiao: '',
     outra: '',
+    lateralidade: 'nenhuma', // 'nenhuma' | 'direita' | 'esquerda' | 'bilateral'
+    contralateral: false,
+    dinamica: false,
+    valsalva: false,
+    contracao: false,
+    compressao: false,
     limitacaoEdema: false,
     limitacaoBiotipo: false,
+    limitacaoProfundidade: false,
+    limitacaoDor: false,
   },
   pele: {
     habitual: true,
@@ -184,19 +195,19 @@ const estado = {
     lipMed1: '', lipMed2: '', lipMed3: '',
     nodulo: false,
     nodEco: 'anecoico',
-    nodTex: 'homogeneo',
-    nodLoc: 'subcutaneo',
+    nodTex: 'homogêneo',
+    nodLoc: 'do subcutâneo',
     nodCon: 'definidos',
     nodMed1: '', nodMed2: '', nodMed3: '',
     nodDop: false,
     colOrg: false,
-    colOrgLoc: 'subcutaneo',
+    colOrgLoc: 'do subcutâneo',
     colOrgPar: 'finas',
     colOrgCon: 'anecoico',
     colOrgMed1: '', colOrgMed2: '', colOrgMed3: '',
     colOrgDis: '',
-    colNao: false,
-    colNaoLoc: 'subcutaneo',
+    colOrgSep: false,
+    colNaoLoc: 'do subcutâneo',
     colNaoMed1: '', colNaoMed2: '', colNaoMed3: '',
     colNaoDis: '',
   },
@@ -212,21 +223,106 @@ const estado = {
     colNaoMed1: '', colNaoMed2: '', colNaoMed3: '',
     colNaoDis: '',
   },
+
+  // ── TIPO DE ACHADO (seletor geral) ──
+  tipo: {
+    normal: false, massa: false, colecao: false, edema: false, hematoma: false,
+    lesaoMuscular: false, tendao: false, linfonodo: false, corpoEstranho: false,
+    hernia: false, vascular: false, calcificacao: false, nervo: false,
+    outros: false, outrosTexto: '',
+  },
+
+  edemaG: {
+    distribuicao: 'difusa', espessamentoCutaneo: false, aumentoEcogenicidade: false,
+    padraoReticular: false, hiperemia: false, colecaoAssoc: false,
+  },
+
+  massa: {
+    loc: 'subcutaneo', morfologia: 'oval', orientacao: 'paralela', margens: 'circunscritas',
+    ecogenicidade: 'hipoecoica', arquitetura: 'homogenea', cistico: 'ausente',
+    doppler: 'sem', compressibilidade: 'compressivel', relacao: 'sem',
+    med1: '', med2: '', med3: '',
+    crescimento: false, lipomaTipico: false,
+  },
+
+  colecaoG: {
+    loc: 'subcutaneo', espessura: 'finas', regularidade: 'regulares',
+    conteudo: 'anecoico', septacoes: false, debris: false, ecosMoveis: false,
+    coagulos: false, gas: false, nivelLL: false,
+    doppler: 'semFluxo', contexto: 'indeterminado',
+    med1: '', med2: '', med3: '', dis: '',
+  },
+
+  hematoma: {
+    loc: 'subcutaneo', aspecto: 'agudo', conteudo: 'anecoico',
+    septacoes: false, coagulos: false, debris: false, doppler: 'sem',
+    med1: '', med2: '', med3: '',
+  },
+
+  lesaoMuscular: {
+    tipoLesao: 'edemaEstiramento', localizacao: 'intramuscular', musculo: '',
+    extLong: '', extTransv: '', profundidade: '', gap: '',
+    retracao: false, hematomaAssoc: false, colecaoAssoc: false, preservacaoParcial: false,
+  },
+
+  tendao: {
+    nome: '', espessura: '', ecotextura: 'normal', padraoFibrilar: 'preservado',
+    tendinose: false, calcificacao: false, liquidoBainha: false, hiperemia: false,
+    lesao: 'nenhuma', retracao: false, alteracaoInsercional: false, avaliacaoDinamica: false,
+  },
+
+  linfonodo: {
+    regiao: '', lateralidade: 'direita', quantidade: 'unico',
+    eixoLongo: '', eixoCurto: '', formato: 'ovalado',
+    hilo: 'preservado', corticalEsp: 'ausente', doppler: 'hilar',
+    necrose: false, calcificacoes: false, conglomerado: false, alteracoesPerinodais: false,
+  },
+
+  corpoEstranho: {
+    tipo: 'vidro', loc: '', distPele: '', comprimento: '', orientacao: 'paralela',
+    relMusculo: false, relTendao: false, relVaso: false,
+    halo: false, colecaoAssoc: false, hiperemia: false, sombra: false,
+  },
+
+  hernia: {
+    regiao: 'inguinal', lateralidade: 'direita', colo: '',
+    conteudo: 'adiposo', redutivel: 'sim',
+    valsalva: false, alteracaoDinamica: false, encarceramentoSuspeito: false,
+  },
+
+  vascular: {
+    tipo: 'pseudoaneurisma', fluxo: 'arterial', padrao: 'turbilhonado',
+    comunicacaoVaso: false, med1: '', med2: '', med3: '', colo: '',
+  },
+
+  calcificacao: {
+    padrao: 'puntiforme', loc: '', sombraAcustica: false, ossificacaoPeriferica: false,
+  },
+
+  nervo: {
+    nome: '', espessamento: false, alteracaoFascicular: false, continuidade: 'preservada',
+    hiperemia: false, compressao: false, neuroma: false, avaliacaoDinamica: false,
+  },
+
   achados: {
     texto: '',
   }
 };
 
+// Cópia profunda do estado inicial, usada pelo botão "Reiniciar" para garantir
+// que o estado inicial e o estado pós-reset sejam sempre idênticos.
+const ESTADO_INICIAL = JSON.parse(JSON.stringify(estado));
+
 const REGIOES = [
   ['queixa','região de queixa do paciente'],
   ['facial','região facial'],
   ['frontaldireita','região frontal direita'],
-  ['frontalEsquerda','região frontal esquerda'],
+  ['frontalesquerda','região frontal esquerda'],
   ['temporal','região temporal'],
   ['temporaldireita','região temporal direita'],
   ['temporalesquerda','região temporal esquerda'],
   ['parotidea','região parotídea'],
-  ['parotidadadireita','região parotídea direita'],
+  ['parotideadireita','região parotídea direita'],
   ['parotideaesquerda','região parotídea esquerda'],
   ['retroauriculardireita','região retroauricular direita'],
   ['retroauricularesquerda','região retroauricular esquerda'],
@@ -275,6 +371,7 @@ function renderPanel() {
   const panel = document.getElementById('main-panel');
   switch(secaoAtual) {
     case 'area':     panel.innerHTML = renderAreaHtml(); break;
+    case 'tipo':     panel.innerHTML = renderTipoHtml(); break;
     case 'pele':     panel.innerHTML = renderPeleHtml(); break;
     case 'muscular': panel.innerHTML = renderMuscularHtml(); break;
     case 'achados':  panel.innerHTML = renderAchadosHtml(); break;
@@ -297,11 +394,25 @@ function tratarFloat(v) {
   return n.toLocaleString('pt-BR', {minimumFractionDigits:1, maximumFractionDigits:1});
 }
 
-function medStr3(m1, m2, m3) {
-  let s = tratarFloat(m1) || '_';
-  if (m2) s += ' x ' + (tratarFloat(m2) || '_');
-  if (m3) s += ' x ' + (tratarFloat(m3) || '_');
-  return s + ' cm';
+// ── HELPERS "SEGUROS" PARA O LAUDO FINAL ──
+// Nunca geram medidas com placeholder "_" nem volume "0,0 cm³" quando os
+// dados não estão completos. Usados exclusivamente na montagem do texto do
+// laudo (a pré-visualização dos campos internos pode continuar mostrando
+// "0,0" enquanto o usuário digita, sem impacto no laudo final).
+function medStrSeguro(m1, m2, m3) {
+  const vals = [m1, m2, m3].map(tratarFloat).filter(Boolean);
+  if (vals.length === 0) return '';
+  return vals.join(' x ') + ' cm';
+}
+function calcVolSeguro(m1, m2, m3) {
+  if (!m1 || !m2 || !m3) return null;
+  const v = parseFloat(String(m1).replace(',', '.')) * parseFloat(String(m2).replace(',', '.')) * parseFloat(String(m3).replace(',', '.')) * 0.52;
+  if (isNaN(v) || v <= 0) return null;
+  return v.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1});
+}
+function maxMed(...vals) {
+  const nums = vals.map(v => parseFloat(String(v||'').replace(',','.'))).filter(n => !isNaN(n));
+  return nums.length ? Math.max(...nums) : 0;
 }
 
 // ── RENDER ÁREA ──
@@ -340,10 +451,284 @@ function renderAreaHtml() {
   </div>
 
   <div class="block">
+    <div class="block-title">Lateralidade e Avaliação Dinâmica</div>
+    <div class="dim-rows">
+      <div class="dim-row">
+        <span class="dim-lbl">lateralidade</span>
+        <select class="sel-tag" onchange="setVal('area','lateralidade',this.value);updateLaudo()">
+          <option value="nenhuma" ${e.lateralidade==='nenhuma'?'selected':''}>não se aplica</option>
+          <option value="direita" ${e.lateralidade==='direita'?'selected':''}>direita</option>
+          <option value="esquerda" ${e.lateralidade==='esquerda'?'selected':''}>esquerda</option>
+          <option value="bilateral" ${e.lateralidade==='bilateral'?'selected':''}>bilateral</option>
+        </select>
+      </div>
+    </div>
+    ${chk2('area','contralateral','comparação com o lado contralateral realizada')}
+    ${chk2('area','dinamica','avaliação dinâmica da região realizada')}
+    ${chk2('area','valsalva','manobra de Valsalva realizada')}
+    ${chk2('area','contracao','avaliação sob contração muscular realizada')}
+    ${chk2('area','compressao','compressão da lesão com o transdutor realizada')}
+  </div>
+
+  <div class="block">
     <div class="block-title">Limitações Técnicas</div>
-    ${chk2('lim-edema','por acentuado edema',e.limitacaoEdema,"setVal('area','limitacaoEdema',this.checked);updateLaudo()")}
-    ${chk2('lim-biotipo','pela intensa atenuação do feixe acústico inerente ao biotipo',e.limitacaoBiotipo,"setVal('area','limitacaoBiotipo',this.checked);updateLaudo()")}
+    ${chk2('area','limitacaoEdema','por acentuado edema')}
+    ${chk2('area','limitacaoBiotipo','pela intensa atenuação do feixe acústico inerente ao biotipo')}
+    ${chk2('area','limitacaoProfundidade','pela profundidade da lesão')}
+    ${chk2('area','limitacaoDor','pela dor referida pelo paciente')}
   </div>`;
+}
+
+// ── HELPERS DE CAMPOS (Tipo de Achado) ──
+function selOpt(sec, key, label, options) {
+  const e = estado[sec];
+  const opts = options.map(o => `<option value="${o[0]}" ${e[key]===o[0]?'selected':''}>${o[1]}</option>`).join('');
+  return `<div class="sub-row"><span class="sub-lbl">${label}</span>
+    <select class="sel-tag" onchange="setVal('${sec}','${key}',this.value);updateLaudo()">${opts}</select>
+  </div>`;
+}
+function chkOpt(sec, key, label) {
+  const e = estado[sec];
+  return `<div class="sub-row">
+    <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2);cursor:pointer">
+      <input type="checkbox" ${e[key]?'checked':''} onchange="setVal('${sec}','${key}',this.checked);updateLaudo()" style="accent-color:var(--blue)">
+      ${label}
+    </label>
+  </div>`;
+}
+function txtOpt(sec, key, label, placeholder) {
+  const e = estado[sec];
+  return `<div class="sub-row"><span class="sub-lbl">${label}</span>
+    <input class="dim-input" style="width:100%" type="text" placeholder="${placeholder||''}" value="${e[key]}"
+      oninput="setVal('${sec}','${key}',this.value);updateLaudo()">
+  </div>`;
+}
+function numOpt(sec, key, label, unit) {
+  const e = estado[sec];
+  return `<div class="sub-row"><span class="sub-lbl">${label}</span>
+    <input class="dim-input dim-input-sm" type="number" step="0.1" min="0" placeholder="—" value="${e[key]}"
+      oninput="setVal('${sec}','${key}',this.value);updateLaudo()">
+    <span class="dim-unit">${unit||'cm'}</span>
+  </div>`;
+}
+function medOpt(sec, k1, k2, k3, spanId) {
+  const e = estado[sec];
+  return `<div class="sub-row">
+      <span class="sub-lbl">medindo</span>
+      <input class="dim-input dim-input-sm" type="number" step="0.1" min="0" placeholder="—" value="${e[k1]}"
+        oninput="setVal('${sec}','${k1}',this.value);updateVolSpan('${spanId}','${sec}','${k1}','${k2}','${k3}')">
+      <span class="sub-lbl">x</span>
+      <input class="dim-input dim-input-sm" type="number" step="0.1" min="0" placeholder="—" value="${e[k2]}"
+        oninput="setVal('${sec}','${k2}',this.value);updateVolSpan('${spanId}','${sec}','${k1}','${k2}','${k3}')">
+      <span class="sub-lbl">x</span>
+      <input class="dim-input dim-input-sm" type="number" step="0.1" min="0" placeholder="—" value="${e[k3]}"
+        oninput="setVal('${sec}','${k3}',this.value);updateVolSpan('${spanId}','${sec}','${k1}','${k2}','${k3}')">
+      <span class="dim-unit">cm</span>
+    </div>
+    <div class="sub-row"><span class="sub-lbl">vol.: <span id="${spanId}">${calcVol(e[k1],e[k2],e[k3])}</span> cm³</span></div>`;
+}
+function updateVolSpan(spanId, sec, k1, k2, k3) {
+  const e = estado[sec];
+  const v = calcVol(e[k1], e[k2], e[k3]);
+  const el = document.getElementById(spanId);
+  if (el) el.textContent = v;
+  updateLaudo();
+}
+
+// ── RENDER TIPO DE ACHADO ──
+function renderTipoHtml() {
+  const t = estado.tipo;
+
+  function bloco(key, label, sub) {
+    return `<div class="check-row ${t[key]?'selected':''}" onclick="toggleTipo('${key}')">
+      <label class="check-label">
+        <span class="check-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="2"><polyline points="1.5,5 4,7.5 8.5,2.5"/></svg></span>
+        ${label}
+      </label>
+      ${t[key] && sub ? `<div class="sub-fields" style="display:flex" onclick="event.stopPropagation()">${sub}</div>` : ''}
+    </div>`;
+  }
+
+  const massaSub = `
+    ${selOpt('massa','loc','localização', [['pele','pele'],['subcutaneo','subcutâneo'],['intramuscular','intramuscular'],['intermuscular','intermuscular'],['fascial','fascial'],['justacortical','justacortical'],['outra','outra']])}
+    ${selOpt('massa','morfologia','morfologia', [['oval','oval'],['redonda','redonda'],['lobulada','lobulada'],['irregular','irregular']])}
+    ${selOpt('massa','orientacao','orientação', [['paralela','paralela à pele'],['naoParalela','não paralela à pele'],['indeterminada','indeterminada']])}
+    ${selOpt('massa','margens','margens', [['circunscritas','circunscritas'],['parcial','parcialmente circunscritas'],['indistintas','indistintas'],['infiltrativas','infiltrativas']])}
+    ${selOpt('massa','ecogenicidade','ecogenicidade', [['anecoica','anecoica'],['hipoecoica','hipoecoica'],['isoecoica','isoecoica'],['hiperecoica','hiperecoica'],['heterogenea','heterogênea']])}
+    ${selOpt('massa','arquitetura','arquitetura', [['homogenea','homogênea'],['heterogenea','heterogênea'],['solida','predominantemente sólida'],['cistica','predominantemente cística'],['mista','mista']])}
+    ${selOpt('massa','cistico','componente cístico/necrose', [['ausente','ausente'],['presente','presente'],['liquefeitas','áreas liquefeitas'],['necrose','necrose']])}
+    ${selOpt('massa','doppler','Doppler', [['sem','sem vascularização'],['periferica','vascularização periférica'],['interna','vascularização interna'],['internaEPeriferica','vascularização interna e periférica']])}
+    ${selOpt('massa','compressibilidade','compressibilidade', [['compressivel','compressível'],['parcial','parcialmente compressível'],['naoCompressivel','não compressível']])}
+    ${selOpt('massa','relacao','relação com estruturas', [['sem','sem contato significativo'],['fascia','contato com fáscia'],['musculo','contato com músculo'],['vaso','contato com vaso'],['nervo','contato com nervo'],['osso','contato com osso'],['deslocamento','deslocamento de estruturas'],['invasao','invasão de estruturas adjacentes']])}
+    ${medOpt('massa','med1','med2','med3','vol-massa')}
+    ${chkOpt('massa','crescimento','crescimento/alteração referida pelo paciente')}
+    ${chkOpt('massa','lipomaTipico','aspecto típico de lipoma (hiperecogênico, homogêneo, paralelo à pele, margens circunscritas, sem vascularização)')}
+  `;
+
+  const colecaoSub = `
+    ${selOpt('colecaoG','loc','localização', [['pele','pele'],['subcutaneo','subcutâneo'],['intermuscular','intermuscular'],['intramuscular','intramuscular'],['fascial','fascial'],['outra','outra']])}
+    ${selOpt('colecaoG','espessura','paredes', [['finas','finas'],['espessas','espessas']])}
+    ${selOpt('colecaoG','regularidade','regularidade das paredes', [['regulares','regulares'],['irregulares','irregulares']])}
+    ${selOpt('colecaoG','conteudo','conteúdo', [['anecoico','anecoico'],['hipoecoico','hipoecoico'],['heterogeneo','heterogêneo'],['debris','com debris'],['espesso','espesso'],['gas','com focos de gás']])}
+    ${chkOpt('colecaoG','ecosMoveis','ecos internos móveis')}
+    ${chkOpt('colecaoG','coagulos','coágulos de permeio')}
+    ${chkOpt('colecaoG','septacoes','septações internas')}
+    ${chkOpt('colecaoG','nivelLL','nível líquido-líquido')}
+    ${selOpt('colecaoG','doppler','Doppler', [['semFluxo','sem fluxo interno'],['hiperemiaPeriferica','hiperemia periférica'],['fluxoInterno','fluxo interno']])}
+    ${selOpt('colecaoG','contexto','contexto', [['posOperatorio','pós-operatório'],['posTraumatico','pós-traumático'],['posProcedimento','pós-procedimento'],['inflamatorioInfeccioso','inflamatório/infeccioso'],['espontaneo','espontâneo'],['indeterminado','indeterminado']])}
+    ${medOpt('colecaoG','med1','med2','med3','vol-colecaoG')}
+    ${numOpt('colecaoG','dis','distando da pele')}
+  `;
+
+  const hematomaSub = `
+    ${selOpt('hematoma','loc','localização', [['subcutaneo','subcutâneo'],['intramuscular','intramuscular'],['intermuscular','intermuscular'],['fascial','fascial'],['outro','outro']])}
+    ${selOpt('hematoma','aspecto','aspecto', [['agudo','agudo'],['subagudo','subagudo'],['organizacao','em organização'],['organizado','organizado'],['cronico','crônico/liquefeito']])}
+    ${selOpt('hematoma','conteudo','conteúdo', [['anecoico','anecoico'],['hipoecoico','hipoecoico'],['heterogeneo','heterogêneo']])}
+    ${chkOpt('hematoma','septacoes','septações')}
+    ${chkOpt('hematoma','coagulos','coágulos')}
+    ${chkOpt('hematoma','debris','debris')}
+    ${selOpt('hematoma','doppler','Doppler', [['sem','sem vascularização interna'],['hiperemiaPeriferica','hiperemia periférica']])}
+    ${medOpt('hematoma','med1','med2','med3','vol-hematoma')}
+  `;
+
+  const lesaoMuscularSub = `
+    ${selOpt('lesaoMuscular','tipoLesao','tipo de lesão', [['edemaEstiramento','edema/estiramento'],['parcial','lesão parcial'],['completa','ruptura completa'],['desinsercao','desinserção'],['avulsao','avulsão'],['contusao','contusão']])}
+    ${selOpt('lesaoMuscular','localizacao','localização', [['intramuscular','intramuscular'],['miotendinea','miotendínea'],['musculotendinea','musculotendínea'],['insercional','insercional'],['outra','outra']])}
+    ${txtOpt('lesaoMuscular','musculo','músculo avaliado','ex.: bíceps femoral')}
+    ${numOpt('lesaoMuscular','extLong','extensão longitudinal','cm')}
+    ${numOpt('lesaoMuscular','extTransv','extensão transversal','cm')}
+    ${numOpt('lesaoMuscular','profundidade','profundidade','cm')}
+    ${numOpt('lesaoMuscular','gap','gap/diástase','cm')}
+    ${chkOpt('lesaoMuscular','retracao','retração das extremidades')}
+    ${chkOpt('lesaoMuscular','preservacaoParcial','preservação parcial das fibras')}
+    ${chkOpt('lesaoMuscular','hematomaAssoc','hematoma associado')}
+    ${chkOpt('lesaoMuscular','colecaoAssoc','coleção associada')}
+  `;
+
+  const tendaoSub = `
+    ${txtOpt('tendao','nome','tendão avaliado','ex.: tendão de Aquiles')}
+    ${numOpt('tendao','espessura','espessura','cm')}
+    ${selOpt('tendao','ecotextura','ecotextura', [['normal','preservada'],['heterogenea','heterogênea']])}
+    ${selOpt('tendao','padraoFibrilar','padrão fibrilar', [['preservado','preservado'],['perdido','perdido/desorganizado']])}
+    ${chkOpt('tendao','tendinose','tendinose')}
+    ${chkOpt('tendao','calcificacao','calcificação')}
+    ${chkOpt('tendao','liquidoBainha','líquido na bainha')}
+    ${chkOpt('tendao','hiperemia','hiperemia ao Doppler')}
+    ${selOpt('tendao','lesao','lesão', [['nenhuma','ausente'],['parcial','parcial'],['completa','ruptura completa']])}
+    ${chkOpt('tendao','retracao','retração das extremidades')}
+    ${chkOpt('tendao','alteracaoInsercional','alteração insercional')}
+    ${chkOpt('tendao','avaliacaoDinamica','avaliação dinâmica realizada')}
+  `;
+
+  const linfonodoSub = `
+    ${txtOpt('linfonodo','regiao','região/cadeia','ex.: cervical nível II')}
+    ${selOpt('linfonodo','lateralidade','lateralidade', [['direita','direita'],['esquerda','esquerda'],['bilateral','bilateral']])}
+    ${selOpt('linfonodo','quantidade','quantidade', [['unico','linfonodo único'],['multiplos','múltiplos linfonodos']])}
+    ${numOpt('linfonodo','eixoLongo','maior eixo','cm')}
+    ${numOpt('linfonodo','eixoCurto','eixo curto','cm')}
+    ${selOpt('linfonodo','formato','formato', [['ovalado','ovalado'],['arredondado','arredondado']])}
+    ${selOpt('linfonodo','hilo','hilo', [['preservado','preservado'],['naoCaracterizado','não caracterizado']])}
+    ${selOpt('linfonodo','corticalEsp','espessamento cortical', [['ausente','ausente'],['difuso','difuso'],['focal','focal']])}
+    ${selOpt('linfonodo','doppler','Doppler', [['hilar','vascularização hilar'],['periferica','vascularização periférica'],['ausente','sem fluxo detectável']])}
+    ${chkOpt('linfonodo','necrose','necrose')}
+    ${chkOpt('linfonodo','calcificacoes','calcificações')}
+    ${chkOpt('linfonodo','conglomerado','conglomerado linfonodal')}
+    ${chkOpt('linfonodo','alteracoesPerinodais','alterações perinodais')}
+  `;
+
+  const corpoEstranhoSub = `
+    ${selOpt('corpoEstranho','tipo','tipo', [['vidro','vidro'],['metal','metal'],['madeira','madeira'],['plastico','plástico'],['espinho','espinho vegetal'],['outro','outro']])}
+    ${txtOpt('corpoEstranho','loc','localização','ex.: face plantar do pé direito')}
+    ${numOpt('corpoEstranho','distPele','distância da pele','cm')}
+    ${numOpt('corpoEstranho','comprimento','comprimento','cm')}
+    ${selOpt('corpoEstranho','orientacao','orientação', [['paralela','paralela à pele'],['obliqua','oblíqua'],['perpendicular','perpendicular']])}
+    ${chkOpt('corpoEstranho','relMusculo','relação com plano muscular')}
+    ${chkOpt('corpoEstranho','relTendao','relação com tendão')}
+    ${chkOpt('corpoEstranho','relVaso','relação com estrutura vascular')}
+    ${chkOpt('corpoEstranho','halo','halo inflamatório periférico')}
+    ${chkOpt('corpoEstranho','colecaoAssoc','coleção associada')}
+    ${chkOpt('corpoEstranho','hiperemia','hiperemia periférica')}
+    ${chkOpt('corpoEstranho','sombra','sombra acústica posterior')}
+  `;
+
+  const herniaSub = `
+    ${selOpt('hernia','regiao','região', [['inguinal','inguinal'],['umbilical','umbilical'],['incisional','incisional'],['epigastrica','epigástrica'],['outra','outra']])}
+    ${selOpt('hernia','lateralidade','lateralidade', [['direita','direita'],['esquerda','esquerda'],['bilateral','bilateral']])}
+    ${numOpt('hernia','colo','dimensão do colo/defeito','cm')}
+    ${selOpt('hernia','conteudo','conteúdo', [['adiposo','adiposo'],['alcaIntestinal','alça intestinal'],['liquido','líquido'],['misto','misto']])}
+    ${selOpt('hernia','redutivel','redutibilidade', [['sim','redutível'],['nao','não redutível'],['parcial','parcialmente redutível']])}
+    ${chkOpt('hernia','valsalva','avaliada durante manobra de Valsalva')}
+    ${chkOpt('hernia','alteracaoDinamica','alteração dinâmica das dimensões ao esforço')}
+    ${chkOpt('hernia','encarceramentoSuspeito','sinais sugestivos de encarceramento')}
+  `;
+
+  const vascularSub = `
+    ${selOpt('vascular','tipo','tipo de alteração', [['pseudoaneurisma','pseudoaneurisma'],['aneurisma','aneurisma'],['trombose','trombose'],['hematomaVaso','hematoma relacionado a vaso'],['malformacao','malformação vascular'],['varizes','varizes'],['indeterminada','indeterminada']])}
+    ${selOpt('vascular','fluxo','fluxo ao Doppler', [['arterial','arterial'],['venoso','venoso'],['ausente','ausente']])}
+    ${selOpt('vascular','padrao','padrão de fluxo', [['turbilhonado','turbilhonado'],['monofasico','monofásico'],['ausente','ausente']])}
+    ${chkOpt('vascular','comunicacaoVaso','comunicação com vaso adjacente identificada')}
+    ${medOpt('vascular','med1','med2','med3','vol-vascular')}
+    ${numOpt('vascular','colo','colo (quando aplicável)','cm')}
+  `;
+
+  const calcificacaoSub = `
+    ${selOpt('calcificacao','padrao','padrão', [['puntiforme','puntiforme'],['grosseira','grosseira'],['periferica','periférica'],['central','central'],['amorfa','amorfa'],['arciforme','arciforme']])}
+    ${txtOpt('calcificacao','loc','localização','ex.: subcutâneo da coxa direita')}
+    ${chkOpt('calcificacao','sombraAcustica','sombra acústica posterior')}
+    ${chkOpt('calcificacao','ossificacaoPeriferica','ossificação periférica')}
+  `;
+
+  const nervoSub = `
+    ${txtOpt('nervo','nome','nervo avaliado','ex.: nervo ulnar')}
+    ${chkOpt('nervo','espessamento','espessamento')}
+    ${chkOpt('nervo','alteracaoFascicular','alteração do padrão fascicular')}
+    ${selOpt('nervo','continuidade','continuidade', [['preservada','preservada'],['interrompida','interrompida']])}
+    ${chkOpt('nervo','hiperemia','hiperemia ao Doppler')}
+    ${chkOpt('nervo','compressao','sinais de compressão extrínseca')}
+    ${chkOpt('nervo','neuroma','achados sugestivos de neuroma')}
+    ${chkOpt('nervo','avaliacaoDinamica','avaliação dinâmica realizada')}
+  `;
+
+  const edemaGSub = `
+    ${selOpt('edemaG','distribuicao','distribuição', [['focal','focal'],['difusa','difusa']])}
+    ${chkOpt('edemaG','espessamentoCutaneo','espessamento cutâneo')}
+    ${chkOpt('edemaG','aumentoEcogenicidade','aumento da ecogenicidade do subcutâneo')}
+    ${chkOpt('edemaG','padraoReticular','padrão reticular')}
+    ${chkOpt('edemaG','hiperemia','hiperemia ao Doppler')}
+    ${chkOpt('edemaG','colecaoAssoc','coleção associada')}
+  `;
+
+  return `
+  <div class="sec-title">Tipo de Achado</div>
+  <div class="block">
+    <div class="block-title">Selecione o(s) achado(s) predominante(s)</div>
+    ${bloco('normal','achado normal / sem alterações')}
+    ${bloco('massa','massa / nódulo', massaSub)}
+    ${bloco('colecao','coleção', colecaoSub)}
+    ${bloco('edema','edema / processo inflamatório', edemaGSub)}
+    ${bloco('hematoma','hematoma', hematomaSub)}
+    ${bloco('lesaoMuscular','lesão muscular', lesaoMuscularSub)}
+    ${bloco('tendao','alteração tendínea', tendaoSub)}
+    ${bloco('linfonodo','linfonodo', linfonodoSub)}
+    ${bloco('corpoEstranho','corpo estranho', corpoEstranhoSub)}
+    ${bloco('hernia','hérnia / defeito da parede', herniaSub)}
+    ${bloco('vascular','alteração vascular', vascularSub)}
+    ${bloco('calcificacao','calcificação / ossificação', calcificacaoSub)}
+    ${bloco('nervo','alteração de nervo periférico', nervoSub)}
+    ${bloco('outros','outros', `<div class="sub-row"><input class="dim-input" style="width:100%" type="text" placeholder="descrever..." value="${estado.tipo.outrosTexto}" oninput="setVal('tipo','outrosTexto',this.value);updateLaudo()"></div>`)}
+  </div>`;
+}
+
+function toggleTipo(key) {
+  if (key === 'normal') {
+    const novo = !estado.tipo.normal;
+    Object.keys(estado.tipo).forEach(k => { if (typeof estado.tipo[k] === 'boolean') estado.tipo[k] = false; });
+    estado.tipo.normal = novo;
+  } else {
+    estado.tipo[key] = !estado.tipo[key];
+    if (estado.tipo[key]) estado.tipo.normal = false;
+  }
+  renderPanel();
 }
 
 // ── RENDER PELE ──
@@ -384,7 +769,7 @@ function renderPeleHtml() {
         <span class="check-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="2"><polyline points="1.5,5 4,7.5 8.5,2.5"/></svg></span>
         lipoma
       </label>
-      <div class="sub-fields">
+      <div class="sub-fields" onclick="event.stopPropagation()">
         <div class="sub-row">
           <span class="sub-lbl">medindo</span>
           <input class="dim-input dim-input-sm" type="number" step="0.1" min="0" placeholder="—" value="${e.lipMed1}"
@@ -410,7 +795,7 @@ function renderPeleHtml() {
         <span class="check-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="2"><polyline points="1.5,5 4,7.5 8.5,2.5"/></svg></span>
         nódulo
       </label>
-      <div class="sub-fields">
+      <div class="sub-fields" onclick="event.stopPropagation()">
         <div class="sub-row">
           <span class="sub-lbl">ecogenicidade</span>
           <select class="sel-tag" onchange="setVal('pele','nodEco',this.value);updateLaudo()">
@@ -468,7 +853,7 @@ function renderPeleHtml() {
         <span class="check-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="2"><polyline points="1.5,5 4,7.5 8.5,2.5"/></svg></span>
         coleção organizada
       </label>
-      <div class="sub-fields">
+      <div class="sub-fields" onclick="event.stopPropagation()">
         <div class="sub-row">
           <span class="sub-lbl">plano</span>
           <select class="sel-tag" onchange="setVal('pele','colOrgLoc',this.value);updateLaudo()">
@@ -510,6 +895,12 @@ function renderPeleHtml() {
             oninput="setVal('pele','colOrgDis',this.value);updateLaudo()">
           <span class="dim-unit">cm da pele</span>
         </div>
+        <div class="sub-row">
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2);cursor:pointer">
+            <input type="checkbox" ${e.colOrgSep?'checked':''} onchange="setVal('pele','colOrgSep',this.checked);updateLaudo()" style="accent-color:var(--blue)">
+            contendo septos de permeio
+          </label>
+        </div>
       </div>
     </div>
     <div class="check-row ${e.colNao?'selected':''}" onclick="toggleCheck('pele','colNao')">
@@ -517,7 +908,7 @@ function renderPeleHtml() {
         <span class="check-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="2"><polyline points="1.5,5 4,7.5 8.5,2.5"/></svg></span>
         coleção não organizada
       </label>
-      <div class="sub-fields">
+      <div class="sub-fields" onclick="event.stopPropagation()">
         <div class="sub-row">
           <span class="sub-lbl">plano</span>
           <select class="sel-tag" onchange="setVal('pele','colNaoLoc',this.value);updateLaudo()">
@@ -575,7 +966,7 @@ function renderMuscularHtml() {
         <span class="check-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="2"><polyline points="1.5,5 4,7.5 8.5,2.5"/></svg></span>
         coleção organizada no plano muscular
       </label>
-      <div class="sub-fields">
+      <div class="sub-fields" onclick="event.stopPropagation()">
         <div class="sub-row">
           <span class="sub-lbl">paredes</span>
           <select class="sel-tag" onchange="setVal('muscular','colOrgPar',this.value);updateLaudo()">
@@ -623,7 +1014,7 @@ function renderMuscularHtml() {
         <span class="check-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="2"><polyline points="1.5,5 4,7.5 8.5,2.5"/></svg></span>
         coleção não organizada no plano muscular
       </label>
-      <div class="sub-fields">
+      <div class="sub-fields" onclick="event.stopPropagation()">
         <div class="sub-row">
           <span class="sub-lbl">medindo</span>
           <input class="dim-input dim-input-sm" type="number" step="0.1" min="0" placeholder="—" value="${e.colNaoMed1}"
@@ -663,13 +1054,13 @@ function renderAchadosHtml() {
 }
 
 // ── CHECKBOX HELPER ──
-function chk2(id, label, checked, onchange) {
-  return `<div class="check-row ${checked?'selected':''}" onclick="(function(){let el=document.getElementById('${id}');el.checked=!el.checked;${onchange}})()">
+function chk2(sec, key, label) {
+  const checked = !!estado[sec][key];
+  return `<div class="check-row ${checked?'selected':''}" onclick="estado.${sec}.${key}=!estado.${sec}.${key};renderPanel()">
     <label class="check-label">
       <span class="check-box">
         <svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="2"><polyline points="1.5,5 4,7.5 8.5,2.5"/></svg>
       </span>
-      <input type="checkbox" id="${id}" style="display:none" ${checked?'checked':''} onchange="${onchange}">
       ${label}
     </label>
   </div>`;
@@ -737,46 +1128,394 @@ function bindEvents() {
   // all inputs/selects trigger updateLaudo via oninput/onchange already
 }
 
+// ── DICIONÁRIOS DE TEXTO (Tipo de Achado) ──
+const TXT = {
+  locMassa: {pele:'da pele', subcutaneo:'do tecido celular subcutâneo', intramuscular:'intramuscular', intermuscular:'intermuscular', fascial:'no plano fascial', justacortical:'justacortical', outra:'não especificada'},
+  morfo: {oval:'oval', redonda:'redonda', lobulada:'lobulada', irregular:'irregular'},
+  orient: {paralela:'paralela à pele', naoParalela:'não paralela à pele', indeterminada:'indeterminada'},
+  margens: {circunscritas:'circunscritas', parcial:'parcialmente circunscritas', indistintas:'indistintas', infiltrativas:'infiltrativas'},
+  ecog: {anecoica:'anecoica', hipoecoica:'hipoecoica', isoecoica:'isoecoica', hiperecoica:'hiperecoica', heterogenea:'heterogênea'},
+  arq: {homogenea:'homogênea', heterogenea:'heterogênea', solida:'predominantemente sólida', cistica:'predominantemente cística', mista:'mista'},
+  cistico: {ausente:'', presente:', com componente cístico de permeio', liquefeitas:', com áreas liquefeitas de permeio', necrose:', com áreas sugestivas de necrose de permeio'},
+  dopMassa: {sem:'sem vascularização ao Doppler', periferica:'com vascularização periférica ao Doppler', interna:'com vascularização interna ao Doppler', internaEPeriferica:'com vascularização interna e periférica ao Doppler'},
+  compr: {compressivel:'compressível', parcial:'parcialmente compressível', naoCompressivel:'não compressível'},
+  relacao: {sem:'sem contato significativo com estruturas adjacentes', fascia:'em contato com o plano fascial', musculo:'em contato com o plano muscular adjacente', vaso:'em contato com estrutura vascular adjacente', nervo:'em contato com estrutura nervosa adjacente', osso:'em contato com o plano ósseo adjacente', deslocamento:'determinando deslocamento de estruturas adjacentes', invasao:'com aparente invasão de estruturas adjacentes'},
+
+  locCol: {pele:'da pele', subcutaneo:'do tecido celular subcutâneo', intermuscular:'intermuscular', intramuscular:'intramuscular', fascial:'no plano fascial', outra:'não especificada'},
+  conteudoCol: {anecoico:'anecoico', hipoecoico:'hipoecoico', heterogeneo:'heterogêneo', debris:'com debris de permeio', espesso:'espesso', gas:'com focos de gás de permeio'},
+  dopCol: {semFluxo:'sem fluxo interno ao Doppler', hiperemiaPeriferica:'com hiperemia periférica ao Doppler', fluxoInterno:'com fluxo interno ao Doppler'},
+  contextoCol: {posOperatorio:'pós-operatório', posTraumatico:'pós-traumático', posProcedimento:'pós-procedimento', inflamatorioInfeccioso:'de possível relação inflamatória/infecciosa', espontaneo:'de caráter aparentemente espontâneo', indeterminado:'de contexto indeterminado'},
+
+  locHemat: {subcutaneo:'do tecido celular subcutâneo', intramuscular:'intramuscular', intermuscular:'intermuscular', fascial:'no plano fascial', outro:'não especificada'},
+  aspectoHemat: {agudo:'agudo', subagudo:'subagudo', organizacao:'em organização', organizado:'organizado', cronico:'crônico/liquefeito'},
+  conteudoHemat: {anecoico:'anecoico', hipoecoico:'hipoecoico', heterogeneo:'heterogêneo'},
+  dopHemat: {sem:'sem vascularização interna ao Doppler', hiperemiaPeriferica:'com hiperemia periférica ao Doppler'},
+
+  tipoLes: {edemaEstiramento:'Edema/estiramento muscular', parcial:'Lesão muscular parcial', completa:'Ruptura muscular completa', desinsercao:'Desinserção muscular', avulsao:'Avulsão muscular', contusao:'Contusão muscular'},
+  locLes: {intramuscular:'intramuscular', miotendinea:'na junção miotendínea', musculotendinea:'musculotendínea', insercional:'insercional', outra:'não especificada'},
+
+  ecotextTend: {normal:'preservada', heterogenea:'heterogênea'},
+  fibrilarTend: {preservado:'preservado', perdido:'perdido/desorganizado'},
+  lesaoTend: {nenhuma:'ausente', parcial:'parcial', completa:'completa'},
+
+  quantLinf: {unico:'linfonodo único', multiplos:'múltiplos linfonodos'},
+  formatoLinf: {ovalado:'ovalado', arredondado:'arredondado'},
+  hiloLinf: {preservado:'preservado', naoCaracterizado:'não caracterizado'},
+  corticalLinf: {ausente:'sem espessamento cortical', difuso:'com espessamento cortical difuso', focal:'com espessamento cortical focal'},
+  dopLinf: {hilar:'vascularização hilar', periferica:'vascularização periférica', ausente:'sem fluxo detectável ao Doppler'},
+
+  tipoCE: {vidro:'vidro', metal:'metal', madeira:'madeira', plastico:'plástico', espinho:'espinho vegetal', outro:'material indeterminado'},
+  orientCE: {paralela:'paralela à pele', obliqua:'oblíqua', perpendicular:'perpendicular'},
+
+  regiaoHernia: {inguinal:'inguinal', umbilical:'umbilical', incisional:'incisional', epigastrica:'epigástrica', outra:'não especificada'},
+  conteudoHernia: {adiposo:'adiposo', alcaIntestinal:'de alça intestinal', liquido:'líquido', misto:'misto'},
+  redutivelHernia: {sim:'redutível', nao:'não redutível ao exame', parcial:'parcialmente redutível'},
+
+  tipoVasc: {pseudoaneurisma:'pseudoaneurisma', aneurisma:'aneurisma', trombose:'trombose', hematomaVaso:'hematoma relacionado a estrutura vascular', malformacao:'malformação vascular', varizes:'varizes', indeterminada:'alteração vascular indeterminada'},
+  fluxoVasc: {arterial:'arterial', venoso:'venoso', ausente:'ausente'},
+  padraoVasc: {turbilhonado:'turbilhonado', monofasico:'monofásico', ausente:'ausente'},
+
+  padraoCalc: {puntiforme:'puntiforme', grosseira:'grosseira', periferica:'periférica', central:'central', amorfa:'amorfa', arciforme:'arciforme'},
+};
+
+function lat(v) {
+  return v === 'direita' ? ' à direita' : v === 'esquerda' ? ' à esquerda' : v === 'bilateral' ? ' bilateral' : '';
+}
+
+// Avalia sinais de alerta (red flags) de uma massa/nódulo, sem gerar
+// automaticamente um diagnóstico definitivo — apenas orienta o grau de
+// suspeição usado para escolher a linguagem da impressão diagnóstica.
+function avaliarFlagsMassa(m) {
+  const flags = [];
+  const dmax = maxMed(m.med1, m.med2, m.med3);
+  if (['intramuscular','intermuscular','fascial','justacortical'].includes(m.loc)) flags.push('localização profunda');
+  if (dmax >= 5) flags.push('maior dimensão ≥ 5 cm');
+  if (m.margens === 'infiltrativas') flags.push('margens infiltrativas');
+  if (m.margens === 'indistintas') flags.push('margens indistintas');
+  if (m.ecogenicidade === 'heterogenea' || m.arquitetura === 'heterogenea') flags.push('heterogeneidade importante');
+  if (m.doppler === 'interna' || m.doppler === 'internaEPeriferica') flags.push('vascularização interna');
+  if (m.cistico === 'necrose') flags.push('componente necrótico/liquefeito');
+  if (m.relacao === 'invasao') flags.push('invasão de estruturas adjacentes');
+  if (m.relacao === 'deslocamento') flags.push('ausência de plano de clivagem nítido com estruturas adjacentes');
+  if (m.crescimento) flags.push('crescimento/alteração referida pelo paciente');
+  if (estado.tipo.calcificacao && flags.length > 0) flags.push('calcificação associada');
+  return flags;
+}
+
+function gerarBlocoMassa() {
+  const m = estado.massa;
+  const ms = medStrSeguro(m.med1, m.med2, m.med3);
+  const vol = calcVolSeguro(m.med1, m.med2, m.med3);
+  const med = ms ? `, medindo ${ms}${vol ? ` (volume estimado de ${vol} cm³)` : ''}` : '';
+  const desc = `Identifica-se formação nodular/expansiva de partes moles em topografia ${TXT.locMassa[m.loc]}, de morfologia ${TXT.morfo[m.morfologia]}, orientação ${TXT.orient[m.orientacao]}, margens ${TXT.margens[m.margens]}, ecogenicidade ${TXT.ecog[m.ecogenicidade]} e arquitetura ${TXT.arq[m.arquitetura]}${TXT.cistico[m.cistico]}${med}, ${TXT.dopMassa[m.doppler]}, ${TXT.compr[m.compressibilidade]}, ${TXT.relacao[m.relacao]}${m.crescimento ? ', com crescimento/alteração referida pelo paciente' : ''}.`;
+
+  const flags = avaliarFlagsMassa(m);
+  let imp;
+  if (m.lipomaTipico && flags.length === 0) {
+    imp = 'Lesão nodular superficial com características ultrassonográficas sugestivas de lipoma.';
+  } else if (m.lipomaTipico && flags.length > 0) {
+    imp = 'Lesão nodular de partes moles com características indeterminadas.';
+  } else if (m.margens === 'infiltrativas' || m.relacao === 'invasao' || flags.length >= 2) {
+    imp = 'Massa de partes moles com características ultrassonográficas indeterminadas/suspeitas, recomendando-se complementação por ressonância magnética para melhor caracterização, conforme contexto clínico.';
+  } else if (flags.length === 1) {
+    imp = 'Massa/nódulo de partes moles com características descritas acima; sugere-se correlação clínica e, conforme evolução, complementação por ressonância magnética.';
+  } else {
+    imp = 'Massa/nódulo de partes moles com características descritas acima, de aspecto atualmente indeterminado, podendo-se considerar acompanhamento clínico-ultrassonográfico ou complementação diagnóstica conforme indicação médica.';
+  }
+  return {desc, imp};
+}
+
+function gerarBlocoColecao() {
+  const c = estado.colecaoG;
+  const ms = medStrSeguro(c.med1, c.med2, c.med3);
+  const vol = calcVolSeguro(c.med1, c.med2, c.med3);
+  const med = ms ? `, medindo ${ms}${vol ? `, com volume estimado de ${vol} cm³` : ''}` : '';
+  const dis = c.dis ? `, distando cerca de ${tratarFloat(c.dis)} cm da pele` : '';
+  const extras = [];
+  if (c.septacoes) extras.push('septações internas');
+  if (c.debris) extras.push('debris');
+  if (c.ecosMoveis) extras.push('ecos internos móveis');
+  if (c.coagulos) extras.push('coágulos de permeio');
+  if (c.gas) extras.push('focos de gás');
+  if (c.nivelLL) extras.push('nível líquido-líquido');
+  const extraTxt = extras.length ? `, com ${extras.join(', ')}` : '';
+  const desc = `Coleção líquida em topografia ${TXT.locCol[c.loc]}, de paredes ${c.espessura} e ${c.regularidade}, conteúdo ${TXT.conteudoCol[c.conteudo]}${extraTxt}${med}${dis}, ${TXT.dopCol[c.doppler]}, em contexto ${TXT.contextoCol[c.contexto]}.`;
+
+  let imp;
+  const criteriosInflamatorios = c.contexto === 'inflamatorioInfeccioso' && (c.regularidade === 'irregulares' || c.espessura === 'espessas') && (c.gas || c.debris || c.conteudo === 'heterogeneo' || c.conteudo === 'espesso' || c.doppler === 'hiperemiaPeriferica');
+  if (criteriosInflamatorios) {
+    imp = 'Achados sugestivos de coleção inflamatória/infecciosa (podendo corresponder a abscesso), conforme contexto clínico e laboratorial.';
+  } else if (c.contexto === 'inflamatorioInfeccioso') {
+    imp = 'Coleção com características podendo se relacionar a processo inflamatório/infeccioso, conforme contexto clínico.';
+  } else {
+    imp = `Coleção ${TXT.locCol[c.loc]}, com características descritas acima, ${TXT.dopCol[c.doppler]}.`;
+  }
+  return {desc, imp};
+}
+
+function gerarBlocoHematoma() {
+  const h = estado.hematoma;
+  const ms = medStrSeguro(h.med1, h.med2, h.med3);
+  const vol = calcVolSeguro(h.med1, h.med2, h.med3);
+  const med = ms ? `, medindo ${ms}${vol ? `, com volume estimado de ${vol} cm³` : ''}` : '';
+  const extras = [];
+  if (h.septacoes) extras.push('septações');
+  if (h.coagulos) extras.push('coágulos');
+  if (h.debris) extras.push('debris');
+  const extraTxt = extras.length ? `, com ${extras.join(', ')}` : '';
+  const desc = `Coleção em topografia ${TXT.locHemat[h.loc]}, de conteúdo ${TXT.conteudoHemat[h.conteudo]}${extraTxt}${med}, aspecto ${TXT.aspectoHemat[h.aspecto]}, ${TXT.dopHemat[h.doppler]}.`;
+  const imp = `Coleção com características compatíveis com hematoma ${TXT.aspectoHemat[h.aspecto]}.`;
+  return {desc, imp};
+}
+
+function gerarBlocoLesaoMuscular() {
+  const l = estado.lesaoMuscular;
+  const musc = l.musculo ? ` do músculo ${l.musculo}` : '';
+  const loc = l.localizacao ? `, em topografia ${TXT.locLes[l.localizacao]}` : '';
+  const dims = [];
+  if (l.extLong) dims.push(`extensão longitudinal de ${tratarFloat(l.extLong)} cm`);
+  if (l.extTransv) dims.push(`extensão transversal de ${tratarFloat(l.extTransv)} cm`);
+  if (l.profundidade) dims.push(`profundidade de ${tratarFloat(l.profundidade)} cm`);
+  const dimTxt = dims.length ? `, com ${dims.join(', ')}` : '';
+  const gapTxt = l.gap ? `, com gap/diástase de ${tratarFloat(l.gap)} cm entre os cotos` : '';
+  const extras = [];
+  if (l.retracao) extras.push('retração das extremidades musculares');
+  if (l.preservacaoParcial) extras.push('preservação parcial das fibras musculares');
+  if (l.hematomaAssoc) extras.push('hematoma associado');
+  if (l.colecaoAssoc) extras.push('coleção associada');
+  const extraTxt = extras.length ? ` Observa-se ainda ${extras.join(', ')}.` : '';
+  const desc = `${TXT.tipoLes[l.tipoLesao]}${musc}${loc}${dimTxt}${gapTxt}.${extraTxt}`;
+  const imp = `${TXT.tipoLes[l.tipoLesao]}${musc}, conforme achados descritos acima.`;
+  return {desc, imp};
+}
+
+function gerarBlocoTendao() {
+  const t = estado.tendao;
+  const nome = t.nome || 'avaliado';
+  const esp = t.espessura ? `, espessura de ${tratarFloat(t.espessura)} cm` : '';
+  const extras = [];
+  if (t.tendinose) extras.push('tendinose');
+  if (t.calcificacao) extras.push('calcificação');
+  if (t.liquidoBainha) extras.push('líquido na bainha tendínea');
+  if (t.hiperemia) extras.push('hiperemia ao Doppler');
+  if (t.alteracaoInsercional) extras.push('alteração insercional');
+  const extraTxt = extras.length ? `, com ${extras.join(', ')}` : '';
+  const desc = `Tendão ${nome} com ecotextura ${TXT.ecotextTend[t.ecotextura]}, padrão fibrilar ${TXT.fibrilarTend[t.padraoFibrilar]}${esp}${extraTxt}, lesão ${TXT.lesaoTend[t.lesao]}${t.retracao ? ', com retração das extremidades' : ''}.`;
+  let imp;
+  if (t.lesao === 'completa') imp = `Ruptura completa do tendão ${nome}, conforme achados descritos acima.`;
+  else if (t.lesao === 'parcial') imp = `Lesão parcial do tendão ${nome}, conforme achados descritos acima.`;
+  else if (t.tendinose) imp = `Tendinose do tendão ${nome}.`;
+  else imp = `Tendão ${nome} com alterações descritas acima.`;
+  return {desc, imp};
+}
+
+function gerarBlocoLinfonodo() {
+  const n = estado.linfonodo;
+  const regiao = n.regiao ? `em cadeia ${n.regiao}` : 'avaliado';
+  const dims = [];
+  if (n.eixoLongo) dims.push(`maior eixo de ${tratarFloat(n.eixoLongo)} cm`);
+  if (n.eixoCurto) dims.push(`eixo curto de ${tratarFloat(n.eixoCurto)} cm`);
+  const dimTxt = dims.length ? `, com ${dims.join(' e ')}` : '';
+  const extras = [];
+  if (n.necrose) extras.push('necrose');
+  if (n.calcificacoes) extras.push('calcificações');
+  if (n.conglomerado) extras.push('conglomerado linfonodal');
+  if (n.alteracoesPerinodais) extras.push('alterações perinodais');
+  const extraTxt = extras.length ? `, com ${extras.join(', ')}` : '';
+  const desc = `${TXT.quantLinf[n.quantidade]} ${regiao}${lat(n.lateralidade)}, formato ${TXT.formatoLinf[n.formato]}, hilo ${TXT.hiloLinf[n.hilo]}, ${TXT.corticalLinf[n.corticalEsp]}${dimTxt}, ${TXT.dopLinf[n.doppler]}${extraTxt}.`;
+
+  const atipico = n.hilo === 'naoCaracterizado' || n.corticalEsp !== 'ausente' || n.necrose || n.calcificacoes || n.conglomerado || n.alteracoesPerinodais;
+  const imp = atipico
+    ? 'Linfonodo com alterações morfológicas inespecíficas/atípicas, recomendando correlação clínico-laboratorial e, conforme contexto, investigação complementar.'
+    : 'Linfonodo com características morfológicas habituais.';
+  return {desc, imp};
+}
+
+function gerarBlocoCorpoEstranho() {
+  const c = estado.corpoEstranho;
+  const loc = c.loc ? `em ${c.loc}` : 'em topografia descrita';
+  const dist = c.distPele ? `, distando ${tratarFloat(c.distPele)} cm da pele` : '';
+  const comp = c.comprimento ? `, medindo cerca de ${tratarFloat(c.comprimento)} cm` : '';
+  const extras = [];
+  if (c.relMusculo) extras.push('relação com o plano muscular');
+  if (c.relTendao) extras.push('relação com estrutura tendínea');
+  if (c.relVaso) extras.push('relação com estrutura vascular');
+  if (c.halo) extras.push('halo inflamatório periférico');
+  if (c.colecaoAssoc) extras.push('coleção associada');
+  if (c.hiperemia) extras.push('hiperemia periférica ao Doppler');
+  if (c.sombra) extras.push('sombra acústica posterior');
+  const extraTxt = extras.length ? `, com ${extras.join(', ')}` : '';
+  const desc = `Corpo estranho de aspecto compatível com ${TXT.tipoCE[c.tipo]}, localizado ${loc}${dist}${comp}, orientação ${TXT.orientCE[c.orientacao]}${extraTxt}.`;
+  const imp = `Corpo estranho localizado no tecido celular subcutâneo/partes moles, conforme achados descritos acima.`;
+  return {desc, imp};
+}
+
+function gerarBlocoHernia() {
+  const h = estado.hernia;
+  const colo = h.colo ? `, colo/defeito medindo ${tratarFloat(h.colo)} cm` : '';
+  const din = [];
+  if (h.valsalva) din.push('avaliada durante manobra de Valsalva');
+  if (h.alteracaoDinamica) din.push('com alteração dinâmica das dimensões ao esforço');
+  const dinTxt = din.length ? `, ${din.join(', ')}` : '';
+  const desc = `Defeito da parede em região ${TXT.regiaoHernia[h.regiao]}${lat(h.lateralidade)}${colo}, com conteúdo ${TXT.conteudoHernia[h.conteudo]}, ${TXT.redutivelHernia[h.redutivel]}${dinTxt}.`;
+  let imp = `Hérnia/defeito da parede em região ${TXT.regiaoHernia[h.regiao]}${lat(h.lateralidade)}, ${TXT.redutivelHernia[h.redutivel]}.`;
+  if (h.encarceramentoSuspeito) {
+    imp += ' Observam-se achados que podem sugerir encarceramento, recomendando-se correlação clínica e conduta conforme quadro apresentado.';
+  }
+  return {desc, imp};
+}
+
+function gerarBlocoVascular() {
+  const v = estado.vascular;
+  const ms = medStrSeguro(v.med1, v.med2, v.med3);
+  const med = ms ? `, medindo ${ms}` : '';
+  const colo = v.colo ? `, colo de ${tratarFloat(v.colo)} cm` : '';
+  const desc = `Achados vasculares compatíveis com ${TXT.tipoVasc[v.tipo]}, com fluxo ${TXT.fluxoVasc[v.fluxo]} e padrão ${TXT.padraoVasc[v.padrao]}${v.comunicacaoVaso ? ', com comunicação identificada com vaso adjacente' : ''}${med}${colo}.`;
+  const imp = v.tipo === 'indeterminada'
+    ? 'Alteração vascular de partes moles indeterminada; sugere-se correlação clínica e, se pertinente, complementação diagnóstica.'
+    : `Achados compatíveis com ${TXT.tipoVasc[v.tipo]}, conforme descrito acima.`;
+  return {desc, imp};
+}
+
+function gerarBlocoCalcificacao() {
+  const c = estado.calcificacao;
+  const loc = c.loc ? ` em ${c.loc}` : '';
+  const extras = [];
+  if (c.sombraAcustica) extras.push('sombra acústica posterior');
+  if (c.ossificacaoPeriferica) extras.push('ossificação periférica');
+  const extraTxt = extras.length ? `, com ${extras.join(', ')}` : '';
+  const desc = `Calcificação/ossificação de padrão ${TXT.padraoCalc[c.padrao]}${loc}${extraTxt}.`;
+  const imp = 'Calcificação(ões)/ossificação de partes moles, com características descritas acima.';
+  return {desc, imp};
+}
+
+function gerarBlocoNervo() {
+  const n = estado.nervo;
+  const nome = n.nome || 'avaliado';
+  const extras = [];
+  if (n.espessamento) extras.push('espessamento');
+  if (n.alteracaoFascicular) extras.push('alteração do padrão fascicular');
+  if (n.hiperemia) extras.push('hiperemia ao Doppler');
+  if (n.compressao) extras.push('sinais de compressão extrínseca');
+  const extraTxt = extras.length ? `, com ${extras.join(', ')}` : '';
+  const desc = `Nervo ${nome}, continuidade ${n.continuidade}${extraTxt}${n.neuroma ? ', com achados sugestivos de neuroma' : ''}.`;
+  let imp;
+  if (n.continuidade === 'interrompida') imp = `Descontinuidade do nervo ${nome}, conforme achados descritos acima.`;
+  else if (n.neuroma) imp = `Achados compatíveis com neuroma em topografia do nervo ${nome}.`;
+  else if (n.espessamento || n.alteracaoFascicular || n.compressao) imp = `Alteração do nervo ${nome} caracterizada pelos achados descritos acima, conforme contexto clínico.`;
+  else imp = `Nervo ${nome} com aspecto preservado.`;
+  return {desc, imp};
+}
+
+function gerarBlocoEdemaG() {
+  const e = estado.edemaG;
+  const extras = [];
+  if (e.espessamentoCutaneo) extras.push('espessamento cutâneo');
+  if (e.aumentoEcogenicidade) extras.push('aumento da ecogenicidade do subcutâneo');
+  if (e.padraoReticular) extras.push('padrão reticular do subcutâneo');
+  if (e.hiperemia) extras.push('hiperemia ao Doppler');
+  if (e.colecaoAssoc) extras.push('coleção associada');
+  const extraTxt = extras.length ? `, com ${extras.join(', ')}` : '';
+  const desc = `Observa-se processo edematoso/inflamatório de distribuição ${e.distribuicao} do tecido celular subcutâneo${extraTxt}.`;
+  const imp = 'Achados compatíveis com processo edematoso/inflamatório de partes moles, conforme contexto clínico.';
+  return {desc, imp};
+}
+
+// Monta todos os blocos referentes à seção "Tipo de Achado".
+function gerarAchadosTipo() {
+  const t = estado.tipo;
+  const descricoes = [];
+  const impressoes = [];
+  const add = (fn) => { const r = fn(); descricoes.push(r.desc); impressoes.push(r.imp); };
+
+  if (t.massa) add(gerarBlocoMassa);
+  if (t.colecao) add(gerarBlocoColecao);
+  if (t.edema) add(gerarBlocoEdemaG);
+  if (t.hematoma) add(gerarBlocoHematoma);
+  if (t.lesaoMuscular) add(gerarBlocoLesaoMuscular);
+  if (t.tendao) add(gerarBlocoTendao);
+  if (t.linfonodo) add(gerarBlocoLinfonodo);
+  if (t.corpoEstranho) add(gerarBlocoCorpoEstranho);
+  if (t.hernia) add(gerarBlocoHernia);
+  if (t.vascular) add(gerarBlocoVascular);
+  if (t.calcificacao) add(gerarBlocoCalcificacao);
+  if (t.nervo) add(gerarBlocoNervo);
+  if (t.outros && t.outrosTexto) { descricoes.push(t.outrosTexto); impressoes.push(t.outrosTexto); }
+
+  return {descricoes, impressoes};
+}
+
 // ── GERAR LAUDO ──
 function updateLaudo() {
   const ar = estado.area;
   const pe = estado.pele;
   const mu = estado.muscular;
   const ac = estado.achados;
+  const t = estado.tipo;
 
   const hd = [];
+
+  // ── DETECÇÃO DE USO DE DOPPLER E AVALIAÇÃO DINÂMICA (para a técnica) ──
+  // Nunca afirmamos Doppler/avaliação dinâmica no texto se nada foi de fato selecionado.
+  const dopplerUsado = pe.nodDop
+    || (t.massa && estado.massa.doppler !== 'sem')
+    || (t.colecao && estado.colecaoG.doppler !== 'semFluxo')
+    || (t.hematoma && estado.hematoma.doppler !== 'sem')
+    || (t.edema && estado.edemaG.hiperemia)
+    || (t.tendao && estado.tendao.hiperemia)
+    || (t.linfonodo && estado.linfonodo.doppler !== 'ausente')
+    || (t.corpoEstranho && estado.corpoEstranho.hiperemia)
+    || (t.vascular && estado.vascular.fluxo !== 'ausente')
+    || (t.nervo && estado.nervo.hiperemia);
+
+  const dinamicaUsada = ar.dinamica || ar.valsalva || ar.contracao || ar.compressao
+    || (t.tendao && estado.tendao.avaliacaoDinamica)
+    || (t.nervo && estado.nervo.avaliacaoDinamica)
+    || (t.hernia && (estado.hernia.valsalva || estado.hernia.alteracaoDinamica));
 
   // ── TÉCNICA ──
   let limitacoes = [];
   if (ar.limitacaoEdema) limitacoes.push('por acentuado edema');
   if (ar.limitacaoBiotipo) limitacoes.push('pela intensa atenuação do feixe acústico inerente ao biotipo');
-  let fraseTecnica = 'Exame realizado em aparelho dinâmico com transdutor linear de alta frequência.';
+  if (ar.limitacaoProfundidade) limitacoes.push('pela profundidade da lesão');
+  if (ar.limitacaoDor) limitacoes.push('pela dor referida pelo paciente');
+
+  let fraseTecnica = 'Exame realizado com transdutor linear de alta frequência, utilizando imagens em modo B'
+    + (dopplerUsado ? ' e Doppler colorido' : '')
+    + (dinamicaUsada ? ', com avaliação dinâmica da região de interesse quando indicada' : '')
+    + '.';
   if (limitacoes.length > 0) {
-    fraseTecnica = 'Exame realizado em aparelho dinâmico com transdutor linear de alta frequência, limitado parcialmente ' + limitacoes.join(' e ') + '.';
+    fraseTecnica += ' Exame parcialmente limitado ' + limitacoes.join(' e ') + '.';
   }
 
   // ── ÁREA ──
-  let fraseArea = '';
+  let regiaoDesc = '';
+  let usarDa = true;
   if (ar.tipo === 'queixa') {
-    fraseArea = 'Exame orientado para avaliação da região de queixa do paciente.';
+    regiaoDesc = 'região de queixa do paciente';
   } else if (ar.tipo === 'pre' && ar.regiao) {
     const reg = REGIOES.find(r => r[0] === ar.regiao);
-    fraseArea = reg ? `Exame orientado para avaliação da ${reg[1]}.` : 'Exame orientado para avaliação da região selecionada.';
+    regiaoDesc = reg ? reg[1] : 'região selecionada';
   } else if (ar.tipo === 'outra' && ar.outra) {
-    fraseArea = `Exame orientado para avaliação ${ar.outra}.`;
+    regiaoDesc = ar.outra;
+    usarDa = false;
   } else {
-    fraseArea = 'Exame orientado para avaliação da região de queixa do paciente.';
+    regiaoDesc = 'região de queixa do paciente';
+  }
+  const jaTemLateralidade = /direit[ao]|esquerd[ao]|bilateral/i.test(regiaoDesc);
+  const latTxt = (ar.lateralidade !== 'nenhuma' && !jaTemLateralidade) ? lat(ar.lateralidade) : '';
+  let fraseArea = `Exame orientado para avaliação ${usarDa ? 'da ' : ''}${regiaoDesc}${latTxt}.`;
+  if (ar.contralateral) {
+    fraseArea += ' Realizada comparação com o lado contralateral.';
   }
 
   // ── PELE ──
   const temAchadoPele = pe.edema || pe.lipoma || pe.nodulo || pe.colOrg || pe.colNao;
-  let frasePele = '';
+  let paragrafosPele = [];
 
   if (!temAchadoPele) {
-    const parts = [];
-    if (pe.habitual) parts.push('Pele e tecido subcutâneo sem anormalidades detectáveis.');
-    if (pe.ausencia) parts.push('Ausência de nódulos, massas ou coleções.');
-    frasePele = parts.join(' ');
+    if (pe.habitual) paragrafosPele.push('Pele e tecido subcutâneo sem anormalidades detectáveis.');
+    if (pe.ausencia) paragrafosPele.push('Ausência de nódulos, massas ou coleções.');
   } else {
     const partes = [];
     if (pe.edema) {
@@ -784,69 +1523,98 @@ function updateLaudo() {
       hd.push('Edema de tecido subcutâneo.');
     }
     if (pe.lipoma) {
-      const med = (pe.lipMed1||pe.lipMed2||pe.lipMed3) ? `, medindo ${medStr3(pe.lipMed1,pe.lipMed2,pe.lipMed3)}` : '';
+      const ms = medStrSeguro(pe.lipMed1,pe.lipMed2,pe.lipMed3);
+      const med = ms ? `, medindo ${ms}` : '';
       const cont = pe.lipReg ? ', de contornos regulares' : '';
       partes.push(`No plano do subcutâneo, identifica-se imagem nodular hiperecogênica e homogênea${cont}${med}, de aspecto compatível com lipoma.`);
       hd.push('Lipoma de subcutâneo.');
     }
     if (pe.nodulo) {
-      const med = (pe.nodMed1||pe.nodMed2||pe.nodMed3) ? `, medindo ${medStr3(pe.nodMed1,pe.nodMed2,pe.nodMed3)}` : '';
+      const ms = medStrSeguro(pe.nodMed1,pe.nodMed2,pe.nodMed3);
+      const med = ms ? `, medindo ${ms}` : '';
       partes.push(`No plano ${pe.nodLoc}, nota-se nódulo ${pe.nodEco} e ${pe.nodTex}, de contornos ${pe.nodCon}${med}${pe.nodDop?', com fluxo ao Doppler':''}.`);
       hd.push(`Nódulo no plano ${pe.nodLoc}.`);
     }
     if (pe.colOrg) {
-      const vol = calcVol(pe.colOrgMed1, pe.colOrgMed2, pe.colOrgMed3);
-      const med = (pe.colOrgMed1||pe.colOrgMed2||pe.colOrgMed3) ? `, medindo ${medStr3(pe.colOrgMed1,pe.colOrgMed2,pe.colOrgMed3)}, com volume de ${vol} cm³` : '';
+      const vol = calcVolSeguro(pe.colOrgMed1, pe.colOrgMed2, pe.colOrgMed3);
+      const ms = medStrSeguro(pe.colOrgMed1,pe.colOrgMed2,pe.colOrgMed3);
+      const sep = pe.colOrgSep ? ', contendo septos de permeio' : '';
+      const med = ms ? `, medindo ${ms}${vol?`, com volume de ${vol} cm³`:''}` : '';
       const dis = pe.colOrgDis ? `, e seu centro distando ${tratarFloat(pe.colOrgDis)} cm da pele` : '';
-      partes.push(`No plano ${pe.colOrgLoc}, nota-se coleção de paredes ${pe.colOrgPar} e conteúdo ${pe.colOrgCon}${med}${dis}.`);
+      partes.push(`No plano ${pe.colOrgLoc}, nota-se coleção de paredes ${pe.colOrgPar} e conteúdo ${pe.colOrgCon}${sep}${med}${dis}.`);
       hd.push(`Coleção organizada no plano ${pe.colOrgLoc}.`);
     }
     if (pe.colNao) {
-      const vol = calcVol(pe.colNaoMed1, pe.colNaoMed2, pe.colNaoMed3);
-      const med = (pe.colNaoMed1||pe.colNaoMed2||pe.colNaoMed3) ? `, medindo cerca de ${medStr3(pe.colNaoMed1,pe.colNaoMed2,pe.colNaoMed3)}, com volume de ${vol} cm³` : '';
+      const vol = calcVolSeguro(pe.colNaoMed1, pe.colNaoMed2, pe.colNaoMed3);
+      const ms = medStrSeguro(pe.colNaoMed1,pe.colNaoMed2,pe.colNaoMed3);
+      const med = ms ? `, medindo cerca de ${ms}${vol?`, com volume de ${vol} cm³`:''}` : '';
       const dis = pe.colNaoDis ? `, e seu centro distando ${tratarFloat(pe.colNaoDis)} cm da pele` : '';
       partes.push(`No plano ${pe.colNaoLoc}, nota-se área heterogênea, predominantemente hipoecogênica, de limites imprecisos${med}${dis}.`);
       hd.push(`Achados sugestivos de coleção em organização no plano ${pe.colNaoLoc}.`);
     }
-    frasePele = partes.join(' ');
+    paragrafosPele = partes;
   }
 
   // ── MUSCULAR ──
   const temAchadoMus = mu.colOrg || mu.colNao;
-  let fraseMusc = '';
+  let paragrafosMusc = [];
 
   if (!temAchadoMus) {
-    if (mu.habitual) fraseMusc = 'Planos musculares de aspecto preservado.';
+    if (mu.habitual) paragrafosMusc.push('Planos musculares de aspecto preservado.');
   } else {
     const partes = [];
     if (mu.colOrg) {
-      const vol = calcVol(mu.colOrgMed1, mu.colOrgMed2, mu.colOrgMed3);
+      const vol = calcVolSeguro(mu.colOrgMed1, mu.colOrgMed2, mu.colOrgMed3);
       const sep = mu.colOrgSep ? ', contendo septos de permeio' : '';
-      const med = (mu.colOrgMed1||mu.colOrgMed2||mu.colOrgMed3) ? `, medindo ${medStr3(mu.colOrgMed1,mu.colOrgMed2,mu.colOrgMed3)}, com volume de ${vol} cm³` : '';
+      const ms = medStrSeguro(mu.colOrgMed1,mu.colOrgMed2,mu.colOrgMed3);
+      const med = ms ? `, medindo ${ms}${vol?`, com volume de ${vol} cm³`:''}` : '';
       const dis = mu.colOrgDis ? `, e seu centro distando ${tratarFloat(mu.colOrgDis)} cm da pele` : '';
       partes.push(`No plano muscular, nota-se coleção de paredes ${mu.colOrgPar} e conteúdo ${mu.colOrgCon}${sep}${med}${dis}.`);
       hd.push('Coleção organizada no plano muscular.');
     }
     if (mu.colNao) {
-      const vol = calcVol(mu.colNaoMed1, mu.colNaoMed2, mu.colNaoMed3);
-      const med = (mu.colNaoMed1||mu.colNaoMed2||mu.colNaoMed3) ? `, medindo cerca de ${medStr3(mu.colNaoMed1,mu.colNaoMed2,mu.colNaoMed3)}, com volume de ${vol} cm³` : '';
+      const vol = calcVolSeguro(mu.colNaoMed1, mu.colNaoMed2, mu.colNaoMed3);
+      const ms = medStrSeguro(mu.colNaoMed1,mu.colNaoMed2,mu.colNaoMed3);
+      const med = ms ? `, medindo cerca de ${ms}${vol?`, com volume de ${vol} cm³`:''}` : '';
       const dis = mu.colNaoDis ? `, e seu centro distando ${tratarFloat(mu.colNaoDis)} cm da pele` : '';
       partes.push(`No plano muscular, nota-se área heterogênea, predominantemente hipoecogênica, de limites imprecisos${med}${dis}.`);
       hd.push('Achados sugestivos de coleção em organização no plano muscular.');
     }
-    fraseMusc = partes.join(' ');
+    paragrafosMusc = partes;
   }
 
+  // ── TIPO DE ACHADO (módulos estruturados) ──
+  const tipoResult = gerarAchadosTipo();
+  const paragrafosTipo = tipoResult.descricoes;
+
   // ── OPINIÃO ──
-  let opFinal;
-  if (hd.length === 0) {
-    opFinal = 'Estudo ecográfico sem evidentes anormalidades apreciáveis ao método.';
+  // A impressão diagnóstica é construída exclusivamente a partir dos achados
+  // efetivamente selecionados — nunca se completa automaticamente com frases
+  // genéricas de normalidade quando há achados positivos (regra de segurança).
+  const todasImpressoes = hd.concat(tipoResult.impressoes);
+  let paragrafosImpressao;
+  if (todasImpressoes.length === 0) {
+    paragrafosImpressao = ['Estudo ultrassonográfico da região avaliada sem alterações significativas.'];
   } else {
-    opFinal = hd.join('\n') + '\nDemais estruturas sem evidentes anormalidades apreciáveis ao método.';
+    paragrafosImpressao = todasImpressoes;
   }
 
   // ── ACHADOS ADICIONAIS ──
-  const fraseAchados = ac.texto ? `\n\nAchados adicionais: ${ac.texto}` : '';
+  const fraseAchados = ac.texto ? `Achados adicionais: ${ac.texto}` : '';
+
+  // Cada alteração/achado vira seu próprio parágrafo (<div class="doc-p">),
+  // em vez de todos ficarem concatenados num único parágrafo corrido.
+  // Também garante que todo parágrafo comece com letra maiúscula, mesmo
+  // quando o texto-fonte (dicionário ou digitação livre) começa em minúscula.
+  function capitalizarFrase(str) {
+    if (!str) return str;
+    const i = str.search(/[a-zà-öø-ÿ]/i);
+    if (i === -1) return str;
+    return str.slice(0, i) + str.charAt(i).toUpperCase() + str.slice(i + 1);
+  }
+  function renderParagrafos(lista) {
+    return lista.filter(Boolean).map(p => `<div class="doc-p">${capitalizarFrase(p)}</div>`).join('');
+  }
 
   // ── HTML ──
   document.getElementById('laudo-doc').innerHTML = `
@@ -857,14 +1625,15 @@ function updateLaudo() {
     </div>
     <div class="doc-secao">
       <span class="doc-label">ANÁLISE:</span>
-      <div class="doc-p">${fraseArea}</div>
-      ${frasePele ? `<div class="doc-p">${frasePele}</div>` : ''}
-      ${fraseMusc ? `<div class="doc-p">${fraseMusc}</div>` : ''}
-      ${fraseAchados ? `<div class="doc-p">${fraseAchados}</div>` : ''}
+      <div class="doc-p">${capitalizarFrase(fraseArea)}</div>
+      ${renderParagrafos(paragrafosPele)}
+      ${renderParagrafos(paragrafosMusc)}
+      ${renderParagrafos(paragrafosTipo)}
+      ${fraseAchados ? `<div class="doc-p">${capitalizarFrase(fraseAchados)}</div>` : ''}
     </div>
     <div class="doc-secao">
       <span class="doc-label">IMPRESSÃO DIAGNÓSTICA:</span>
-      <div class="doc-p">${opFinal.replace(/\n/g,'<br>')}</div>
+      ${renderParagrafos(paragrafosImpressao)}
     </div>`;
 }
 
@@ -922,18 +1691,18 @@ function imprimir() {
   const w = window.open('', '_blank');
   w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Helvetica,Arial,sans-serif;font-size:10pt;padding:32px;color:#111;line-height:1.65;}.doc-titulo{text-align:center;font-weight:700;text-transform:uppercase;margin-bottom:16px;}.doc-label{font-weight:700;}.doc-p{margin-bottom:8px;}.doc-secao{margin-bottom:14px;}*{color:#111 !important;}.laudo-doc:focus { outline: none; }
 </style></head><body>${h}
-<div id="toast-notification" class="toast-notification">Laudo copiado!</div>
 </body></html>`);
   w.document.close();
   w.print();
 }
 
 // ── REINICIAR ──
+// Restaura TODOS os campos (originais e novos módulos) para o estado inicial,
+// garantindo que estado inicial e estado pós-reset sejam sempre idênticos.
 function reiniciar() {
-  estado.area = { tipo:'queixa', regiao:'', outra:'', limitacaoEdema:false, limitacaoBiotipo:false };
-  estado.pele = { habitual:true, ausencia:true, edema:false, lipoma:false, lipReg:false, lipMed1:'', lipMed2:'', lipMed3:'', nodulo:false, nodEco:'anecoico', nodTex:'homogêneo', nodLoc:'do subcutâneo', nodCon:'definidos', nodMed1:'', nodMed2:'', nodMed3:'', nodDop:false, colOrg:false, colOrgLoc:'do subcutâneo', colOrgPar:'finas', colOrgCon:'anecoico', colOrgMed1:'', colOrgMed2:'', colOrgMed3:'', colOrgDis:'', colNao:false, colNaoLoc:'do subcutâneo', colNaoMed1:'', colNaoMed2:'', colNaoMed3:'', colNaoDis:'' };
-  estado.muscular = { habitual:true, colOrg:false, colOrgPar:'finas', colOrgCon:'anecoico', colOrgMed1:'', colOrgMed2:'', colOrgMed3:'', colOrgDis:'', colOrgSep:false, colNao:false, colNaoMed1:'', colNaoMed2:'', colNaoMed3:'', colNaoDis:'' };
-  estado.achados = { texto:'' };
+  Object.keys(ESTADO_INICIAL).forEach(k => {
+    estado[k] = JSON.parse(JSON.stringify(ESTADO_INICIAL[k]));
+  });
   showSection('area');
 }
 

@@ -319,26 +319,96 @@
 
         function copiarTexto() {
             const editor = document.getElementById('editor');
-            const range = document.createRange();
-            range.selectNodeContents(editor);
-            const sel = window.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(range);
+            // Clone the content so we never touch the live DOM / theme
+            var clone = editor.cloneNode(true);
+            
+            // Inline computed styles to preserve all formatting
+            var sourceEls = [editor].concat(Array.prototype.slice.call(editor.querySelectorAll('*')));
+            var cloneEls = [clone].concat(Array.prototype.slice.call(clone.querySelectorAll('*')));
+            var propsToCopy = [
+                'font-family', 'font-size', 'font-weight', 'font-style', 'line-height',
+                'text-align', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left',
+                'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
+                'text-indent', 'vertical-align', 'list-style', 'display', 'border', 'border-collapse',
+                'width', 'max-width'
+            ];
 
-            const wasDark = document.body.classList.contains('dark-mode');
-            if (wasDark) document.body.classList.remove('dark-mode');
+            for (var i = 0; i < sourceEls.length; i++) {
+                var sEl = sourceEls[i];
+                var cEl = cloneEls[i];
+                if (sEl.nodeType !== 1) continue;
 
-            try {
-                document.execCommand('copy');
-                sel.removeAllRanges();
-                alert('Texto formatado copiado!');
-            } catch (err) {
-                console.error('Falha ao copiar rich text: ', err);
-                alert('Erro ao copiar o texto.');
+                var comp = window.getComputedStyle(sEl);
+                for (var j = 0; j < propsToCopy.length; j++) {
+                    var prop = propsToCopy[j];
+                    var val = comp.getPropertyValue(prop);
+                    if (val && val !== 'none' && val !== 'normal' && val !== '0px') {
+                        cEl.style[prop] = val;
+                    }
+                }
+                
+                cEl.style.color = '#000000';
+                var bg = comp.getPropertyValue('background-color');
+                if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
+                    if (_isLight(bg)) cEl.style.backgroundColor = bg;
+                    else cEl.style.backgroundColor = 'transparent';
+                } else {
+                    cEl.style.backgroundColor = 'transparent';
+                }
             }
 
-            if (wasDark) document.body.classList.add('dark-mode');
+            var htmlContent = '<div style="background: #fff;">' + clone.innerHTML + '</div>';
+            var plainText = editor.innerText || editor.textContent || '';
+
+            if (navigator.clipboard && typeof ClipboardItem !== 'undefined') {
+                try {
+                    var htmlBlob = new Blob([htmlContent], { type: 'text/html' });
+                    var textBlob = new Blob([plainText], { type: 'text/plain' });
+                    navigator.clipboard.write([
+                        new ClipboardItem({ 'text/html': htmlBlob, 'text/plain': textBlob })
+                    ]).then(function() {
+                        alert('Texto formatado copiado!');
+                    }).catch(function() {
+                        _fallbackCopyMascara(htmlContent, plainText);
+                    });
+                    return;
+                } catch (e) {}
+            }
+            _fallbackCopyMascara(htmlContent, plainText);
         }
+
+        function _fallbackCopyMascara(htmlContent, plainText) {
+            var container = document.createElement('div');
+            container.innerHTML = htmlContent;
+            container.style.position = 'fixed';
+            container.style.left = '-9999px';
+            container.style.top = '0';
+            container.style.opacity = '0';
+            document.body.appendChild(container);
+            var range = document.createRange();
+            range.selectNodeContents(container);
+            var sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+            try { document.execCommand('copy'); alert('Texto formatado copiado!'); }
+            catch (err) { alert('Erro ao copiar o texto.'); }
+            sel.removeAllRanges();
+            document.body.removeChild(container);
+        }
+
+        function _parseRGBLocal(colorStr) {
+            if (!colorStr) return null;
+            var m = colorStr.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+            if (m) return { r: parseInt(m[1]), g: parseInt(m[2]), b: parseInt(m[3]) };
+            if (colorStr.charAt(0) === '#') {
+                var hex = colorStr.replace('#', '');
+                if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+                if (hex.length === 6) return { r: parseInt(hex.substr(0,2),16), g: parseInt(hex.substr(2,2),16), b: parseInt(hex.substr(4,2),16) };
+            }
+            return null;
+        }
+        function _isLight(c) { var rgb = _parseRGBLocal(c); return rgb ? (rgb.r > 200 && rgb.g > 200 && rgb.b > 200) : false; }
+        function _isDark(c) { var rgb = _parseRGBLocal(c); return rgb ? (rgb.r < 80 && rgb.g < 80 && rgb.b < 80) : false; }
 
         const body = document.body;
         const themeBtn = document.getElementById('themeBtn');

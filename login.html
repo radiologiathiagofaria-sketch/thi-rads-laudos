@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THI-RADS - Login</title>
+    <style>
+        /* Variáveis de tema (Light) */
+        :root {
+            --bg: linear-gradient(135deg, #f0f2f5, #e0e5ec);
+            --box-bg: rgba(255, 255, 255, 0.85);
+            --text-color: #1e3c72;
+            --subtext-color: #666;
+            --input-bg: rgba(255, 255, 255, 0.9);
+            --input-border: rgba(30, 60, 114, 0.2);
+            --btn-bg: #0288d1;
+            --btn-hover: #0277bd;
+            --erro-color: #d32f2f;
+            --glow: #0288d1;
+            --box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            --card-border: rgba(30, 60, 114, 0.1);
+        }
+
+        /* Variáveis de tema (Dark) */
+        body.dark-mode {
+            --bg: radial-gradient(circle at center, #152238 0%, #0a101d 100%);
+            --box-bg: rgba(20, 30, 48, 0.6);
+            --text-color: #e0e6f0;
+            --subtext-color: #9ab;
+            --input-bg: rgba(10, 15, 25, 0.5);
+            --input-border: rgba(79, 195, 247, 0.15);
+            --btn-bg: #0288d1;
+            --btn-hover: #4fc3f7;
+            --erro-color: #ff6b6b;
+            --glow: #4fc3f7;
+            --box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(79, 195, 247, 0.05);
+            --card-border: rgba(79, 195, 247, 0.2);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            transition: background 0.5s ease;
+            position: relative;
+        }
+
+        /* Botão de tema */
+        .theme-toggle {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: var(--box-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            transition: all 0.3s;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        .theme-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(79, 195, 247, 0.2);
+        }
+
+        /* Container Principal do Login */
+        .login-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: var(--box-bg);
+            padding: 45px 35px;
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+            box-shadow: var(--box-shadow);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            transition: all 0.4s ease;
+            color: var(--text-color);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        /* Logo no topo do card */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+        
+        .logo-separator {
+            width: 1px;
+            height: 34px;
+            background: var(--glow);
+            opacity: 0.6;
+            border-radius: 2px;
+        }
+
+        .logo-text-block {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .logo-title {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-size: 1.6em;
+            font-weight: 300;
+            letter-spacing: 5px;
+            margin-bottom: 4px;
+        }
+
+        .logo-subtitle {
+            font-size: 0.55em;
+            font-weight: 400;
+            letter-spacing: 2px;
+            color: var(--subtext-color);
+            text-transform: uppercase;
+        }
+
+        /* Textos de instrução */
+        .login-box h1 {
+            color: var(--text-color);
+            margin-bottom: 8px;
+            font-size: 20px;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        .login-box h2 {
+            color: var(--subtext-color);
+            font-weight: 400;
+            font-size: 13px;
+            margin-bottom: 35px;
+        }
+
+        /* Campos de Input */
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            color: var(--subtext-color);
+            transition: color 0.3s;
+            pointer-events: none;
+        }
+
+        .login-box input {
+            width: 100%;
+            height: 50px;
+            padding: 0 16px 0 46px;
+            border: 1px solid var(--input-border);
+            border-radius: 12px;
+            font-size: 15px;
+            outline: none;
+            background: var(--input-bg);
+            color: var(--text-color);
+            transition: all 0.3s;
+        }
+
+        .login-box input:focus {
+            border-color: var(--glow);
+            box-shadow: 0 0 12px rgba(79,195,247,0.15);
+        }
+
+        .login-box input:focus + .input-icon,
+        .login-box input:focus ~ .input-icon {
+            color: var(--glow);
+        }
+
+        /* Botão Entrar */
+        .login-box button.btn-entrar {
+            width: 100%;
+            height: 50px;
+            background: var(--btn-bg);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(2, 136, 209, 0.2);
+        }
+
+        .login-box button.btn-entrar:hover {
+            background: var(--btn-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 195, 247, 0.3);
+        }
+
+        .erro {
+            color: var(--erro-color);
+            font-size: 13px;
+            margin-top: 15px;
+            min-height: 18px;
+        }
+
+        /* Rodapé de acesso restrito */
+        .acesso-restrito {
+            margin-top: 30px;
+            font-size: 12px;
+            color: var(--subtext-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Botão de alternar tema -->
+    <button class="theme-toggle" id="themeBtn" onclick="alternarTema()" title="Alternar tema">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+
+    <div class="login-wrapper">
+        <div class="login-box">
+            
+            <!-- Logo Oficial (Mesmo SVG preservado) -->
+            <div class="logo-container">
+                <svg viewBox="0 0 64 64" width="38" height="38" fill="none" stroke="var(--glow)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 6px rgba(79,195,247,0.4));">
+                    <path d="M32 26 L32 40 M22 26 L42 26" stroke-width="3" />
+                    <path d="M22 18 C28 14, 36 14, 42 18" />
+                    <path d="M14 10 C24 2, 40 2, 50 10" />
+                    <path d="M22 46 C28 50, 36 50, 42 46" />
+                    <path d="M14 54 C24 62, 40 62, 50 54" />
+                </svg>
+                <div class="logo-separator"></div>
+                <div class="logo-text-block">
+                    <div class="logo-title">
+                        <span style="color: var(--text-color);">THI</span><span style="color: var(--glow);">-RADS</span>
+                    </div>
+                    <div class="logo-subtitle">
+                        Laudos Estruturados em Ultrassonografia
+                    </div>
+                </div>
+            </div>
+
+            <!-- Títulos Funcionais -->
+            <h1>Acessar o sistema</h1>
+            <h2>Entre com suas credenciais para continuar.</h2>
+            
+            <!-- Formulário -->
+            <div class="input-group">
+                <svg class="input-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                </svg>
+                <input type="text" id="usuario" placeholder="Usuário" autocomplete="off">
+            </div>
+
+            <div class="input-group">
+                <svg class="input-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                <input type="password" id="senha" placeholder="Senha">
+            </div>
+
+            <button class="btn-entrar" onclick="fazerLogin()">ENTRAR</button>
+            
+            <p id="mensagemErro" class="erro"></p>
+
+            <!-- Rodapé Discreto -->
+            <div class="acesso-restrito">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                Acesso restrito
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== GERENCIAMENTO DE TEMA ==========
+        const body = document.body;
+        const themeBtn = document.getElementById("themeBtn");
+
+        const iconeSol = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+        const iconeLua = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+
+        // Modo escuro é o padrão agora
+        if (localStorage.getItem("tema") === "light") {
+            body.classList.remove("dark-mode");
+            themeBtn.innerHTML = iconeLua;
+        } else {
+            body.classList.add("dark-mode");
+            themeBtn.innerHTML = iconeSol;
+        }
+
+        function alternarTema() {
+            body.classList.toggle("dark-mode");
+            if (body.classList.contains("dark-mode")) {
+                localStorage.setItem("tema", "dark");
+                themeBtn.innerHTML = iconeSol;
+            } else {
+                localStorage.setItem("tema", "light");
+                themeBtn.innerHTML = iconeLua;
+            }
+        }
+
+        // ========== LOGIN ==========
+        function fazerLogin() {
+            var usuario = document.getElementById("usuario").value;
+            var senha = document.getElementById("senha").value;
+            var msgErro = document.getElementById("mensagemErro");
+
+            if (usuario === "residentesanta" && senha === "2026") {
+                window.location.href = "selecao.html";
+            } else {
+                msgErro.textContent = "Usuário ou senha incorretos.";
+                document.getElementById("senha").value = "";
+            }
+        }
+
+        document.getElementById("senha").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                fazerLogin();
+            }
+        });
+    </script>
+</body>
+</html>

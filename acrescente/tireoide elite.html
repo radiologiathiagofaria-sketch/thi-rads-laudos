@@ -1123,6 +1123,15 @@ function copiar() {
     showToast('Falha ao copiar. Use Ctrl+A e Ctrl+C no texto do laudo.');
   }
 }
+// Intercepta copy manual no dark mode para remover fundo escuro
+document.getElementById('laudo-doc').addEventListener('copy', function(e) {
+  if (!document.body.classList.contains('dark')) return;
+  document.body.classList.remove('dark');
+  document.body.offsetHeight;
+  setTimeout(function() {
+    document.body.classList.add('dark');
+  }, 0);
+});
 
 function showToast(msg) {
   let t = document.getElementById('toast-notification');

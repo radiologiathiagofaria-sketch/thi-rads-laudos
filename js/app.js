@@ -426,34 +426,307 @@ function updatePreview() {
 
 function copyRichText() {
   const editor = document.getElementById('report-editor');
-  
-  // Create a Range and Selection to select the content
-  const range = document.createRange();
-  range.selectNodeContents(editor);
-  const selection = window.getSelection();
-  selection.removeAllRanges();
-  selection.addRange(range);
-
-  const wasDark = document.body.classList.contains('dark-mode');
-  if (wasDark) document.body.classList.remove('dark-mode');
-
-  try {
-    // Execute the copy command (copies HTML + Text)
-    const successful = document.execCommand('copy');
-    if (successful) {
+  _copyLaudoRichText(editor, function(ok) {
+    if (ok) {
       showToast('Laudo copiado (com formatação) para a área de transferência!');
     } else {
       alert('Falha ao copiar. Pressione CTRL+C após o texto ser selecionado.');
     }
-  } catch (err) {
-    console.error('Falha ao copiar', err);
-    alert('Erro ao copiar o laudo.');
+  });
+}
+
+/**
+ * Central rich-text copy helper.
+ *
+ * STRATEGY: Clone the original laudo element, then walk the original and clone
+ * DOM trees in parallel. For each element, read getComputedStyle() from the
+ * ORIGINAL (which has access to the page's CSS) and apply relevant document-
+ * formatting properties as inline styles on the CLONE. This makes the copied
+ * HTML completely self-contained and independent of the page's stylesheets.
+ *
+ * Dark-mode colours (dark backgrounds, light text) are replaced with
+ * document-standard values (white background, black text). All other
+ * formatting (bold, italic, alignment, margins, spacing, tables, etc.)
+ * is faithfully preserved.
+ *
+ * The live DOM (#report-editor) is NEVER modified.
+ *
+ * @param {HTMLElement} sourceEl  – the element whose content is the laudo
+ * @param {function}    callback  – called with (true) on success, (false) on failure
+ */
+function _copyLaudoRichText(sourceEl, callback) {
+  // ── 1. Clone the laudo so we never touch the live DOM ──
+  var clone = sourceEl.cloneNode(true);
+
+  // ── 2. Document-relevant CSS properties to inline ──
+  var RELEVANT_PROPS = [
+    'font-family', 'font-size', 'font-weight', 'font-style',
+    'line-height', 'text-align', 'text-indent', 'text-decoration',
+    'vertical-align', 'white-space', 'display',
+    'margin-top', 'margin-right', 'margin-bottom', 'margin-left',
+    'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
+    'list-style', 'list-style-type',
+    'border-collapse', 'border-spacing'
+  ];
+
+  // ── 3. Walk original + clone trees in parallel, inlining computed styles ──
+  var originalEls = sourceEl.querySelectorAll('*');
+  var cloneEls    = clone.querySelectorAll('*');
+
+  // Also process the root element itself
+  _inlineComputedStyles(sourceEl, clone, RELEVANT_PROPS, true);
+
+  for (var i = 0; i < originalEls.length; i++) {
+    _inlineComputedStyles(originalEls[i], cloneEls[i], RELEVANT_PROPS, false);
   }
 
-  if (wasDark) document.body.classList.add('dark-mode');
+  // ── 4. Force document colours on the root clone ──
+  clone.style.backgroundColor = '#ffffff';
+  clone.style.color = '#000000';
 
-  // Remove selection
-  selection.removeAllRanges();
+  // Remove the id/contenteditable from the clone (not needed in clipboard)
+  clone.removeAttribute('id');
+  clone.removeAttribute('contenteditable');
+
+  // ── 5. Build the final HTML string ──
+  var htmlContent = clone.outerHTML;
+
+  // ── 6. Plain-text fallback (preserves line breaks) ──
+  var plainText = sourceEl.innerText || sourceEl.textContent || '';
+
+  // ── 7. Write to clipboard ──
+  if (navigator.clipboard && typeof ClipboardItem !== 'undefined') {
+    try {
+      var htmlBlob = new Blob([htmlContent], { type: 'text/html' });
+      var textBlob = new Blob([plainText],   { type: 'text/plain' });
+      navigator.clipboard.write([
+        new ClipboardItem({
+          'text/html': htmlBlob,
+          'text/plain': textBlob
+        })
+      ]).then(function() {
+        callback(true);
+      }).catch(function() {
+        _fallbackCopy(htmlContent, plainText, callback);
+      });
+      return;
+    } catch (e) {
+      // ClipboardItem constructor failed – fall through to fallback
+    }
+  }
+
+  _fallbackCopy(htmlContent, plainText, callback);
+}
+
+/**
+ * Reads getComputedStyle() from `originalEl` and applies relevant document-
+ * formatting properties as inline styles on `cloneEl`.
+ *
+ * Colour handling:
+ *   - background-color: forced to transparent (or white for root)
+ *   - color: forced to #000000 unless the computed colour is already dark
+ *   - border colours on table cells: preserved as-is (they are document formatting)
+ *
+ * @param {HTMLElement} originalEl  – element in the live DOM (has computed styles)
+ * @param {HTMLElement} cloneEl     – corresponding element in the clone
+ * @param {string[]}   props       – list of CSS property names to inline
+ * @param {boolean}    isRoot      – true if this is the root container element
+ */
+function _inlineComputedStyles(originalEl, cloneEl, props, isRoot) {
+  if (!originalEl || !cloneEl) return;
+  if (originalEl.nodeType !== 1 || cloneEl.nodeType !== 1) return;
+
+  var computed = window.getComputedStyle(originalEl);
+
+  // Apply each relevant document-formatting property
+  for (var i = 0; i < props.length; i++) {
+    var prop = props[i];
+    var val  = computed.getPropertyValue(prop);
+    if (val) {
+      cloneEl.style.setProperty(prop, val);
+    }
+  }
+
+  // ── Handle colours specially ──
+
+  // Background: strip any dark background, keep white/transparent
+  var bgColor = computed.getPropertyValue('background-color');
+  if (bgColor) {
+    var bgRgb = _parseRGB(bgColor);
+    if (!bgRgb || _isTransparent(bgColor)) {
+      // transparent or unparseable – leave as transparent
+      cloneEl.style.backgroundColor = 'transparent';
+    } else if (bgRgb.r > 200 && bgRgb.g > 200 && bgRgb.b > 200) {
+      // Light/white background – keep it
+      cloneEl.style.backgroundColor = '#ffffff';
+    } else {
+      // Dark background (likely from dark mode) – force white/transparent
+      cloneEl.style.backgroundColor = isRoot ? '#ffffff' : 'transparent';
+    }
+  }
+
+  // Text colour: force dark
+  var textColor = computed.getPropertyValue('color');
+  if (textColor) {
+    var textRgb = _parseRGB(textColor);
+    if (!textRgb || textRgb.r > 100 || textRgb.g > 100 || textRgb.b > 100) {
+      // Light text or unparseable – force black
+      cloneEl.style.color = '#000000';
+    } else {
+      // Already dark text – keep it
+      cloneEl.style.color = textColor;
+    }
+  }
+
+  // Preserve border styles for table elements (td, th, table)
+  var tag = originalEl.tagName.toLowerCase();
+  if (tag === 'td' || tag === 'th' || tag === 'table') {
+    var borderProps = ['border-top', 'border-right', 'border-bottom', 'border-left', 'border'];
+    for (var j = 0; j < borderProps.length; j++) {
+      var bv = computed.getPropertyValue(borderProps[j]);
+      if (bv) {
+        cloneEl.style.setProperty(borderProps[j], bv);
+      }
+    }
+  }
+
+  // Remove class attribute from clone – styles are now inline
+  cloneEl.removeAttribute('class');
+}
+
+/**
+ * Fallback copy using offscreen container + execCommand('copy').
+ */
+function _fallbackCopy(htmlContent, plainText, callback) {
+  var container = document.createElement('div');
+  container.innerHTML = htmlContent;
+  container.style.position = 'fixed';
+  container.style.left = '-9999px';
+  container.style.top = '0';
+  container.style.opacity = '0';
+  document.body.appendChild(container);
+
+  var range = document.createRange();
+  range.selectNodeContents(container);
+  var sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+
+  var ok = false;
+  try {
+    ok = document.execCommand('copy');
+  } catch (e) {
+    ok = false;
+  }
+
+  sel.removeAllRanges();
+  document.body.removeChild(container);
+  callback(ok);
+}
+
+/** Returns true when the colour string represents a transparent/rgba(0,0,0,0) value */
+function _isTransparent(colorStr) {
+  if (!colorStr) return true;
+  if (colorStr === 'transparent') return true;
+  var m = colorStr.match(/rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([\d.]+)\s*\)/);
+  if (m && parseFloat(m[4]) === 0) return true;
+  return false;
+}
+
+/** Returns true when the parsed colour is light (i.e. white-ish / suitable for document bg) */
+function _isLightColor(colorStr) {
+  var rgb = _parseRGB(colorStr);
+  if (!rgb) return false;
+  return (rgb.r > 200 && rgb.g > 200 && rgb.b > 200);
+}
+
+/** Returns true when the parsed colour is dark (i.e. black-ish / suitable for document text) */
+function _isDarkColor(colorStr) {
+  var rgb = _parseRGB(colorStr);
+  if (!rgb) return false;
+  return (rgb.r < 80 && rgb.g < 80 && rgb.b < 80);
+}
+
+function _parseRGB(colorStr) {
+  if (!colorStr) return null;
+  var m = colorStr.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+  if (m) return { r: parseInt(m[1]), g: parseInt(m[2]), b: parseInt(m[3]) };
+  // Hex
+  if (colorStr.charAt(0) === '#') {
+    var hex = colorStr.replace('#', '');
+    if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+    if (hex.length === 6) {
+      return { r: parseInt(hex.substr(0,2),16), g: parseInt(hex.substr(2,2),16), b: parseInt(hex.substr(4,2),16) };
+    }
+  }
+  return null;
+}
+
+/**
+ * Inlines computed styles on an element that is already in the DOM.
+ * Used by the copy-event interceptor on #report-editor.
+ * Reads getComputedStyle() directly from `el` (which is temporarily
+ * inserted in the DOM), applies relevant document-formatting props as
+ * inline styles, and strips dark-mode colours.
+ *
+ * @param {HTMLElement} el      – element already in the DOM
+ * @param {string[]}   props   – CSS property names to inline
+ * @param {boolean}    isRoot  – true for the wrapper/root element
+ */
+function _inlineCopyStyles(el, props, isRoot) {
+  if (!el || el.nodeType !== 1) return;
+
+  var computed = window.getComputedStyle(el);
+
+  // Inline document-formatting properties
+  for (var i = 0; i < props.length; i++) {
+    var prop = props[i];
+    var val  = computed.getPropertyValue(prop);
+    if (val) {
+      el.style.setProperty(prop, val);
+    }
+  }
+
+  // ── Colour handling (strip dark mode) ──
+
+  // Background
+  var bgColor = computed.getPropertyValue('background-color');
+  if (bgColor) {
+    var bgRgb = _parseRGB(bgColor);
+    if (!bgRgb || _isTransparent(bgColor)) {
+      el.style.backgroundColor = 'transparent';
+    } else if (bgRgb.r > 200 && bgRgb.g > 200 && bgRgb.b > 200) {
+      el.style.backgroundColor = '#ffffff';
+    } else {
+      el.style.backgroundColor = isRoot ? '#ffffff' : 'transparent';
+    }
+  }
+
+  // Text colour
+  var textColor = computed.getPropertyValue('color');
+  if (textColor) {
+    var textRgb = _parseRGB(textColor);
+    if (!textRgb || textRgb.r > 100 || textRgb.g > 100 || textRgb.b > 100) {
+      el.style.color = '#000000';
+    } else {
+      el.style.color = textColor;
+    }
+  }
+
+  // Borders for table elements
+  var tag = el.tagName.toLowerCase();
+  if (tag === 'td' || tag === 'th' || tag === 'table') {
+    var borderProps = ['border-top', 'border-right', 'border-bottom', 'border-left', 'border'];
+    for (var j = 0; j < borderProps.length; j++) {
+      var bv = computed.getPropertyValue(borderProps[j]);
+      if (bv) {
+        el.style.setProperty(borderProps[j], bv);
+      }
+    }
+  }
+
+  // Remove class attribute – styles are now inline
+  el.removeAttribute('class');
 }
 
 function showToast(message) {
@@ -471,6 +744,68 @@ document.addEventListener('DOMContentLoaded', () => {
   const modoParam = urlParams.get('modo');
   if (modoParam) {
     abrirForm(modoParam);
+  }
+
+  // ── Intercept manual Ctrl+C inside the pre-laudo ──────────────────────
+  // Strips dark-mode backgrounds/colours from the selection so that
+  // Word/PACS receives clean document formatting (white bg, black text).
+  // Only affects #report-editor; the rest of the page is untouched.
+  var reportEditor = document.getElementById('report-editor');
+  if (reportEditor) {
+    reportEditor.addEventListener('copy', function(event) {
+      var selection = window.getSelection();
+      if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return;
+
+      // 1. Clone only the selected fragment (not the entire laudo)
+      var range = selection.getRangeAt(0);
+      var fragment = range.cloneContents();
+
+      // 2. Put fragment in a temporary wrapper and insert it hidden
+      //    inside the report-editor so it inherits the same CSS context
+      var tempWrapper = document.createElement('div');
+      tempWrapper.style.position = 'fixed';
+      tempWrapper.style.left = '-99999px';
+      tempWrapper.style.top = '0';
+      tempWrapper.style.opacity = '0';
+      tempWrapper.style.pointerEvents = 'none';
+      tempWrapper.appendChild(fragment);
+      reportEditor.appendChild(tempWrapper);
+
+      // 3. Document-relevant CSS properties to inline
+      var COPY_PROPS = [
+        'font-family', 'font-size', 'font-weight', 'font-style',
+        'line-height', 'text-align', 'text-indent', 'text-decoration',
+        'vertical-align', 'white-space', 'display',
+        'margin-top', 'margin-right', 'margin-bottom', 'margin-left',
+        'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
+        'list-style', 'list-style-type',
+        'border-collapse', 'border-spacing'
+      ];
+
+      // 4. Walk all elements inside the temp wrapper and inline computed styles
+      var allEls = tempWrapper.querySelectorAll('*');
+      // Also process the wrapper itself (it acts as the root container)
+      _inlineCopyStyles(tempWrapper, COPY_PROPS, true);
+      for (var i = 0; i < allEls.length; i++) {
+        _inlineCopyStyles(allEls[i], COPY_PROPS, false);
+      }
+
+      // 5. Force document colours on the wrapper
+      tempWrapper.style.backgroundColor = '#ffffff';
+      tempWrapper.style.color = '#000000';
+
+      // 6. Extract HTML and plain text
+      var htmlContent = tempWrapper.innerHTML;
+      var plainText = tempWrapper.innerText || tempWrapper.textContent || '';
+
+      // 7. Remove the temporary wrapper from the DOM
+      reportEditor.removeChild(tempWrapper);
+
+      // 8. Set clipboard data and prevent the native copy (which carries dark bg)
+      event.clipboardData.setData('text/html', htmlContent);
+      event.clipboardData.setData('text/plain', plainText);
+      event.preventDefault();
+    });
   }
 
   // Input triggers for Inicial
