@@ -90,6 +90,7 @@ body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
 .check-row:last-child{border-bottom:none;}
 .check-row:hover{background:#f0f5ff;}
 .check-row.selected{background:#e6eeff;}
+.check-row input[type=checkbox]{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
 .check-label{display:flex;align-items:center;gap:10px;width:100%;padding:9px 14px 9px 32px;font-size:12px;color:var(--text-2);cursor:pointer;}
 .check-row.selected .check-label{color:var(--blue);font-weight:600;}
 .check-box{width:16px;height:16px;border-radius:4px;border:2px solid var(--border-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
@@ -133,6 +134,8 @@ body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
 .conclusao-lista { margin: 0; padding: 0; list-style: none; }
 .conclusao-lista li { margin: 0; padding: 0; line-height: 1.4; }
 .laudo-doc:focus { outline: none; }
+.toast-notification{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--white);padding:10px 18px;border-radius:8px;font-size:12.5px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.18);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:9999;}
+.toast-notification.show{opacity:1;}
 </style>
 </head>
 <body>
@@ -183,14 +186,16 @@ const estado = {
   ovD: { sit: 'habitual', loc: 'tópico', dA: '', dB: '', dC: '', lesoes: [], multiFolMed: '' },
   ovE: { sit: 'habitual', loc: 'tópico', dA: '', dB: '', dC: '', lesoes: [], multiFolMed: '' },
   liquido: { sit: 'ausente', qtd: 'discreta', aspecto: 'anecoico', local: 'cavidade pélvica' },
-  anexos: { varizes: false, varizesCal: '', hidros: false, hidrosCal: '', pios: false, piosCal: '', abscesso: false, abscessoLado: 'direita', abscessoA: '', abscessoB: '', abscessoC: '', teratoma: false, teratomaLado: 'direita', teratomaA: '', teratomaB: '', teratomaC: '', textoLiv: '' }
+  anexos: { varizes: false, varizesCal: '', hidros: false, hidrosCal: '', hidrosLado: '', pios: false, piosCal: '', piosLado: '', abscesso: false, abscessoLado: '', abscessoA: '', abscessoB: '', abscessoC: '', textoLiv: '' }
 };
 
 let secaoAtual = 'clinico';
 let lesId = 0;
 let opFinal = [];
+// C1: flag que distingue edição manual do laudo (usuário digitando em #laudo-doc) de renderização automática
+let manualEdit = false;
 
-function showSection(sec){ secaoAtual=sec; document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); document.getElementById('nav-'+sec).classList.add('active'); renderPanel(sec); updateLaudo(); }
+function showSection(sec){ secaoAtual=sec; document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); document.getElementById('nav-'+sec).classList.add('active'); renderPanel(sec); if(!manualEdit) updateLaudo(); }
 
 function rOpt(id, label, checked, onclickAction, extra=''){
   return `<div class="radio-opt ${checked?'selected':''}" onclick="${onclickAction}"><label class="radio-label"><span class="radio-mark"></span>${label}${extra}</label></div>`;
@@ -200,6 +205,16 @@ function cBox(id, label, checked, onchangeAction, indent=true){
 }
 function dInp(id, label, val, oninputAction, unit='cm'){
   return `<div class="dim-row"><span class="dim-lbl">${label}</span><input class="dim-input" type="text" value="${val}" placeholder="—" oninput="${oninputAction}"><span class="dim-unit">${unit}</span></div>`;
+}
+// Seleção de lateralidade (Direita/Esquerda/Bilateral) usada apenas por Hidrossalpinge, Hemato/Piossalpinge
+// e Abscesso Tubo-Ovariano. Não assume lado algum por padrão (opção em branco selecionada quando val==='').
+function selLado(id, val, onchangeAction){
+  return `<div style="padding:10px 14px; background:#fafbff; border-top:1px solid var(--border);"><select id="${id}" class="sel-tag" style="width:100%;margin:0;font-size:12.5px;" onchange="${onchangeAction}">
+    <option value="" ${val===''?'selected':''}>Selecione a lateralidade</option>
+    <option value="direita" ${val==='direita'?'selected':''}>Direita</option>
+    <option value="esquerda" ${val==='esquerda'?'selected':''}>Esquerda</option>
+    <option value="bilateral" ${val==='bilateral'?'selected':''}>Bilateral</option>
+  </select></div>`;
 }
 function sTag(opts, val, onchangeAction, w=""){
   return `<select class="sel-tag" style="${w}" onchange="${onchangeAction}; updateLaudo()" onclick="event.stopPropagation()">${opts.map(o=>`<option value="${o.v}" ${val===o.v?'selected':''}>${o.l}</option>`).join('')}</select>`;
@@ -390,13 +405,26 @@ function renderAnexos(){
     ${cBox('an-v', 'Varizes Pélvicas', e.varizes, "estado.anexos.varizes=this.checked;renderPanel('anexos')", false)}
     ${e.varizes?`<div class="dim-rows" style="background:#fafbff;">${dInp('an-vc', 'Calibre de até', e.varizesCal, "estado.anexos.varizesCal=this.value;updateLaudo()", 'cm')}</div>`:''}
     ${cBox('an-h', 'Hidrossalpinge', e.hidros, "estado.anexos.hidros=this.checked;renderPanel('anexos')", false)}
+    ${e.hidros?selLado('an-h-lado', e.hidrosLado, "estado.anexos.hidrosLado=this.value;updateLaudo()"):''}
     ${cBox('an-p', 'Hemato / Piossalpinge', e.pios, "estado.anexos.pios=this.checked;renderPanel('anexos')", false)}
+    ${e.pios?selLado('an-p-lado', e.piosLado, "estado.anexos.piosLado=this.value;updateLaudo()"):''}
     ${cBox('an-a', 'Abscesso Tubo-Ovariano', e.abscesso, "estado.anexos.abscesso=this.checked;renderPanel('anexos')", false)}
-    ${e.abscesso?`<div class="dim-rows" style="background:#fafbff;">${dInp('an-am', 'Medidas (ex: 4.0 x 3.0 x 2.0)', e.abscessoA, "estado.anexos.abscessoA=this.value;updateLaudo()", 'cm')}</div>`:''}
+    ${e.abscesso?`${selLado('an-a-lado', e.abscessoLado, "estado.anexos.abscessoLado=this.value;updateLaudo()")}<div class="dim-rows" style="background:#fafbff;">
+      ${dInp('an-am-a', 'Diâmetro 1', e.abscessoA, "estado.anexos.abscessoA=this.value;updateLaudo()", 'cm')}
+      ${dInp('an-am-b', 'Diâmetro 2', e.abscessoB, "estado.anexos.abscessoB=this.value;updateLaudo()", 'cm')}
+      ${dInp('an-am-c', 'Diâmetro 3', e.abscessoC, "estado.anexos.abscessoC=this.value;updateLaudo()", 'cm')}
+    </div>`:''}
   </div>
   <div class="block"><div class="block-title">Achados Adicionais (Texto Livre)</div>
     <div style="padding:12px 14px;"><textarea class="text-area" placeholder="Digite observações adicionais..." oninput="estado.anexos.textoLiv=this.value;updateLaudo()">${e.textoLiv}</textarea></div>
   </div>`;
+}
+
+// Função auxiliar para escapar caracteres HTML em campos de texto livre inseridos no innerHTML do laudo,
+// garantindo que o conteúdo digitado/colado pelo médico apareça literalmente, sem ser interpretado como HTML.
+function escapeHtml(str){
+  if(!str) return '';
+  return str.toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 // Função auxiliar para limpar e validar números (vírgula -> ponto, remove múltiplas vírgulas)
@@ -425,7 +453,7 @@ function vMed(a,b,c){
 }
 function mStr(a,b,c){
   const vals = [a,b,c].filter(v => v && v.trim() !== '');
-  if(vals.length === 3){
+  if(vals.length === 3 || vals.length === 2){
     let clean = vals.map(v => sanitizeNumber(v).replace('.', ','));
     return ` medindo cerca de ${clean.join(' x ')} cm`;
   }
@@ -434,6 +462,35 @@ function mStr(a,b,c){
     return ` medindo ${clean} cm`;
   }
   return '';
+}
+
+// DESCRIÇÃO DE LESÕES OVARIANAS (léxico IOTA/O-RADS) — função única usada nos dois ramos de renderização do ovário
+// Usa somente as características selecionadas pelo usuário ou inerentes ao diagnóstico escolhido; não infere vascularização,
+// septações, componente sólido, papilas, calcificação, bilateralidade, ascite ou origem extraovariana não informadas.
+function descreverLesoesOvario(lesoes, nmeLower){
+  let out = '';
+  lesoes.forEach(ls => {
+    let m = mStr(ls.dA, ls.dB, ls.dC);
+    if(ls.tipo==='cisto_simples'){
+      out += `\nPresença de imagem cística unilocular, de conteúdo anecoico e parede regular, sem septações ou componentes sólidos${m}.`;
+      opFinal.push(`Cisto de aspecto simples no ${nmeLower}.`);
+    }
+    if(ls.tipo==='cisto_hemo'){
+      out += `\nPresença de imagem cística de contornos regulares, conteúdo em padrão reticular/rendilhado (fibrinoso), podendo associar-se a área de aspecto retrátil (coágulo), sem componente sólido${m}.`;
+      opFinal.push(`Imagem com aspecto compatível com cisto hemorrágico no ${nmeLower}.`);
+    }
+    if(ls.tipo==='dermoide'){
+      out += `\nPresença de formação cística intraovariana de contornos regulares, com conteúdo heterogêneo à custa de componente sólido hiperecogênico determinando sombra acústica posterior (nódulo de Rokitansky), associado a finas linhas/pontos ecogênicos de permeio${m}.`;
+      opFinal.push(`Achados ultrassonográficos sugestivos de teratoma cístico maduro (cisto dermoide) no ${nmeLower}.`);
+    }
+    if(ls.tipo==='endometrioma'){
+      out += `\nPresença de imagem cística intraovariana, unilocular, com conteúdo finamente ecogênico e homogêneo (padrão vidro fosco), paredes regulares, sem septações espessas ou componentes sólidos${m}.`;
+      opFinal.push(`Imagem com aspecto ultrassonográfico compatível com endometrioma no ${nmeLower}.`);
+    }
+    if(ls.tipo==='foliculo_dom'){ out += `\nPresença de folículo dominante${m}.`; }
+    if(ls.tipo==='corpo_luteo'){ out += `\nPresença de corpo lúteo${m}.`; }
+  });
+  return out;
 }
 
 // NÓDULOS MIOMETRIAIS
@@ -480,6 +537,12 @@ function renderLesoesOvario(l){
 
 // LAUDO PRINCIPAL
 function updateLaudo(){
+  // C1: se havia uma edição manual pendente, ela não é descartada silenciosamente - o usuário é avisado
+  // de que a atualização automática dos campos estruturados irá regerar o laudo.
+  if(manualEdit){
+    manualEdit = false;
+    showToast('Atenção: a edição manual do laudo foi substituída pela atualização automática dos campos.');
+  }
   const cl = estado.clinico, u = estado.utero, en = estado.endometrio, oD = estado.ovD, oE = estado.ovE, liq = estado.liquido, an = estado.anexos;
   const isDefensivo = document.getElementById('laudo-defensivo').checked;
   opFinal = [];
@@ -487,82 +550,151 @@ function updateLaudo(){
   // Indicação Clínica
   let indicacaoHtml = '';
   if(cl.indicacao && cl.indicacao.trim() !== ''){
-    indicacaoHtml = `<div class="doc-p"><span class="doc-label">Indicação clínica:</span> ${cl.indicacao}</div>`;
+    indicacaoHtml = `<div class="doc-p"><span class="doc-label">Indicação clínica:</span> ${escapeHtml(cl.indicacao)}</div>`;
   }
-
-  let refU = cl.status==='menopausa' ? 70 : (cl.gesta==='0'?90 : (cl.gesta==='1-2'?140 : (cl.gesta==='3'?160 : 180)));
 
   let fUtero='', fEndo='', fOvD='', fOvE='', fLiq='', fAnx='';
 
   // DUM
   let fClin = '';
   if(cl.dum==='data') {
-    let dStr = cl.dumData ? cl.dumData.split('-').reverse().join('/') : 'DD/MM/AAAA';
-    fClin = `D.U.M.: ${dStr}`;
+    if(cl.dumData && cl.dumData.trim() !== ''){
+      let dStr = cl.dumData.split('-').reverse().join('/');
+      fClin = `D.U.M.: ${dStr}`;
+    }
   } else if(cl.dum==='estimado') {
-    fClin = `D.U.M.: há ${cl.dumTempo||'_'} ${cl.dumUnidade}`;
+    if(cl.dumTempo && cl.dumTempo.trim() !== ''){
+      fClin = `D.U.M.: há ${cl.dumTempo} ${cl.dumUnidade}`;
+    }
   }
 
   // ÚTERO
   if(u.sit==='hist_total'){ fUtero='Útero não caracterizado (status pós-cirúrgico).'; opFinal.push('Status pós-histerectomia total.'); }
   else {
     let volU = vMed(u.dA, u.dB, u.dC);
-    let dsU = mStr(u.dA, u.dB, u.dC) + (volU ? `, com volume de ${volU} cm³ (normal até ${refU},0 cm³)` : ' medindo cerca de _ x _ x _ cm, com volume de _ cm³');
-    if(u.sit==='hist_parcial'){ fUtero=`Sinais de histerectomia parcial, com colo uterino remanescente de aspecto habitual${dsU}.`; opFinal.push('Status pós-histerectomia parcial.'); }
-    else {
+    let dsUMed = mStr(u.dA, u.dB, u.dC);
+    let dsU = dsUMed + (volU ? `, com volume de ${volU} cm³` : '');
+    let dsUColo = dsUMed + (volU ? `, com volume de ${volU} cm³` : '');
+    // C2: histerectomia parcial reconhece a existência do colo/remanescente uterino, mas não afirma
+    // automaticamente "aspecto habitual" - os achados preenchidos pelo usuário (nódulos, adenomiose,
+    // colo/cistos de Naboth etc.) abaixo são reaproveitados normalmente, assim como para o útero íntegro.
+    if(u.sit==='hist_parcial'){
+      fUtero = `Sinais de histerectomia parcial, com colo uterino/remanescente uterino${dsUColo}.`;
+      opFinal.push('Status pós-histerectomia parcial.');
+    } else {
       let uSit = u.sit==='aumentado' ? 'aumentadas' : 'habituais';
-      fUtero = `Útero ${u.formato}, em ${u.flexao}, com dimensões ${uSit},${dsU}.`;
+      fUtero = `Útero ${u.formato}, em ${u.flexao}, com dimensões ${uSit}${dsU?','+dsU:''}.`;
       if(u.sit==='aumentado') opFinal.push('Útero de dimensões aumentadas.');
+    }
 
-      if(u.eco==='homogenea' && !u.adenomiose) fUtero += `\nApresenta contornos ${u.contornos} e ecotextura miometrial homogênea.`;
-      else if(u.eco==='heterogenea' && !u.adenomiose) { fUtero += `\nApresenta contornos ${u.contornos} e ecotextura miometrial heterogênea, sem lesões focais visíveis.`; opFinal.push('Útero com ecotextura miometrial heterogênea.'); }
-      else if(u.eco==='nodulos' && !u.adenomiose) {
-        if(u.nodulos.length===0) {
-          fUtero += `\nApresenta contornos ${u.contornos} e ecotextura miometrial heterogênea.`;
-        } else {
-          let hasFigo = false;
-          let nstrs = u.nodulos.map(n=>{
-            let v = vMed(n.dA, n.dB, n.dC);
-            let pMed = mStr(n.dA, n.dB, n.dC) + (v ? ` (volume de ${v} cm³)` : '');
-            let fStr = n.figo !== '- -' ? ` (FIGO ${n.figo})` : '';
-            if(n.figo !== '- -') hasFigo = true;
-            return `nódulo miometrial ${n.eco} localizado na ${n.parede} do segmento ${n.segmento}, de componente predominantemente ${n.classif}${fStr}${pMed}`;
-          });
-          
-          if(u.nodulos.length === 1) {
-            fUtero += `\nApresenta contornos ${u.contornos} e ecotextura miometrial heterogênea à custa de ${nstrs[0]}.`;
-          } else {
-            fUtero += `\nApresenta contornos ${u.contornos} e ecotextura miometrial heterogênea à custa de nódulos miometrais assim dispostos:<br>` + nstrs.map(ns => `— ${ns}`).join('<br>');
-          }
+    if(u.eco==='homogenea' && !u.adenomiose) fUtero += `\nApresenta contornos ${u.contornos} e ecotextura miometrial homogênea.`;
+    else if(u.eco==='heterogenea' && !u.adenomiose) { fUtero += `\nApresenta contornos ${u.contornos} e ecotextura miometrial heterogênea, sem lesões focais visíveis.`; opFinal.push('Útero com ecotextura miometrial heterogênea.'); }
+    else if(u.eco==='nodulos' && !u.adenomiose) {
+      if(u.nodulos.length===0) {
+        fUtero += `\nApresenta contornos ${u.contornos} e ecotextura miometrial heterogênea.`;
+        opFinal.push('Útero com ecotextura miometrial heterogênea.');
+      } else {
+        let hasFigo = false;
+        let nstrs = u.nodulos.map(n=>{
+          let v = vMed(n.dA, n.dB, n.dC);
+          let pMed = mStr(n.dA, n.dB, n.dC) + (v ? ` (volume de ${v} cm³)` : '');
+          let fStr = n.figo !== '- -' ? ` (FIGO ${n.figo})` : '';
+          if(n.figo !== '- -') hasFigo = true;
+          return `nódulo miometrial ${n.eco} localizado na ${n.parede} do segmento ${n.segmento}, de componente predominantemente ${n.classif}${fStr}${pMed}`;
+        });
+        
+        if(u.nodulos.length === 1) {
+          fUtero += `\nApresenta contornos ${u.contornos} e ecotextura miometrial heterogênea à custa de ${nstrs[0]}.`;
           opFinal.push(`Útero com nódulo miometrial mais comumente relacionado a leiomioma${hasFigo?' (classificação FIGO inclusa no corpo do relatório)':''}.`);
+        } else {
+          fUtero += `\nApresenta contornos ${u.contornos} e ecotextura miometrial heterogênea à custa de nódulos miometriais assim dispostos:<br>` + nstrs.map(ns => `— ${ns}`).join('<br>');
+          opFinal.push(`Útero com nódulos miometriais mais comumente relacionados a leiomiomas${hasFigo?' (classificação FIGO inclusa no corpo do relatório)':''}.`);
         }
       }
-      
-      if(u.adenomiose) {
-        let listSinais = u.adenoSinais.map(s => s === 'artefato acústico em leque' ? 'artefato acústico "em leque"' : s);
-        fUtero += `\nApresenta contornos ${u.contornos} e ecotextura miometrial difusamente heterogênea, notando-se: ${listSinais.length?listSinais.join(', '):'sinais de adenomiose'}.`;
+    }
+    // C3: quando miomas (eco==='nodulos') e adenomiose coexistem, a informação de que o
+    // miométrio é heterogêneo é apresentada uma única vez (em vez de duas frases seguidas
+    // repetindo "ecotextura miometrial heterogênea"), mantendo na sequência os detalhes
+    // específicos de cada achado (nódulos e sinais de adenomiose/MUSA) normalmente.
+    else if(u.eco==='nodulos' && u.adenomiose) {
+      let listSinais = u.adenoSinais.map(s => s === 'artefato acústico em leque' ? 'artefato acústico "em leque"' : s);
+      fUtero += `\nApresenta contornos ${u.contornos}, com nódulos miometriais e sinais ultrassonográficos de adenomiose.`;
+      if(u.nodulos.length===0) {
+        opFinal.push('Útero com ecotextura miometrial heterogênea.');
+      } else {
+        let hasFigo = false;
+        let nstrs = u.nodulos.map(n=>{
+          let v = vMed(n.dA, n.dB, n.dC);
+          let pMed = mStr(n.dA, n.dB, n.dC) + (v ? ` (volume de ${v} cm³)` : '');
+          let fStr = n.figo !== '- -' ? ` (FIGO ${n.figo})` : '';
+          if(n.figo !== '- -') hasFigo = true;
+          return `nódulo miometrial ${n.eco} localizado na ${n.parede} do segmento ${n.segmento}, de componente predominantemente ${n.classif}${fStr}${pMed}`;
+        });
+
+        if(u.nodulos.length === 1) {
+          fUtero += `\nNódulo miometrial: ${nstrs[0]}.`;
+          opFinal.push(`Útero com nódulo miometrial mais comumente relacionado a leiomioma${hasFigo?' (classificação FIGO inclusa no corpo do relatório)':''}.`);
+        } else {
+          fUtero += `\nNódulos miometriais assim dispostos:<br>` + nstrs.map(ns => `— ${ns}`).join('<br>');
+          opFinal.push(`Útero com nódulos miometriais mais comumente relacionados a leiomiomas${hasFigo?' (classificação FIGO inclusa no corpo do relatório)':''}.`);
+        }
+      }
+      fUtero += `\nQuanto à adenomiose, notando-se: ${listSinais.length?listSinais.join(', '):'sinais de adenomiose'}.`;
+      // Classificação interna conforme consenso MUSA (critérios diretos x indiretos), sem alterar a lista exibida ao usuário
+      const sinaisDiretosMUSA = ['cistos miometriais','cistos subendometriais','ilhas hiperecoicas','linhas/botões ecogênicos'];
+      const temSinalDireto = u.adenoSinais.some(s => sinaisDiretosMUSA.includes(s));
+      if(temSinalDireto){
+        opFinal.push('Achados ecográficos compatíveis com adenomiose miometrial.');
+      } else if(u.adenoSinais.length > 0) {
+        opFinal.push('Achados ecográficos indiretos, inespecíficos, que podem estar associados a adenomiose, sugerindo-se correlação clínica.');
+      } else {
         opFinal.push('Alteração ecotextural miometrial com aspecto que pode estar relacionado a adenomiose.');
       }
-
-      if(u.colo==='habitual') fUtero += `\nColo uterino e canal endocervical de aspecto habitual.`;
-      else { fUtero += `\nColo uterino e canal endocervical de aspecto habitual, com presença de cistos de retenção${u.cistoColoMed?` medindo até ${u.cistoColoMed} cm`:''}.`; opFinal.push('Cistos de retenção no colo uterino.'); }
     }
+
+    if(u.adenomiose && u.eco !== 'nodulos') {
+      let listSinais = u.adenoSinais.map(s => s === 'artefato acústico em leque' ? 'artefato acústico "em leque"' : s);
+      fUtero += `\nApresenta contornos ${u.contornos} e ecotextura miometrial difusamente heterogênea, notando-se: ${listSinais.length?listSinais.join(', '):'sinais de adenomiose'}.`;
+      // Classificação interna conforme consenso MUSA (critérios diretos x indiretos), sem alterar a lista exibida ao usuário
+      const sinaisDiretosMUSA = ['cistos miometriais','cistos subendometriais','ilhas hiperecoicas','linhas/botões ecogênicos'];
+      const temSinalDireto = u.adenoSinais.some(s => sinaisDiretosMUSA.includes(s));
+      if(temSinalDireto){
+        opFinal.push('Achados ecográficos compatíveis com adenomiose miometrial.');
+      } else if(u.adenoSinais.length > 0) {
+        opFinal.push('Achados ecográficos indiretos, inespecíficos, que podem estar associados a adenomiose, sugerindo-se correlação clínica.');
+      } else {
+        opFinal.push('Alteração ecotextural miometrial com aspecto que pode estar relacionado a adenomiose.');
+      }
+    }
+
+    if(u.colo==='habitual') fUtero += `\nColo uterino e canal endocervical de aspecto habitual.`;
+    else { fUtero += `\nColo uterino e canal endocervical com presença de cistos de retenção${u.cistoColoMed?` medindo até ${u.cistoColoMed} cm`:''}.`; opFinal.push('Cistos de retenção no colo uterino.'); }
   }
 
   // ENDOMÉTRIO
-  if(en.carac==='nao' || u.sit==='hist_total') fEndo = u.sit==='hist_total'?'':'Endométrio não caracterizado.';
+  if(en.carac==='nao' || u.sit==='hist_total' || u.sit==='hist_parcial') fEndo = (u.sit==='hist_total' || u.sit==='hist_parcial')?'':'Endométrio não caracterizado.';
   else {
     let car = en.carac==='integralmente' ? '' : 'parcialmente caracterizado, ';
-    if(en.aspecto==='espessado'){ fEndo=`Endométrio ${car}espessado${en.esp?`, com espessura de ${en.esp} mm`:''}.`; opFinal.push('Espessamento endometrial homogêneo/heterogêneo, de etiologia a esclarecer. A histeroscopia pode trazer maiores subsídios diagnósticos.'); }
-    else if(en.aspecto==='heterogeneo'){ fEndo=`Endométrio ${car}de aspecto heterogêneo, apresentando pequenas áreas císticas anecogênicas de permeio${en.esp?`, com espessura de ${en.esp} mm`:''}.`; opFinal.push('Endométrio de aspecto heterogêneo (com áreas císticas).'); }
+    if(en.aspecto==='espessado'){ fEndo=`Endométrio ${car}espessado${en.esp?`, com espessura de ${en.esp} mm`:''}.`; opFinal.push(`Espessamento endometrial${cl.status==='menopausa'?', cuja relevância deve ser avaliada em correlação com o status hormonal (menopausa) e o quadro clínico':', cuja relevância deve ser interpretada em correlação com a fase do ciclo menstrual e o quadro clínico'}.`); }
+    else if(en.aspecto==='heterogeneo'){ fEndo=`Endométrio ${car}de aspecto heterogêneo, apresentando pequenas áreas císticas anecogênicas de permeio${en.esp?`, com espessura de ${en.esp} mm`:''}.`; opFinal.push(`Endométrio de aspecto heterogêneo (com áreas císticas)${cl.status==='menopausa'?', cuja relevância deve ser avaliada em correlação com o status hormonal (menopausa) e o quadro clínico':', cuja relevância deve ser interpretada em correlação com a fase do ciclo menstrual e o quadro clínico'}.`); }
     else {
       let asp = en.aspecto==='habitual' ? 'regular e homogêneo' : `de aspecto ${en.aspecto}`;
       fEndo=`Endométrio ${car}${asp}${en.esp?`, com espessura de ${en.esp} mm`:''}.`;
     }
-    if(en.liq) { fEndo+='\nPresença de discreta quantidade de líquido anecoide, que separa os folhetos endometriais, podendo corresponder a conteúdo fluido e/ou hemático.'; opFinal.push('Achados sugestivos de mucometra/hemometra.'); }
+    if(en.liq) {
+      fEndo+='\nPresença de discreta quantidade de líquido anecoide, que separa os folhetos endometriais, podendo corresponder a conteúdo fluido e/ou hemático.';
+      // Proporcionalidade análoga à do líquido livre pélvico: discreta quantidade isolada, sem outro contexto (menopausa, DIU),
+      // não deve gerar automaticamente o termo categórico "mucometra/hemometra" na conclusão.
+      const contextoRelevante = cl.status==='menopausa';
+      if(contextoRelevante) {
+        opFinal.push('Achados sugestivos de mucometra/hemometra.');
+      } else {
+        opFinal.push('Discreta quantidade de líquido intracavitário separando os folhetos endometriais, de significado clínico incerto, sugerindo-se correlação clínica se pertinente.');
+      }
+    }
     
     if(en.diu==='normo'){ fEndo+='\nCavidade uterina ocupada por DIU, com seu extremo inferior da haste central acima do orifício cervical interno, com suas hastes transversais simétricas e abertas no sentido látero-lateral, sem alterações de rotação.'; opFinal.push('DIU tópico.'); }
-    else if(en.diu==='baixo'){ fEndo+='\nCavidade uterina IBM ocupada por DIU, com seu extremo inferior da haste central abaixo do orifício cervical interno, com suas hastes transversais parcialmente abertas.'; opFinal.push('DIU em posição baixa na cavidade uterina.'); }
+    else if(en.diu==='baixo'){ fEndo+='\nCavidade uterina ocupada por DIU, com seu extremo inferior da haste central abaixo do orifício cervical interno, com suas hastes transversais parcialmente abertas.'; opFinal.push('DIU em posição baixa na cavidade uterina.'); }
     else if(en.diu==='deslocado'){ fEndo+='\nDispositivo intra-uterino (DIU) com trajeto intramural.'; opFinal.push('DIU com trajeto intramural.'); }
 
     if(en.polipo==='endometrial'){ fEndo+=`\nPresença de imagem polipoide hiperecoica no segmento endometrial${en.polMed?` medindo ${en.polMed} cm`:''}.`; opFinal.push('Lesão polipoide endometrial.'); }
@@ -574,6 +706,9 @@ function updateLaudo(){
     let st = estado[l];
     let nmeLower = l==='ovD'?'direito':'esquerdo';
     let nmeUpper = l==='ovD'?'Ovário direito':'Ovário esquerdo';
+    // Lateralidade anatomicamente completa, usada exclusivamente na conclusão dos achados ovarianos
+    // (descreverLesoesOvario), para produzir "no ovário direito/esquerdo" em vez de "no direito/esquerdo".
+    let nmeCompleto = 'ovário ' + nmeLower;
     
     if(st.sit==='naocarac'){ 
       return `Ovário ${nmeLower} não caracterizado no presente estudo (interposição gasosa de alças intestinais?).`; 
@@ -582,18 +717,35 @@ function updateLaudo(){
     let temMedida = (st.dA && st.dA.trim() !== '') || (st.dB && st.dB.trim() !== '') || (st.dC && st.dC.trim() !== '');
     
     if(!temMedida) {
-      let bs = `Ovário ${nmeLower} em topografia, morfologia, contornos, dimensões e ecotextura normais.`;
+      if(st.sit==='habitual') {
+        if(st.lesoes.length > 0){
+          // Sem medidas, mas com lesão cadastrada: não afirmar "ecotextura normal" antes de descrever o achado
+          let bs = `Ovário ${nmeLower} em topografia, morfologia, contornos normais.`;
+          bs += descreverLesoesOvario(st.lesoes, nmeCompleto);
+          return bs;
+        }
+        return `Ovário ${nmeLower} em topografia, morfologia, contornos, dimensões e ecotextura normais.`;
+      }
+      
+      // Situação anormal (aumentado / multifolicular / policístico) sem medidas gerais preenchidas
+      let bs = `Ovário ${nmeLower} em topografia, morfologia, contornos normais.\n`;
+      if(st.sit==='aumentado'){
+        opFinal.push(`${nmeUpper} com volume aumentado.`);
+        // C3: sem medidas, o corpo não pode sugerir normalidade incompatível com a conclusão de volume aumentado,
+        // nem inventar valores. Se houver lesão associada, mantém-se apenas a abertura neutra (sem afirmar
+        // ecotextura habitual) antes de descrevê-la, mesma lógica já usada no ramo "habitual + lesão".
+        if(st.lesoes.length === 0){
+          bs += `Parênquima com ecotextura habitual.\n`;
+        }
+        bs += `Medidas gerais do ovário não disponíveis para mensuração no presente estudo, notando-se volume ovariano aumentado.`;
+      } else if(st.sit==='multifolicular'){
+        bs += `Parênquima com ecotextura homogênea, com presença de várias imagens císticas de aspecto simples${st.multiFolMed?` medindo até ${st.multiFolMed} cm`:''}.`;
+      } else if(st.sit==='policistico'){
+        bs += `Nota-se a presença de múltiplos folículos antrais, medindo entre 2,0 e 9,0 mm, e em número maior ou igual a 20. Não se observa cistos, corpo lúteo ou folículos dominantes.`;
+      }
       
       if(st.lesoes.length > 0){
-        st.lesoes.forEach(ls => {
-          let m = mStr(ls.dA,ls.dB,ls.dC);
-          if(ls.tipo==='cisto_simples'){ bs+=`\nPresença de imagem cística com conteúdo anecoico e contornos regulares${m}.`; opFinal.push(`Cisto de aspecto simples no ${nmeLower}.`); }
-          if(ls.tipo==='cisto_hemo'){ bs+=`\nPresença de imagem cística de contornos regulares, contendo septações finas e líquido com debris (podendo corresponder a conteúdo hemático)${m}.`; opFinal.push(`Imagem com aspecto compatível com cisto hemorrágico no ${nmeLower}.`); }
-          if(ls.tipo==='dermoide'){ bs+=`\nPresença de formação intraovariana de contornos regulares, com conteúdo heterogêneo contendo focos hiperecogênicos com sombra acústica posterior e nódulo mural ecogênico${m}.`; opFinal.push(`Achados ultrassonográficos sugestivos de teratoma cístico maduro (cisto dermoide) no ${nmeLower}.`); }
-          if(ls.tipo==='endometrioma'){ bs+=`\nPresença de imagem cística intraovariana, unilocular, com conteúdo finamente ecogênico e homogêneo (padrão vidro fosco), paredes regulares, sem septações espessas ou componentes sólidos${m}.`; opFinal.push(`Imagem com aspecto ultrassonográfico compatível com endometrioma no ${nmeLower}.`); }
-          if(ls.tipo==='foliculo_dom'){ bs+=`\nPresença de folículo dominante${m}.`; }
-          if(ls.tipo==='corpo_luteo'){ bs+=`\nPresença de corpo lúteo${m}.`; }
-        });
+        bs += descreverLesoesOvario(st.lesoes, nmeCompleto);
       }
       return bs;
     }
@@ -605,10 +757,8 @@ function updateLaudo(){
     
     if(st.sit==='multifolicular'){
       bs += `Parênquima com ecotextura homogênea, com presença de várias imagens císticas de aspecto simples${st.multiFolMed?` medindo até ${st.multiFolMed} cm`:''}.\n`;
-      opFinal.push(`Ovário com padrão multifolicular.`);
     } else if(st.sit==='policistico'){
       bs += `Nota-se a presença de múltiplos folículos antrais, medindo entre 2,0 e 9,0 mm, e em número maior ou igual a 20. Não se observa cistos, corpo lúteo ou folículos dominantes.\n`;
-      opFinal.push(`Ovário com aspecto policístico.`);
     } else {
       bs += `Parênquima com ecotextura habitual.\n`;
     }
@@ -617,34 +767,123 @@ function updateLaudo(){
     bs += `Medidas do ovário: ${dStr} cm ( volume: ${vo||'—'} cm³ ).`;
 
     if(st.lesoes.length>0){
-      st.lesoes.forEach(ls => {
-        let m = mStr(ls.dA,ls.dB,ls.dC);
-        if(ls.tipo==='cisto_simples'){ bs+=`\nPresença de imagem cística com conteúdo anecoico e contornos regulares${m}.`; opFinal.push(`Cisto de aspecto simples no ${nmeLower}.`); }
-        if(ls.tipo==='cisto_hemo'){ bs+=`\nPresença de imagem cística de contornos regulares, contendo septações finas e líquido com debris (podendo corresponder a conteúdo hemático)${m}.`; opFinal.push(`Imagem com aspecto compatível com cisto hemorrágico no ${nmeLower}.`); }
-        if(ls.tipo==='dermoide'){ bs+=`\nPresença de formação intraovariana de contornos regulares, com conteúdo heterogêneo contendo focos hiperecogênicos com sombra acústica posterior e nódulo mural ecogênico${m}.`; opFinal.push(`Achados ultrassonográficos sugestivos de teratoma cístico maduro (cisto dermoide) no ${nmeLower}.`); }
-        if(ls.tipo==='endometrioma'){ bs+=`\nPresença de imagem cística intraovariana, unilocular, com conteúdo finamente ecogênico e homogêneo (padrão vidro fosco), paredes regulares, sem septações espessas ou componentes sólidos${m}.`; opFinal.push(`Imagem com aspecto ultrassonográfico compatível com endometrioma no ${nmeLower}.`); }
-        if(ls.tipo==='foliculo_dom'){ bs+=`\nPresença de folículo dominante${m}.`; }
-        if(ls.tipo==='corpo_luteo'){ bs+=`\nPresença de corpo lúteo${m}.`; }
-      });
+      bs += descreverLesoesOvario(st.lesoes, nmeCompleto);
     }
     return bs;
   }
   fOvD = renderO('ovD'); fOvE = renderO('ovE');
 
+  // Conclusão de padrão multifolicular / aspecto policístico: lateralidade explícita quando unilateral,
+  // frase única "bilateral" quando ambos os ovários apresentam o mesmo achado.
+  if(oD.sit==='multifolicular' && oE.sit==='multifolicular'){
+    opFinal.push('Ovários com padrão multifolicular bilateral.');
+  } else if(oD.sit==='multifolicular'){
+    opFinal.push('Ovário direito com padrão multifolicular.');
+  } else if(oE.sit==='multifolicular'){
+    opFinal.push('Ovário esquerdo com padrão multifolicular.');
+  }
+  if(oD.sit==='policistico' && oE.sit==='policistico'){
+    opFinal.push('Ovários com aspecto policístico bilateral.');
+  } else if(oD.sit==='policistico'){
+    opFinal.push('Ovário direito com aspecto policístico.');
+  } else if(oE.sit==='policistico'){
+    opFinal.push('Ovário esquerdo com aspecto policístico.');
+  }
+
   // LÍQUIDO
   if(liq.sit==='ausente') fLiq='Ausência de líquido livre na cavidade pélvica.';
-  else { fLiq=`Presença de ${liq.qtd} quantidade de líquido livre ${liq.aspecto} em ${liq.local}.`; opFinal.push(`Presença de líquido livre na cavidade pélvica.`); }
+  else {
+    fLiq=`Presença de ${liq.qtd} quantidade de líquido livre ${liq.aspecto} em ${liq.local}.`;
+    // Pequena/discreta quantidade de conteúdo anecoico é achado frequentemente fisiológico (ex.: periovulatório) e não é
+    // automaticamente listada como achado na conclusão; quantidades maiores ou conteúdo não anecoico são destacadas.
+    const qtdFisiologica = (liq.qtd==='discreta' || liq.qtd==='pequena');
+    if(!qtdFisiologica || liq.aspecto!=='anecoico'){
+      opFinal.push(`Presença de líquido livre em quantidade ${liq.qtd} na cavidade pélvica${liq.aspecto!=='anecoico'?', de conteúdo '+liq.aspecto:''}.`);
+    }
+  }
 
   // ANEXOS
   if(an.varizes){ fAnx+=`Dilatação e tortuosidade dos vasos pélvicos bilateralmente${an.varizesCal?`, com calibre de até ${an.varizesCal} cm`:''}.\n`; opFinal.push('Varizes pélvicas.'); }
-  if(an.hidros){ fAnx+=`Formação tubuliforme com conteúdo anecoico na região anexial, sugestivo de hidrossalpinge.\n`; opFinal.push('Hidrossalpinge.'); }
-  if(an.pios){ fAnx+=`Formação tubuliforme com conteúdo hipoecoico na região anexial.\n`; opFinal.push('Tuba uterina com conteúdo espesso, podendo corresponder a hemato/piossalpinge na dependência de correlação clínico-laboratorial.'); }
-  if(an.abscesso){ fAnx+=`Formação expansiva heterogênea na região anexial, de paredes espessas e conteúdo predominantemente hipoecogênico${an.abscessoA?` medindo ${mStr(an.abscessoA,an.abscessoB,an.abscessoC).replace(' medindo cerca de ','')}`:''}.\n`; opFinal.push('Formação expansiva na região anexial. Considerar a possibilidade de abscesso tubo-ovariano na dependência de correlação clínico-laboratorial.'); }
-  if(an.textoLiv) fAnx += `Achados adicionais: ${an.textoLiv}\n`;
+  if(an.hidros){
+    // C5: lateralidade opcional (Direita/Esquerda/Bilateral); se não selecionada, mantém o texto original sem inventar lado.
+    let ladoHidroTxt = an.hidrosLado==='direita' ? ' à direita' : an.hidrosLado==='esquerda' ? ' à esquerda' : an.hidrosLado==='bilateral' ? ' bilateral' : '';
+    fAnx+=`Estrutura tubular anecoica, de trajeto sinuoso, de provável origem tubária (não ovariana), com septações incompletas, compatível com hidrossalpinge${ladoHidroTxt}.\n`;
+    opFinal.push(an.hidrosLado==='direita' ? 'Hidrossalpinge à direita.' : an.hidrosLado==='esquerda' ? 'Hidrossalpinge à esquerda.' : an.hidrosLado==='bilateral' ? 'Hidrossalpinge bilateral.' : 'Hidrossalpinge.');
+  }
+  if(an.pios){
+    let ladoPiosTxt = an.piosLado==='direita' ? ', à direita' : an.piosLado==='esquerda' ? ', à esquerda' : an.piosLado==='bilateral' ? ', bilateralmente' : '';
+    fAnx+=`Estrutura tubular de trajeto sinuoso, de provável origem tubária (não ovariana), com conteúdo espesso/hipoecogênico com debris${ladoPiosTxt}.\n`;
+    let ladoPiosConc = an.piosLado==='direita' ? ' à direita' : an.piosLado==='esquerda' ? ' à esquerda' : an.piosLado==='bilateral' ? ' bilateral' : '';
+    opFinal.push(`Estrutura tubária com conteúdo espesso, podendo corresponder a hemato/piossalpinge${ladoPiosConc} na dependência de correlação clínico-laboratorial.`);
+  }
+  if(an.abscesso){
+    let ladoAbscTxt = an.abscessoLado==='direita' ? ', à direita' : an.abscessoLado==='esquerda' ? ', à esquerda' : an.abscessoLado==='bilateral' ? ', bilateralmente' : '';
+    fAnx+=`Formação expansiva heterogênea na região anexial, de paredes espessas e conteúdo predominantemente hipoecogênico, sem plano de clivagem nítido em relação ao ovário e/ou tuba adjacentes${(an.abscessoA || an.abscessoB || an.abscessoC)?` medindo ${mStr(an.abscessoA,an.abscessoB,an.abscessoC).replace(' medindo cerca de ','').replace(' medindo ','')}`:''}${ladoAbscTxt}.\n`;
+    // Bilateral pluraliza "abscesso(s) tubo-ovariano(s)"; direita/esquerda mantêm a forma singular com o lado anexado.
+    let ladoAbscConcSing = an.abscessoLado==='direita' ? ' à direita' : an.abscessoLado==='esquerda' ? ' à esquerda' : '';
+    opFinal.push(an.abscessoLado==='bilateral'
+      ? 'Formação expansiva na região anexial. Considerar a possibilidade de abscessos tubo-ovarianos bilaterais na dependência de correlação clínico-laboratorial.'
+      : `Formação expansiva na região anexial. Considerar a possibilidade de abscesso tubo-ovariano${ladoAbscConcSing} na dependência de correlação clínico-laboratorial.`);
+  }
+  if(an.textoLiv) fAnx += `Achados adicionais: ${escapeHtml(an.textoLiv)}\n`;
 
   // CONCLUSÃO (ex- "Opinião do relatório")
   let oTxt = '';
-  const uniqueOp = [...new Set(opFinal)]; 
+  // C4: quando o mesmo tipo de achado ovariano ocorre uma única vez em cada ovário (ex.: um cisto simples
+  // no ovário direito e um cisto simples no ovário esquerdo), as duas frases são unificadas em uma só,
+  // usando "bilateral" (ex.: "Cistos de aspecto simples bilaterais."), em vez de duas frases separadas por lado.
+  // Achados diferentes entre os ovários, ou casos com mais de uma lesão do mesmo tipo no mesmo lado,
+  // continuam sendo descritos separadamente, sem alteração de comportamento.
+  const achadosLateralizados = [
+    { direito: 'Cisto de aspecto simples no ovário direito.', esquerdo: 'Cisto de aspecto simples no ovário esquerdo.', bilateral: 'Cistos de aspecto simples bilaterais.' },
+    { direito: 'Imagem com aspecto compatível com cisto hemorrágico no ovário direito.', esquerdo: 'Imagem com aspecto compatível com cisto hemorrágico no ovário esquerdo.', bilateral: 'Imagens com aspecto compatível com cisto hemorrágico bilaterais.' },
+    { direito: 'Achados ultrassonográficos sugestivos de teratoma cístico maduro (cisto dermoide) no ovário direito.', esquerdo: 'Achados ultrassonográficos sugestivos de teratoma cístico maduro (cisto dermoide) no ovário esquerdo.', bilateral: 'Achados ultrassonográficos sugestivos de teratoma cístico maduro (cisto dermoide) bilaterais.' },
+    { direito: 'Imagem com aspecto ultrassonográfico compatível com endometrioma no ovário direito.', esquerdo: 'Imagem com aspecto ultrassonográfico compatível com endometrioma no ovário esquerdo.', bilateral: 'Imagens com aspecto ultrassonográfico compatível com endometrioma bilaterais.' },
+  ];
+  achadosLateralizados.forEach(par => {
+    const countDireito = opFinal.filter(i => i === par.direito).length;
+    const countEsquerdo = opFinal.filter(i => i === par.esquerdo).length;
+    if(countDireito === 1 && countEsquerdo === 1){
+      const idxDireito = opFinal.indexOf(par.direito);
+      opFinal.splice(idxDireito, 1, par.bilateral);
+      const idxEsquerdo = opFinal.indexOf(par.esquerdo);
+      opFinal.splice(idxEsquerdo, 1);
+    }
+  });
+  // Deduplicação inteligente: entradas repetidas por coincidência (ex.: mesma frase de achado único) continuam
+  // sendo unificadas em uma só linha, mas entradas repetidas que correspondem a lesões reais e distintas do mesmo
+  // tipo no mesmo lado (ex.: dois cistos simples no mesmo ovário) são diferenciadas/numeradas em vez de ocultadas.
+  function numPT(n){
+    const map = {2:'Dois',3:'Três',4:'Quatro',5:'Cinco',6:'Seis',7:'Sete',8:'Oito',9:'Nove',10:'Dez'};
+    return map[n] || String(n);
+  }
+  function pluralizarAchado(texto, n){
+    const regras = [
+      { re: /^Cisto de aspecto simples no (.+)\.$/, plural: (lado)=>`${numPT(n)} cistos de aspecto simples no ${lado}.` },
+      { re: /^Imagem com aspecto compatível com cisto hemorrágico no (.+)\.$/, plural: (lado)=>`${numPT(n)} imagens com aspecto compatível com cisto hemorrágico no ${lado}.` },
+      { re: /^Achados ultrassonográficos sugestivos de teratoma cístico maduro \(cisto dermoide\) no (.+)\.$/, plural: (lado)=>`${numPT(n)} achados ultrassonográficos sugestivos de teratoma cístico maduro (cisto dermoide) no ${lado}.` },
+      { re: /^Imagem com aspecto ultrassonográfico compatível com endometrioma no (.+)\.$/, plural: (lado)=>`${numPT(n)} imagens com aspecto ultrassonográfico compatível com endometrioma no ${lado}.` },
+    ];
+    for(const r of regras){
+      const m = texto.match(r.re);
+      if(m) return r.plural(m[1]);
+    }
+    return null;
+  }
+  const contagemOp = new Map();
+  opFinal.forEach(item => contagemOp.set(item, (contagemOp.get(item)||0)+1));
+  const uniqueOp = [];
+  opFinal.forEach(item => {
+    if(!contagemOp.has(item)) return;
+    const n = contagemOp.get(item);
+    contagemOp.delete(item);
+    if(n > 1){
+      const plural = pluralizarAchado(item, n);
+      uniqueOp.push(plural || item);
+    } else {
+      uniqueOp.push(item);
+    }
+  });
 
   if(uniqueOp.length===0) {
     oTxt = '<div class="doc-p" style="margin-bottom:0">Estudo ecográfico sem evidentes anormalidades apreciáveis ao método.</div>';
@@ -707,6 +946,10 @@ function copiar() {
     showToast('Falha ao copiar. Use Ctrl+A e Ctrl+C no texto do laudo.');
   }
 }
+// C1: detecta edição manual do médico no laudo (contenteditable) para não ser apagada silenciosamente
+document.getElementById('laudo-doc').addEventListener('input', function(e) {
+  manualEdit = true;
+});
 // Intercepta copy manual no dark mode para remover fundo escuro
 document.getElementById('laudo-doc').addEventListener('copy', function(e) {
   if (!document.body.classList.contains('dark')) return;

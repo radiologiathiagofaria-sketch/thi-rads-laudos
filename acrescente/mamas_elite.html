@@ -155,12 +155,15 @@ body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
   <div class="sidebar">
     <div class="sidebar-hd"><div class="sidebar-tipo">Ultrassonografia</div><div class="sidebar-titulo">Mamas</div></div>
     <div class="nav-group">
+      <div class="nav-item" id="nav-indicacao" onclick="showSection('indicacao')"><span class="nav-dot"></span>Indicação</div>
+      <div class="nav-item" id="nav-examesanteriores" onclick="showSection('examesanteriores')"><span class="nav-dot"></span>Exames Anteriores</div>
       <div class="nav-item" id="nav-composicao" onclick="showSection('composicao')"><span class="nav-dot"></span>Composição</div>
       <div class="nav-item" id="nav-cirurgias" onclick="showSection('cirurgias')"><span class="nav-dot"></span>Cirurgias</div>
       <div class="nav-item" id="nav-implantes" onclick="showSection('implantes')"><span class="nav-dot"></span>Implantes</div>
       <div class="nav-item" id="nav-cistos" onclick="showSection('cistos')"><span class="nav-dot"></span>Cistos</div>
       <div class="nav-item" id="nav-nodulos" onclick="showSection('nodulos')"><span class="nav-dot"></span>Nódulos</div>
-      <div class="nav-item" id="nav-linfonodo" onclick="showSection('linfonodo')"><span class="nav-dot"></span>Linfonodo IM</div>
+      <div class="nav-item" id="nav-naomassa" onclick="showSection('naomassa')"><span class="nav-dot"></span>Lesão Não-Nodular</div>
+      <div class="nav-item" id="nav-linfonodo" onclick="showSection('linfonodo')"><span class="nav-dot"></span>Linfonodos</div>
       <div class="nav-item" id="nav-ectasias" onclick="showSection('ectasias')"><span class="nav-dot"></span>Ectasias Ductais</div>
       <div class="nav-item" id="nav-distorcao" onclick="showSection('distorcao')"><span class="nav-dot"></span>Distorção Arq.</div>
       <div class="nav-item" id="nav-muscular" onclick="showSection('muscular')"><span class="nav-dot"></span>Planos Musc.</div>
@@ -172,34 +175,55 @@ body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
 
   <div class="laudo-panel">
     <div class="laudo-header"><span class="laudo-header-title">Pré-visualização</span></div>
-    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc" contenteditable="true"></div></div>
+    <div class="laudo-body">
+      <div class="doc-p" style="font-size:10.5px;color:var(--text-3);padding:8px 0 0;max-width:720px">Edições feitas diretamente no texto abaixo serão substituídas se qualquer campo do formulário for alterado depois. Para observações que devem sempre ser preservadas, use o campo "Observações adicionais" ao final.</div>
+      <div class="laudo-doc" id="laudo-doc" contenteditable="true"></div>
+      <div class="doc-secao" style="margin-top:14px;max-width:720px">
+        <span class="doc-label" style="font-weight:700">OBSERVAÇÕES ADICIONAIS DO RADIOLOGISTA:</span>
+        <textarea id="notas-adicionais" style="width:100%;min-height:60px;margin-top:6px;padding:8px;border:1px solid var(--border-strong);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);background:var(--white)" placeholder="Texto livre — preservado mesmo ao alterar campos do formulário." oninput="estado.notasAdicionais=this.value"></textarea>
+      </div>
+    </div>
   </div>
 </div>
 
 <script>
 // ── ESTADO ──
 const estado = {
+  indicacao: { preset:'rastreamento', manual:'', clinicoAchados:{nodulo:false,dor:false,secrecao:false,pele:false} },
+  examesAnteriores: { tem:false, usgData:'', incluirMmg:false, mmgData:'' },
   composicao: 'fibroglandular',
+  componenteGlandular: '',
   cirurgias: { mastDir:false, mastEsq:false, mastBil:false, recDir:false, recEsq:false, recBil:false, quadDir:false, quadEsq:false, quadBil:false, mamDir:false, mamEsq:false, mamBil:false },
   implantes: { sit:'ausentes', loc:'retroglandular', lat:'bilateralmente', intDir:false, intEsq:false, intBil:false, extDir:false, extEsq:false, extBil:false, hetDir:false, hetEsq:false, hetBil:false },
   cistos: [],
   cistosMultDir:false, cistosMultEsq:false, cistosMultBil:false,
   nodulos: [],
-  linfonodo: { sit:'ausentes', locDir:'qsl', locEsq:'qsl' },
-  ectasias: { sit:'ausentes', preLoc:'rra', preLat:'bilateral', preCon:'anecoico', preCal:'', nodLoc:'rra', nodLat:'bilateral', nodCal:'', nodMed1:'', nodMed2:'', nodMed3:'', nodDop:'sem', nodPap:'', nodPel:'' },
-  distorcao: { sit:'ausente', sitLoc:'qsl', sitLat:'direita', forLoc:'qsl', forLat:'direita' },
-  muscular: { habitual:true, colOrg:false, orgPar:'finas', orgCon:'anecoico', orgMed1:'', orgMed2:'', orgMed3:'', orgDis:'', orgSep:false, colNao:false, naoMed1:'', naoMed2:'', naoMed3:'', naoDis:'' },
-  birads: { modo:'auto' }
+  naomassa: [],
+  linfonodos: [],
+  ectasias: [],
+  distorcoes: [],
+  muscular: { habitual:true, colOrg:false, orgMam:'direita', orgPar:'finas', orgCon:'anecoico', orgMed1:'', orgMed2:'', orgMed3:'', orgDis:'', orgSep:false, colNao:false, naoMam:'direita', naoMed1:'', naoMed2:'', naoMed3:'', naoDis:'' },
+  birads: { modo:'auto', confirmado:false },
+  notasAdicionais: ''
 };
 
 let cistoCont = 0;
 let noduloCont = 0;
 
 // ── HELPERS ──
-function sv(k,v){ eval(`estado.${k}=v`); updateLaudo(); }
+function sv(k,v){ estado[k]=v; updateLaudo(); } // caminho simples (chave direta em estado); não suporta dot-path aninhado — não é usado hoje no arquivo
 function setSit(sec,v){ estado[sec].sit=v; renderSection(sec); updateLaudo(); }
 
 function chkSvg(){ return `<svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="2"><polyline points="1.5,5 4,7.5 8.5,2.5"/></svg>`; }
+
+function maskData(el, campo){
+  let v = el.value.replace(/\D/g,'').slice(0,8);
+  if(v.length>4) v = v.slice(0,2)+'/'+v.slice(2,4)+'/'+v.slice(4);
+  else if(v.length>2) v = v.slice(0,2)+'/'+v.slice(2);
+  el.value = v;
+  estado.examesAnteriores[campo] = v;
+  updateLaudo();
+}
 
 function radio(name, val, label, cur, onclick){
   const sel = cur===val;
@@ -241,11 +265,14 @@ const LOCS_TXT = {
 // ── SEÇÕES ──
 function renderSection(sec){
   const funcs = {
+    indicacao: renderIndicacao,
+    examesanteriores: renderExamesAnteriores,
     composicao: renderComposicao,
     cirurgias: renderCirurgias,
     implantes: renderImplantes,
     cistos: renderCistos,
     nodulos: renderNodulos,
+    naomassa: renderNaoMassa,
     linfonodo: renderLinfonodo,
     ectasias: renderEctasias,
     distorcao: renderDistorcao,
@@ -261,22 +288,78 @@ function renderSection(sec){
 }
 
 function secLabel(s){
-  const m = {composicao:'Composição das Mamas',cirurgias:'Cirurgias',implantes:'Implantes',cistos:'Cistos',nodulos:'Nódulos',linfonodo:'Linfonodo Intramamário',ectasias:'Ectasias Ductais',distorcao:'Distorção Arquitetural',muscular:'Planos Musculares',birads:'BIRADS'};
+  const m = {indicacao:'Indicação do Exame',examesanteriores:'Exames Anteriores',composicao:'Composição das Mamas',cirurgias:'Cirurgias',implantes:'Implantes',cistos:'Cistos',nodulos:'Nódulos',naomassa:'Lesão Não-Nodular',linfonodo:'Linfonodos',ectasias:'Ectasias Ductais',distorcao:'Distorção Arquitetural',muscular:'Planos Musculares',birads:'BIRADS'};
   return m[s]||s;
 }
 
 function showSection(s){ renderSection(s); }
 
+// ── INDICAÇÃO ──
+function renderIndicacao(){
+  const ind = estado.indicacao;
+  const r = (v,l) => radio('ind',v,l,ind.preset,`estado.indicacao.preset='${v}';renderSection('indicacao');updateLaudo()`);
+  return `<div class="block"><div class="block-title">Indicação do exame</div>
+    ${r('rastreamento','rastreamento de rotina')}
+    ${r('clinico','avaliação diagnóstica de achado clínico')}
+    ${ind.preset==='clinico'?`<div style="padding:4px 14px 8px 32px;display:flex;flex-direction:column;gap:2px">
+      ${chk('ind-ca-nodulo','nódulo palpável', ind.clinicoAchados.nodulo, "estado.indicacao.clinicoAchados.nodulo=!estado.indicacao.clinicoAchados.nodulo;renderSection('indicacao');updateLaudo()")}
+      ${chk('ind-ca-dor','dor', ind.clinicoAchados.dor, "estado.indicacao.clinicoAchados.dor=!estado.indicacao.clinicoAchados.dor;renderSection('indicacao');updateLaudo()")}
+      ${chk('ind-ca-secrecao','secreção papilar', ind.clinicoAchados.secrecao, "estado.indicacao.clinicoAchados.secrecao=!estado.indicacao.clinicoAchados.secrecao;renderSection('indicacao');updateLaudo()")}
+      ${chk('ind-ca-pele','alteração cutânea', ind.clinicoAchados.pele, "estado.indicacao.clinicoAchados.pele=!estado.indicacao.clinicoAchados.pele;renderSection('indicacao');updateLaudo()")}
+    </div>`:''}
+    ${r('imagem','avaliação/complementação diagnóstica de achado identificado em outro método de imagem')}
+    ${r('seguimento','seguimento de achado(s) prévio(s)')}
+    ${r('protese','avaliação de prótese mamária')}
+    ${r('altorisco','rastreamento em paciente de alto risco para câncer de mama')}
+    ${r('manual','indicação personalizada (digitar manualmente)')}
+    ${ind.preset==='manual'?`<div style="padding:8px 14px">
+      <textarea id="ind-manual" style="width:100%;min-height:50px;padding:8px;border:1px solid var(--border-strong);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);background:var(--white)" placeholder="Digite a indicação do exame..." oninput="estado.indicacao.manual=this.value;updateLaudo()">${ind.manual||''}</textarea>
+    </div>`:''}
+  </div>`;
+}
+
+// ── EXAMES ANTERIORES ──
+function renderExamesAnteriores(){
+  const ea = estado.examesAnteriores;
+  return `<div class="block"><div class="block-title">Exames anteriores para comparação</div>
+    ${chk('ea-tem','possui exame(s) anterior(es) disponível(is) para comparação', ea.tem, "estado.examesAnteriores.tem=!estado.examesAnteriores.tem;renderSection('examesanteriores');updateLaudo()")}
+  </div>
+  ${ea.tem?`<div class="block"><div class="block-title">Dados do exame anterior</div>
+    <div class="dim-rows">
+      <div class="dim-row">
+        <span class="dim-lbl">data do USG anterior:</span>
+        <input class="dim-input" style="width:100px" type="text" inputmode="numeric" maxlength="10" id="ea-usgdata" value="${ea.usgData||''}" placeholder="--/--/----" oninput="maskData(this,'usgData')">
+      </div>
+    </div>
+    ${chk('ea-mmg','incluir também mamografia anterior', ea.incluirMmg, "estado.examesAnteriores.incluirMmg=!estado.examesAnteriores.incluirMmg;renderSection('examesanteriores');updateLaudo()")}
+    ${ea.incluirMmg?`<div class="dim-rows">
+      <div class="dim-row">
+        <span class="dim-lbl">data da mamografia anterior:</span>
+        <input class="dim-input" style="width:100px" type="text" inputmode="numeric" maxlength="10" id="ea-mmgdata" value="${ea.mmgData||''}" placeholder="--/--/----" oninput="maskData(this,'mmgData')">
+      </div>
+    </div>`:''}
+  </div>`:''}`;
+}
+
 // ── COMPOSIÇÃO ──
 function renderComposicao(){
   const c = estado.composicao;
   const r = (v,l) => radio('comp',v,l,c,`estado.composicao='${v}';renderSection('composicao');updateLaudo()`);
+  const cg = estado.componenteGlandular;
+  const rcg = (v,l) => radio('cg',v,l,cg,`estado.componenteGlandular='${v}';renderSection('composicao');updateLaudo()`);
   return `<div class="block"><div class="block-title">Padrão de ecotextura de fundo</div>
     ${r('fibroglandular','predomínio fibroglandular')}
     ${r('adiposa','predomínio adiposo')}
     ${r('heterogenea','ecotextura heterogênea (áreas adiposas com áreas fibroglandulares)')}
     ${r('lactacional','paciente em período lactacional com dilatação ductal')}
     ${r('lactacionalSem','paciente em período lactacional sem dilatação ductal')}
+  </div>
+  <div class="block"><div class="block-title">Componente glandular tecidual (TDLUs)</div>
+    ${rcg('','não informar')}
+    ${rcg('minimo','mínimo (<25%)')}
+    ${rcg('leve','leve (25 a 49%)')}
+    ${rcg('moderado','moderado (50 a 74%)')}
+    ${rcg('acentuado','acentuado (≥75%)')}
   </div>`;
 }
 
@@ -340,8 +423,8 @@ function renderCistos(){
       <div class="lesao-hd"><span class="lesao-hd-title">Cisto ${i+1}</span>
         <button class="btn-rem" onclick="remCisto(${i})">✕ Remover</button></div>
       <div class="ff-grid">
-        <div class="ff"><label>Med 1 (cm)</label><input type="number" step="0.1" value="${c.m1||''}" onchange="estado.cistos[${i}].m1=this.value;updateLaudo()"></div>
-        <div class="ff"><label>Med 2 (cm)</label><input type="number" step="0.1" value="${c.m2||''}" onchange="estado.cistos[${i}].m2=this.value;updateLaudo()"></div>
+        <div class="ff"><label>Med 1 (cm)</label><input type="number" step="0.1" min="0" value="${c.m1||''}" onchange="estado.cistos[${i}].m1=this.value;updateLaudo()"></div>
+        <div class="ff"><label>Med 2 (cm)</label><input type="number" step="0.1" min="0" value="${c.m2||''}" onchange="estado.cistos[${i}].m2=this.value;updateLaudo()"></div>
         <div class="ff"><label>Conteúdo</label>
           <select onchange="estado.cistos[${i}].con=this.value;updateLaudo()">
             <option value="anecoico"${c.con==='anecoico'?' selected':''}>anecoico</option>
@@ -402,25 +485,22 @@ function renderNodulos(){
       <div class="lesao-hd"><span class="lesao-hd-title">Nódulo ${i+1}</span>
         <button class="btn-rem" onclick="remNodulo(${i})">✕ Remover</button></div>
       <div class="ff-grid">
-        <div class="ff"><label>Med 1 (cm)</label><input type="number" step="0.1" value="${n.m1||''}" onchange="estado.nodulos[${i}].m1=this.value;updateLaudo()"></div>
-        <div class="ff"><label>Med 2 (cm)</label><input type="number" step="0.1" value="${n.m2||''}" onchange="estado.nodulos[${i}].m2=this.value;updateLaudo()"></div>
-        <div class="ff"><label>Med 3 (cm)</label><input type="number" step="0.1" value="${n.m3||''}" onchange="estado.nodulos[${i}].m3=this.value;updateLaudo()"></div>
-        <div class="ff"><label>Composição</label>
-          <select onchange="estado.nodulos[${i}].com=this.value;updateLaudo()">
-            <option value="solido"${n.com==='solido'?' selected':''}>sólido</option>
-            <option value="complexo"${n.com==='complexo'?' selected':''}>complexo sólido-cístico</option>
-          </select></div>
-        <div class="ff"><label>Ecogenicidade</label>
+        <div class="ff"><label>Med 1 (cm)</label><input type="number" step="0.1" min="0" value="${n.m1||''}" onchange="estado.nodulos[${i}].m1=this.value;updateLaudo()"></div>
+        <div class="ff"><label>Med 2 (cm)</label><input type="number" step="0.1" min="0" value="${n.m2||''}" onchange="estado.nodulos[${i}].m2=this.value;updateLaudo()"></div>
+        <div class="ff"><label>Med 3 (cm)</label><input type="number" step="0.1" min="0" value="${n.m3||''}" onchange="estado.nodulos[${i}].m3=this.value;updateLaudo()"></div>
+        <div class="ff"><label>Padrão ecogênico</label>
           <select onchange="estado.nodulos[${i}].eco=this.value;updateLaudo()">
             <option value="hipoecoico"${n.eco==='hipoecoico'?' selected':''}>hipoecoico</option>
             <option value="anecoico"${n.eco==='anecoico'?' selected':''}>anecoico</option>
             <option value="hiperecoico"${n.eco==='hiperecoico'?' selected':''}>hiperecoico</option>
             <option value="isoecoico"${n.eco==='isoecoico'?' selected':''}>isoecoico</option>
             <option value="heterogeneo"${n.eco==='heterogeneo'?' selected':''}>heterogêneo</option>
+            <option value="misto"${n.eco==='misto'?' selected':''}>misto sólido-cístico</option>
           </select></div>
         <div class="ff"><label>Forma</label>
           <select onchange="estado.nodulos[${i}].for=this.value;updateLaudo()">
             <option value="oval"${n.for==='oval'?' selected':''}>oval</option>
+            <option value="lobulado"${n.for==='lobulado'?' selected':''}>lobulado</option>
             <option value="redondo"${n.for==='redondo'?' selected':''}>redondo</option>
             <option value="irregular"${n.for==='irregular'?' selected':''}>irregular</option>
           </select></div>
@@ -429,7 +509,7 @@ function renderNodulos(){
             <option value="circunscritas"${n.mar==='circunscritas'?' selected':''}>circunscritas</option>
             <option value="indistintas"${n.mar==='indistintas'?' selected':''}>indistintas</option>
             <option value="anguladas"${n.mar==='anguladas'?' selected':''}>anguladas</option>
-            <option value="lobuladas"${n.mar==='lobuladas'?' selected':''}>lobuladas</option>
+            <option value="microlobuladas"${n.mar==='microlobuladas'?' selected':''}>microlobuladas</option>
             <option value="espiculadas"${n.mar==='espiculadas'?' selected':''}>espiculadas</option>
           </select></div>
         <div class="ff"><label>Orientação</label>
@@ -444,6 +524,26 @@ function renderNodulos(){
             <option value="sombra"${n.efe==='sombra'?' selected':''}>sombra acústica</option>
             <option value="combinado"${n.efe==='combinado'?' selected':''}>combinado</option>
           </select></div>
+        <div class="ff"><label>Vascularização</label>
+          <select onchange="estado.nodulos[${i}].vasc=this.value;updateLaudo()">
+            <option value="naoavaliado"${(n.vasc||'naoavaliado')==='naoavaliado'?' selected':''}>não avaliada</option>
+            <option value="avascular"${n.vasc==='avascular'?' selected':''}>avascular</option>
+            <option value="interna"${n.vasc==='interna'?' selected':''}>vascularização interna</option>
+            <option value="periferica"${n.vasc==='periferica'?' selected':''}>vascularização periférica</option>
+          </select></div>
+        <div class="ff"><label>Calcificação assoc.</label>
+          <select onchange="estado.nodulos[${i}].calc=this.value;updateLaudo()">
+            <option value="ausente"${(n.calc||'ausente')==='ausente'?' selected':''}>ausente</option>
+            <option value="macro"${n.calc==='macro'?' selected':''}>macrocalcificação</option>
+            <option value="micro"${n.calc==='micro'?' selected':''}>microcalcificação</option>
+          </select></div>
+        <div class="ff"><label>Elastografia</label>
+          <select onchange="estado.nodulos[${i}].elasto=this.value;updateLaudo()">
+            <option value="naoreal"${(n.elasto||'naoreal')==='naoreal'?' selected':''}>não realizada</option>
+            <option value="macia"${n.elasto==='macia'?' selected':''}>macia</option>
+            <option value="intermediaria"${n.elasto==='intermediaria'?' selected':''}>intermediária</option>
+            <option value="rigida"${n.elasto==='rigida'?' selected':''}>rígida</option>
+          </select></div>
         <div class="ff"><label>Localização</label>
           <select onchange="estado.nodulos[${i}].loc=this.value;updateLaudo()">
             ${LOCS.map(([v,l])=>`<option value="${v}"${n.loc===v?' selected':''}>${l}</option>`).join('')}
@@ -453,9 +553,10 @@ function renderNodulos(){
             <option value="direita"${n.mam==='direita'?' selected':''}>direita</option>
             <option value="esquerda"${n.mam==='esquerda'?' selected':''}>esquerda</option>
           </select></div>
-        <div class="ff"><label>Dist. papila (cm)</label><input type="number" step="0.1" value="${n.pap||''}" onchange="estado.nodulos[${i}].pap=this.value;updateLaudo()"></div>
-        <div class="ff"><label>Dist. pele (cm)</label><input type="number" step="0.1" value="${n.pel||''}" onchange="estado.nodulos[${i}].pel=this.value;updateLaudo()"></div>
+        <div class="ff"><label>Dist. papila (cm)</label><input type="number" step="0.1" min="0" value="${n.pap||''}" onchange="estado.nodulos[${i}].pap=this.value;updateLaudo()"></div>
+        <div class="ff"><label>Dist. pele (cm)</label><input type="number" step="0.1" min="0" value="${n.pel||''}" onchange="estado.nodulos[${i}].pel=this.value;updateLaudo()"></div>
       </div>
+      ${chk('nod-rind-'+i,'borda ecogênica espessa (echogenic rind) — incluir na medida', n.rind, "estado.nodulos["+i+"].rind=!estado.nodulos["+i+"].rind;updateLaudo()")}
     </div>`;
   });
   html += `</div>
@@ -467,85 +568,218 @@ function renderNodulos(){
 }
 
 function addNodulo(){
-  estado.nodulos.push({m1:'',m2:'',m3:'',com:'solido',eco:'hipoecoico',for:'oval',mar:'circunscritas',ori:'paralelo',efe:'nenhum',loc:'qsl',mam:'direita',pap:'',pel:''});
+  estado.nodulos.push({m1:'',m2:'',m3:'',eco:'hipoecoico',for:'oval',mar:'circunscritas',ori:'paralelo',efe:'nenhum',loc:'qsl',mam:'direita',pap:'',pel:'',vasc:'naoavaliado',calc:'ausente',rind:false,elasto:'naoreal'});
   renderSection('nodulos');updateLaudo();
 }
 function remNodulo(i){
   estado.nodulos.splice(i,1);renderSection('nodulos');updateLaudo();
 }
 
-// ── LINFONODO ──
+// ── LESÃO NON-MASS ──
+// Categoria formalmente adicionada ao léxico de US no BI-RADS v2025 (confirmado por múltiplas fontes: ACR, AJR, revisões peer-reviewed).
+// Distinta de "massa": não tem contorno tridimensional definido, não recebe forma/margem — é descrita por distribuição e padrão ecogênico.
+function renderNaoMassa(){
+  let html = `<div class="block"><div class="block-title">Lesões não-nodulares descritas</div>
+    <div class="doc-p" style="padding:8px 14px 0;font-size:11.5px;color:var(--text-3)">Achado focal distinto do tecido normal, sem contorno definido de massa (não recebe forma/margem — apenas distribuição e padrão ecogênico).</div>
+    <div class="nodulo-wrap" id="naomassa-wrap">`;
+  estado.naomassa.forEach((x,i)=>{
+    html += `<div class="lesao-card">
+      <div class="lesao-hd"><span class="lesao-hd-title">Não-Nodular ${i+1}</span>
+        <button class="btn-rem" onclick="remNaoMassa(${i})">✕ Remover</button></div>
+      <div class="ff-grid">
+        <div class="ff"><label>Distribuição</label>
+          <select onchange="estado.naomassa[${i}].dist=this.value;updateLaudo()">
+            <option value="focal"${x.dist==='focal'?' selected':''}>focal</option>
+            <option value="regional"${x.dist==='regional'?' selected':''}>regional</option>
+            <option value="ductal"${x.dist==='ductal'?' selected':''}>linear</option>
+            <option value="segmentar"${x.dist==='segmentar'?' selected':''}>segmentar</option>
+          </select></div>
+        <div class="ff"><label>Padrão ecogênico</label>
+          <select onchange="estado.naomassa[${i}].eco=this.value;updateLaudo()">
+            <option value="hipoecoico"${x.eco==='hipoecoico'?' selected':''}>hipoecoico</option>
+            <option value="hiperecoico"${x.eco==='hiperecoico'?' selected':''}>hiperecoico</option>
+            <option value="heterogeneo"${x.eco==='heterogeneo'?' selected':''}>heterogêneo</option>
+          </select></div>
+        <div class="ff"><label>Ef. Acústico</label>
+          <select onchange="estado.naomassa[${i}].efe=this.value;updateLaudo()">
+            <option value="nenhum"${x.efe==='nenhum'?' selected':''}>nenhum</option>
+            <option value="sombra"${x.efe==='sombra'?' selected':''}>sombra acústica</option>
+            <option value="reforco"${x.efe==='reforco'?' selected':''}>reforço posterior</option>
+          </select></div>
+        <div class="ff"><label>Localização</label>
+          <select onchange="estado.naomassa[${i}].loc=this.value;updateLaudo()">
+            ${LOCS.map(([v,l])=>`<option value="${v}"${x.loc===v?' selected':''}>${l}</option>`).join('')}
+          </select></div>
+        <div class="ff"><label>Mama</label>
+          <select onchange="estado.naomassa[${i}].mam=this.value;updateLaudo()">
+            <option value="direita"${x.mam==='direita'?' selected':''}>direita</option>
+            <option value="esquerda"${x.mam==='esquerda'?' selected':''}>esquerda</option>
+          </select></div>
+      </div>
+      <div class="doc-p" style="font-size:11px;color:#b45309;padding-top:4px">Distribuição segmentar é reconhecida como achado com maior associação a malignidade — requer confirmação manual da classificação final.</div>
+    </div>`;
+  });
+  html += `</div>
+    <button class="btn-add-lesao" onclick="addNaoMassa()">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+      Adicionar lesão não-nodular</button>
+  </div>`;
+  return html;
+}
+function addNaoMassa(){
+  estado.naomassa.push({dist:'focal',eco:'hipoecoico',efe:'nenhum',loc:'qsl',mam:'direita'});
+  renderSection('naomassa');updateLaudo();
+}
+function remNaoMassa(i){
+  estado.naomassa.splice(i,1);renderSection('naomassa');updateLaudo();
+}
+
+// ── LINFONODOS ──
+const BACIAS = [['intramamario','intramamário'],['axilar','axilar'],['mamariointerno','mamário interno'],['supraclavicular','supraclavicular'],['infraclavicular','infraclavicular']];
 function renderLinfonodo(){
-  const ln = estado.linfonodo;
-  const r = (v,l) => radio('lin',v,l,ln.sit,`estado.linfonodo.sit='${v}';renderSection('linfonodo');updateLaudo()`);
-  return `<div class="block"><div class="block-title">Situação</div>
-    ${r('ausentes','ausentes')}
-    ${r('direita','presente em mama direita')}
-    ${r('esquerda','presente em mama esquerda')}
-  </div>
-  ${ln.sit==='direita'?`<div class="block"><div class="block-title">Localização — Mama Direita</div>
-    <div class="dim-rows"><div class="dim-row"><span class="dim-lbl">local:</span>
-      ${sel('lin-locDir',LOCS2,ln.locDir,"estado.linfonodo.locDir=this.value;updateLaudo()")}</div></div>
-  </div>`:''}
-  ${ln.sit==='esquerda'?`<div class="block"><div class="block-title">Localização — Mama Esquerda</div>
-    <div class="dim-rows"><div class="dim-row"><span class="dim-lbl">local:</span>
-      ${sel('lin-locEsq',LOCS2,ln.locEsq,"estado.linfonodo.locEsq=this.value;updateLaudo()")}</div></div>
-  </div>`:''}`;
+  let html = `<div class="block"><div class="block-title">Linfonodos descritos</div>
+    <div class="nodulo-wrap" id="linf-wrap">`;
+  estado.linfonodos.forEach((l,i)=>{
+    html += `<div class="lesao-card">
+      <div class="lesao-hd"><span class="lesao-hd-title">Linfonodo ${i+1}</span>
+        <button class="btn-rem" onclick="remLinfonodo(${i})">✕ Remover</button></div>
+      <div class="ff-grid">
+        <div class="ff"><label>Bacia</label>
+          <select onchange="estado.linfonodos[${i}].bacia=this.value;updateLaudo()">
+            ${BACIAS.map(([v,l2])=>`<option value="${v}"${l.bacia===v?' selected':''}>${l2}</option>`).join('')}
+          </select></div>
+        <div class="ff"><label>Mama</label>
+          <select onchange="estado.linfonodos[${i}].mam=this.value;updateLaudo()">
+            <option value="direita"${l.mam==='direita'?' selected':''}>direita</option>
+            <option value="esquerda"${l.mam==='esquerda'?' selected':''}>esquerda</option>
+          </select></div>
+        <div class="ff"><label>Localização</label>
+          <select onchange="estado.linfonodos[${i}].loc=this.value;updateLaudo()">
+            ${LOCS2.map(([v,l2])=>`<option value="${v}"${l.loc===v?' selected':''}>${l2}</option>`).join('')}
+          </select></div>
+        <div class="ff"><label>Morfologia</label>
+          <select onchange="estado.linfonodos[${i}].morf=this.value;updateLaudo()">
+            <option value="normal"${l.morf==='normal'?' selected':''}>preservada (córtex ≤3mm, hilo gorduroso presente)</option>
+            <option value="suspeita"${l.morf==='suspeita'?' selected':''}>alterada (espessamento cortical / perda do hilo / arredondado)</option>
+          </select></div>
+      </div>
+      ${l.morf==='suspeita'?`<div class="doc-p" style="font-size:11px;color:#b45309;padding-top:4px">Morfologia alterada não recebe categoria BI-RADS automática. Confirme a classificação final manualmente na aba BIRADS.</div>`:''}
+    </div>`;
+  });
+  html += `</div>
+    <button class="btn-add-lesao" onclick="addLinfonodo()">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+      Adicionar linfonodo</button>
+  </div>`;
+  return html;
+}
+function addLinfonodo(){
+  estado.linfonodos.push({bacia:'intramamario',mam:'direita',loc:'qsl',morf:'normal'});
+  renderSection('linfonodo');updateLaudo();
+}
+function remLinfonodo(i){
+  estado.linfonodos.splice(i,1);renderSection('linfonodo');updateLaudo();
 }
 
 // ── ECTASIAS ──
 function renderEctasias(){
-  const ec = estado.ectasias;
-  const r = (v,l) => radio('ect',v,l,ec.sit,`estado.ectasias.sit='${v}';renderSection('ectasias');updateLaudo()`);
-  return `<div class="block"><div class="block-title">Situação</div>
-    ${r('ausentes','ausentes')}
-    ${r('presentes','presentes, sem nódulo intraductal')}
-    ${r('nodulo','presentes, com nódulo intraductal')}
-  </div>
-  ${ec.sit==='presentes'?`<div class="block"><div class="block-title">Ectasias — detalhes</div>
-    <div class="dim-rows">
-      <div class="dim-row"><span class="dim-lbl">localização:</span>${sel('ect-preLoc',LOCS2,ec.preLoc,"estado.ectasias.preLoc=this.value;updateLaudo()")}</div>
-      <div class="dim-row"><span class="dim-lbl">lateralidade:</span>${sel('ect-preLat',[['direita','à direita'],['esquerda','à esquerda'],['bilateral','bilateral']],ec.preLat,"estado.ectasias.preLat=this.value;updateLaudo()")}</div>
-      <div class="dim-row"><span class="dim-lbl">conteúdo:</span>${sel('ect-preCon',[['anecoico','anecoico'],['espesso','espesso']],ec.preCon,"estado.ectasias.preCon=this.value;updateLaudo()")}</div>
-      <div class="dim-row"><span class="dim-lbl">calibre (mm):</span><input class="dim-input" type="number" step="0.1" value="${ec.preCal}" onchange="estado.ectasias.preCal=this.value;updateLaudo()"></div>
-    </div>
-  </div>`:''}
-  ${ec.sit==='nodulo'?`<div class="block"><div class="block-title">Ectasias c/ nódulo — detalhes</div>
-    <div class="dim-rows">
-      <div class="dim-row"><span class="dim-lbl">localização:</span>${sel('ect-nodLoc',LOCS2,ec.nodLoc,"estado.ectasias.nodLoc=this.value;updateLaudo()")}</div>
-      <div class="dim-row"><span class="dim-lbl">lateralidade:</span>${sel('ect-nodLat',[['direita','à direita'],['esquerda','à esquerda'],['bilateral','bilateral']],ec.nodLat,"estado.ectasias.nodLat=this.value;updateLaudo()")}</div>
-      <div class="dim-row"><span class="dim-lbl">calibre (mm):</span><input class="dim-input" type="number" step="0.1" value="${ec.nodCal}" onchange="estado.ectasias.nodCal=this.value;updateLaudo()"></div>
-      <div class="dim-row"><span class="dim-lbl">nód. med 1 (cm):</span><input class="dim-input" type="number" step="0.1" value="${ec.nodMed1}" onchange="estado.ectasias.nodMed1=this.value;updateLaudo()"></div>
-      <div class="dim-row"><span class="dim-lbl">nód. med 2 (cm):</span><input class="dim-input" type="number" step="0.1" value="${ec.nodMed2}" onchange="estado.ectasias.nodMed2=this.value;updateLaudo()"></div>
-      <div class="dim-row"><span class="dim-lbl">nód. med 3 (cm):</span><input class="dim-input" type="number" step="0.1" value="${ec.nodMed3}" onchange="estado.ectasias.nodMed3=this.value;updateLaudo()"></div>
-      <div class="dim-row"><span class="dim-lbl">Doppler:</span>${sel('ect-nodDop',[['sem','ausente'],['com','presente']],ec.nodDop,"estado.ectasias.nodDop=this.value;updateLaudo()")}</div>
-      <div class="dim-row"><span class="dim-lbl">dist. papila (cm):</span><input class="dim-input" type="number" step="0.1" value="${ec.nodPap}" onchange="estado.ectasias.nodPap=this.value;updateLaudo()"></div>
-      <div class="dim-row"><span class="dim-lbl">dist. pele (cm):</span><input class="dim-input" type="number" step="0.1" value="${ec.nodPel}" onchange="estado.ectasias.nodPel=this.value;updateLaudo()"></div>
-    </div>
-  </div>`:''}`;
+  let html = `<div class="block"><div class="block-title">Ectasias ductais descritas</div>
+    <div class="nodulo-wrap" id="ect-wrap">`;
+  estado.ectasias.forEach((e,i)=>{
+    html += `<div class="lesao-card">
+      <div class="lesao-hd"><span class="lesao-hd-title">Ectasia ${i+1}</span>
+        <button class="btn-rem" onclick="remEctasia(${i})">✕ Remover</button></div>
+      <div class="ff-grid">
+        <div class="ff"><label>Tipo</label>
+          <select onchange="estado.ectasias[${i}].tipo=this.value;renderSection('ectasias');updateLaudo()">
+            <option value="simples"${e.tipo==='simples'?' selected':''}>sem nódulo intraductal</option>
+            <option value="nodulo"${e.tipo==='nodulo'?' selected':''}>com nódulo intraductal</option>
+          </select></div>
+        <div class="ff"><label>Mama</label>
+          <select onchange="estado.ectasias[${i}].mam=this.value;updateLaudo()">
+            <option value="direita"${e.mam==='direita'?' selected':''}>direita</option>
+            <option value="esquerda"${e.mam==='esquerda'?' selected':''}>esquerda</option>
+          </select></div>
+        <div class="ff"><label>Localização</label>
+          <select onchange="estado.ectasias[${i}].loc=this.value;updateLaudo()">
+            ${LOCS2.map(([v,l])=>`<option value="${v}"${e.loc===v?' selected':''}>${l}</option>`).join('')}
+          </select></div>
+        <div class="ff"><label>Calibre (mm)</label><input type="number" step="0.1" min="0" value="${e.cal||''}" onchange="estado.ectasias[${i}].cal=this.value;updateLaudo()"></div>
+        ${e.tipo==='simples'?`<div class="ff"><label>Conteúdo</label>
+          <select onchange="estado.ectasias[${i}].con=this.value;updateLaudo()">
+            <option value="anecoico"${(e.con||'anecoico')==='anecoico'?' selected':''}>anecoico</option>
+            <option value="espesso"${e.con==='espesso'?' selected':''}>espesso</option>
+          </select></div>`:''}
+      </div>
+      ${e.tipo==='nodulo'?`<div class="ff-grid">
+        <div class="ff"><label>Nód. med 1 (cm)</label><input type="number" step="0.1" min="0" value="${e.nMed1||''}" onchange="estado.ectasias[${i}].nMed1=this.value;updateLaudo()"></div>
+        <div class="ff"><label>Nód. med 2 (cm)</label><input type="number" step="0.1" min="0" value="${e.nMed2||''}" onchange="estado.ectasias[${i}].nMed2=this.value;updateLaudo()"></div>
+        <div class="ff"><label>Nód. med 3 (cm)</label><input type="number" step="0.1" min="0" value="${e.nMed3||''}" onchange="estado.ectasias[${i}].nMed3=this.value;updateLaudo()"></div>
+        <div class="ff"><label>Doppler</label>
+          <select onchange="estado.ectasias[${i}].dop=this.value;updateLaudo()">
+            <option value="sem"${(e.dop||'sem')==='sem'?' selected':''}>ausente</option>
+            <option value="com"${e.dop==='com'?' selected':''}>presente</option>
+          </select></div>
+        <div class="ff"><label>Dist. papila (cm)</label><input type="number" step="0.1" min="0" value="${e.nPap||''}" onchange="estado.ectasias[${i}].nPap=this.value;updateLaudo()"></div>
+        <div class="ff"><label>Dist. pele (cm)</label><input type="number" step="0.1" min="0" value="${e.nPel||''}" onchange="estado.ectasias[${i}].nPel=this.value;updateLaudo()"></div>
+      </div>`:''}
+    </div>`;
+  });
+  html += `</div>
+    <button class="btn-add-lesao" onclick="addEctasia()">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+      Adicionar ectasia</button>
+  </div>`;
+  return html;
+}
+function addEctasia(){
+  estado.ectasias.push({tipo:'simples',mam:'direita',loc:'rra',cal:'',con:'anecoico',nMed1:'',nMed2:'',nMed3:'',dop:'sem',nPap:'',nPel:''});
+  renderSection('ectasias');updateLaudo();
+}
+function remEctasia(i){
+  estado.ectasias.splice(i,1);renderSection('ectasias');updateLaudo();
 }
 
 // ── DISTORÇÃO ──
 function renderDistorcao(){
-  const di = estado.distorcao;
-  const r = (v,l) => radio('dis',v,l,di.sit,`estado.distorcao.sit='${v}';renderSection('distorcao');updateLaudo()`);
-  return `<div class="block"><div class="block-title">Situação</div>
-    ${r('ausente','ausente')}
-    ${r('cicatricial','distorção de natureza cicatricial (pós-cirúrgica)')}
-    ${r('fora','distorção arquitetural fora de contexto cirúrgico')}
-  </div>
-  ${di.sit==='cicatricial'?`<div class="block"><div class="block-title">Distorção cicatricial — localização</div>
-    <div class="dim-rows">
-      <div class="dim-row"><span class="dim-lbl">local:</span>${sel('dis-sitLoc',LOCS2,di.sitLoc,"estado.distorcao.sitLoc=this.value;updateLaudo()")}</div>
-      <div class="dim-row"><span class="dim-lbl">lateralidade:</span>${sel('dis-sitLat',[['direita','à direita'],['esquerda','à esquerda'],['bilateral','bilateral']],di.sitLat,"estado.distorcao.sitLat=this.value;updateLaudo()")}</div>
-    </div>
-  </div>`:''}
-  ${di.sit==='fora'?`<div class="block"><div class="block-title">Distorção — localização</div>
-    <div class="dim-rows">
-      <div class="dim-row"><span class="dim-lbl">local:</span>${sel('dis-forLoc',LOCS2,di.forLoc,"estado.distorcao.forLoc=this.value;updateLaudo()")}</div>
-      <div class="dim-row"><span class="dim-lbl">lateralidade:</span>${sel('dis-forLat',[['direita','à direita'],['esquerda','à esquerda'],['bilateral','bilateral']],di.forLat,"estado.distorcao.forLat=this.value;updateLaudo()")}</div>
-    </div>
-  </div>`:''}`;
+  let html = `<div class="block"><div class="block-title">Distorções arquiteturais descritas</div>
+    <div class="nodulo-wrap" id="dist-wrap">`;
+  estado.distorcoes.forEach((d,i)=>{
+    html += `<div class="lesao-card">
+      <div class="lesao-hd"><span class="lesao-hd-title">Distorção ${i+1}</span>
+        <button class="btn-rem" onclick="remDistorcao(${i})">✕ Remover</button></div>
+      <div class="ff-grid">
+        <div class="ff"><label>Natureza</label>
+          <select onchange="estado.distorcoes[${i}].nat=this.value;updateLaudo()">
+            <option value="cicatricial"${d.nat==='cicatricial'?' selected':''}>cicatricial (pós-cirúrgica)</option>
+            <option value="fora"${d.nat==='fora'?' selected':''}>fora de contexto cirúrgico</option>
+          </select></div>
+        <div class="ff"><label>Mama</label>
+          <select onchange="estado.distorcoes[${i}].mam=this.value;updateLaudo()">
+            <option value="direita"${d.mam==='direita'?' selected':''}>direita</option>
+            <option value="esquerda"${d.mam==='esquerda'?' selected':''}>esquerda</option>
+          </select></div>
+        <div class="ff"><label>Localização</label>
+          <select onchange="estado.distorcoes[${i}].loc=this.value;updateLaudo()">
+            ${LOCS2.map(([v,l])=>`<option value="${v}"${d.loc===v?' selected':''}>${l}</option>`).join('')}
+          </select></div>
+      </div>
+      ${d.nat==='fora'?`<div class="doc-p" style="font-size:11px;color:#b45309;padding-top:4px">Distorção fora de contexto cirúrgico é achado de alta suspeição — confirme a classificação final manualmente.</div>`:''}
+    </div>`;
+  });
+  html += `</div>
+    <button class="btn-add-lesao" onclick="addDistorcao()">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+      Adicionar distorção</button>
+  </div>`;
+  return html;
+}
+function addDistorcao(){
+  estado.distorcoes.push({nat:'cicatricial',mam:'direita',loc:'qsl'});
+  renderSection('distorcao');updateLaudo();
+}
+function remDistorcao(i){
+  estado.distorcoes.splice(i,1);renderSection('distorcao');updateLaudo();
 }
 
 // ── MUSCULAR ──
@@ -558,21 +792,23 @@ function renderMuscular(){
   </div>
   ${mu.colOrg?`<div class="block"><div class="block-title">Coleção organizada — detalhes</div>
     <div class="dim-rows">
+      <div class="dim-row"><span class="dim-lbl">mama:</span>${sel('mu-orgMam',[['direita','direita'],['esquerda','esquerda']],mu.orgMam,"estado.muscular.orgMam=this.value;updateLaudo()")}</div>
       <div class="dim-row"><span class="dim-lbl">paredes:</span>${sel('mu-orgPar',[['finas','finas'],['espessas','espessas']],mu.orgPar,"estado.muscular.orgPar=this.value;updateLaudo()")}</div>
       <div class="dim-row"><span class="dim-lbl">conteúdo:</span>${sel('mu-orgCon',[['anecoico','anecoico'],['hipoecoico','hipoecoico/espesso'],['heterogeneo','heterogêneo']],mu.orgCon,"estado.muscular.orgCon=this.value;updateLaudo()")}</div>
-      <div class="dim-row"><span class="dim-lbl">med 1 (cm):</span><input class="dim-input" type="number" step="0.1" value="${mu.orgMed1}" onchange="estado.muscular.orgMed1=this.value;updateLaudo()"></div>
-      <div class="dim-row"><span class="dim-lbl">med 2 (cm):</span><input class="dim-input" type="number" step="0.1" value="${mu.orgMed2}" onchange="estado.muscular.orgMed2=this.value;updateLaudo()"></div>
-      <div class="dim-row"><span class="dim-lbl">med 3 (cm):</span><input class="dim-input" type="number" step="0.1" value="${mu.orgMed3}" onchange="estado.muscular.orgMed3=this.value;updateLaudo()"></div>
-      <div class="dim-row"><span class="dim-lbl">dist. pele (cm):</span><input class="dim-input" type="number" step="0.1" value="${mu.orgDis}" onchange="estado.muscular.orgDis=this.value;updateLaudo()"></div>
+      <div class="dim-row"><span class="dim-lbl">med 1 (cm):</span><input class="dim-input" type="number" step="0.1" min="0" value="${mu.orgMed1}" onchange="estado.muscular.orgMed1=this.value;updateLaudo()"></div>
+      <div class="dim-row"><span class="dim-lbl">med 2 (cm):</span><input class="dim-input" type="number" step="0.1" min="0" value="${mu.orgMed2}" onchange="estado.muscular.orgMed2=this.value;updateLaudo()"></div>
+      <div class="dim-row"><span class="dim-lbl">med 3 (cm):</span><input class="dim-input" type="number" step="0.1" min="0" value="${mu.orgMed3}" onchange="estado.muscular.orgMed3=this.value;updateLaudo()"></div>
+      <div class="dim-row"><span class="dim-lbl">dist. pele (cm):</span><input class="dim-input" type="number" step="0.1" min="0" value="${mu.orgDis}" onchange="estado.muscular.orgDis=this.value;updateLaudo()"></div>
     </div>
     ${chk('mu-orgSep','contendo septos de permeio', mu.orgSep, "estado.muscular.orgSep=!estado.muscular.orgSep;updateLaudo()")}
   </div>`:''}
   ${mu.colNao?`<div class="block"><div class="block-title">Coleção não organizada — detalhes</div>
     <div class="dim-rows">
-      <div class="dim-row"><span class="dim-lbl">med 1 (cm):</span><input class="dim-input" type="number" step="0.1" value="${mu.naoMed1}" onchange="estado.muscular.naoMed1=this.value;updateLaudo()"></div>
-      <div class="dim-row"><span class="dim-lbl">med 2 (cm):</span><input class="dim-input" type="number" step="0.1" value="${mu.naoMed2}" onchange="estado.muscular.naoMed2=this.value;updateLaudo()"></div>
-      <div class="dim-row"><span class="dim-lbl">med 3 (cm):</span><input class="dim-input" type="number" step="0.1" value="${mu.naoMed3}" onchange="estado.muscular.naoMed3=this.value;updateLaudo()"></div>
-      <div class="dim-row"><span class="dim-lbl">dist. pele (cm):</span><input class="dim-input" type="number" step="0.1" value="${mu.naoDis}" onchange="estado.muscular.naoDis=this.value;updateLaudo()"></div>
+      <div class="dim-row"><span class="dim-lbl">mama:</span>${sel('mu-naoMam',[['direita','direita'],['esquerda','esquerda']],mu.naoMam,"estado.muscular.naoMam=this.value;updateLaudo()")}</div>
+      <div class="dim-row"><span class="dim-lbl">med 1 (cm):</span><input class="dim-input" type="number" step="0.1" min="0" value="${mu.naoMed1}" onchange="estado.muscular.naoMed1=this.value;updateLaudo()"></div>
+      <div class="dim-row"><span class="dim-lbl">med 2 (cm):</span><input class="dim-input" type="number" step="0.1" min="0" value="${mu.naoMed2}" onchange="estado.muscular.naoMed2=this.value;updateLaudo()"></div>
+      <div class="dim-row"><span class="dim-lbl">med 3 (cm):</span><input class="dim-input" type="number" step="0.1" min="0" value="${mu.naoMed3}" onchange="estado.muscular.naoMed3=this.value;updateLaudo()"></div>
+      <div class="dim-row"><span class="dim-lbl">dist. pele (cm):</span><input class="dim-input" type="number" step="0.1" min="0" value="${mu.naoDis}" onchange="estado.muscular.naoDis=this.value;updateLaudo()"></div>
     </div>
   </div>`:''}`;
 }
@@ -580,14 +816,27 @@ function renderMuscular(){
 // ── BIRADS ──
 function renderBirads(){
   const bi = estado.birads;
-  const biAuto = calcBirads();
-  return `<div class="block"><div class="block-title">Classificação</div>
-    ${radio('bir','auto',`classificação automática: ACR BIRADS® ${biAuto}`,bi.modo,"estado.birads.modo='auto';renderSection('birads');updateLaudo()")}
-    ${radio('bir','manual','classificação manual:',bi.modo,"estado.birads.modo='manual';renderSection('birads');updateLaudo()")}
+  const biSugestao = calcBirads();
+  const confirmSel = (bi.modo==='manual'&&bi.manual==='6');
+  return `<div class="block"><div class="block-title">Sugestão do sistema (não é diagnóstico)</div>
+    <div class="doc-p" style="padding:10px 14px;font-size:12.5px;color:var(--text-2)">
+      Com base nos descritores estruturados preenchidos, a sugestão do sistema é <b>ACR BIRADS® ${biSugestao}</b>. Esta é apenas uma sugestão derivada de padrões descritivos — <b>não</b> substitui o julgamento clínico. A classificação final é sempre de responsabilidade do radiologista.
+    </div>
+  </div>
+  <div class="block"><div class="block-title">Classificação final (responsabilidade do radiologista)</div>
+    ${radio('bir','auto',`adotar a sugestão do sistema como classificação final: ACR BIRADS® ${biSugestao}`,bi.modo,"estado.birads.modo='auto';estado.birads.confirmado=false;renderSection('birads');updateLaudo()")}
+    ${radio('bir','manual','definir classificação final manualmente:',bi.modo,"estado.birads.modo='manual';estado.birads.confirmado=false;renderSection('birads');updateLaudo()")}
     ${bi.modo==='manual'?`<div style="padding:8px 14px">
-      <select class="inline-select" id="bir-man" onchange="estado.birads.manual=this.value;updateLaudo()">
+      <select class="inline-select" id="bir-man" onchange="estado.birads.manual=this.value;estado.birads.confirmado=false;renderSection('birads');updateLaudo()">
         ${['0','1','2','3','4','4a','4b','4c','5','6'].map(v=>`<option value="${v}"${(bi.manual||'1')===v?' selected':''}>BIRADS ${v}</option>`).join('')}
       </select></div>`:''}
+    ${(bi.modo==='manual'&&String(bi.manual)!==String(biSugestao)&&bi.manual)?`<div class="doc-p" style="padding:0 14px 10px;font-size:11.5px;color:#b45309">A classificação escolhida (${bi.manual}) diverge da sugestão estrutural (${biSugestao}). Revise se a descrição dos achados no laudo está coerente com a categoria final escolhida.</div>`:''}
+    ${confirmSel?`<div class="doc-p" style="padding:0 14px 10px;font-size:11.5px;color:#b45309">BIRADS 6 pressupõe malignidade já comprovada por biópsia. Confirme abaixo antes de prosseguir.</div>
+      ${chk('bir-hist','confirmo comprovação histopatológica prévia de malignidade', bi.histConfirmado, "estado.birads.histConfirmado=!estado.birads.histConfirmado;updateLaudo()")}`:''}
+  </div>
+  <div class="block"><div class="block-title">Confirmação</div>
+    ${chk('bir-confirmado','confirmo esta classificação como a classificação final do laudo', bi.confirmado, "estado.birads.confirmado=!estado.birads.confirmado;renderSection('birads');updateLaudo()")}
+    ${!bi.confirmado?`<div class="doc-p" style="padding:0 14px 10px;font-size:11.5px;color:var(--red)">Enquanto não confirmada, a impressão/cópia do laudo exibirá um aviso de que a classificação ainda não foi revisada pelo radiologista.</div>`:''}
   </div>`;
 }
 
@@ -601,17 +850,41 @@ function calcBirads(){
     else b=Math.max(b,2);
   }
   estado.cistos.forEach(c=>{
-    if(c.par==='espessas'||c.sep==='espessas') b=Math.max(b,3);
-    else b=Math.max(b,2);
+    if(!c.m1) return; // lesão ainda não preenchida — não deve influenciar a sugestão (evita divergência com o texto do laudo)
+    if(c.par==='espessas'||c.sep==='espessas'){
+      // parede ou septo espesso / componente sólido mural → padrão de "massa complexa/mista sólido-cística", não de cisto simples ou complicado
+      b=Math.max(b,4);
+    } else if(c.con&&c.con!=='anecoico'){
+      // conteúdo não anecoico sem parede/septo espesso → padrão de "cisto complicado" (literatura diverge entre 2 e 3; adota-se 3 como padrão mais conservador, sujeito a confirmação do radiologista)
+      b=Math.max(b,3);
+    } else {
+      b=Math.max(b,2); // cisto simples
+    }
   });
   if(estado.cistosMultDir||estado.cistosMultEsq||estado.cistosMultBil) b=Math.max(b,2);
   estado.nodulos.forEach(n=>{
-    if(n.com==='solido'&&n.for==='oval'&&n.eco==='hipoecoico'&&n.mar==='circunscritas'&&n.ori==='paralelo') b=Math.max(b,3);
-    else b=Math.max(b,4);
+    if(!n.m1) return; // lesão ainda não preenchida — não deve influenciar a sugestão (evita divergência com o texto do laudo)
+    if(n.mar==='espiculadas'){
+      // achado isolado de altíssima especificidade — não é "contagem de descritores", é um único gatilho binário
+      b=Math.max(b,5);
+    } else if(n.eco==='hipoecoico'&&n.for==='oval'&&n.mar==='circunscritas'&&n.ori==='paralelo'){
+      b=Math.max(b,3);
+    } else {
+      b=Math.max(b,4);
+    }
   });
-  if(estado.linfonodo.sit!=='ausentes') b=Math.max(b,2);
-  if(estado.ectasias.sit==='nodulo') b=Math.max(b,4);
-  if(estado.distorcao.sit==='fora') b=Math.max(b,4);
+  estado.linfonodos.forEach(l=>{
+    // presença isolada, com morfologia normal, é achado benigno; morfologia alterada NÃO recebe categoria automática 4/5 aqui —
+    // a sugestão permanece na linha de base e o alerta de confirmação manual é exibido separadamente na interface
+    b=Math.max(b,2);
+  });
+  estado.naomassa.forEach(x=>{
+    // lesão não-nodular recebe categoria de base 4 (achado suspeito), com forte sinalização de
+    // confirmação manual na interface (ver renderNaoMassa)
+    b=Math.max(b,4);
+  });
+  estado.ectasias.forEach(e=>{ if(e.tipo==='nodulo') b=Math.max(b,4); });
+  estado.distorcoes.forEach(d=>{ if(d.nat==='fora') b=Math.max(b,4); });
   return b;
 }
 
@@ -619,14 +892,45 @@ function calcBirads(){
 function updateLaudo(){
   const ci = estado.cirurgias;
   const im = estado.implantes;
-  const ln = estado.linfonodo;
-  const ec = estado.ectasias;
-  const di = estado.distorcao;
   const mu = estado.muscular;
   const bi = estado.birads;
 
   let opiniao = [];
   let laudoBirads = bi.modo==='manual'?(bi.manual||'1'):calcBirads();
+  let biradsRevisado = !!bi.confirmado;
+
+  // ── INDICAÇÃO ──
+  const ind = estado.indicacao;
+  const ACHADO_CLINICO_TXT = {nodulo:'nódulo palpável',dor:'dor',secrecao:'secreção papilar',pele:'alteração cutânea'};
+  let clinicoTxt;
+  const achadosSel = Object.keys(ind.clinicoAchados||{}).filter(k=>ind.clinicoAchados[k]).map(k=>ACHADO_CLINICO_TXT[k]);
+  if(achadosSel.length===0) clinicoTxt = 'Avaliação diagnóstica de achado clínico (nódulo palpável, dor, secreção papilar ou alteração cutânea).';
+  else if(achadosSel.length===1) clinicoTxt = `Avaliação diagnóstica de achado clínico (${achadosSel[0]}).`;
+  else clinicoTxt = `Avaliação diagnóstica de achado clínico (${achadosSel.slice(0,-1).join(', ')} ou ${achadosSel[achadosSel.length-1]}).`;
+  const IND_TXT = {
+    rastreamento:'Rastreamento de rotina.',
+    clinico:clinicoTxt,
+    imagem:'Avaliação/complementação diagnóstica de achado identificado em outro método de imagem.',
+    seguimento:'Seguimento de achado(s) prévio(s).',
+    protese:'Avaliação de prótese mamária.',
+    altorisco:'Rastreamento em paciente de alto risco para câncer de mama.'
+  };
+  const indicacaoTxt = ind.preset==='manual' ? (ind.manual||'_') : (IND_TXT[ind.preset]||IND_TXT.rastreamento);
+
+  // ── EXAMES ANTERIORES ──
+  const ea = estado.examesAnteriores;
+  let exAntTxt;
+  if(ea.tem){
+    const usgD = ea.usgData||'--/--/----';
+    if(ea.incluirMmg){
+      const mmgD = ea.mmgData||'--/--/----';
+      exAntTxt = `Estudo comparativo com exame ultrassonográfico do dia ${usgD} e mamografia do dia ${mmgD}.`;
+    } else {
+      exAntTxt = `Estudo comparativo com exame ultrassonográfico do dia ${usgD}.`;
+    }
+  } else {
+    exAntTxt = 'Exames anteriores indisponíveis para análise comparativa.';
+  }
 
   // ── TÉCNICA ──
   let tecHtml = `<div class="doc-p">Exame realizado em aparelho dinâmico com transdutor linear de alta frequência.</div>`;
@@ -652,11 +956,14 @@ function updateLaudo(){
 
   // Composição
   let compFrase = '';
-  if(estado.composicao==='fibroglandular') compFrase='A composição mamária apresenta ecotextura de fundo homogênea com predomínio fibroglandular.';
-  else if(estado.composicao==='adiposa') compFrase='A composição mamária apresenta ecotextura de fundo homogênea com predomínio adiposo.';
-  else if(estado.composicao==='heterogenea') compFrase='A composição mamária apresenta ecotextura de fundo heterogênea, com áreas adiposas entremeando o tecido fibroglandular.';
-  else if(estado.composicao==='lactacional') compFrase='A composição mamária apresenta ecotextura de fundo heterogênea, hiperecogenicidade difusa e predomínio acentuado de tecido fibroglandular denso, com dilatação ductal.';
-  else if(estado.composicao==='lactacionalSem') compFrase='A composição mamária apresenta ecotextura de fundo heterogênea, hiperecogenicidade difusa e predomínio acentuado de tecido fibroglandular denso.';
+  if(estado.composicao==='fibroglandular') compFrase='A composição mamária apresenta ecotextura de fundo homogênea com predomínio fibroglandular';
+  else if(estado.composicao==='adiposa') compFrase='A composição mamária apresenta ecotextura de fundo homogênea com predomínio adiposo';
+  else if(estado.composicao==='heterogenea') compFrase='A composição mamária apresenta ecotextura de fundo heterogênea, com áreas adiposas entremeando o tecido fibroglandular';
+  else if(estado.composicao==='lactacional') compFrase='A composição mamária apresenta ecotextura de fundo heterogênea, hiperecogenicidade difusa e predomínio acentuado de tecido fibroglandular denso, com dilatação ductal';
+  else if(estado.composicao==='lactacionalSem') compFrase='A composição mamária apresenta ecotextura de fundo heterogênea, hiperecogenicidade difusa e predomínio acentuado de tecido fibroglandular denso';
+  const CG_TXT = {minimo:'mínimo',leve:'leve',moderado:'moderado',acentuado:'acentuado'};
+  if(CG_TXT[estado.componenteGlandular]) compFrase += ` e ${CG_TXT[estado.componenteGlandular]} componente glandular tecidual.`;
+  else compFrase += '.';
   analiseHtml += `<div class="doc-p">${compFrase}</div>`;
 
   // Implantes
@@ -714,15 +1021,25 @@ function updateLaudo(){
     let med = n.m1;
     if(n.m2) med += ` x ${n.m2}`;
     if(n.m3) med += ` x ${n.m3}`;
-    const com = n.com==='complexo'?'complexo sólido-cístico':n.com;
+    const ecoTxt = n.eco==='misto'?'de padrão ecogênico misto sólido-cístico':n.eco;
     const efe = n.efe==='nenhum'?'sem fenômeno acústico posterior':`com ${({reforco:'reforço acústico posterior',sombra:'sombra acústica posterior',combinado:'efeito acústico posterior combinado'})[n.efe]}`;
     let distPP='';
     if(n.pap&&n.pel) distPP=`, distando cerca de ${n.pap} cm da papila e ${n.pel} cm da pele`;
     else if(n.pap) distPP=`, distando cerca de ${n.pap} cm da papila`;
     else if(n.pel) distPP=`, distando cerca de ${n.pel} cm da pele`;
-    nodFrases.push(`- N${i+1}: nódulo ${com}, ${n.eco}, ${n.for}, de margens ${n.mar}, ${n.ori} à pele, ${efe}, localizado em ${LOCS_TXT[n.loc]||n.loc} da mama ${n.mam}, medindo cerca de ${med} cm${distPP};`);
-    if(n.com==='solido'&&n.for==='oval'&&n.eco==='hipoecoico'&&n.mar==='circunscritas'&&n.ori==='paralelo') opiniao.push(`Nódulo com características tipicamente benignas em mama ${n.mam}.`);
-    else opiniao.push(`Nódulo suspeito em mama ${n.mam}.`);
+    const achadosAssoc = [];
+    if(n.vasc==='avascular') achadosAssoc.push('avascular ao Doppler');
+    else if(n.vasc==='interna') achadosAssoc.push('com vascularização interna ao Doppler');
+    else if(n.vasc==='periferica') achadosAssoc.push('com vascularização periférica ao Doppler');
+    if(n.calc==='macro') achadosAssoc.push('associado a macrocalcificação(ões)');
+    else if(n.calc==='micro') achadosAssoc.push('associado a microcalcificação(ões)');
+    if(n.rind) achadosAssoc.push('circundado por borda ecogênica espessa (incluída na medida acima)');
+    if(n.elasto&&n.elasto!=='naoreal') achadosAssoc.push(`à elastografia com padrão ${({macia:'macio',intermediaria:'intermediário',rigida:'rígido'})[n.elasto]}`);
+    const assocTxt = achadosAssoc.length?`, ${achadosAssoc.join(', ')}`:'';
+    nodFrases.push(`- N${i+1}: nódulo ${ecoTxt}, ${n.for}, de margens ${n.mar}, ${n.ori} à pele, ${efe}, localizado em ${LOCS_TXT[n.loc]||n.loc} da mama ${n.mam}, medindo cerca de ${med} cm${distPP}${assocTxt};`);
+    if(n.mar==='espiculadas') opiniao.push(`Nódulo com margem espiculada em mama ${n.mam} — achado de alta suspeição.`);
+    else if(n.eco==='hipoecoico'&&n.for==='oval'&&n.mar==='circunscritas'&&n.ori==='paralelo') opiniao.push(`Nódulo com características tipicamente benignas em mama ${n.mam}.`);
+    else opiniao.push(`Nódulo com características não classicamente benignas em mama ${n.mam} — requer correlação e definição do radiologista.`);
   });
   if(nodFrases.length>0){
     analiseHtml += `<div class="doc-p">Presença de nódulos assim descritos:<br>${nodFrases.join('<br>')}</div>`;
@@ -730,44 +1047,59 @@ function updateLaudo(){
     analiseHtml += `<div class="doc-p">Não há evidências de imagens nodulares.</div>`;
   }
 
-  // Linfonodo IM
-  if(ln.sit!=='ausentes'){
-    const loc = ln.sit==='direita'?ln.locDir:ln.locEsq;
-    analiseHtml += `<div class="doc-p">Presença de linfonodo intramamário localizado em ${LOCS_TXT[loc]||loc} da mama ${ln.sit}.</div>`;
-    opiniao.push(`Linfonodo intramamário em mama ${ln.sit}.`);
-  }
+  // Lesões não-nodulares
+  const DIST_TXT = {focal:'focal',regional:'regional',ductal:'linear',segmentar:'segmentar'};
+  estado.naomassa.forEach(x=>{
+    const efeTxt = x.efe==='nenhum'?'sem fenômeno acústico posterior':`com ${({sombra:'sombra acústica posterior',reforco:'reforço acústico posterior'})[x.efe]}`;
+    analiseHtml += `<div class="doc-p">Nota-se lesão não-nodular, de padrão ecogênico ${x.eco}, distribuição ${DIST_TXT[x.dist]||x.dist}, ${efeTxt}, localizada em ${LOCS_TXT[x.loc]||x.loc} da mama ${x.mam}.</div>`;
+    if(x.dist==='segmentar') opiniao.push(`Lesão não-nodular de distribuição segmentar em mama ${x.mam} — achado com maior associação a malignidade, requer definição do radiologista.`);
+    else opiniao.push(`Lesão não-nodular em mama ${x.mam} — requer correlação e definição do radiologista.`);
+  });
+
+  // Linfonodos
+  const BACIAS_TXT = {intramamario:'intramamário',axilar:'axilar',mamariointerno:'mamário interno',supraclavicular:'supraclavicular',infraclavicular:'infraclavicular'};
+  estado.linfonodos.forEach(l=>{
+    const bTxt = BACIAS_TXT[l.bacia]||l.bacia;
+    if(l.morf==='suspeita'){
+      analiseHtml += `<div class="doc-p">Presença de linfonodo ${bTxt} localizado em ${LOCS_TXT[l.loc]||l.loc} da mama ${l.mam}, com morfologia atípica (espessamento cortical e/ou perda do hilo gorduroso).</div>`;
+      opiniao.push(`Linfonodo ${bTxt} com morfologia atípica em mama ${l.mam} — requer correlação clínica e definição do radiologista.`);
+    } else {
+      analiseHtml += `<div class="doc-p">Presença de linfonodo ${bTxt} localizado em ${LOCS_TXT[l.loc]||l.loc} da mama ${l.mam}, de morfologia preservada (córtex fino, hilo gorduroso presente).</div>`;
+      opiniao.push(`Linfonodo ${bTxt} de aspecto habitual em mama ${l.mam}.`);
+    }
+  });
 
   // Regiões retroareolares
   analiseHtml += `<div class="doc-p">Regiões retroareolares sem alterações.</div>`;
 
   // Ectasias
-  if(ec.sit!=='ausentes'){
-    if(ec.sit==='presentes'){
-      const cal = ec.preCal?` de calibre de até ${ec.preCal} mm`:'';
-      analiseHtml += `<div class="doc-p">Presença de ectasias ductais de conteúdo ${ec.preCon} em ${LOCS_TXT[ec.preLoc]||ec.preLoc} ${ec.preLat}${cal}, sem nódulo intraductal em seu interior.</div>`;
-      opiniao.push('Ectasias ductais.');
-    } else if(ec.sit==='nodulo'){
+  estado.ectasias.forEach(e=>{
+    if(e.tipo==='simples'){
+      const cal = e.cal?` de calibre de até ${e.cal} mm`:'';
+      analiseHtml += `<div class="doc-p">Presença de ectasia ductal de conteúdo ${e.con||'anecoico'} em ${LOCS_TXT[e.loc]||e.loc} da mama ${e.mam}${cal}, sem nódulo intraductal em seu interior.</div>`;
+      opiniao.push(`Ectasia ductal em mama ${e.mam}.`);
+    } else if(e.tipo==='nodulo'){
       let med='_';
-      if(ec.nodMed1){ med=ec.nodMed1; if(ec.nodMed2)med+=` x ${ec.nodMed2}`; if(ec.nodMed3)med+=` x ${ec.nodMed3}`; }
-      const cal = ec.nodCal?` de calibre de até ${ec.nodCal} mm`:'';
+      if(e.nMed1){ med=e.nMed1; if(e.nMed2)med+=` x ${e.nMed2}`; if(e.nMed3)med+=` x ${e.nMed3}`; }
+      const cal = e.cal?` de calibre de até ${e.cal} mm`:'';
       let distPP='';
-      if(ec.nodPap&&ec.nodPel) distPP=`, distando cerca de ${ec.nodPap} cm da papila e ${ec.nodPel} cm da pele`;
-      else if(ec.nodPap) distPP=`, distando cerca de ${ec.nodPap} cm da papila`;
-      analiseHtml += `<div class="doc-p">Presença de ectasias ductais em ${LOCS_TXT[ec.nodLoc]||ec.nodLoc} ${ec.nodLat}${cal}, contendo nódulo intraductal medindo cerca de ${med} cm, ${ec.nodDop==='com'?'com':'sem'} sinal Doppler, em seu interior${distPP}.</div>`;
-      opiniao.push('Nódulo intraductal — correlacionar clinicamente.');
+      if(e.nPap&&e.nPel) distPP=`, distando cerca de ${e.nPap} cm da papila e ${e.nPel} cm da pele`;
+      else if(e.nPap) distPP=`, distando cerca de ${e.nPap} cm da papila`;
+      analiseHtml += `<div class="doc-p">Presença de ectasia ductal em ${LOCS_TXT[e.loc]||e.loc} da mama ${e.mam}${cal}, contendo nódulo intraductal medindo cerca de ${med} cm, ${e.dop==='com'?'com':'sem'} sinal Doppler, em seu interior${distPP}.</div>`;
+      opiniao.push(`Nódulo intraductal em mama ${e.mam} — correlacionar clinicamente.`);
     }
-  }
+  });
 
   // Distorção
-  if(di.sit!=='ausente'){
-    if(di.sit==='cicatricial'){
-      analiseHtml += `<div class="doc-p">Presença de distorção arquitetural em ${LOCS_TXT[di.sitLoc]||di.sitLoc} ${di.sitLat}, de provável natureza cirúrgica.</div>`;
-      opiniao.push(`Distorção arquitetural ${di.sitLat}, de provável natureza cirúrgica.`);
+  estado.distorcoes.forEach(d=>{
+    if(d.nat==='cicatricial'){
+      analiseHtml += `<div class="doc-p">Presença de distorção arquitetural em ${LOCS_TXT[d.loc]||d.loc} da mama ${d.mam}, de provável natureza cirúrgica.</div>`;
+      opiniao.push(`Distorção arquitetural em mama ${d.mam}, de provável natureza cirúrgica.`);
     } else {
-      analiseHtml += `<div class="doc-p">Presença de distorção arquitetural em ${LOCS_TXT[di.forLoc]||di.forLoc} ${di.forLat}.</div>`;
-      opiniao.push(`Distorção arquitetural ${di.forLat}.`);
+      analiseHtml += `<div class="doc-p">Presença de distorção arquitetural em ${LOCS_TXT[d.loc]||d.loc} da mama ${d.mam}, fora de contexto cirúrgico.</div>`;
+      opiniao.push(`Distorção arquitetural em mama ${d.mam}, fora de contexto cirúrgico — achado de alta suspeição.`);
     }
-  }
+  });
 
   // Muscular
   if(mu.colOrg){
@@ -775,31 +1107,54 @@ function updateLaudo(){
     if(mu.orgMed1){ med=mu.orgMed1; if(mu.orgMed2)med+=` x ${mu.orgMed2}`; if(mu.orgMed3)med+=` x ${mu.orgMed3}`; }
     const dis = mu.orgDis?`, distando ${mu.orgDis} cm da pele`:'';
     const sep = mu.orgSep?', contendo septos de permeio':'';
-    analiseHtml += `<div class="doc-p">Coleção organizada, localizada no plano muscular, de paredes ${mu.orgPar} e conteúdo ${mu.orgCon}, medindo ${med} cm${dis}${sep}.</div>`;
-    opiniao.push('Coleção organizada no plano muscular.');
+    analiseHtml += `<div class="doc-p">Coleção organizada, localizada no plano muscular da mama ${mu.orgMam}, de paredes ${mu.orgPar} e conteúdo ${mu.orgCon}, medindo ${med} cm${dis}${sep}.</div>`;
+    opiniao.push(`Coleção organizada no plano muscular da mama ${mu.orgMam}.`);
   }
   if(mu.colNao){
     let med='_';
     if(mu.naoMed1){ med=mu.naoMed1; if(mu.naoMed2)med+=` x ${mu.naoMed2}`; if(mu.naoMed3)med+=` x ${mu.naoMed3}`; }
     const dis = mu.naoDis?`, distando ${mu.naoDis} cm da pele`:'';
-    analiseHtml += `<div class="doc-p">Coleção não organizada, localizada no plano muscular, medindo ${med} cm${dis}.</div>`;
-    opiniao.push('Coleção não organizada no plano muscular.');
+    analiseHtml += `<div class="doc-p">Coleção não organizada, localizada no plano muscular da mama ${mu.naoMam}, medindo ${med} cm${dis}.</div>`;
+    opiniao.push(`Coleção não organizada no plano muscular da mama ${mu.naoMam}.`);
   }
   if(!mu.colOrg&&!mu.colNao&&mu.habitual){
     analiseHtml += `<div class="doc-p">Planos musculares de aspecto preservado.</div>`;
   }
 
   // ── OPINIÃO ──
+  const classifTxt = 'Classificação ACR BIRADS ®: '+laudoBirads+(biradsRevisado?'':' (sugestão do sistema — classificação final ainda não confirmada pelo radiologista)');
   let opFinal;
-  if(opiniao.length===0) opFinal='Estudo ecográfico sem evidentes anormalidades apreciáveis ao método.\nClassificação ACR BIRADS ®: '+laudoBirads;
-  else opFinal=opiniao.join('\n')+'\nDemais estruturas sem evidentes anormalidades apreciáveis ao método.\nClassificação ACR BIRADS ®: '+laudoBirads;
+  if(opiniao.length===0) opFinal='Estudo ecográfico sem evidentes anormalidades apreciáveis ao método.\n'+classifTxt;
+  else opFinal=opiniao.join('\n')+'\nDemais estruturas descritas sem evidentes anormalidades apreciáveis ao método.\n'+classifTxt;
 
   // ── RECOMENDAÇÕES ──
-  const recMap = {'0':'Recomendação para aquisição de imagens adicionais.','1':'Rastreamento de rotina.','2':'Seguimento de rotina ou a critério clínico.','3':'Seguimento de curto prazo (controle em 6, 12, 24 e 36 meses).','4':'Diagnóstico tecidual.','4a':'Diagnóstico tecidual.','4b':'Diagnóstico tecidual.','4c':'Diagnóstico tecidual.','5':'Diagnóstico tecidual.','6':'Seguimento de curto prazo (controle em 6, 12, 24 e 36 meses).'};
+  // Observação: a formulação abaixo segue a prática consolidada de acompanhamento (não há indício de mudança textual
+  // obrigatória no v2025 para a recomendação de categoria 3). Para a categoria 0, o v2025 passou a diferenciar
+  // "necessidade de imagem adicional" de "necessidade de comparação com exames prévios" — ambas as opções são mantidas
+  // aqui como recomendação genérica, cabendo ao radiologista especificar qual se aplica no texto final.
+  // A recomendação de categoria 6 NÃO é uma citação textual do manual (categoria 6 trata de doença já comprovada,
+  // sob acompanhamento oncológico, não de uma "conduta radiológica" no mesmo sentido das demais categorias).
+  const recMap = {
+    '0':'Recomendação para avaliação complementar: aquisição de imagens adicionais e/ou comparação com exames prévios, conforme indicado pelo radiologista.',
+    '1':'Rastreamento de rotina.',
+    '2':'Seguimento de rotina ou a critério clínico.',
+    '3':'Seguimento de curto prazo (controle em 6, 12 e 24 meses).',
+    '4':'Diagnóstico tecidual.','4a':'Diagnóstico tecidual.','4b':'Diagnóstico tecidual.','4c':'Diagnóstico tecidual.',
+    '5':'Diagnóstico tecidual.',
+    '6':'Achado com malignidade já comprovada por biópsia — conduta de acordo com avaliação de resposta terapêutica/estadiamento e planejamento definido pela equipe assistente, não seguimento de rotina.'
+  };
   const rec = recMap[String(laudoBirads)]||'Rastreamento de rotina.';
 
   document.getElementById('laudo-doc').innerHTML=`
     <div class="doc-titulo">ULTRASSONOGRAFIA DE MAMAS</div>
+    <div class="doc-secao">
+      <span class="doc-label">INDICAÇÃO:</span>
+      <div class="doc-p">${indicacaoTxt}</div>
+    </div>
+    <div class="doc-secao">
+      <span class="doc-label">EXAMES ANTERIORES:</span>
+      <div class="doc-p">${exAntTxt}</div>
+    </div>
     <div class="doc-secao">
       <span class="doc-label">TÉCNICA:</span>
       ${tecHtml}
@@ -818,7 +1173,7 @@ function updateLaudo(){
     </div>
     <div class="doc-secao" style="margin-top:18px;font-size:8pt;color:#555;">
       <div class="doc-p" style="font-size:8pt;font-style:italic;">Referências:<br>
-      1. Mendelson, Ellen B., et al. "ACR BI-RADS® Ultrasound." ACR BI-RADS® Atlas, Breast Imaging Reporting and Data System 2013 (2013).</div>
+      1. Newell MS, Destounis SV, Leung JWT, DeMartini WB, Lee CH, Eby PR, et al. ACR BI-RADS® v2025 Manual. Reston, VA: American College of Radiology; 2025.</div>
     </div>`;
 }
 
@@ -835,12 +1190,26 @@ function toggleDark(){
 (function(){ if(localStorage.getItem('darkMode')==='1') toggleDark(); })();
 
 function copiar() {
+  if(!estado.birads.confirmado){
+    if(!confirm('A classificação BI-RADS final ainda não foi confirmada pelo radiologista (aba BIRADS). Deseja copiar mesmo assim?')) return;
+  }
   const isDark = document.body.classList.contains('dark');
   if (isDark) document.body.classList.remove('dark');
-  
-  const el = document.getElementById('laudo-doc');
+
+  // Elemento temporário fora da tela: laudo + observações adicionais (preservadas mesmo que não estejam no painel regenerável)
+  const temp = document.createElement('div');
+  temp.style.position='fixed';temp.style.left='-9999px';temp.style.top='0';
+  temp.innerHTML = document.getElementById('laudo-doc').innerHTML;
+  const notas = (estado.notasAdicionais||'').trim();
+  if(notas){
+    const p = document.createElement('div');
+    p.innerHTML = '<br><b>OBSERVAÇÕES ADICIONAIS DO RADIOLOGISTA:</b><br>'+notas.replace(/\n/g,'<br>');
+    temp.appendChild(p);
+  }
+  document.body.appendChild(temp);
+
   const range = document.createRange();
-  range.selectNodeContents(el);
+  range.selectNodeContents(temp);
   const selection = window.getSelection();
   selection.removeAllRanges();
   selection.addRange(range);
@@ -852,6 +1221,7 @@ function copiar() {
   }
   
   selection.removeAllRanges();
+  document.body.removeChild(temp);
   if (isDark) document.body.classList.add('dark');
   
   if (success) {
@@ -877,30 +1247,46 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 function imprimir(){
+  if(!estado.birads.confirmado){
+    if(!confirm('A classificação BI-RADS final ainda não foi confirmada pelo radiologista (aba BIRADS). Deseja imprimir mesmo assim?')) return;
+  }
   const h=document.getElementById('laudo-doc').innerHTML;
+  const notas = (estado.notasAdicionais||'').trim();
+  const notasHtml = notas?('<br><b>OBSERVAÇÕES ADICIONAIS DO RADIOLOGISTA:</b><br>'+notas.replace(/\n/g,'<br>')):'';
   const w=window.open('','_blank');
   w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Helvetica,Arial,sans-serif;font-size:10pt;padding:32px;color:#111;line-height:1.65;}.doc-titulo{text-align:center;font-weight:700;text-transform:uppercase;margin-bottom:16px;}.doc-label{font-weight:700;}.doc-p{margin-bottom:8px;}.doc-secao{margin-bottom:14px;}*{color:#111 !important;}.laudo-doc:focus { outline: none; }
-</style></head><body>${h}
+</style></head><body>${h}${notasHtml}
 <div id="toast-notification" class="toast-notification">Laudo copiado!</div>
 </body></html>`);
   w.document.close();w.print();
 }
 function reiniciar(){
+  if(!confirm('Isso vai apagar todos os dados preenchidos do laudo atual e não pode ser desfeito. Deseja continuar?')) return;
+  estado.indicacao={preset:'rastreamento',manual:'',clinicoAchados:{nodulo:false,dor:false,secrecao:false,pele:false}};
+  estado.examesAnteriores={tem:false,usgData:'',incluirMmg:false,mmgData:''};
   estado.composicao='fibroglandular';
+  estado.componenteGlandular='';
   estado.cirurgias={mastDir:false,mastEsq:false,mastBil:false,recDir:false,recEsq:false,recBil:false,quadDir:false,quadEsq:false,quadBil:false,mamDir:false,mamEsq:false,mamBil:false};
   estado.implantes={sit:'ausentes',loc:'retroglandular',lat:'bilateralmente',intDir:false,intEsq:false,intBil:false,extDir:false,extEsq:false,extBil:false,hetDir:false,hetEsq:false,hetBil:false};
   estado.cistos=[];
   estado.cistosMultDir=false;estado.cistosMultEsq=false;estado.cistosMultBil=false;
   estado.nodulos=[];
-  estado.linfonodo={sit:'ausentes',locDir:'qsl',locEsq:'qsl'};
-  estado.ectasias={sit:'ausentes',preLoc:'rra',preLat:'bilateral',preCon:'anecoico',preCal:'',nodLoc:'rra',nodLat:'bilateral',nodCal:'',nodMed1:'',nodMed2:'',nodMed3:'',nodDop:'sem',nodPap:'',nodPel:''};
-  estado.distorcao={sit:'ausente',sitLoc:'qsl',sitLat:'direita',forLoc:'qsl',forLat:'direita'};
-  estado.muscular={habitual:true,colOrg:false,orgPar:'finas',orgCon:'anecoico',orgMed1:'',orgMed2:'',orgMed3:'',orgDis:'',orgSep:false,colNao:false,naoMed1:'',naoMed2:'',naoMed3:'',naoDis:''};
-  estado.birads={modo:'auto'};
-  showSection('composicao');
+  estado.naomassa=[];
+  estado.linfonodos=[];
+  estado.ectasias=[];
+  estado.distorcoes=[];
+  estado.muscular={habitual:true,colOrg:false,orgMam:'direita',orgPar:'finas',orgCon:'anecoico',orgMed1:'',orgMed2:'',orgMed3:'',orgDis:'',orgSep:false,colNao:false,naoMam:'direita',naoMed1:'',naoMed2:'',naoMed3:'',naoDis:''};
+  estado.birads={modo:'auto',confirmado:false};
+  estado.notasAdicionais='';
+  const notasEl = document.getElementById('notas-adicionais');
+  if(notasEl) notasEl.value='';
+  showSection('indicacao');
+  updateLaudo(); // CRÍTICO: garante que a pré-visualização do laudo seja imediatamente sincronizada com o estado zerado,
+                 // evitando que o texto do paciente anterior permaneça na tela e seja impresso/copiado por engano
 }
 
-showSection('composicao');
+showSection('indicacao');
+updateLaudo();
 </script>
 
 <div id="toast-notification" class="toast-notification">Laudo copiado!</div>

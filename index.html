@@ -5,38 +5,195 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>THI-RADS — Laudos Estruturados em Ultrassonografia</title>
 <meta name="description" content="THI-RADS — laudos estruturados para ultrassonografia.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#07111f;--surface:rgba(15,29,48,.86);--text:#f4f8fc;--muted:#aab8c8;--accent:#4fc3f7;--border:rgba(130,190,225,.18);--glow:rgba(79,195,247,.25)}
-body.light{--bg:#f4f8fb;--surface:rgba(255,255,255,.9);--text:#10233b;--muted:#5d6e80;--accent:#087fb2;--border:rgba(16,70,105,.14);--glow:rgba(8,127,178,.14)}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;color:var(--text);background:radial-gradient(circle at 80% 10%,var(--glow),transparent 28%),var(--bg);transition:.3s}
-a{text-decoration:none;color:inherit}.container{width:min(1160px,calc(100% - 32px));margin:auto}
-header{position:fixed;top:0;left:0;right:0;z-index:10;background:rgba(7,17,31,.78);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
-body.light header{background:rgba(244,248,251,.84)}
-nav{height:74px;display:flex;align-items:center;justify-content:space-between;gap:20px}
-.brand{display:flex;align-items:center;max-width:760px}.brand-svg{display:block;width:min(455px,52vw);height:auto;flex:none;overflow:visible}
-.name{font-size:1.45rem;font-weight:400;letter-spacing:4px}.tag{font-size:.56rem;letter-spacing:1.5px;color:var(--muted);white-space:nowrap}
-.links{display:flex;gap:26px;color:var(--muted);font-size:.88rem}.links a:hover{color:var(--accent)}
-.actions{display:flex;gap:9px;align-items:center}.theme{width:40px;height:40px;border:1px solid var(--border);border-radius:50%;background:var(--surface);color:var(--accent);display:grid;place-items:center;cursor:pointer}.theme svg{width:18px}
-.login,.primary{background:var(--accent);color:#03111b;font-weight:700;border-radius:10px;padding:11px 18px;box-shadow:0 10px 28px var(--glow)}
-.hero{padding:150px 0 90px}.hero-grid{display:grid;grid-template-columns:1fr .95fr;gap:70px;align-items:center}
-.kicker{font-size:.7rem;letter-spacing:2px;color:var(--accent);font-weight:700;text-transform:uppercase}
-h1{font-size:clamp(2.8rem,5vw,4.8rem);font-weight:300;line-height:1.02;letter-spacing:-2px;margin:18px 0}h1 strong{color:var(--accent);font-weight:650}
-.lead{font-size:1.1rem;color:var(--muted);max-width:650px;margin-bottom:28px}.actions2{display:flex;gap:12px;flex-wrap:wrap}.secondary{padding:11px 18px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font-weight:700}
-.mock{border:1px solid var(--border);border-radius:20px;background:var(--surface);overflow:hidden;box-shadow:0 25px 70px rgba(0,0,0,.28)}.mockbar{height:45px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;padding:0 15px}.dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}.mocktitle{margin-left:7px;font-size:.7rem;color:var(--muted);letter-spacing:1px}.mockbody{display:grid;grid-template-columns:130px 1fr;min-height:320px}.side{padding:18px 12px;border-right:1px solid var(--border)}.line{height:8px;border-radius:5px;background:var(--border);margin-bottom:12px}.line.active{background:var(--accent);opacity:.6;width:75%}.main{padding:22px}.main h3{font-weight:500;margin:0 0 16px}.boxes{display:grid;grid-template-columns:1fr 1fr;gap:10px}.box{border:1px solid var(--border);border-radius:10px;padding:13px}.box small{display:block;color:var(--muted);font-size:.65rem;margin-bottom:5px}.box b{font-size:.82rem;font-weight:500}.conclusion{margin-top:14px;border-left:2px solid var(--accent);padding:12px;color:var(--muted);font-size:.75rem;background:rgba(79,195,247,.05)}
-section{padding:85px 0}.head{max-width:700px;margin-bottom:35px}.head h2{font-size:clamp(2rem,3.5vw,3rem);font-weight:350;line-height:1.1;margin:8px 0 12px}.head p{color:var(--muted)}
-.features{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.feature,.step,.exam{background:var(--surface);border:1px solid var(--border);border-radius:16px}.feature{padding:24px}.feature svg{width:40px;height:40px;color:var(--accent);margin-bottom:16px}.feature h3{margin:0 0 7px;font-size:1rem}.feature p{margin:0;color:var(--muted);font-size:.85rem}
-.exams{display:grid;grid-template-columns:repeat(8,1fr);gap:10px}.exam{text-align:center;padding:18px 8px}.exam svg{width:32px;height:32px;color:var(--accent);margin-bottom:7px}.exam span{display:block;color:var(--muted);font-size:.7rem}
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.step{padding:26px}.num{color:var(--accent);font-size:.7rem;letter-spacing:2px;font-weight:700}.step h3{margin:10px 0 7px}.step p{margin:0;color:var(--muted);font-size:.88rem}
-.cta{padding:52px 25px;text-align:center;border:1px solid var(--border);border-radius:22px;background:radial-gradient(circle at 50% 0,var(--glow),transparent 50%),var(--surface)}.cta h2{font-size:clamp(2rem,4vw,3rem);font-weight:350;margin:8px 0}.cta p{color:var(--muted);max-width:650px;margin:0 auto 25px}
-footer{border-top:1px solid var(--border);padding:32px 0;color:var(--muted);font-size:.76rem}.foot{display:flex;justify-content:space-between;gap:20px}.foot strong{color:var(--text);letter-spacing:3px}
-@media(max-width:900px){.links{display:none}.hero-grid{grid-template-columns:1fr}.features{grid-template-columns:1fr 1fr}.exams{grid-template-columns:repeat(4,1fr)}}
-@media(max-width:600px){.brand-svg{width:285px;height:auto;max-width:76vw}.tag{display:none}.hero{padding-top:120px}.features,.steps{grid-template-columns:1fr}.exams{grid-template-columns:1fr 1fr}.mockbody{grid-template-columns:85px 1fr}.foot{flex-direction:column}}
+:root{
+  --bg:#0a0d12;
+  --surface:rgba(255,255,255,.045);
+  --surface-solid:#12161d;
+  --text:#eef2f6;
+  --muted:#8992a1;
+  --accent:#3fb6f0;
+  --accent2:#1c6fd6;
+  --accent-ink:#071019;
+  --wash:#161b23;
+  --border:rgba(210,222,235,.13);
+  --grain:rgba(255,255,255,.035);
+}
+body.light{
+  --bg:#eef1f5;
+  --surface:rgba(255,255,255,.7);
+  --surface-solid:#ffffff;
+  --text:#10141a;
+  --muted:#5a6373;
+  --accent:#0d7dc4;
+  --accent2:#0a5a94;
+  --accent-ink:#f3f9fd;
+  --wash:#e2e7ee;
+  --border:rgba(15,22,32,.13);
+  --grain:rgba(0,0,0,.025);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:'Inter',system-ui,sans-serif;
+  color:var(--text);
+  background:var(--bg);
+  transition:background .35s ease,color .35s ease;
+}
+::selection{background:var(--accent);color:var(--accent-ink)}
+a{text-decoration:none;color:inherit}
+.container{width:min(1180px,calc(100% - 40px));margin:auto}
+.serif{font-family:'Space Grotesk',sans-serif}
+.mono{font-family:'IBM Plex Mono',monospace}
+
+/* ---------- eyebrow / caliper mark ---------- */
+.eyebrow{
+  display:inline-flex;align-items:center;gap:9px;
+  font-family:'IBM Plex Mono',monospace;font-size:.68rem;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--accent);
+  margin-bottom:16px;
+}
+.eyebrow::before,.eyebrow::after{content:"";width:9px;height:9px;flex:none;
+  background:
+    linear-gradient(currentColor,currentColor) center/1px 100% no-repeat,
+    linear-gradient(currentColor,currentColor) center/100% 1px no-repeat;
+}
+
+/* ---------- header (always dark: instrument bezel) ---------- */
+header{position:fixed;top:0;left:0;right:0;z-index:20;background:rgba(7,9,13,.88);backdrop-filter:blur(14px);border-bottom:1px solid rgba(210,222,235,.1)}
+nav{height:76px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.brand{display:flex;align-items:center;max-width:760px;min-width:0}
+.brand-svg{display:block;width:clamp(230px,30vw,430px);height:auto;flex:none;overflow:visible;filter:drop-shadow(0 0 0 rgba(63,182,240,0));animation:brandpulse 5s ease-in-out infinite}
+@keyframes brandpulse{0%,100%{filter:drop-shadow(0 0 0 rgba(63,182,240,0))}50%{filter:drop-shadow(0 0 10px rgba(63,182,240,.35))}}
+@media(prefers-reduced-motion:reduce){.brand-svg{animation:none}}
+.links{display:flex;gap:26px;color:#9aa3b0;font-size:.84rem;font-family:'IBM Plex Mono',monospace;letter-spacing:.02em;flex:none}
+.links a{position:relative;padding-bottom:3px}
+.links a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:1px;background:#3fb6f0;transition:right .25s ease}
+.links a:hover{color:#eef2f6}
+.links a:hover::after{right:0}
+.actions{display:flex;gap:10px;align-items:center;flex:none}
+.theme{width:38px;height:38px;border:1px solid rgba(210,222,235,.18);border-radius:50%;background:transparent;color:#3fb6f0;display:grid;place-items:center;cursor:pointer;transition:border-color .2s,transform .2s}
+.theme:hover{border-color:#3fb6f0;transform:rotate(18deg)}
+.theme svg{width:16px}
+.login{border:1px solid rgba(210,222,235,.28);color:#eef2f6;font-family:'IBM Plex Mono',monospace;font-size:.76rem;letter-spacing:.08em;border-radius:2px;padding:10px 18px;transition:border-color .2s,color .2s}
+.login:hover{border-color:#3fb6f0;color:#3fb6f0}
+
+/* ---------- buttons ---------- */
+.primary,.secondary{display:inline-flex;align-items:center;gap:10px;font-family:'IBM Plex Mono',monospace;font-size:.78rem;letter-spacing:.06em;padding:14px 22px;border-radius:2px;font-weight:500;transition:box-shadow .25s ease,border-color .25s ease,transform .2s ease}
+.primary{background:linear-gradient(155deg,#6fd0f7,var(--accent2));color:var(--accent-ink);box-shadow:0 14px 30px -10px rgba(63,182,240,.5)}
+.primary:hover{box-shadow:0 18px 36px -10px rgba(63,182,240,.65);transform:translateY(-1px)}
+.secondary{border:1px solid var(--border);color:var(--text)}
+.secondary:hover{border-color:var(--accent);color:var(--accent)}
+.actions2{display:flex;gap:14px;flex-wrap:wrap}
+
+.arrow{position:relative;display:inline-block;width:1em;height:1em;overflow:hidden;vertical-align:-.1em}
+.arrow span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transition:transform .3s ease,opacity .3s ease;animation:arrow-idle 1.8s ease-in-out infinite}
+.arrow span:last-child{transform:translateX(-140%);opacity:0;animation:none}
+a:hover .arrow span:first-child{transform:translateX(140%);opacity:0}
+a:hover .arrow span:last-child{transform:translateX(0);opacity:1}
+@keyframes arrow-idle{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
+@media(prefers-reduced-motion:reduce){.arrow span{animation:none}}
+
+/* ---------- hero ---------- */
+.hero{padding:176px 0 60px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background-image:radial-gradient(var(--grain) 1px,transparent 1px);background-size:3px 3px;pointer-events:none;opacity:.6}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;position:relative}
+h1{font-family:'Space Grotesk',sans-serif;font-weight:500;font-size:clamp(2.6rem,4.6vw,4.3rem);line-height:1.06;letter-spacing:-.01em;margin:0 0 22px}
+h1 em{font-style:normal;color:var(--accent);font-weight:600}
+.lead{font-size:1.05rem;line-height:1.65;color:var(--muted);max-width:560px;margin-bottom:32px}
+
+.scan-wrap{position:relative}
+.scan-wrap svg{width:100%;height:auto;display:block}
+@media(prefers-reduced-motion:no-preference){
+  .sweep{animation:sweep 7s ease-in-out infinite alternate;transform-origin:260px 34px}
+  .pulse-ring{animation:pulse-ring 3.2s ease-out infinite}
+  .pulse-ring:nth-child(2){animation-delay:.8s}
+  .pulse-ring:nth-child(3){animation-delay:1.6s}
+  .pulse-ring:nth-child(4){animation-delay:2.4s}
+}
+@keyframes sweep{0%{transform:rotate(-15deg)}100%{transform:rotate(15deg)}}
+@keyframes pulse-ring{0%{r:20;opacity:.6;stroke-width:1.6}100%{r:280;opacity:0;stroke-width:.3}}
+
+/* ---------- section shell ---------- */
+section{padding:96px 0}
+.rule{border:0;border-top:1px solid var(--border);margin:0}
+.head{max-width:660px;margin-bottom:44px}
+.head h2{font-family:'Space Grotesk',sans-serif;font-weight:500;font-size:clamp(1.9rem,3.2vw,2.7rem);line-height:1.14;margin:0 0 14px}
+.head h2 em{font-style:normal;color:var(--accent);font-weight:600}
+.head p{color:var(--muted);line-height:1.6;margin:0}
+
+/* ---------- funcionalidades ---------- */
+.feat-list{display:grid;grid-template-columns:repeat(2,1fr);border-top:1px solid var(--border)}
+.feature{padding:30px 26px 30px 0;border-bottom:1px solid var(--border);display:grid;grid-template-columns:56px 1fr;gap:18px;transition:background .25s ease}
+.feature:nth-child(odd){border-right:1px solid var(--border);padding-right:26px}
+.feature:nth-child(even){padding-left:26px}
+.feature:hover{background:var(--wash)}
+.feature svg{width:30px;height:30px;color:var(--accent);transition:transform .3s ease}
+.feature:hover svg{transform:scale(1.12) rotate(-4deg)}
+.feature h3{font-family:'Space Grotesk',sans-serif;font-weight:500;font-size:1.18rem;margin:2px 0 8px}
+.feature p{margin:0;color:var(--muted);font-size:.92rem;line-height:1.6}
+
+/* ---------- exames (índice) ---------- */
+.exam-index{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border)}
+.exam{background:var(--bg);padding:26px 18px;display:flex;flex-direction:column;gap:14px;transition:background .2s,transform .2s}
+.exam:hover{background:var(--wash);transform:translateY(-3px)}
+.exam .idx{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--accent);letter-spacing:.05em}
+.exam svg{width:26px;height:26px;color:var(--muted);transition:color .2s,transform .3s ease}
+.exam:hover svg{color:var(--accent);transform:translateY(-2px)}
+.exam span{font-family:'Space Grotesk',sans-serif;font-size:1rem}
+
+/* ---------- revelação ao rolar ---------- */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+.reveal.is-visible{opacity:1;transform:translateY(0)}
+@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+
+/* ---------- como funciona ---------- */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border)}
+.step{background:var(--bg);padding:32px 28px;transition:background .25s ease}
+.step:hover{background:var(--wash)}
+.num{font-family:'IBM Plex Mono',monospace;color:var(--accent);font-size:.72rem;letter-spacing:.12em}
+.step h3{font-family:'Space Grotesk',sans-serif;font-weight:500;font-size:1.3rem;margin:14px 0 9px}
+.step p{margin:0;color:var(--muted);font-size:.92rem;line-height:1.6}
+
+/* ---------- cta ---------- */
+.cta{padding:64px 40px;text-align:center;border:1px solid var(--border);border-radius:6px;background:var(--surface);position:relative;overflow:hidden}
+.cta::before{content:"";position:absolute;left:50%;top:0;width:1px;height:100%;background:var(--border)}
+.cta .eyebrow{justify-content:center}
+.cta h2{font-family:'Space Grotesk',sans-serif;font-weight:500;font-size:clamp(1.9rem,3.6vw,2.8rem);margin:0 0 14px}
+.cta h2 em{font-style:normal;color:var(--accent);font-weight:600}
+.cta p{color:var(--muted);max-width:560px;margin:0 auto 30px;line-height:1.6}
+
+/* ---------- footer ---------- */
+footer{border-top:1px solid var(--border);padding:36px 0;color:var(--muted);font-size:.78rem}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:20px;font-family:'IBM Plex Mono',monospace}
+.foot strong{color:var(--text);letter-spacing:.18em;font-weight:500}
+
+@media(max-width:940px){
+  .links{display:none}
+  .hero-grid{grid-template-columns:1fr}
+  .scan-wrap{margin-bottom:20px}
+  .feat-list{grid-template-columns:1fr}
+  .feature:nth-child(odd){border-right:0}
+  .feature:nth-child(even){padding-left:0}
+  .exam-index{grid-template-columns:repeat(2,1fr)}
+  .steps{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .brand-svg{width:230px;max-width:60vw}
+  .hero{padding-top:130px}
+  .actions2{flex-direction:column;align-items:stretch}
+  .foot{flex-direction:column;align-items:flex-start}
+}
 </style>
 </head>
 <body>
 <header><div class="container"><nav>
 <a class="brand" href="#" aria-label="THI-RADS">
-<svg class="brand-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 913 248" width="455" height="124" role="img" aria-labelledby="thiRadsTitle thiRadsDesc">
+<svg class="brand-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 913 248" width="430" height="117" role="img" aria-labelledby="thiRadsTitle thiRadsDesc">
 <title id="thiRadsTitle">THI-RADS</title>
 <desc id="thiRadsDesc">THI-RADS — Laudos Estruturados em Ultrassonografia</desc>
 <defs>
@@ -109,42 +266,128 @@ footer{border-top:1px solid var(--border);padding:32px 0;color:var(--muted);font
 </nav></div></header>
 
 <main>
-<section class="hero"><div class="container hero-grid"><div>
-<div class="kicker">Ultrassonografia estruturada</div>
-<h1>Laudos mais <strong>rápidos</strong>, estruturados e consistentes.</h1>
-<p class="lead">O THI-RADS reúne máscaras estruturadas e ferramentas de apoio para otimizar a elaboração de laudos de ultrassonografia, mantendo o radiologista no controle da interpretação.</p>
-<div class="actions2"><a class="primary" href="login.html">ENTRAR NO SISTEMA</a><a class="secondary" href="#funcionalidades">CONHECER A PLATAFORMA</a></div>
+
+<section class="hero"><div class="container hero-grid">
+<div>
+<div class="eyebrow">Ultrassonografia estruturada</div>
+<h1>O laudo nasce<br>junto com <em>o exame</em>.</h1>
+<p class="lead">O THI-RADS transforma cada medida e achado, no momento em que são coletados, em um laudo estruturado e consistente — mantendo o radiologista inteiramente no controle da interpretação.</p>
+<div class="actions2"><a class="primary" href="login.html">ENTRAR NO SISTEMA <span class="arrow"><span>→</span><span>→</span></span></a><a class="secondary" href="#funcionalidades">CONHECER A PLATAFORMA</a></div>
 </div>
-<div class="mock"><div class="mockbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="mocktitle">THI-RADS / LAUDO ESTRUTURADO</span></div><div class="mockbody"><div class="side"><div class="line active"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div></div><div class="main"><h3>Ultrassonografia de Tireoide</h3><div class="boxes"><div class="box"><small>Lobo direito</small><b>4,2 × 1,7 × 1,5 cm</b></div><div class="box"><small>Lobo esquerdo</small><b>3,9 × 1,5 × 1,4 cm</b></div></div><div class="box" style="margin-top:10px"><small>Achados</small><div class="line"></div><div class="line" style="width:65%"></div></div><div class="conclusion">Conclusão estruturada a partir dos achados preenchidos.</div></div></div></div>
+
+<div class="scan-wrap">
+<svg viewBox="0 0 520 440" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <clipPath id="fanClip"><path d="M260,26 L27,308 A365,365 0 0 1 493,308 Z"/></clipPath>
+  <radialGradient id="fanShade" cx="50%" cy="4%" r="90%">
+    <stop offset="0%" stop-color="#5b5f66"/>
+    <stop offset="45%" stop-color="#33363c"/>
+    <stop offset="100%" stop-color="#0c0d10"/>
+  </radialGradient>
+  <radialGradient id="sweepGrad" cx="50%" cy="0%" r="100%">
+    <stop offset="0%" stop-color="#8fdcff" stop-opacity=".28"/>
+    <stop offset="70%" stop-color="#8fdcff" stop-opacity="0"/>
+  </radialGradient>
+  <filter id="speckle"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.5 0"/></filter>
+</defs>
+
+<rect x="0" y="0" width="520" height="440" fill="none"/>
+
+<g clip-path="url(#fanClip)">
+  <rect x="0" y="0" width="520" height="440" fill="url(#fanShade)"/>
+  <rect x="0" y="0" width="520" height="440" filter="url(#speckle)" opacity=".5"/>
+  <g stroke="#dceefb" stroke-opacity=".12" fill="none">
+    <circle cx="260" cy="26" r="90"/>
+    <circle cx="260" cy="26" r="160"/>
+    <circle cx="260" cy="26" r="230"/>
+    <circle cx="260" cy="26" r="300"/>
+  </g>
+  <g fill="none" stroke="#3fb6f0">
+    <circle class="pulse-ring" cx="260" cy="26" r="60"/>
+    <circle class="pulse-ring" cx="260" cy="26" r="60"/>
+    <circle class="pulse-ring" cx="260" cy="26" r="60"/>
+    <circle class="pulse-ring" cx="260" cy="26" r="60"/>
+  </g>
+  <g class="sweep">
+    <path d="M260,26 L27,308 A365,365 0 0 1 493,308 Z" fill="url(#sweepGrad)"/>
+  </g>
+</g>
+
+<path d="M260,26 L27,308 A365,365 0 0 1 493,308 Z" fill="none" stroke="#dceefb" stroke-opacity=".18" stroke-width="1"/>
+
+<!-- depth scale -->
+<g class="mono" fill="#8992a1" font-size="9" letter-spacing=".5">
+  <text x="500" y="98">1</text>
+  <text x="500" y="168">2</text>
+  <text x="500" y="238">3</text>
+  <text x="500" y="308">4</text>
+</g>
+<g stroke="#8992a1" stroke-opacity=".5">
+  <line x1="493" y1="94" x2="500" y2="94"/>
+  <line x1="493" y1="164" x2="500" y2="164"/>
+  <line x1="493" y1="234" x2="500" y2="234"/>
+  <line x1="493" y1="304" x2="500" y2="304"/>
+</g>
+
+<!-- caliper measurement -->
+<g stroke="#3fb6f0" fill="#3fb6f0">
+  <line x1="182" y1="196" x2="182" y2="188" stroke-width="1.6"/>
+  <line x1="174" y1="192" x2="190" y2="192" stroke-width="1.6"/>
+  <line x1="316" y1="246" x2="316" y2="238" stroke-width="1.6"/>
+  <line x1="308" y1="242" x2="324" y2="242" stroke-width="1.6"/>
+  <line x1="182" y1="192" x2="316" y2="242" stroke-width="1" stroke-dasharray="3 4" opacity=".85"/>
+</g>
+<g class="mono" fill="#eef2f6" font-size="12" font-weight="500">
+  <rect x="212" y="204" width="66" height="20" fill="#0a0d12" opacity=".8" rx="2"/>
+  <text x="219" y="218">4,2 cm</text>
+</g>
+</svg>
+</div>
+</div>
+</section>
+
+<section id="funcionalidades"><div class="container">
+<div class="head"><div class="eyebrow">Por que THI-RADS</div><h2>Menos tarefas repetitivas.<br>Mais foco na <em>interpretação</em>.</h2><p>Uma plataforma pensada para organizar informações, medidas e descrições em um fluxo de laudo mais consistente, do primeiro campo à conclusão.</p></div>
+<div class="feat-list">
+<div class="feature"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="17" stroke="currentColor" stroke-width="1.6"/><path d="M24 15v18M15 24h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><div><h3>Mais agilidade</h3><p>Reduza tarefas repetitivas com máscaras estruturadas e campos organizados por exame.</p></div></div>
+<div class="feature"><svg viewBox="0 0 48 48" fill="none"><rect x="10" y="8" width="28" height="32" rx="4" stroke="currentColor" stroke-width="1.6"/><path d="m16 25 5 5 11-12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><div><h3>Padronização</h3><p>Organize achados, medidas e descrições de forma sistemática e reproduzível.</p></div></div>
+<div class="feature"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="13" stroke="currentColor" stroke-width="1.8"/><path d="M24 17v14M17 24h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><div><h3>Ferramentas de apoio</h3><p>Cálculos e geração de texto ajudam a transformar dados preenchidos em um laudo organizado.</p></div></div>
+<div class="feature"><svg viewBox="0 0 48 48" fill="none"><path d="M24 7 39 13v11c0 9-6 15-15 17-9-2-15-8-15-17V13L24 7Z" stroke="currentColor" stroke-width="1.6"/><path d="m17 24 5 5 10-11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><div><h3>Feito para radiologistas</h3><p>Interface focada no fluxo de trabalho e na documentação dos principais achados ultrassonográficos.</p></div></div>
+</div>
 </div></section>
 
-<section id="funcionalidades"><div class="container"><div class="head"><div class="kicker">Por que THI-RADS</div><h2>Menos tarefas repetitivas. Mais foco na interpretação.</h2><p>Uma plataforma pensada para organizar informações, medidas e descrições em um fluxo de laudo mais consistente.</p></div>
-<div class="features">
-<div class="feature"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="17" stroke="currentColor" stroke-width="1.8"/><path d="M24 15v18M15 24h18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg><h3>Mais agilidade</h3><p>Reduza tarefas repetitivas com máscaras estruturadas e campos organizados por exame.</p></div>
-<div class="feature"><svg viewBox="0 0 48 48" fill="none"><rect x="10" y="8" width="28" height="32" rx="4" stroke="currentColor" stroke-width="2"/><path d="m16 25 5 5 11-12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><h3>Padronização</h3><p>Organize achados, medidas e descrições de forma sistemática e reproduzível.</p></div>
-<div class="feature"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="13" stroke="currentColor" stroke-width="2.2"/><path d="M24 17v14M17 24h14" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg><h3>Ferramentas de apoio</h3><p>Cálculos e geração de texto ajudam a transformar dados preenchidos em um laudo organizado.</p></div>
-<div class="feature"><svg viewBox="0 0 48 48" fill="none"><path d="M24 7 39 13v11c0 9-6 15-15 17-9-2-15-8-15-17V13L24 7Z" stroke="currentColor" stroke-width="2"/><path d="m17 24 5 5 10-11" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><h3>Feito para radiologistas</h3><p>Interface focada no fluxo de trabalho e na documentação dos principais achados ultrassonográficos.</p></div>
-</div></div></section>
+<section id="exames"><div class="container">
+<div class="head"><div class="eyebrow">Biblioteca de exames</div><h2>Um índice para cada <em>área</em> da ultrassonografia.</h2><p>Máscaras estruturadas reunidas por especialidade, prontas para acompanhar a rotina do exame.</p></div>
+<div class="exam-index">
+<div class="exam"><span class="idx">N.01</span><svg viewBox="0 0 48 48" fill="none"><path d="M9 23c4-9 10-14 15-14s11 5 15 14c-4 9-10 14-15 14S13 32 9 23Z" stroke="currentColor" stroke-width="1.6"/></svg><span>Abdome</span></div>
+<div class="exam"><span class="idx">N.02</span><svg viewBox="0 0 48 48" fill="none"><path d="M15 10c-5 3-7 10-5 16 2 7 8 11 14 12-1-8-1-16-9-28ZM33 10c5 3 7 10 5 16-2 7-8 11-14 12 1-8 1-16 9-28Z" stroke="currentColor" stroke-width="1.6"/></svg><span>Tireoide</span></div>
+<div class="exam"><span class="idx">N.03</span><svg viewBox="0 0 48 48" fill="none"><path d="M9 23c4-9 10-14 15-14s11 5 15 14c-4 9-10 14-15 14S13 32 9 23Z" stroke="currentColor" stroke-width="1.6"/><circle cx="24" cy="23" r="5" stroke="currentColor" stroke-width="1.6"/></svg><span>Mamas</span></div>
+<div class="exam"><span class="idx">N.04</span><svg viewBox="0 0 48 48" fill="none"><path d="M24 8c-8 0-14 7-14 15 0 9 6 15 14 17 8-2 14-8 14-17 0-8-6-15-14-15Z" stroke="currentColor" stroke-width="1.6"/></svg><span>Obstétrico</span></div>
+<div class="exam"><span class="idx">N.05</span><svg viewBox="0 0 48 48" fill="none"><path d="M24 8c-5 0-9 4-9 9v8c0 9 4 13 9 15 5-2 9-6 9-15v-8c0-5-4-9-9-9Z" stroke="currentColor" stroke-width="1.6"/></svg><span>Ginecológico</span></div>
+<div class="exam"><span class="idx">N.06</span><svg viewBox="0 0 48 48" fill="none"><path d="M24 8v32M24 14c-7 0-11 4-11 10s4 10 11 10M24 14c7 0 11 4 11 10s-4 10-11 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Carótidas</span></div>
+<div class="exam"><span class="idx">N.07</span><svg viewBox="0 0 48 48" fill="none"><path d="M24 8c-8 0-14 7-14 15v6c0 8 6 13 14 13s14-5 14-13v-6c0-8-6-15-14-15Z" stroke="currentColor" stroke-width="1.6"/></svg><span>Partes moles</span></div>
+<div class="exam"><span class="idx">N.08</span><svg viewBox="0 0 48 48" fill="none"><path d="M13 10c-4 7-4 18 1 28M35 10c4 7 4 18-1 28M13 24h22" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="13" cy="24" r="3" stroke="currentColor" stroke-width="1.6"/><circle cx="35" cy="24" r="3" stroke="currentColor" stroke-width="1.6"/></svg><span>Vascular</span></div>
+</div>
+</div></section>
 
-<section id="exames"><div class="container"><div class="head"><div class="kicker">Biblioteca de exames</div><h2>Estrutura para diferentes áreas da ultrassonografia.</h2><p>Uma plataforma que pode reunir máscaras para diferentes áreas da rotina ultrassonográfica.</p></div>
-<div class="exams">
-<div class="exam"><svg viewBox="0 0 48 48" fill="none"><path d="M9 23c4-9 10-14 15-14s11 5 15 14c-4 9-10 14-15 14S13 32 9 23Z" stroke="currentColor" stroke-width="2"/></svg><span>Abdome</span></div>
-<div class="exam"><svg viewBox="0 0 48 48" fill="none"><path d="M15 10c-5 3-7 10-5 16 2 7 8 11 14 12-1-8-1-16-9-28ZM33 10c5 3 7 10 5 16-2 7-8 11-14 12 1-8 1-16 9-28Z" stroke="currentColor" stroke-width="2"/></svg><span>Tireoide</span></div>
-<div class="exam"><svg viewBox="0 0 48 48" fill="none"><path d="M9 23c4-9 10-14 15-14s11 5 15 14c-4 9-10 14-15 14S13 32 9 23Z" stroke="currentColor" stroke-width="2"/><circle cx="24" cy="23" r="5" stroke="currentColor" stroke-width="2"/></svg><span>Mamas</span></div>
-<div class="exam"><svg viewBox="0 0 48 48" fill="none"><path d="M24 8c-8 0-14 7-14 15 0 9 6 15 14 17 8-2 14-8 14-17 0-8-6-15-14-15Z" stroke="currentColor" stroke-width="2"/></svg><span>Obstétrico</span></div>
-<div class="exam"><svg viewBox="0 0 48 48" fill="none"><path d="M24 8c-5 0-9 4-9 9v8c0 9 4 13 9 15 5-2 9-6 9-15v-8c0-5-4-9-9-9Z" stroke="currentColor" stroke-width="2"/></svg><span>Ginecológico</span></div>
-<div class="exam"><svg viewBox="0 0 48 48" fill="none"><path d="M24 8v32M24 14c-7 0-11 4-11 10s4 10 11 10M24 14c7 0 11 4 11 10s-4 10-11 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Carótidas</span></div>
-<div class="exam"><svg viewBox="0 0 48 48" fill="none"><path d="M24 8c-8 0-14 7-14 15v6c0 8 6 13 14 13s14-5 14-13v-6c0-8-6-15-14-15Z" stroke="currentColor" stroke-width="2"/></svg><span>Partes moles</span></div>
-<div class="exam"><svg viewBox="0 0 48 48" fill="none"><path d="M13 10c-4 7-4 18 1 28M35 10c4 7 4 18-1 28M13 24h22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="13" cy="24" r="3" stroke="currentColor" stroke-width="2"/><circle cx="35" cy="24" r="3" stroke="currentColor" stroke-width="2"/></svg><span>Vascular</span></div>
-</div></div></section>
+<section id="como-funciona"><div class="container">
+<div class="head"><div class="eyebrow">Como funciona</div><h2>Um fluxo simples até o <em>laudo</em>.</h2></div>
+<div class="steps">
+<div class="step"><div class="num mono">01 — ESCOLHA</div><h3>Selecione o exame</h3><p>Escolha a máscara estruturada correspondente ao estudo que está realizando.</p></div>
+<div class="step"><div class="num mono">02 — PREENCHA</div><h3>Registre os achados</h3><p>Informe medidas e características relevantes em uma interface organizada por exame.</p></div>
+<div class="step"><div class="num mono">03 — GERE</div><h3>Finalize seu laudo</h3><p>As informações preenchidas são organizadas em um texto estruturado para revisão.</p></div>
+</div>
+</div></section>
 
-<section id="como-funciona"><div class="container"><div class="head"><div class="kicker">Como funciona</div><h2>Um fluxo simples para chegar ao laudo.</h2></div><div class="steps">
-<div class="step"><div class="num">01 — ESCOLHA</div><h3>Selecione o exame</h3><p>Escolha a máscara estruturada correspondente ao estudo que está realizando.</p></div>
-<div class="step"><div class="num">02 — PREENCHA</div><h3>Registre os achados</h3><p>Informe medidas e características relevantes em uma interface organizada por exame.</p></div>
-<div class="step"><div class="num">03 — GERE</div><h3>Finalize seu laudo</h3><p>As informações preenchidas são organizadas em um texto estruturado para revisão.</p></div>
-</div></div></section>
+<section><div class="container">
+<div class="cta">
+<div class="eyebrow">THI-RADS</div>
+<h2>Pronto para conhecer<br>a <em>plataforma</em>?</h2>
+<p>Acesse o sistema e explore as máscaras estruturadas disponíveis para sua rotina de ultrassonografia.</p>
+<a class="primary" href="login.html">ENTRAR NO THI-RADS <span class="arrow"><span>→</span><span>→</span></span></a>
+</div>
+</div></section>
 
-<section><div class="container"><div class="cta"><div class="kicker">THI-RADS</div><h2>Pronto para conhecer a plataforma?</h2><p>Acesse o sistema e explore as máscaras estruturadas disponíveis para sua rotina de ultrassonografia.</p><a class="primary" href="login.html">ENTRAR NO THI-RADS</a></div></div></section>
 </main>
 
 <footer><div class="container foot"><strong>THI-RADS</strong><span>Laudos Estruturados em Ultrassonografia</span><span>© 2026</span></div></footer>
@@ -156,6 +399,19 @@ const moon='<svg viewBox="0 0 24 24" fill="none"><path d="M20 15.2A8.2 8.2 0 0 1
 if(localStorage.getItem("landingTema")==="light")body.classList.add("light");
 function icon(){btn.innerHTML=body.classList.contains("light")?moon:sun}
 icon();btn.onclick=()=>{body.classList.toggle("light");localStorage.setItem("landingTema",body.classList.contains("light")?"light":"dark");icon()};
+
+const revealTargets=document.querySelectorAll(".head,.feature,.exam,.step,.cta");
+revealTargets.forEach(el=>el.classList.add("reveal"));
+if("IntersectionObserver" in window){
+  const io=new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){entry.target.classList.add("is-visible");io.unobserve(entry.target)}
+    });
+  },{threshold:.15,rootMargin:"0px 0px -60px 0px"});
+  revealTargets.forEach(el=>io.observe(el));
+}else{
+  revealTargets.forEach(el=>el.classList.add("is-visible"));
+}
 </script>
 </body>
 </html>
