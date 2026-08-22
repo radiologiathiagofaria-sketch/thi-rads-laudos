@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -266,7 +266,7 @@
                 nome: "Vascular",
                 exames: [
                     { nome: "CARÓTIDAS", icone: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M26 62 C 26 40, 26 36, 18 16"/><path d="M38 62 C 38 40, 38 36, 46 16"/><path d="M26 42 C 32 30, 38 30, 46 42"/><path d="M30 62 L 30 42"/><path d="M34 62 L 34 42"/><path d="M14 20 C 20 28, 26 28, 30 20"/><path d="M50 20 C 44 28, 38 28, 34 20"/></svg>` },
-                    { nome: "TVP MEMBROS INF", icone: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M24 10 C 14 16, 16 36, 20 54 C 22 62, 42 62, 44 54 C 48 36, 50 16, 40 10"/><path d="M32 14 C 32 20, 26 24, 32 30 C 32 36, 38 40, 32 46 C 32 52, 26 56, 32 60"/><path d="M28 22 L 32 26 L 36 22"/><path d="M28 38 L 32 42 L 36 38"/></svg>` },
+                    { nome: "DOPPLER VENOSO", icone: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M24 10 C 14 16, 16 36, 20 54 C 22 62, 42 62, 44 54 C 48 36, 50 16, 40 10"/><path d="M32 14 C 32 20, 26 24, 32 30 C 32 36, 38 40, 32 46 C 32 52, 26 56, 32 60"/><path d="M28 22 L 32 26 L 36 22"/><path d="M28 38 L 32 42 L 36 38"/></svg>` },
                     { nome: "ARTERIAL DE MEMBROS", icone: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M24 10 C 14 16, 16 36, 20 54 C 22 62, 42 62, 44 54 C 48 36, 50 16, 40 10"/><path d="M32 14 C 32 26, 32 42, 32 58"/><path d="M26 24 L 32 30 L 38 24"/><path d="M26 44 L 32 50 L 38 44"/><path d="M48 26 C 52 30, 52 38, 48 42"/><path d="M52 20 C 58 28, 58 44, 52 50"/></svg>` }
                  ]
             },
@@ -295,6 +295,13 @@
                 nome: "Partes Moles",
                 exames: [
                     { nome: "PARTES MOLES", icone: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M12 24 C 24 16, 40 16, 52 24"/><path d="M12 34 C 24 26, 40 26, 52 34"/><path d="M12 44 C 24 36, 40 36, 52 44"/><path d="M22 20 L 16 42 M 32 20 L 26 42 M 42 20 L 36 42"/><path d="M26 12 C 30 8, 34 8, 38 12"/></svg>` }
+                 ]
+            },
+            {
+                nome: "Musculoesquelético",
+                exames: [
+                    { nome: "JOELHO", icone: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M24 16 L 24 28 C 24 34, 40 34, 40 28 L 40 16 M 28 48 L 28 36 C 28 32, 36 32, 36 36 L 36 48 M 32 28 A 4 4 0 1 1 32 36 A 4 4 0 1 1 32 28"/></svg>` },
+                    { nome: "PUNHO", icone: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M20 50 L 20 36 C 20 28, 26 24, 28 16 L 28 12 M 44 50 L 44 36 C 44 28, 38 24, 36 16 L 36 12 M 24 38 L 40 38 M 28 26 L 36 26 M 32 46 L 32 36"/></svg>` }
                  ]
             }
         ];
@@ -353,7 +360,7 @@
                 window.location.href = 'acrescente/bolsa escrotal com doppler.html';
             } else if (exame === 'CARÓTIDAS') {
                 window.location.href = 'acrescente/carotidas.html';
-            } else if (exame === 'TVP MEMBROS INF') {
+            } else if (exame === 'DOPPLER VENOSO') {
                 window.location.href = 'acrescente/thirads-venoso-corrigido.html';
             } else if (exame === 'ARTERIAL DE MEMBROS') {
                 window.location.href = 'acrescente/arterial-mmii.html';
@@ -369,6 +376,10 @@
                 window.location.href = 'acrescente/mamas_elite.html';
             } else if (exame === 'PARTES MOLES') {
                 window.location.href = 'acrescente/partes_moles_elite.html';
+            } else if (exame === 'JOELHO') {
+                window.location.href = 'acrescente/ultrassonografia_joelho_elite.html';
+            } else if (exame === 'PUNHO') {
+                window.location.href = 'acrescente/ultrassonografia_punho.html';
             } else {
                 alert('O módulo para "' + exame + '" está em desenvolvimento e estará disponível em breve!');
             }

@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thi-Rads — Laudos estruturados</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#1a56db;--blue-dark:#1140a6;--blue-light:#e8f0fe;--blue-mid:#dbeafe;
+  --surface:#f4f6fb;--border:#e2e6ef;--border-strong:#c8cfe0;
+  --text:#1a1f2e;--text-2:#4b5570;--text-3:#8892a4;
+  --white:#ffffff;--green:#059669;--red:#dc2626;--radius:8px;--radius-lg:12px;
+}
+body.dark{
+  --blue:#4d86f5;--blue-dark:#3a6fd4;--blue-light:#1e2d4a;--blue-mid:#1e2d4a;
+  --surface:#141820;--border:#2a2f3d;--border-strong:#3a4155;
+  --text:#e2e6f0;--text-2:#9aa3b8;--text-3:#5d6680;
+  --white:#1e2230;--green:#34d399;--red:#f87171;
+}
+body.dark .laudo-doc{color:#e2e6f0;}
+body.dark .laudo-panel{background:#1e2230;border-left-color:var(--border);}
+body.dark .laudo-body{background:#1e2230;}
+body.dark .laudo-header{background:#1e2230;border-bottom-color:var(--border);}
+@media print{ body.dark .laudo-doc, body.dark .laudo-doc *{color:#111 !important;} }
+.btn-dark{margin-left:auto;}
+body.dark .btn-dark{background:#2a2f3d;border-color:#3a4155;color:#e2e6f0;}
+body.dark .btn-dark:hover{background:#343a4d;color:#fff;}
+body.dark .dim-input,body.dark .ff select,body.dark .ff input[type=text],body.dark textarea{background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .radio-mark{background:var(--white);}
+body.dark .check-box{background:var(--white);}
+body.dark .sub-opts{background:#1a2040;border-bottom-color:#2a3460;}
+body.dark .sub-opt-label{background:var(--white);color:var(--text-2);}
+body.dark .lesao-card{background:#141820;border-color:var(--border);}
+body.dark .toolbar{background:var(--white);border-bottom-color:var(--border);}
+body.dark .sidebar{background:var(--white);border-right-color:var(--border);}
+body.dark .sidebar-hd{border-bottom-color:var(--border);}
+body.dark .block{background:var(--white);border-color:var(--border);}
+body.dark .block-title{background:var(--white);border-bottom-color:var(--border);}
+body.dark .radio-opt:hover{background:#1e2d4a;}
+body.dark .radio-opt.selected{background:#1e2d4a;}
+body.dark .check-row{background:#1a1f2e;}
+body.dark .check-row:hover{background:#1e2d4a;}
+body.dark .check-row.selected{background:#1e2d4a;}
+body.dark .btn-add-lesao{background:var(--white);color:var(--text-2);border-color:var(--border-strong);}
+body.dark .sel-tag{background:var(--white);color:var(--text);border-color:var(--border-strong);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',system-ui,sans-serif;font-size:13px;background:var(--surface);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+.toolbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:10px;height:48px;flex-shrink:0;}
+.logo{display:flex;align-items:baseline;gap:6px;margin-right:12px;}
+.logo-name{font-size:17px;font-weight:600;color:var(--blue);letter-spacing:-.3px;}
+.logo-sub{font-size:11px;color:var(--text-3);font-weight:400;letter-spacing:.2px;}
+.tb-sep{width:1px;height:20px;background:var(--border);margin:0 4px;}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid var(--border);font-weight:500;transition:all .13s;background:var(--white);color:var(--text-2);}
+.btn:hover{background:var(--surface);border-color:var(--border-strong);color:var(--text);}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue);}
+.btn-primary:hover{background:var(--blue-dark);border-color:var(--blue-dark);color:#fff;}
+.btn-danger{background:#fff5f5;color:var(--red);border-color:#fecaca;}
+body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
+.btn-danger:hover{background:#fee2e2;border-color:#fca5a5;}
+.btn svg{width:13px;height:13px;flex-shrink:0;}
+.body{display:flex;flex:1;overflow:hidden;}
+.sidebar{width:190px;background:var(--white);border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;}
+.sidebar-hd{padding:10px 12px 8px;border-bottom:1px solid var(--border);}
+.sidebar-tipo{font-size:9px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;}
+.sidebar-titulo{font-size:11px;font-weight:600;color:var(--text);}
+.nav-group{padding:6px 0;}
+.nav-item{display:flex;align-items:center;gap:7px;padding:7px 12px;font-size:11.5px;color:var(--text-2);cursor:pointer;transition:all .12s;border-left:2px solid transparent;}
+.nav-item:hover{background:var(--blue-light);color:var(--blue);}
+.nav-item.active{background:var(--blue-light);color:var(--blue);border-left-color:var(--blue);font-weight:600;}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.4;flex-shrink:0;}
+.nav-item.active .nav-dot{opacity:1;}
+.panel{width:480px;flex-shrink:0;overflow-y:auto;padding:14px 14px 20px;background:var(--surface);}
+.sec-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.sec-title::before{content:'';display:block;width:3px;height:16px;background:var(--blue);border-radius:2px;}
+.block{margin-bottom:10px;background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden;}
+.block-title{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.7px;padding:8px 14px 7px;border-bottom:1px solid var(--border);background:var(--white);}
+.radio-opt{display:flex;align-items:flex-start;gap:0;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;position:relative;}
+.radio-opt:last-child{border-bottom:none;}
+.radio-opt:hover{background:#f5f8ff;}
+.radio-opt.selected{background:var(--blue-light);}
+.radio-opt input[type=radio]{position:absolute;opacity:0;pointer-events:none;}
+.radio-label{display:flex;align-items:center;gap:10px;width:100%;padding:9px 14px;font-size:12.5px;color:var(--text-2);line-height:1.4;cursor:pointer;}
+.radio-opt.selected .radio-label{color:var(--blue);font-weight:500;}
+.radio-mark{width:16px;height:16px;border-radius:50%;border:2px solid var(--border-strong);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.radio-opt:hover .radio-mark{border-color:var(--blue);}
+.radio-opt.selected .radio-mark{border-color:var(--blue);background:var(--blue);}
+.radio-mark::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff;opacity:0;transition:opacity .15s;}
+.radio-opt.selected .radio-mark::after{opacity:1;}
+.check-row{display:flex;align-items:center;gap:0;border-bottom:1px solid var(--border);cursor:pointer;background:#fafbff;}
+.check-row:last-child{border-bottom:none;}
+.check-row:hover{background:#f0f5ff;}
+.check-row.selected{background:#e6eeff;}
+.check-row input[type=checkbox]{position:absolute;opacity:0;pointer-events:none;}
+.check-label{display:flex;align-items:center;gap:10px;width:100%;padding:8px 14px 8px 32px;font-size:12px;color:var(--text-2);cursor:pointer;}
+.check-row.selected .check-label{color:var(--blue);font-weight:500;}
+.check-box{width:15px;height:15px;border-radius:4px;border:2px solid var(--border-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.check-row:hover .check-box{border-color:var(--blue);}
+.check-row.selected .check-box{border-color:var(--blue);background:var(--blue);}
+.check-box svg{display:none;width:9px;height:9px;}
+.check-row.selected .check-box svg{display:block;}
+.sel-tag{font-size:11px;border:1px solid var(--border-strong);border-radius:5px;padding:2px 6px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);margin-left:5px;cursor:pointer;}
+.dim-rows{padding:8px 14px;display:flex;flex-direction:column;gap:6px;}
+.dim-row{display:flex;align-items:center;gap:10px;}
+.dim-lbl{flex:1;font-size:12px;color:var(--text-2);}
+.dim-input{width:60px;padding:5px 8px;border:1px solid var(--border-strong);border-radius:6px;font-size:12.5px;font-family:'DM Sans',sans-serif;text-align:center;color:var(--text);background:var(--white);transition:border .12s;}
+.dim-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,.08);}
+.dim-unit{font-size:12px;color:var(--text-3);}
+.laudo-panel{flex:1;min-width:0;background:var(--white);display:flex;flex-direction:column;border-left:1px solid var(--border);}
+.laudo-header{padding:9px 20px 8px;border-bottom:1px solid var(--border);background:var(--white);display:flex;align-items:center;}
+.laudo-header-title{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.6px;}
+.laudo-body{flex:1;overflow-y:auto;padding:22px 28px;}
+.laudo-doc{font-family:Helvetica,Arial,sans-serif;font-size:10pt;line-height:1.65;color:#111;max-width:720px;}
+.doc-titulo{text-align:center;font-weight:700;font-size:10pt;margin-bottom:16px;text-transform:uppercase;letter-spacing:.3px;}
+.doc-label{font-weight:700;font-size:10pt;}
+.doc-p{margin-bottom:8px;font-size:10pt;}
+.doc-secao{margin-bottom:14px;}
+textarea.achados{width:100%;height:100px;padding:10px;border:1px solid var(--border-strong);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;resize:vertical;}
+textarea.achados:focus{outline:none;border-color:var(--blue);}
+.laudo-doc:focus { outline: none; }
+.toast-notification{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--white);padding:10px 18px;border-radius:8px;font-size:12.5px;font-weight:500;opacity:0;pointer-events:none;transition:all .25s;z-index:999;box-shadow:0 4px 14px rgba(0,0,0,.18);}
+.toast-notification.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+  <div class="toolbar">
+    <div class="logo" style="cursor:pointer" onclick="window.location.href='../laudo-thirads.html'"><span class="logo-name">THI-RADS</span><span class="logo-sub">laudo estruturado</span></div>
+    <button class="btn" onclick="window.location.href='../laudo-thirads.html'"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2L4 8l6 6"/></svg>Voltar</button>
+    <div class="tb-sep"></div>
+  <button class="btn" onclick="copiar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>Copiar laudo</button>
+  <button class="btn btn-primary" onclick="imprimir()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6V2h8v4M4 12H2V7h12v5h-2M4 9h8M4 12v2h8v-2"/></svg>Imprimir</button>
+  <button class="btn btn-dark" id="btn-dark-toggle" onclick="toggleDark()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro</button>
+  <button class="btn btn-danger" onclick="reiniciar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8a6 6 0 1 0 1.5-3.9M2 4v4h4"/></svg>Reiniciar</button>
+</div>
+
+<div class="body">
+  <div class="sidebar">
+    <div class="sidebar-hd"><div class="sidebar-tipo">Ultrassonografia</div><div class="sidebar-titulo">Punho</div></div>
+    <div class="nav-group">
+      <div class="nav-item" id="nav-geral" onclick="showSection('geral')"><span class="nav-dot"></span>Lateralidade / Indicação</div>
+      <div class="nav-item" id="nav-pele" onclick="showSection('pele')"><span class="nav-dot"></span>Pele / Subcutâneo (opc.)</div>
+      <div class="nav-item" id="nav-osseo" onclick="showSection('osseo')"><span class="nav-dot"></span>Superfície Óssea (opc.)</div>
+      <div class="nav-item" id="nav-mediano" onclick="showSection('mediano')"><span class="nav-dot"></span>Nervo Mediano</div>
+      <div class="nav-item" id="nav-tunelposop" onclick="showSection('tunelposop')"><span class="nav-dot"></span>Túnel do Carpo Pós-Op (opc.)</div>
+      <div class="nav-item" id="nav-extensores" onclick="showSection('extensores')"><span class="nav-dot"></span>Compart. Extensores</div>
+      <div class="nav-item" id="nav-flexores" onclick="showSection('flexores')"><span class="nav-dot"></span>Compart. Flexores</div>
+      <div class="nav-item" id="nav-derrame" onclick="showSection('derrame')"><span class="nav-dot"></span>Derrame Articular</div>
+      <div class="nav-item" id="nav-cisto" onclick="showSection('cisto')"><span class="nav-dot"></span>Cisto Gangliônico (opc.)</div>
+      <div class="nav-item" id="nav-adicionais" onclick="showSection('adicionais')"><span class="nav-dot"></span>Achados Adicionais</div>
+    </div>
+  </div>
+
+  <div class="panel" id="main-panel"></div>
+
+  <div class="laudo-panel">
+    <div class="laudo-header"><span class="laudo-header-title">Pré-visualização</span></div>
+    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc" contenteditable="true"></div></div>
+  </div>
+</div>
+
+<script>
+const estadoInicial = () => ({
+  geral: { lado: 'direito', indicacao: '' },
+  pele: { locais: [] },
+  osseo: { locais: [] },
+  mediano: { sit: 'normal', areaProx: '', areaAntebraco: '', hipotrofia: false },
+  tunelposop: { usar: false, sit: '' },
+  extensores: {
+    compartimentos: [], tipo: '',
+    quervain: '',
+    viCompartimento: false,
+    intersecao: ''
+  },
+  flexores: { tendoes: [], tenossinovite: false, bursite: false },
+  derrame: { sit: 'ausente', intensidade: 'pequeno', hipertrofiaSinovial: false },
+  cisto: { usar: false, local: 'dorsal', opcao: 'simples', x: '', y: '', z: '', abaulamento: false, envolvimento: false },
+  adicionais: {
+    bossaCarpal: false, bossaMetacarpo: 'terceiro',
+    trombose: false,
+    noduloNeural: false, noduloX: '', noduloY: '', noduloZ: '',
+    rizartrose: '',
+    sinoviteUsar: false, sinoviteArticulacao: '', sinoviteTipo: '',
+    texto: '', sugerirRM: false
+  }
+});
+
+let estado = estadoInicial();
+let secaoAtual = 'geral';
+
+function showSection(sec){
+  secaoAtual = sec;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('nav-'+sec).classList.add('active');
+  renderPanel();
+  updateLaudo();
+}
+
+function renderPanel(){
+  const p = document.getElementById('main-panel');
+  if(secaoAtual==='geral') p.innerHTML = renderGeral();
+  else if(secaoAtual==='pele') p.innerHTML = renderPele();
+  else if(secaoAtual==='osseo') p.innerHTML = renderOsseo();
+  else if(secaoAtual==='mediano') p.innerHTML = renderMediano();
+  else if(secaoAtual==='tunelposop') p.innerHTML = renderTunelPosOp();
+  else if(secaoAtual==='extensores') p.innerHTML = renderExtensores();
+  else if(secaoAtual==='flexores') p.innerHTML = renderFlexores();
+  else if(secaoAtual==='derrame') p.innerHTML = renderDerrame();
+  else if(secaoAtual==='cisto') p.innerHTML = renderCisto();
+  else if(secaoAtual==='adicionais') p.innerHTML = renderAdicionais();
+}
+
+function radioVal(sec, field, val, label, name, extra=''){
+  const sel = estado[sec][field] === val ? 'selected' : '';
+  return `<div class="radio-opt ${sel}" onclick="setVal('${sec}','${field}','${val}')"><input type="radio" name="${name}"><label class="radio-label"><span class="radio-mark"></span>${label}${extra}</label></div>`;
+}
+function chk(sec, field, label){
+  const sel = estado[sec][field] ? 'selected' : '';
+  return `<div class="check-row ${sel}" onclick="toggleChk('${sec}','${field}')"><input type="checkbox" ${estado[sec][field]?'checked':''}><label class="check-label"><span class="check-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.8"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg></span>${label}</label></div>`;
+}
+function chkArr(sec, field, val, label){
+  const arr = estado[sec][field];
+  const sel = arr.includes(val) ? 'selected' : '';
+  return `<div class="check-row ${sel}" onclick="toggleArrChk('${sec}','${field}','${val}')"><input type="checkbox" ${arr.includes(val)?'checked':''}><label class="check-label"><span class="check-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.8"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg></span>${label}</label></div>`;
+}
+function toggleArrChk(sec, field, val){
+  const arr = estado[sec][field];
+  const i = arr.indexOf(val);
+  if(i>=0) arr.splice(i,1); else arr.push(val);
+  renderPanel(); updateLaudo();
+}
+function dimInput(sec, field, label, unit='cm'){
+  return `<div class="dim-row"><span class="dim-lbl">${label}</span><input class="dim-input" type="text" value="${estado[sec][field]}" placeholder="—" oninput="setTextVal('${sec}','${field}',this.value)"><span class="dim-unit">${unit}</span></div>`;
+}
+
+// ── CONTROLES ──
+function setVal(sec, field, val){ estado[sec][field] = val; renderPanel(); updateLaudo(); }
+function setTextVal(sec, field, val){ estado[sec][field] = val; updateLaudo(); }
+function toggleChk(sec, field){ estado[sec][field] = !estado[sec][field]; renderPanel(); updateLaudo(); }
+
+// ── GERAL (LATERALIDADE / INDICAÇÃO) ──
+function renderGeral(){
+  const e = estado.geral;
+  return `
+  <div class="sec-title">Lateralidade e Indicação</div>
+  <div class="block"><div class="block-title">Lateralidade do Exame</div>
+    ${radioVal('geral','lado','direito','Punho Direito','lado')}
+    ${radioVal('geral','lado','esquerdo','Punho Esquerdo','lado')}
+  </div>
+  <div class="block"><div class="block-title">Indicação Clínica</div>
+    <div style="padding:14px;">
+      <textarea class="achados" id="txt-indicacao" oninput="setTextVal('geral','indicacao',this.value)" placeholder="Digite a indicação clínica...">${e.indicacao}</textarea>
+    </div>
+  </div>
+  `;
+}
+
+// ── PELE E TECIDO SUBCUTÂNEO (opcional) ──
+function renderPele(){
+  return `
+  <div class="sec-title">Pele e Tecido Subcutâneo</div>
+  <div class="block"><div class="block-title">Edema — opcional (não altera o laudo se não marcado)</div>
+    ${chkArr('pele','locais','palmar','Edema da face palmar do punho')}
+    ${chkArr('pele','locais','dorsal','Edema da face dorsal do punho')}
+  </div>
+  `;
+}
+
+// ── SUPERFÍCIE ÓSSEA (opcional) ──
+function renderOsseo(){
+  return `
+  <div class="sec-title">Superfície Óssea</div>
+  <div class="block"><div class="block-title">Irregularidades corticais / osteófitos marginais — opcional</div>
+    ${chkArr('osseo','locais','radio_distal','Rádio distal')}
+    ${chkArr('osseo','locais','ulna_distal','Ulna distal')}
+    ${chkArr('osseo','locais','primeira_fileira','1ª fileira carpal')}
+    ${chkArr('osseo','locais','segunda_fileira','2ª fileira carpal')}
+  </div>
+  `;
+}
+
+// ── NERVO MEDIANO ──
+function renderMediano(){
+  const e = estado.mediano;
+  return `
+  <div class="sec-title">Nervo Mediano</div>
+  <div class="block"><div class="block-title">Situação</div>
+    ${radioVal('mediano','sit','normal','Aspecto ecográfico habitual','sit_med')}
+    ${radioVal('mediano','sit','neuropatia','Neuropatia do mediano','sit_med')}
+    ${radioVal('mediano','sit','neuropatia_conservador','Espessamento sugestivo de neuropatia (achado conservador)','sit_med')}
+    ${radioVal('mediano','sit','aumento_calibre','Aumento de calibre (síndrome do túnel do carpo)','sit_med')}
+    ${radioVal('mediano','sit','nervo_bifido','Nervo mediano bífido (variação anatômica)','sit_med')}
+  </div>
+  ${(e.sit==='normal'||e.sit==='neuropatia'||e.sit==='neuropatia_conservador') ? `
+  <div class="block"><div class="block-title">Área de Secção Transversa — túnel do carpo proximal</div><div class="dim-rows">
+    ${dimInput('mediano','areaProx','Área', 'mm²')}
+  </div></div>` : ''}
+  ${e.sit==='aumento_calibre' ? `
+  <div class="block"><div class="block-title">Áreas de Secção Transversa</div><div class="dim-rows">
+    ${dimInput('mediano','areaProx','Túnel do carpo proximal', 'mm²')}
+    ${dimInput('mediano','areaAntebraco','Antebraço distal', 'mm²')}
+  </div></div>` : ''}
+  ${e.sit!=='normal' ? `
+  <div class="block"><div class="block-title">Musculatura Tenar — opcional (após alteração do nervo mediano)</div>
+    ${chk('mediano','hipotrofia','Hipotrofia e lipossubstituição da musculatura da região tenar')}
+  </div>` : ''}
+  `;
+}
+
+// ── TÚNEL DO CARPO - PÓS-OPERATÓRIO (opcional) ──
+function renderTunelPosOp(){
+  const e = estado.tunelposop;
+  return `
+  <div class="sec-title">Túnel do Carpo — Pós-Operatório</div>
+  <div class="block"><div class="block-title">Utilizar esta seção — opcional</div>
+    ${chk('tunelposop','usar','Paciente com túnel do carpo operado')}
+  </div>
+  ${e.usar ? `
+  <div class="block"><div class="block-title">Situação</div>
+    ${radioVal('tunelposop','sit','habitual','Alterações pós-operatórias habituais, sem complicações','tpo_sit')}
+    ${radioVal('tunelposop','sit','complicacao_tardia','Complicação tardia (espessamento fibrocicatricial / compressão)','tpo_sit')}
+    ${radioVal('tunelposop','sit','complicacao_recente','Complicação recente (achatamento do nervo mediano)','tpo_sit')}
+  </div>` : ''}
+  `;
+}
+
+// ── COMPARTIMENTO EXTENSORES ──
+function renderExtensores(){
+  const e = estado.extensores;
+  return `
+  <div class="sec-title">Compartimento Extensores</div>
+  <div class="block"><div class="block-title">Tipo de Alteração — opcional</div>
+    ${radioVal('extensores','tipo','','Não avaliar','ext_tipo')}
+    ${radioVal('extensores','tipo','tendinopatia','Tendinopatia','ext_tipo')}
+    ${radioVal('extensores','tipo','tenossinovite','Tenossinovite','ext_tipo')}
+    ${radioVal('extensores','tipo','ambas','Tendinopatia e tenossinovite','ext_tipo')}
+  </div>
+  ${e.tipo ? `
+  <div class="block"><div class="block-title">Compartimentos Acometidos (2º ao 5º)</div>
+    ${chkArr('extensores','compartimentos','2','2º compartimento')}
+    ${chkArr('extensores','compartimentos','3','3º compartimento')}
+    ${chkArr('extensores','compartimentos','4','4º compartimento')}
+    ${chkArr('extensores','compartimentos','5','5º compartimento')}
+  </div>` : ''}
+  <div class="block"><div class="block-title">1º Compartimento (De Quervain) — opcional</div>
+    ${radioVal('extensores','quervain','','Não avaliar','quervain')}
+    ${radioVal('extensores','quervain','tenossinovite','Tenossinovite de De Quervain','quervain')}
+    ${radioVal('extensores','quervain','tenossinovite_estenosante','Tenossinovite estenosante de De Quervain','quervain')}
+    ${radioVal('extensores','quervain','extensor_curto_isolado','Tenossinovite isolada do extensor curto do polegar','quervain')}
+  </div>
+  <div class="block"><div class="block-title">6º Compartimento — opcional</div>
+    ${chk('extensores','viCompartimento','Tendinopatia e tenossinovite do extensor ulnar do carpo')}
+  </div>
+  <div class="block"><div class="block-title">Síndrome de Intersecção — opcional</div>
+    ${radioVal('extensores','intersecao','','Não avaliar','intersecao')}
+    ${radioVal('extensores','intersecao','proximal','Síndrome de intersecção proximal','intersecao')}
+    ${radioVal('extensores','intersecao','distal','Síndrome de intersecção distal','intersecao')}
+  </div>
+  `;
+}
+
+// ── COMPARTIMENTO FLEXORES ──
+function renderFlexores(){
+  const e = estado.flexores;
+  return `
+  <div class="sec-title">Compartimento Flexores</div>
+  <div class="block"><div class="block-title">Tendinopatia — opcional</div>
+    ${chkArr('flexores','tendoes','flexor ulnar do carpo','Flexor ulnar do carpo')}
+    ${chkArr('flexores','tendoes','flexor longo do polegar','Flexor longo do polegar')}
+    ${chkArr('flexores','tendoes','flexor superficial dos dedos','Flexor superficial dos dedos')}
+  </div>
+  <div class="block"><div class="block-title">Tenossinovite dos Flexores — opcional</div>
+    ${chk('flexores','tenossinovite','Tenossinovite dos flexores / bursas radial e ulnar')}
+  </div>
+  <div class="block"><div class="block-title">Bursite Ulnar — opcional</div>
+    ${chk('flexores','bursite','Bursite / tenossinovite da bursa ulnar')}
+  </div>
+  `;
+}
+
+// ── DERRAME ARTICULAR ──
+function renderDerrame(){
+  const e = estado.derrame;
+  return `
+  <div class="sec-title">Derrame Articular</div>
+  <div class="block"><div class="block-title">Situação</div>
+    ${radioVal('derrame','sit','ausente','Ausência de derrame articular','sit_der')}
+    ${radioVal('derrame','sit','presente','Derrame articular','sit_der')}
+  </div>
+  ${e.sit==='presente' ? `
+  <div class="block"><div class="block-title">Intensidade</div>
+    ${radioVal('derrame','intensidade','pequeno','Pequeno','int_der')}
+    ${radioVal('derrame','intensidade','moderado','Moderado','int_der')}
+    ${radioVal('derrame','intensidade','volumoso','Volumoso','int_der')}
+  </div>` : ''}
+  <div class="block"><div class="block-title">Sinóvia — opcional (independente da situação acima)</div>
+    ${chk('derrame','hipertrofiaSinovial','Hipertrofia sinovial nos recessos articulares do punho')}
+  </div>
+  `;
+}
+
+// ── CISTO GANGLIÔNICO (opcional) ──
+function renderCisto(){
+  const e = estado.cisto;
+  return `
+  <div class="sec-title">Cisto Gangliônico</div>
+  <div class="block"><div class="block-title">Utilizar esta seção — opcional</div>
+    ${chk('cisto','usar','Incluir cisto gangliônico no laudo')}
+  </div>
+  ${e.usar ? `
+  <div class="block"><div class="block-title">Localização</div>
+    ${radioVal('cisto','local','dorsal','Dorsal','cisto_local')}
+    ${radioVal('cisto','local','volar','Radial / Volar','cisto_local')}
+  </div>
+  <div class="block"><div class="block-title">Caracterização</div>
+    ${radioVal('cisto','opcao','simples','Descrição simples','cisto_op')}
+    ${radioVal('cisto','opcao','completa','Descrição completa','cisto_op')}
+  </div>
+  <div class="block"><div class="block-title">Dimensões</div><div class="dim-rows">
+    ${dimInput('cisto','x','Medida 1')}
+    ${dimInput('cisto','y','Medida 2')}
+    ${dimInput('cisto','z','Medida 3')}
+  </div></div>
+  ${e.local==='volar' ? `
+  <div class="block"><div class="block-title">Relação com a Artéria Radial — opcional</div>
+    ${chk('cisto','abaulamento','Determinando abaulamento da artéria radial')}
+    ${chk('cisto','envolvimento','Envolvendo circunferencialmente a artéria radial')}
+  </div>` : ''}
+  ` : ''}
+  `;
+}
+
+// ── ACHADOS ADICIONAIS ──
+function renderAdicionais(){
+  const e = estado.adicionais;
+  return `
+  <div class="sec-title">Achados Adicionais</div>
+  <div class="block"><div class="block-title">Bossa Carpal — opcional</div>
+    ${chk('adicionais','bossaCarpal','Proeminência óssea sugestiva de bossa carpal')}
+  </div>
+  ${e.bossaCarpal ? `
+  <div class="block"><div class="block-title">Base do Metacarpo</div>
+    ${radioVal('adicionais','bossaMetacarpo','terceiro','Terceiro metacarpo','bossa_mc')}
+    ${radioVal('adicionais','bossaMetacarpo','segundo','Segundo metacarpo','bossa_mc')}
+  </div>` : ''}
+  <div class="block"><div class="block-title">Artéria Ulnar — opcional</div>
+    ${chk('adicionais','trombose','Trombose da artéria ulnar (Síndrome do Martelo Hipotenar)')}
+  </div>
+  <div class="block"><div class="block-title">Nódulo Neural — opcional</div>
+    ${chk('adicionais','noduloNeural','Nódulo sólido em continuidade com o nervo radial')}
+  </div>
+  ${e.noduloNeural ? `
+  <div class="block"><div class="block-title">Dimensões do Nódulo</div><div class="dim-rows">
+    ${dimInput('adicionais','noduloX','Medida 1')}
+    ${dimInput('adicionais','noduloY','Medida 2')}
+    ${dimInput('adicionais','noduloZ','Medida 3')}
+  </div></div>` : ''}
+  <div class="block"><div class="block-title">Rizartrose — opcional</div>
+    ${radioVal('adicionais','rizartrose','','Não avaliar','rizartrose')}
+    ${radioVal('adicionais','rizartrose','incipiente','Incipiente / leve','rizartrose')}
+    ${radioVal('adicionais','rizartrose','acentuada','Acentuada','rizartrose')}
+  </div>
+  <div class="block"><div class="block-title">Sinovite — opcional</div>
+    ${chk('adicionais','sinoviteUsar','Incluir achado de sinovite')}
+  </div>
+  ${e.sinoviteUsar ? `
+  <div class="block"><div class="block-title">Articulação Acometida</div><div style="padding:10px 14px;">
+    <input type="text" class="dim-input" style="width:100%;text-align:left;" value="${e.sinoviteArticulacao}" placeholder="Ex.: radiocarpal, mediocarpal..." oninput="setTextVal('adicionais','sinoviteArticulacao',this.value)">
+  </div></div>
+  <div class="block"><div class="block-title">Caracterização / Doppler</div>
+    ${radioVal('adicionais','sinoviteTipo','sem_doppler','Espessamento sinovial, sem vascularização ao Doppler','sinovite_tipo')}
+    ${radioVal('adicionais','sinoviteTipo','com_doppler','Espessamento sinovial com vascularização ao Power Doppler','sinovite_tipo')}
+    ${radioVal('adicionais','sinoviteTipo','com_erosoes','Artropatia inflamatória com erosões ósseas marginais','sinovite_tipo')}
+  </div>` : ''}
+  <div class="block"><div class="block-title">Texto Livre</div>
+    <div style="padding:14px;">
+      <textarea class="achados" id="txt-adicionais" oninput="setTextVal('adicionais','texto',this.value)" placeholder="Digite aqui...">${e.texto}</textarea>
+    </div>
+  </div>
+  <div class="block"><div class="block-title">Recomendação — opcional</div>
+    ${chk('adicionais','sugerirRM','Sugerir complementação por ressonância magnética')}
+  </div>
+  `;
+}
+
+// ── HELPERS DE TEXTO ──
+function cap(s){ return s ? s.charAt(0).toUpperCase()+s.slice(1) : s; }
+function listaFormatada(arr){
+  if(arr.length===0) return '';
+  if(arr.length===1) return arr[0];
+  return arr.slice(0,-1).join(', ') + ' e ' + arr[arr.length-1];
+}
+
+// ── GERADOR DE LAUDO ──
+function updateLaudo(){
+  const eG = estado.geral;
+  const eP = estado.pele;
+  const eO = estado.osseo;
+  const eM = estado.mediano;
+  const eT = estado.tunelposop;
+  const eEx = estado.extensores;
+  const eFl = estado.flexores;
+  const eD = estado.derrame;
+  const eC = estado.cisto;
+  const eAd = estado.adicionais;
+
+  let linhas = [];
+  let opinioesPrincipais = [];
+  let opinioesAssociados = [];
+  let opinioesIncidentais = [];
+
+  // PELE E TECIDO SUBCUTÂNEO (opcional, não está no laudo padrão)
+  if(eP.locais.includes('palmar')){
+    linhas.push('Espessamento da pele e aumento da ecogenicidade do plano subcutâneo na face palmar do punho, inferindo edema.');
+    opinioesAssociados.push('Edema da face palmar do punho.');
+  }
+  if(eP.locais.includes('dorsal')){
+    linhas.push('Espessamento da pele e aumento da ecogenicidade do plano subcutâneo na face dorsal do punho, inferindo edema.');
+    opinioesAssociados.push('Edema da face dorsal do punho.');
+  }
+
+  // SUPERFÍCIE ÓSSEA (opcional, não está no laudo padrão)
+  if(eO.locais.length){
+    const mapaOsso = {radio_distal:'no rádio distal', ulna_distal:'na ulna distal', primeira_fileira:'na primeira fileira carpal', segunda_fileira:'na segunda fileira carpal'};
+    const partes = eO.locais.map(l=>mapaOsso[l]);
+    const f = `Irregularidades corticais / osteófitos marginais ${listaFormatada(partes)}.`;
+    linhas.push(f);
+    opinioesAssociados.push(f);
+  }
+
+  // COMPARTIMENTO EXTENSORES (substitui a frase normal quando houver alteração)
+  let extensoresLinhas = [];
+  if(eEx.compartimentos.length && eEx.tipo){
+    const comps = eEx.compartimentos.sort().map(c=>c+'°');
+    const listaComps = listaFormatada(comps);
+    if(eEx.tipo==='tendinopatia'){
+      const f = `Espessamento e hipoecogenicidade tendínea do ${listaComps} compartimento dos extensores, sugerindo tendinopatia.`;
+      extensoresLinhas.push(f);
+      opinioesAssociados.push(`Tendinopatia do ${listaComps} compartimento dos extensores.`);
+    } else if(eEx.tipo==='tenossinovite'){
+      const f = `Hipoecogenicidade e distensão líquida da bainha tendínea do ${listaComps} compartimento dos extensores, sugerindo tenossinovite.`;
+      extensoresLinhas.push(f);
+      opinioesAssociados.push(`Tenossinovite do ${listaComps} compartimento dos extensores.`);
+    } else if(eEx.tipo==='ambas'){
+      const f = `Espessamento e hipoecogenicidade tendínea do ${listaComps} compartimento dos extensores, associado a distensão líquida da sua bainha, sugerindo tendinopatia e tenossinovite.`;
+      extensoresLinhas.push(f);
+      opinioesAssociados.push(`Tendinopatia e tenossinovite do ${listaComps} compartimento dos extensores.`);
+    }
+  }
+  if(eEx.quervain==='tenossinovite'){
+    extensoresLinhas.push('Tenossinovite do primeiro compartimento extensor caracterizada por espessamento e distensão líquida da bainha sinovial dos tendões abdutor longo e extensor curto do polegar, sem alterações tendíneas significativas.');
+    opinioesAssociados.push('Tenossinovite do primeiro compartimento extensor do punho (abdutor longo e extensor curto do polegar), sugestiva de tenossinovite de De Quervain.');
+  } else if(eEx.quervain==='tenossinovite_estenosante'){
+    extensoresLinhas.push('Tenossinovite estenosante dos tendões abdutor longo do polegar e extensor curto do polegar no primeiro compartimento extensor (De Quervain) caracterizada por espessamento do retináculo com espessamento / distensão líquida da bainha sinovial. Associa-se tendinopatia com aumento do calibre tendíneo.');
+    opinioesAssociados.push('Tenossinovite estenosante do primeiro compartimento extensor do punho (tenossinovite de De Quervain), associada a tendinopatia dos tendões abdutor longo e extensor curto do polegar.');
+  } else if(eEx.quervain==='extensor_curto_isolado'){
+    extensoresLinhas.push('Tenossinovite isolada do extensor curto do polegar com espessamento da bainha tendínea e espessamento do retináculo, inferindo septação com subcompartimentalização do primeiro compartimento extensor.');
+    opinioesAssociados.push('Tenossinovite isolada do extensor curto do polegar.');
+  }
+  if(eEx.viCompartimento){
+    extensoresLinhas.push('Sinais de tendinopatia e tenossinovite do extensor ulnar do carpo caracterizada por aumento de calibre, redução da ecogenicidade e espessamento com distensão líquida da bainha sinovial. Não há sinais de instabilidade durante as manobras dinâmicas de pronação e supinação.');
+    opinioesAssociados.push('Tendinopatia e tenossinovite do extensor ulnar do carpo.');
+  }
+  if(eEx.intersecao==='proximal'){
+    extensoresLinhas.push('Aumento das partes moles com edema peritendíneo adjacente ao tendão abdutor longo do polegar e transição miotendínea do extensor curto do polegar, junto à intersecção com os tendões extensores radiais longo e curto do carpo, ao nível do antebraço distal, quando comparada ao lado contralateral, inferindo síndrome de intersecção proximal.');
+    opinioesAssociados.push('Edema peritendíneo na região de intersecção dos tendões abdutor longo e extensor curto do polegar com os extensores radiais do carpo, compatível com síndrome de intersecção proximal.');
+  } else if(eEx.intersecao==='distal'){
+    extensoresLinhas.push('Espessamento / distensão líquida das bainhas sinoviais do extensor longo do polegar junto à intersecção com os tendões extensores radiais longo e curto do carpo, inferindo síndrome de intersecção distal.');
+    opinioesAssociados.push('Tenossinovite do extensor longo do polegar na região de intersecção com os tendões extensores radiais do carpo, compatível com síndrome de intersecção distal.');
+  }
+  if(extensoresLinhas.length){
+    linhas.push(...extensoresLinhas);
+  } else {
+    linhas.push('Compartimentos dos tendões extensores de aspecto habitual, sem tendinopatias ou tenossinovites.');
+  }
+
+  // COMPARTIMENTO FLEXORES (substitui a frase normal quando houver alteração)
+  let flexoresLinhas = [];
+  if(eFl.tendoes.length){
+    const lista = listaFormatada(eFl.tendoes);
+    const f = `Espessamento e hipoecogenicidade tendínea do ${lista}, sugerindo tendinopatia.`;
+    flexoresLinhas.push(f);
+    opinioesAssociados.push(`Tendinopatia do ${lista}.`);
+  }
+  if(eFl.tenossinovite){
+    flexoresLinhas.push('Hipoecogenicidade e distensão líquida da bainha tendínea dos flexores / bursas radial e ulnar ao nível do túnel do carpo, sugerindo tenossinovite.');
+    opinioesAssociados.push('Tenossinovite dos flexores.');
+  }
+  if(eFl.bursite){
+    flexoresLinhas.push('Proeminente distensão líquida da bursa ulnar, que se estende do antebraço distal até ao nível das bases metacarpais, envolvendo os tendões flexores, indicando bursite / tenossinovite. Necessário correlação clínica e laboratorial para definição etiológica.');
+    opinioesAssociados.push('Bursite ulnar com acometimento das bainhas dos tendões flexores (tenossinovite associada), estendendo-se do antebraço distal às bases metacarpais.');
+  }
+  if(flexoresLinhas.length){
+    linhas.push(...flexoresLinhas);
+  } else {
+    linhas.push('Tendões flexores com calibre, ecogenicidade e ecotextura normais.');
+  }
+
+  // NERVO MEDIANO (substitui as frases normais quando houver alteração)
+  if(eM.sit==='normal'){
+    linhas.push('Nervo mediano com calibre e aspecto ecográfico habitual.');
+    linhas.push(`Área de secção transversa do nervo mediano ao nível do túnel do carpo proximal de ${eM.areaProx || '??'} mm².`);
+  } else if(eM.sit==='neuropatia'){
+    linhas.push(`Nervo mediano com aumento de calibre, redução da ecogenicidade e perda do padrão fascicular. Área de secção transversa de ${eM.areaProx || 'X'} mm² ao nível do túnel do carpo proximal.`);
+    opinioesPrincipais.push('Sinais ecográficos de neuropatia do mediano.');
+  } else if(eM.sit==='neuropatia_conservador'){
+    linhas.push(`Espessamento e hipoecogenicidade do nervo mediano no interior do túnel do carpo, apresentando área de secção transversa medindo ${eM.areaProx || 'X'} mm². Estes achados podem estar relacionados a neuropatia na dependência de correlação clínica e eletroneuromiográfica.`);
+    opinioesAssociados.push('Espessamento do nervo mediano no interior do túnel do carpo, que pode corresponder a neuropatia na dependência de correlação clínica e eletroneuromiográfica.');
+  } else if(eM.sit==='aumento_calibre'){
+    linhas.push('Sinais de aumento de calibre do nervo mediano. Foram realizadas as medidas da área de secção transversa ao nível do túnel do carpo proximal e ao nível do antebraço distal, resultando diferença > 2 mm².');
+    opinioesPrincipais.push('Aumento da área de secção transversa do nervo mediano no túnel do carpo, com diferença superior a 2 mm² em relação ao antebraço distal, achado sugestivo de síndrome do túnel do carpo (Klauser et al., Radiology 2009;250:171-177).');
+  } else if(eM.sit==='nervo_bifido'){
+    linhas.push('Nervo mediano bífido no interior do túnel do carpo (variante anatômica).');
+    opinioesIncidentais.push('Nervo mediano bífido no interior do túnel do carpo (variante anatômica).');
+  }
+  if(eM.sit!=='normal' && eM.hipotrofia){
+    linhas.push('Sinais de hipotrofia e lipossubstituição da musculatura da região tenar.');
+    opinioesAssociados.push('Hipotrofia e lipossubstituição da musculatura da região tenar.');
+  }
+
+  // TÚNEL DO CARPO — lesões expansivas / variações anatômicas OU pós-operatório
+  if(eT.usar && eT.sit){
+    if(eT.sit==='habitual'){
+      linhas.push('Sinais de ressecção do retináculo dos flexores, com aumento da amplitude ao nível do túnel do carpo. Durante as manobras dinâmicas não foram caracterizadas áreas de fibrose.');
+      opinioesAssociados.push('Alterações pós-operatórias com ressecção do retináculo dos flexores, sem complicações.');
+    } else if(eT.sit==='complicacao_tardia'){
+      linhas.push('Espessamento fibrocicatricial do retináculo dos flexores ao nível do túnel do carpo proximal, com sinais de compressão do nervo mediano neste nível.');
+      opinioesPrincipais.push('Espessamento fibrocicatricial do retináculo dos flexores ao nível do túnel do carpo proximal, com sinais de compressão do nervo mediano neste nível.');
+    } else if(eT.sit==='complicacao_recente'){
+      linhas.push('Achatamento do nervo mediano ao nível do túnel do carpo distal, com aumento do calibre ao nível do carpo proximal, inferindo compressão local.');
+      opinioesPrincipais.push('Achatamento do nervo mediano ao nível do túnel do carpo distal, com aumento do calibre ao nível do carpo proximal, inferindo compressão local.');
+    }
+  } else if(eM.sit!=='nervo_bifido'){
+    linhas.push('Não foram caracterizadas lesões expansivas ou variações anatômicas no interior do túnel do carpo.');
+  }
+
+  // DERRAME ARTICULAR / HIPERTROFIA SINOVIAL
+  if(eD.sit==='ausente' && !eD.hipertrofiaSinovial){
+    linhas.push('Ausência de derrame articular ou hipertrofia sinovial nos recessos articulares do punho.');
+  } else {
+    if(eD.sit==='ausente'){
+      linhas.push('Ausência de derrame articular.');
+    } else {
+      const f = `${cap(eD.intensidade)} derrame articular.`;
+      linhas.push(f);
+      opinioesPrincipais.push(f);
+    }
+    if(eD.hipertrofiaSinovial){
+      linhas.push('Hipertrofia sinovial nos recessos articulares do punho.');
+      opinioesAssociados.push('Hipertrofia sinovial nos recessos articulares do punho.');
+    }
+  }
+
+  // ACHADOS ADICIONAIS ESTRUTURADOS
+  if(eAd.bossaCarpal){
+    const f = `Na região nodular referida pelo paciente, face dorsal do punho, nota-se proeminência óssea na região dorsal da base do ${eAd.bossaMetacarpo} metacarpo, sugestivo de bossa carpal.`;
+    linhas.push(f);
+    opinioesIncidentais.push('Bossa carpal.');
+  }
+  if(eAd.trombose){
+    linhas.push('Na região referida pelo paciente, face volar e ulnar do punho / mão, nota-se aumento do calibre com espessamento parietal e trombose da artéria ulnar (Síndrome do Martelo Hipotenar).');
+    opinioesPrincipais.push('Trombose da artéria ulnar (Síndrome do Martelo Hipotenar).');
+  }
+  if(eAd.noduloNeural){
+    const f = `Na região referida pelo paciente, nota-se nódulo sólido de contornos regulares em continuidade com o nervo radial, medindo ${eAd.noduloX||'X'} x ${eAd.noduloY||'Y'} x ${eAd.noduloZ||'Z'} cm, de provável origem neural.`;
+    linhas.push(f);
+    opinioesAssociados.push('Nódulo sólido em continuidade com o nervo radial, de provável origem neural.');
+  }
+  if(eAd.rizartrose==='incipiente'){
+    linhas.push('Artropatia degenerativa carpometacarpal do primeiro dedo caracterizada por pequena osteofitose marginal.');
+    opinioesAssociados.push('Rizartrose incipiente.');
+  } else if(eAd.rizartrose==='acentuada'){
+    linhas.push('Acentuada artropatia degenerativa carpometacarpal do primeiro dedo, com osteofitose marginal, afilamento condral, redução da interlinha articular e derrame articular com sinais de sinovite.');
+    opinioesPrincipais.push('Acentuada rizartrose (artropatia degenerativa carpometacarpal do primeiro dedo).');
+  }
+  if(eAd.sinoviteUsar && eAd.sinoviteTipo){
+    const art = eAd.sinoviteArticulacao.trim() || '??';
+    if(eAd.sinoviteTipo==='sem_doppler'){
+      const f = `Espessamento sinovial da articulação ${art}, sem vascularização ao estudo Doppler.`;
+      linhas.push(f);
+      opinioesAssociados.push(f);
+    } else if(eAd.sinoviteTipo==='com_doppler'){
+      const f = `Espessamento sinovial da articulação ${art}, indicando sinovite. Destaca-se vascularização ao Power Doppler, inferindo atividade inflamatória.`;
+      linhas.push(f);
+      opinioesPrincipais.push(`Sinovite da articulação ${art}, com atividade inflamatória ao Doppler.`);
+    } else if(eAd.sinoviteTipo==='com_erosoes'){
+      const f = `Sinais de artropatia inflamatória da articulação ${art}, caracterizada por erosões ósseas marginais e acentuado espessamento sinovial com vascularização ao estudo Doppler, indicando sinovite.`;
+      linhas.push(f);
+      opinioesPrincipais.push(`Artropatia inflamatória da articulação ${art}, com erosões ósseas marginais.`);
+    }
+  }
+  let adicionaisTexto = eAd.texto.trim() ? `<div class="doc-p">Achados adicionais: ${eAd.texto}</div>` : '';
+
+  // CISTO GANGLIÔNICO (seção própria, não faz parte do laudo padrão)
+  let cistoHtml = '';
+  if(eC.usar){
+    const x = eC.x || 'X', y = eC.y || 'Y', z = eC.z || 'Z';
+    let f = '';
+    if(eC.local==='dorsal'){
+      if(eC.opcao==='simples'){
+        f = `Imagem com características císticas na região dorsal do punho, superficialmente às estruturas capsuloligamentares da articulação escafossemilunar, medindo ${x} x ${y} x ${z} cm.`;
+      } else {
+        f = `Imagem com características císticas de contornos bem definidos e lobulados, com conteúdo anecoide e finas septações em seu interior, apresentando reforço acústico posterior e ausência de vascularização ao estudo Doppler, localizada na região dorsal do punho, profundamente ao quarto compartimento extensor e adjacente aos ossos do carpo, com fino colo de comunicação com as estruturas capsuloligamentares das articulações escafossemilunar / radiocarpal, medindo ${x} x ${y} x ${z} cm.`;
+      }
+      opinioesAssociados.push('Cisto gangliônico na região dorsal do punho.');
+    } else {
+      let extras = [];
+      if(eC.abaulamento) extras.push('determinando abaulamento da artéria radial');
+      if(eC.envolvimento) extras.push('envolvendo circunferencialmente a artéria radial');
+      const sufixoExtra = extras.length ? `, ${extras.join(' e ')}` : '';
+      if(eC.opcao==='simples'){
+        f = `Imagem com características císticas na região radial e volar do punho, superficialmente às estruturas capsuloligamentares das articulações radiocarpal / intercarpal, medindo ${x} x ${y} x ${z} cm${sufixoExtra}.`;
+      } else {
+        f = `Imagem com características císticas de contornos bem definidos e lobulados, com conteúdo anecoide e finas septações em seu interior, apresentando reforço acústico posterior e ausência de vascularização ao estudo Doppler, localizada na região radial e volar do punho, localizada superficialmente e com fino colo de comunicação com as estruturas capsuloligamentares das articulações radiocarpal / intercarpal, medindo ${x} x ${y} x ${z} cm${sufixoExtra}.`;
+      }
+      opinioesAssociados.push('Cisto gangliônico na região radial volar do punho.');
+    }
+    cistoHtml = `<div class="doc-secao"><span class="doc-label">CISTO GANGLIÔNICO:</span><div class="doc-p">${f}</div></div>`;
+  }
+
+  // RECOMENDAÇÃO DE RM (opcional)
+  let rmHtml = eAd.sugerirRM ? `<div class="doc-secao"><div class="doc-p">Na presença de persistência dos sintomas ou dúvida diagnóstica, considerar complementação por ressonância magnética.</div></div>` : '';
+
+  // TÍTULO CONFORME LATERALIDADE
+  const ladoTxt = eG.lado==='esquerdo' ? 'ESQUERDO' : 'DIREITO';
+
+  // INDICAÇÃO
+  let indicacaoHtml = eG.indicacao.trim() ? `
+    <div class="doc-secao">
+      <span class="doc-label">INDICAÇÃO CLÍNICA:</span>
+      <div class="doc-p">${eG.indicacao}</div>
+    </div>` : '';
+
+  // CONCLUSÃO FINAL (ordenada por prioridade: principais > associados > incidentais)
+  let opFinal = '';
+  const opinioesOrdenadas = [...new Set([...opinioesPrincipais, ...opinioesAssociados, ...opinioesIncidentais])];
+  if(opinioesOrdenadas.length===0){
+    opFinal = 'Exame ecográfico do punho dentro dos padrões da normalidade.';
+  } else {
+    opFinal = opinioesOrdenadas.join('<br>');
+  }
+
+  document.getElementById('laudo-doc').innerHTML=`
+    <div class="doc-titulo">ULTRASSONOGRAFIA DO PUNHO ${ladoTxt}</div>
+    ${indicacaoHtml}
+    <div class="doc-secao">
+      <span class="doc-label">TÉCNICA DO EXAME:</span>
+      <div class="doc-p">Exame realizado com transdutor linear multifrequencial de alta resolução.</div>
+    </div>
+    <div class="doc-secao">
+      <span class="doc-label">ANÁLISE:</span>
+      ${linhas.map(l=>`<div class="doc-p">${l}</div>`).join('')}
+      ${adicionaisTexto}
+    </div>
+    ${cistoHtml}
+    <div class="doc-secao">
+      <span class="doc-label">IMPRESSÃO DIAGNÓSTICA:</span>
+      <div class="doc-p">${opFinal}</div>
+    </div>
+    ${rmHtml}`;
+}
+
+function toggleDark(){
+  const isDark = document.body.classList.toggle('dark');
+  const btn = document.getElementById('btn-dark-toggle');
+  if(isDark) btn.innerHTML='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 8.5A5.5 5.5 0 0 1 6 3c0-.18.01-.36.03-.53A6 6 0 1 0 13.97 9.5c-.15.01-.31.01-.47 0z"/></svg>Modo claro';
+  else btn.innerHTML='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro';
+  localStorage.setItem('darkModePunho', isDark ? '1' : '0');
+}
+(function(){ if(localStorage.getItem('darkModePunho')==='1') toggleDark(); })();
+
+function copiar() {
+  var el = document.getElementById('laudo-doc');
+  if (!el) return;
+  _copyLaudoRichText(el, function(ok) {
+    if (ok) {
+      showToast('Laudo copiado para a área de transferência!');
+    } else {
+      showToast('Falha ao copiar. Use Ctrl+A e Ctrl+C no texto do laudo.');
+    }
+  });
+}
+
+// --- INÃCIO: FUNÃ‡Ã•ES DE CÃ“PIA RICH-TEXT (PadrÃ£o ObstÃ©trico) ---
+function _copyLaudoRichText(sourceEl, callback) {
+  var clone = sourceEl.cloneNode(true);
+  var RELEVANT_PROPS = [
+    'font-family', 'font-size', 'font-weight', 'font-style',
+    'line-height', 'text-align', 'text-indent', 'text-decoration',
+    'vertical-align', 'white-space', 'display',
+    'margin-top', 'margin-right', 'margin-bottom', 'margin-left',
+    'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
+    'list-style', 'list-style-type',
+    'border-collapse', 'border-spacing'
+  ];
+  var originalEls = sourceEl.querySelectorAll('*');
+  var cloneEls    = clone.querySelectorAll('*');
+
+  _inlineComputedStyles(sourceEl, clone, RELEVANT_PROPS, true);
+  for (var i = 0; i < originalEls.length; i++) {
+    _inlineComputedStyles(originalEls[i], cloneEls[i], RELEVANT_PROPS, false);
+  }
+
+  clone.style.backgroundColor = '#ffffff';
+  clone.style.color = '#000000';
+  clone.removeAttribute('id');
+  clone.removeAttribute('contenteditable');
+
+  var htmlContent = clone.outerHTML;
+  var plainText = sourceEl.innerText || sourceEl.textContent || '';
+
+  if (navigator.clipboard && typeof ClipboardItem !== 'undefined') {
+    try {
+      var htmlBlob = new Blob([htmlContent], { type: 'text/html' });
+      var textBlob = new Blob([plainText],   { type: 'text/plain' });
+      navigator.clipboard.write([
+        new ClipboardItem({
+          'text/html': htmlBlob,
+          'text/plain': textBlob
+        })
+      ]).then(function() {
+        callback(true);
+      }).catch(function() {
+        _fallbackCopy(htmlContent, plainText, callback);
+      });
+      return;
+    } catch (e) {
+    }
+  }
+  _fallbackCopy(htmlContent, plainText, callback);
+}
+
+function _inlineComputedStyles(originalEl, cloneEl, props, isRoot) {
+  if (!originalEl || !cloneEl) return;
+  if (originalEl.nodeType !== 1 || cloneEl.nodeType !== 1) return;
+  var computed = window.getComputedStyle(originalEl);
+  for (var i = 0; i < props.length; i++) {
+    var prop = props[i];
+    var val  = computed.getPropertyValue(prop);
+    if (val) {
+      cloneEl.style.setProperty(prop, val);
+    }
+  }
+  var bgColor = computed.getPropertyValue('background-color');
+  if (bgColor) {
+    var bgRgb = _parseRGB(bgColor);
+    if (!bgRgb || _isTransparent(bgColor)) {
+      cloneEl.style.backgroundColor = 'transparent';
+    } else if (bgRgb.r > 200 && bgRgb.g > 200 && bgRgb.b > 200) {
+      cloneEl.style.backgroundColor = '#ffffff';
+    } else {
+      cloneEl.style.backgroundColor = isRoot ? '#ffffff' : 'transparent';
+    }
+  }
+  var textColor = computed.getPropertyValue('color');
+  if (textColor) {
+    var textRgb = _parseRGB(textColor);
+    if (!textRgb || textRgb.r > 100 || textRgb.g > 100 || textRgb.b > 100) {
+      cloneEl.style.color = '#000000';
+    } else {
+      cloneEl.style.color = textColor;
+    }
+  }
+  var tag = originalEl.tagName.toLowerCase();
+  if (tag === 'td' || tag === 'th' || tag === 'table') {
+    var borderProps = ['border-top', 'border-right', 'border-bottom', 'border-left', 'border'];
+    for (var j = 0; j < borderProps.length; j++) {
+      var bv = computed.getPropertyValue(borderProps[j]);
+      if (bv) {
+        cloneEl.style.setProperty(borderProps[j], bv);
+      }
+    }
+  }
+  cloneEl.removeAttribute('class');
+}
+
+function _fallbackCopy(htmlContent, plainText, callback) {
+  var container = document.createElement('div');
+  container.innerHTML = htmlContent;
+  container.style.position = 'fixed';
+  container.style.left = '-9999px';
+  container.style.top = '0';
+  container.style.opacity = '0';
+  document.body.appendChild(container);
+  var range = document.createRange();
+  range.selectNodeContents(container);
+  var sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+  var ok = false;
+  try {
+    ok = document.execCommand('copy');
+  } catch (e) {
+    ok = false;
+  }
+  sel.removeAllRanges();
+  document.body.removeChild(container);
+  callback(ok);
+}
+
+function _isTransparent(colorStr) {
+  if (!colorStr) return true;
+  if (colorStr === 'transparent') return true;
+  var m = colorStr.match(/rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([\d.]+)\s*\)/);
+  if (m && parseFloat(m[4]) === 0) return true;
+  return false;
+}
+
+function _parseRGB(colorStr) {
+  if (!colorStr) return null;
+  var m = colorStr.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+  if (m) return { r: parseInt(m[1]), g: parseInt(m[2]), b: parseInt(m[3]) };
+  if (colorStr.charAt(0) === '#') {
+    var hex = colorStr.replace('#', '');
+    if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+    if (hex.length === 6) {
+      return { r: parseInt(hex.substr(0,2),16), g: parseInt(hex.substr(2,2),16), b: parseInt(hex.substr(4,2),16) };
+    }
+  }
+  return null;
+}
+// --- FIM: FUNÃ‡Ã•ES DE CÃ“PIA RICH-TEXT ---
+document.getElementById('laudo-doc').addEventListener('copy', function(e) {
+  if (!document.body.classList.contains('dark')) return;
+  document.body.classList.remove('dark');
+  document.body.offsetHeight;
+  setTimeout(function() {
+    document.body.classList.add('dark');
+  }, 0);
+});
+
+function showToast(msg) {
+  let t = document.getElementById('toast-notification');
+  t.innerText = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+function imprimir(){
+  const h=document.getElementById('laudo-doc').innerHTML;
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Helvetica,Arial,sans-serif;font-size:10pt;padding:32px;color:#111;line-height:1.65;}.doc-titulo{text-align:center;font-weight:700;text-transform:uppercase;margin-bottom:16px;}.doc-label{font-weight:700;}.doc-p{margin-bottom:8px;}.doc-secao{margin-bottom:14px;}*{color:#111 !important;}.laudo-doc:focus { outline: none; }
+</style></head><body>${h}
+<div id="toast-notification" class="toast-notification">Laudo copiado!</div>
+</body></html>`);
+  w.document.close();
+  w.print();
+}
+function reiniciar(){
+  estado = estadoInicial();
+  showSection('geral');
+}
+
+showSection('geral');
+</script>
+
+<div id="toast-notification" class="toast-notification">Laudo copiado!</div>
+</body>
+</html>
