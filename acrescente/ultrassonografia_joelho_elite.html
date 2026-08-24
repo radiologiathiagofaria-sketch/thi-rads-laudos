@@ -922,11 +922,11 @@ function updateLaudo(){
     if(ePt.sit==='normal'){
       linhas.push('Tendões da "pata de ganso" de aspecto ecográfico habitual.');
     } else {
-      linhas.push(integraDoppler('Espessamento dos tendões da pata anserina, caracterizando tendinopatia.', ePt.dopplerTend, ''));
+      linhas.push(integraDoppler('Tendões conjuntos da pata anserina (sartório, grácil e semitendinoso) com espessamento e alteração da ecotextura, associados a perda da definição do padrão fibrilar normal, sem evidência de solução de continuidade, achados compatíveis com tendinopatia', ePt.dopplerTend, ''));
       opinioesAssociados.push('Tendinopatia da "pata de ganso".');
     }
     if(ePt.bursite){
-      linhas.push(integraDoppler('Distensão líquida da bursa anserina, indicando bursite.', ePt.dopplerBursite, 'periférica'));
+      linhas.push(integraDoppler('Bursa anserina distendida por conteúdo líquido com paredes discretamente espessadas, sem septações ou componentes sólidos em seu interior, achados compatíveis com bursite anserina.', ePt.dopplerBursite, 'periférica'));
       opinioesAssociados.push('Bursite anserina.');
     }
   }
@@ -1036,9 +1036,9 @@ function updateLaudo(){
   }
   // NOVO: Trato iliotibial, bíceps femoral distal, tendão poplíteo (opcionais)
   if(eL.trato_sit){
-    const map = {habitual:'Trato iliotibial de aspecto habitual.', espessamento:'Espessamento do trato iliotibial.',
-      ecotextura:'Alteração da ecotextura do trato iliotibial.', atrito:'Sinais de atrito do trato iliotibial junto ao côndilo femoral lateral.',
-      bursite:'Bursite associada ao trato iliotibial.', tendinopatia:'Tendinopatia do trato iliotibial.'};
+    const map = {habitual:'Trato iliotibial de aspecto habitual.', espessamento:'Trato iliotibial com espessura aumentada em relação ao contralateral/padrão habitual, em sua porção distal, próximo à inserção no côndilo femoral lateral e no tubérculo de Gerdy, sem afilamento das margens.',
+      ecotextura:'Trato iliotibial com perda da ecotextura fibrilar normal, apresentando áreas de heterogeneidade e hipoecogenicidade.', atrito:'Trato iliotibial espessado e com ecotextura heterogênea em seu segmento distal, notando-se discreta coleção líquida laminar/edema dos tecidos moles profundos ao trato, na interface com o côndilo femoral lateral, compatível com sinais de atrito (síndrome do trato iliotibial). Ao exame dinâmico, observa-se deslizamento anômalo da estrutura sobre a proeminência óssea condilar durante a flexoextensão do joelho.',
+      bursite:'Bursite associada ao trato iliotibial.', tendinopatia:'Trato iliotibial com espessamento e heterogeneidade da ecotextura em sua inserção distal, associado a discreta hipervascularização ao estudo Doppler, achados compatíveis com tendinopatia.'};
     let f = map[eL.trato_sit] || '';
     if(f){
       if(eL.trato_sit!=='habitual'){
@@ -1051,9 +1051,9 @@ function updateLaudo(){
     }
   }
   if(eL.biceps_sit){
-    const map = {habitual:'Tendão distal do bíceps femoral de aspecto habitual.', tendinopatia:'Tendinopatia do tendão distal do bíceps femoral.',
-      entesopatia:'Entesopatia do tendão distal do bíceps femoral.', fibrilar:'Alteração fibrilar/fissuras do tendão distal do bíceps femoral.',
-      rotura_parcial:'Rotura parcial do tendão distal do bíceps femoral.', rotura_completa:'Rotura completa do tendão distal do bíceps femoral.'};
+    const map = {habitual:'Tendão distal do bíceps femoral de aspecto habitual.', tendinopatia:'Tendão distal do bíceps femoral com espessamento e heterogeneidade da ecotextura fibrilar, sem solução de continuidade, associado a discreta hipervascularização ao estudo Doppler, achados compatíveis com tendinopatia.',
+      entesopatia:'Inserção distal do tendão do bíceps femoral na cabeça da fíbula com espessamento e irregularidade das margens, associada a irregularidade do contorno ósseo adjacente (espículas/entesófitos), sem evidência de solução de continuidade das fibras tendíneas, achados compatíveis com entesopatia insercional.', fibrilar:'Tendão distal do bíceps femoral com perda focal da ecotextura fibrilar habitual, notando-se área linear hipoecogênica de permeio às fibras, sem retração ou afastamento significativo dos cotos, compatível com fissura/microrrotura intrassubstancial.',
+      rotura_parcial:'Tendão distal do bíceps femoral com descontinuidade parcial de suas fibras, identificando-se solução de continuidade que acomete cerca de ___% da espessura tendínea, com afilamento e retração discreta do coto acometido, associada a coleção líquida/hematoma adjacente, achados compatíveis com rotura parcial.', rotura_completa:'Tendão distal do bíceps femoral com descontinuidade completa de suas fibras em toda a sua espessura, notando-se retração do coto proximal (afastamento estimado de aproximadamente ___ cm em relação à inserção na cabeça da fíbula), associada a volumosa coleção líquida/hematoma na topografia da lesão, achados compatíveis com rotura completa.'};
     const f = map[eL.biceps_sit];
     if(f){
       linhas.push(f);
@@ -1076,7 +1076,7 @@ function updateLaudo(){
   // NOVO — BURSAS PRÉ/INFRAPATELARES E CARTILAGEM (seção opcional, só entra se "usar" marcado)
   if(eBc.usar){
     if(eBc.prepatelar){
-      const map = {sem_distensao:'Bursa pré-patelar sem distensão.', distensao:'Distensão líquida da bursa pré-patelar.', bursite:'Bursite pré-patelar (bursa pré-patelar).'};
+      const map = {sem_distensao:'Bursa pré-patelar sem distensão.', distensao:'Distensão líquida da bursa pré-patelar.', bursite:'Bursa pré-patelar apresentando distensão por conteúdo anecoico, associada a espessamento e hiperecogenicidade de suas paredes.'};
       let f = map[eBc.prepatelar] || '';
       if(f){
         if(eBc.prepatelarConteudo) f += ' Observa-se conteúdo/debris em seu interior.';
@@ -1085,12 +1085,12 @@ function updateLaudo(){
       }
     }
     if(eBc.infraSup){
-      const map = {sem_distensao:'Bursa infrapatelar superficial sem distensão.', distensao:'Distensão líquida da bursa infrapatelar superficial.', bursite:'Bursite infrapatelar superficial.'};
+      const map = {sem_distensao:'Bursa infrapatelar superficial sem distensão.', distensao:'Distensão líquida da bursa infrapatelar superficial.', bursite:'Bursa infrapatelar superficial apresentando distensão por conteúdo anecoico, associada a espessamento e hiperecogenicidade de suas paredes.'};
       const f = map[eBc.infraSup];
       if(f){ linhas.push(f); if(eBc.infraSup==='bursite') opinioesAssociados.push('Bursite infrapatelar superficial.'); }
     }
     if(eBc.infraProf){
-      const map = {sem_distensao:'Bursa infrapatelar profunda sem distensão.', distensao:'Distensão líquida da bursa infrapatelar profunda.', bursite:'Bursite infrapatelar profunda.'};
+      const map = {sem_distensao:'Bursa infrapatelar profunda sem distensão.', distensao:'Distensão líquida da bursa infrapatelar profunda.', bursite:'Bursa infrapatelar profunda apresentando distensão por conteúdo anecoico, associada a espessamento e hiperecogenicidade de suas paredes.'};
       const f = map[eBc.infraProf];
       if(f){ linhas.push(f); if(eBc.infraProf==='bursite') opinioesAssociados.push('Bursite infrapatelar profunda.'); }
     }
