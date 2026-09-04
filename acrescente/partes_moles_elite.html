@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -1663,147 +1663,6 @@ function copiar() {
   });
 }
 
-// --- INÃCIO: FUNÃ‡Ã•ES DE CÃ“PIA RICH-TEXT (PadrÃ£o ObstÃ©trico) ---
-function _copyLaudoRichText(sourceEl, callback) {
-  var clone = sourceEl.cloneNode(true);
-  var RELEVANT_PROPS = [
-    'font-family', 'font-size', 'font-weight', 'font-style',
-    'line-height', 'text-align', 'text-indent', 'text-decoration',
-    'vertical-align', 'white-space', 'display',
-    'margin-top', 'margin-right', 'margin-bottom', 'margin-left',
-    'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
-    'list-style', 'list-style-type',
-    'border-collapse', 'border-spacing'
-  ];
-  var originalEls = sourceEl.querySelectorAll('*');
-  var cloneEls    = clone.querySelectorAll('*');
-
-  _inlineComputedStyles(sourceEl, clone, RELEVANT_PROPS, true);
-  for (var i = 0; i < originalEls.length; i++) {
-    _inlineComputedStyles(originalEls[i], cloneEls[i], RELEVANT_PROPS, false);
-  }
-
-  clone.style.backgroundColor = '#ffffff';
-  clone.style.color = '#000000';
-  clone.removeAttribute('id');
-  clone.removeAttribute('contenteditable');
-
-  var htmlContent = clone.outerHTML;
-  var plainText = sourceEl.innerText || sourceEl.textContent || '';
-
-  if (navigator.clipboard && typeof ClipboardItem !== 'undefined') {
-    try {
-      var htmlBlob = new Blob([htmlContent], { type: 'text/html' });
-      var textBlob = new Blob([plainText],   { type: 'text/plain' });
-      navigator.clipboard.write([
-        new ClipboardItem({
-          'text/html': htmlBlob,
-          'text/plain': textBlob
-        })
-      ]).then(function() {
-        callback(true);
-      }).catch(function() {
-        _fallbackCopy(htmlContent, plainText, callback);
-      });
-      return;
-    } catch (e) {
-    }
-  }
-  _fallbackCopy(htmlContent, plainText, callback);
-}
-
-function _inlineComputedStyles(originalEl, cloneEl, props, isRoot) {
-  if (!originalEl || !cloneEl) return;
-  if (originalEl.nodeType !== 1 || cloneEl.nodeType !== 1) return;
-  var computed = window.getComputedStyle(originalEl);
-  for (var i = 0; i < props.length; i++) {
-    var prop = props[i];
-    var val  = computed.getPropertyValue(prop);
-    if (val) {
-      cloneEl.style.setProperty(prop, val);
-    }
-  }
-  var bgColor = computed.getPropertyValue('background-color');
-  if (bgColor) {
-    var bgRgb = _parseRGB(bgColor);
-    if (!bgRgb || _isTransparent(bgColor)) {
-      cloneEl.style.backgroundColor = 'transparent';
-    } else if (bgRgb.r > 200 && bgRgb.g > 200 && bgRgb.b > 200) {
-      cloneEl.style.backgroundColor = '#ffffff';
-    } else {
-      cloneEl.style.backgroundColor = isRoot ? '#ffffff' : 'transparent';
-    }
-  }
-  var textColor = computed.getPropertyValue('color');
-  if (textColor) {
-    var textRgb = _parseRGB(textColor);
-    if (!textRgb || textRgb.r > 100 || textRgb.g > 100 || textRgb.b > 100) {
-      cloneEl.style.color = '#000000';
-    } else {
-      cloneEl.style.color = textColor;
-    }
-  }
-  var tag = originalEl.tagName.toLowerCase();
-  if (tag === 'td' || tag === 'th' || tag === 'table') {
-    var borderProps = ['border-top', 'border-right', 'border-bottom', 'border-left', 'border'];
-    for (var j = 0; j < borderProps.length; j++) {
-      var bv = computed.getPropertyValue(borderProps[j]);
-      if (bv) {
-        cloneEl.style.setProperty(borderProps[j], bv);
-      }
-    }
-  }
-  cloneEl.removeAttribute('class');
-}
-
-function _fallbackCopy(htmlContent, plainText, callback) {
-  var container = document.createElement('div');
-  container.innerHTML = htmlContent;
-  container.style.position = 'fixed';
-  container.style.left = '-9999px';
-  container.style.top = '0';
-  container.style.opacity = '0';
-  document.body.appendChild(container);
-  var range = document.createRange();
-  range.selectNodeContents(container);
-  var sel = window.getSelection();
-  sel.removeAllRanges();
-  sel.addRange(range);
-  var ok = false;
-  try {
-    ok = document.execCommand('copy');
-  } catch (e) {
-    ok = false;
-  }
-  sel.removeAllRanges();
-  document.body.removeChild(container);
-  callback(ok);
-}
-
-function _isTransparent(colorStr) {
-  if (!colorStr) return true;
-  if (colorStr === 'transparent') return true;
-  var m = colorStr.match(/rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([\d.]+)\s*\)/);
-  if (m && parseFloat(m[4]) === 0) return true;
-  return false;
-}
-
-function _parseRGB(colorStr) {
-  if (!colorStr) return null;
-  var m = colorStr.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
-  if (m) return { r: parseInt(m[1]), g: parseInt(m[2]), b: parseInt(m[3]) };
-  if (colorStr.charAt(0) === '#') {
-    var hex = colorStr.replace('#', '');
-    if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
-    if (hex.length === 6) {
-      return { r: parseInt(hex.substr(0,2),16), g: parseInt(hex.substr(2,2),16), b: parseInt(hex.substr(4,2),16) };
-    }
-  }
-  return null;
-}
-// --- FIM: FUNÃ‡Ã•ES DE CÃ“PIA RICH-TEXT ---
-
-
 function showToast(msg) {
   let t = document.getElementById('toast-notification');
   t.innerText = msg;
@@ -1836,5 +1695,6 @@ showSection('area');
 </script>
 
 <div id="toast-notification" class="toast-notification">Laudo copiado!</div>
+<script src="../js/copy-pacs.js"></script>
 </body>
 </html>

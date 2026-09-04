@@ -89,7 +89,24 @@ function gerarTextoDoppler(dados) {
   html += tableHtml;
   html += `Peso estimado em ${dados.peso || '---'} gramas pelos critérios de Hadlock IV (+/- 15%).<br>`;
   html += `Percentil estimado no ${dados.p_peso || '---'} (valor de referência p10-p90).<br>`;
-  html += `Biometria fetal estimada em ${formatarIdade(dados.biometria_sem, dados.biometria_dias)}.<br><br>`;
+  let biometriaFrase = `Biometria fetal estimada em ${formatarIdade(dados.biometria_sem, dados.biometria_dias)}`;
+  let biometriaSemNum = parseInt(dados.biometria_sem) || 0;
+  if (biometriaSemNum >= 21 && biometriaSemNum <= 27) {
+    biometriaFrase += ` (variação esperada de ±11 dias)`;
+  } else if (biometriaSemNum >= 28 && biometriaSemNum <= 40) {
+    biometriaFrase += ` (variação esperada de ±20 dias)`;
+  }
+  biometriaFrase += `.`;
+  html += `${biometriaFrase}<br>`;
+
+  if (dados.exibir_estatura && dados.cf) {
+    let cfNum = parseFloat(dados.cf);
+    if (!isNaN(cfNum) && cfNum > 0) {
+      let estatura = (6.18 + 0.59 * cfNum).toFixed(1).replace('.', ',');
+      html += `Estatura fetal estimada em ${estatura} cm, calculada a partir do comprimento do fêmur fetal.<br>`;
+    }
+  }
+  html += `<br>`;
 
   // ÍNDICES BIOMÉTRICOS (Opcional)
   if (dados.exibir_indices) {
@@ -164,9 +181,7 @@ function gerarTextoDoppler(dados) {
     imp += `- Idade gestacional cronológica de ${formatarIdade(dados.ig_sem, dados.ig_dias)}.<br>`;
   }
   
-  imp += `- Biometria fetal de ${formatarIdade(dados.biometria_sem, dados.biometria_dias)}.`;
-  
-  imp += `<br><span id="drfetal-conclusion-container">`;
+  imp += `<span id="drfetal-conclusion-container">`;
   
   if (isDoppler) {
     imp += `- Estudo dopplervelocimétrico dentro da normalidade para idade gestacional.`;

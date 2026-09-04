@@ -131,13 +131,16 @@
           <label>Opções do Laudo</label>
           <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 5px;">
             <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; font-size: 0.9rem;">
-              <input type="checkbox" id="exibir_percentis" checked> Mostrar Percentis na Tabela
+              <input type="checkbox" id="exibir_percentis"> Mostrar Percentis na Tabela
             </label>
             <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; font-size: 0.9rem;">
               <input type="checkbox" id="exibir_indices"> Mostrar Índices Biométricos
             </label>
             <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; font-size: 0.9rem;">
-              <input type="checkbox" id="exibir_umero"> Incluir Úmero
+              <input type="checkbox" id="exibir_umero" checked> Incluir Úmero
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; font-size: 0.9rem;">
+              <input type="checkbox" id="exibir_estatura" checked> Mostrar estatura fetal estimada
             </label>
           </div>
         </div>
@@ -148,7 +151,7 @@
           <div class="field"><label>CA (mm)</label><input type="number" id="ca" oninput="calcularPesoEPerc()"></div>
           <div class="field"><label>CF (mm)</label><input type="number" id="cf" oninput="calcularPesoEPerc()"></div>
         </div>
-        <div class="grid-4" id="div_umero" style="display:none; margin-top: 10px;">
+        <div class="grid-4" id="div_umero" style="margin-top: 10px;">
           <div class="field"><label>Úmero (mm)</label><input type="number" id="umero" oninput="calcularPesoEPerc()"></div>
         </div>
         

@@ -211,6 +211,7 @@ function getFormDadosDoppler() {
     exibir_percentis: document.getElementById('exibir_percentis') ? document.getElementById('exibir_percentis').checked : true,
     exibir_indices: document.getElementById('exibir_indices') ? document.getElementById('exibir_indices').checked : false,
     exibir_umero: document.getElementById('exibir_umero') ? document.getElementById('exibir_umero').checked : false,
+    exibir_estatura: document.getElementById('exibir_estatura') ? document.getElementById('exibir_estatura').checked : true,
     exibir_uterinas: document.getElementById('exibir_uterinas') ? document.getElementById('exibir_uterinas').checked : false,
     exibir_ducto: document.getElementById('exibir_ducto') ? document.getElementById('exibir_ducto').checked : false,
     
