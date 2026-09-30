@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -335,6 +335,8 @@ function renderVesicula(){
     <div class="radio-opt ${isSit('habitual')}" onclick="setSit('habitual')"><input type="radio" name="sit_ves"><label class="radio-label"><span class="radio-mark"></span>normodistendida (habitual)</label></div>
     <div class="radio-opt ${isSit('hipo')}" onclick="setSit('hipo')"><input type="radio" name="sit_ves"><label class="radio-label"><span class="radio-mark"></span>hipodistendida</label></div>
     <div class="radio-opt ${isSit('hiper')}" onclick="setSit('hiper')"><input type="radio" name="sit_ves"><label class="radio-label"><span class="radio-mark"></span>hiperdistendida</label></div>
+    <div class="radio-opt ${isSit('vazia')}" onclick="setSit('vazia')"><input type="radio" name="sit_ves"><label class="radio-label"><span class="radio-mark"></span>vazia</label></div>
+    <div class="radio-opt ${isSit('vazia_preparo')}" onclick="setSit('vazia_preparo')"><input type="radio" name="sit_ves"><label class="radio-label"><span class="radio-mark"></span>vazia (preparo)</label></div>
   </div>
   <div class="block"><div class="block-title">Alterações</div>
     <div class="radio-opt ${isSit('escleratrofica')}" onclick="setSit('escleratrofica')"><input type="radio" name="sit_ves"><label class="radio-label"><span class="radio-mark"></span>escleroatrófica</label></div>
@@ -363,7 +365,7 @@ function renderVesicula(){
   <div class="block"><div class="block-title">Causa do espessamento reacional</div>
     ${CAUSAS_REAC.map(c=>`<div class="radio-opt ${e.espReacionalCausa===c?'selected':''}" onclick="setVal('vesicula','espReacionalCausa','${c}');updateLaudo()"><input type="radio" name="causa_reac"><label class="radio-label"><span class="radio-mark"></span>${c}</label></div>`).join('')}
   </div>`:''}
-  ${!['escleratrofica','parede_eco','adenomiose_focal','adenomiose_difusa','colesterolose','porcelana','esp_reacional','ausente'].includes(e.sit)?`
+  ${!['escleratrofica','parede_eco','adenomiose_focal','adenomiose_difusa','colesterolose','porcelana','esp_reacional','ausente','vazia','vazia_preparo'].includes(e.sit)?`
   <div class="block"><div class="block-title">Cálculos</div>
     <div class="radio-opt ${e.calculos==='nenhum'?'selected':''}" onclick="setVesCalc('nenhum')"><input type="radio" name="calc_ves"><label class="radio-label"><span class="radio-mark"></span>sem cálculos</label></div>
     <div class="radio-opt ${e.calculos==='unico'?'selected':''}" onclick="setVesCalc('unico')"><input type="radio" name="calc_ves"><label class="radio-label"><span class="radio-mark"></span>cálculo único</label></div>
@@ -642,9 +644,11 @@ function updateLaudo(){
   else if(vs.sit==='porcelana') { fraseVesicula='Vesícula biliar apresentando hiperrefringência difusa e linear da sua parede anterior, não sendo caracteriza o complexo "parede-eco-sombra", associado à extensa sombra acústica posterior, no qual limita a adequada avaliação do seu conteúdo e da parede posterior.'; opVesicula='Achados ultrassonográficos sugestivos de vesícula em porcelana.'; }
   else if(vs.sit==='esp_reacional') { const causaR=vs.espReacionalCausa||'_'; fraseVesicula=`A vesícula biliar apresenta espessamento das suas paredes, medindo ${vs.espParede||'_'} cm (VR ≤0,4 cm), conteúdo anecóide e homogêneo, achado que pode estar relacionado ao quadro de ${causaR}, na dependência de correlação com dados clínicos.`; opVesicula=`Espessamento parietal vesicular, podendo estar relacionado ao quadro ${causaR}.`; }
   else if(vs.sit==='ausente') { fraseVesicula='Vesícula biliar não caracterizada (status pós-operatório).'; opVesicula='Status pós-colecistectomia.'; }
+  else if(vs.sit==='vazia') { fraseVesicula='Vesícula biliar não caracterizada (vazia? Interposição gasosa?).'; }
+  else if(vs.sit==='vazia_preparo') { fraseVesicula='Vesícula biliar vazia ao presente exame, achado que pode estar relacionado a preparo inadequado. Sugere-se, a critério clínico, realização de exame ecográfico complementar com orientação adequada para melhor caracterização da vesícula biliar.'; }
 
   // Cálculos (para situações que admitem cálculos)
-  if(!['escleratrofica','parede_eco','adenomiose_focal','adenomiose_difusa','colesterolose','porcelana','esp_reacional','ausente'].includes(vs.sit) && bi.sit!=='colecistectomia'){
+  if(!['escleratrofica','parede_eco','adenomiose_focal','adenomiose_difusa','colesterolose','porcelana','esp_reacional','ausente','vazia','vazia_preparo'].includes(vs.sit) && bi.sit!=='colecistectomia'){
     const infStr=vs.infundibulo?', impactado no infundíbulo':'';
     if(vs.calculos==='nenhum'){ fraseCalc=''; opCalc=''; }
     else if(vs.calculos==='lama'){ fraseCalc=' Em seu interior destacam-se conteúdo ecogênico formando nível líquido-debris e móvel às mudanças de decúbito.'; opCalc='Lama biliar.'; }

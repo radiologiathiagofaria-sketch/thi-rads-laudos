@@ -134,6 +134,12 @@ textarea.achados:focus{outline:none;border-color:var(--blue);}
 .laudo-doc:focus { outline: none; }
 .toast-notification{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--white);padding:10px 18px;border-radius:8px;font-size:12.5px;font-weight:500;opacity:0;pointer-events:none;transition:all .25s;z-index:999;box-shadow:0 4px 14px rgba(0,0,0,.18);}
 .toast-notification.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.pendente{background:#fde68a;color:#92400e;border-radius:3px;padding:0 3px;font-weight:600;}
+.laudo-doc.sem-destaque .pendente{background:none;color:inherit;padding:0;font-weight:inherit;}
+.aviso-pend{margin-left:10px;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;border-radius:10px;padding:1px 9px;font-size:11px;font-weight:600;}
+.aviso-edicao{align-items:center;gap:10px;padding:7px 20px;background:#fff7ed;color:#9a3412;border-bottom:1px solid #fed7aa;font-size:11.5px;}
+body.dark .aviso-edicao{background:#3a2412;color:#fdba74;border-bottom-color:#6b3a1a;}
+body.dark .aviso-pend{background:#3a2f10;color:#fcd34d;border-color:#6b5a1a;}
 </style>
 </head>
 <body>
@@ -173,23 +179,32 @@ textarea.achados:focus{outline:none;border-color:var(--blue);}
   <div class="panel" id="main-panel"></div>
 
   <div class="laudo-panel">
-    <div class="laudo-header"><span class="laudo-header-title">Pré-visualização</span></div>
+    <div class="laudo-header"><span class="laudo-header-title">Pré-visualização</span><span id="aviso-pend" class="aviso-pend" style="display:none"></span></div>
+    <div id="aviso-edicao" class="aviso-edicao" style="display:none"><span>Laudo editado manualmente: novas seleções no formulário <b>não</b> são aplicadas aqui.</span><button class="btn" onclick="regenerarLaudo()">Regenerar a partir do formulário</button></div>
     <div class="laudo-body"><div class="laudo-doc" id="laudo-doc" contenteditable="true"></div></div>
   </div>
 </div>
 
 <script>
 const estadoInicial = () => ({
-  geral: { lado: 'direito', indicacao: '' },
-  derrame: { sit: 'ausente', intensidade: 'pequeno', corpoLivreMed: '', sinovia: '', doppler: '' },
-  anterior: { sit: 'normal', roturaMed: '', bursitePre: false, bursitePreConteudo: false, dopplerTend: '', dopplerBursite: '', naoAvaliado: false },
-  medial: { extrusao: false, osteofitose: false, degenerativas: false, rotura: false, cistoParam: false, cistoX: '', cistoY: '', naoAvaliado: false },
-  lateral: { extrusao: false, osteofitose: false, degenerativas: false, rotura: false, cistoParam: false, cistoX: '', cistoY: '', naoAvaliado: false,
-    trato_sit: '', trato_doppler: '', biceps_sit: '', popliteo_sit: '' },
+  geral: { lado: 'direito', indicacao: '', tecnica: 'Exame realizado com transdutor linear multifrequencial de alta resolução.', ventres: true },
+  derrame: { sit: 'ausente', intensidade: 'pequeno', liquido: 'anecoico', fluxoSinov: '', hemartrose: '', corpoLivreMed: '' },
+  anterior: { quad: 'habitual', patelar: 'habitual', osgood: false,
+    quadParcialFolheto: '', quadParcialDist: '', quadParcialExt: '', quadParcialPct: '',
+    quadTotalDist: '', quadTotalRetr: '', quadTotalConteudo: '',
+    patTendLocal: '', patParcialPct: '', patParcialLocal: '', patParcialColecao: '',
+    patTotalDist: '', patTotalGap: '', patTotalFase: '', patTotalSem: '',
+    bursitePre: '', bursaHemat: false, bursaCronDoppler: '',
+    dopplerTend: '', naoAvaliado: false },
+  medial: { extrusao: false, osteofitose: false, degenerativas: false, rotura: false, cistoParam: false, cistoX: '', cistoY: '', cistoZ: '', naoAvaliado: false },
+  lateral: { extrusao: false, osteofitose: false, degenerativas: false, rotura: false, cistoParam: false, cistoX: '', cistoY: '', cistoZ: '', naoAvaliado: false,
+    trato_sit: '', trato_doppler: '', biceps_sit: '', biceps_pct: '', biceps_cm: '', popliteo_sit: '' },
   posterior: { sit: 'ausente', bakerX: '', bakerY: '', bakerZ: '', lamina: false, tendinopatia: false, naoAvaliado: false,
     caracteristica: '', debris: false, extravasamento: false },
   pata: { sit: 'normal', bursite: false, dopplerTend: '', dopplerBursite: '', naoAvaliado: false },
   ligamentos: { medial: 'preservado', lateral: 'preservado', naoAvaliado: false,
+    medEdema: 'sem', medPct: '', medPorcao: '', medGap: '', medRetracao: '',
+    latEdema: 'sem', latPct: '', latPorcao: '', latGap: '', latRetracao: '',
     lateralExtra: { localizacao: '', desinsercao: false, retracao: false, hematoma: false } },
   bursascart: { usar: false,
     prepatelar: '', prepatelarConteudo: false,
@@ -242,7 +257,7 @@ function chk(sec, field, label){
   return `<div class="check-row ${sel}" onclick="toggleChk('${sec}','${field}')"><input type="checkbox" ${estado[sec][field]?'checked':''}><label class="check-label"><span class="check-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.8"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg></span>${label}</label></div>`;
 }
 function dimInput(sec, field, label, unit='cm'){
-  return `<div class="dim-row"><span class="dim-lbl">${label}</span><input class="dim-input" type="text" value="${estado[sec][field]}" placeholder="—" oninput="setTextVal('${sec}','${field}',this.value)"><span class="dim-unit">${unit}</span></div>`;
+  return `<div class="dim-row"><span class="dim-lbl">${label}</span><input class="dim-input" type="text" value="${escHtml(estado[sec][field])}" placeholder="—" oninput="setTextVal('${sec}','${field}',this.value)"><span class="dim-unit">${unit}</span></div>`;
 }
 
 // ── CONTROLES ──
@@ -261,8 +276,16 @@ function renderGeral(){
   </div>
   <div class="block"><div class="block-title">Indicação Clínica</div>
     <div style="padding:14px;">
-      <textarea class="achados" id="txt-indicacao" oninput="setTextVal('geral','indicacao',this.value)" placeholder="Digite a indicação clínica...">${e.indicacao}</textarea>
+      <textarea class="achados" id="txt-indicacao" oninput="setTextVal('geral','indicacao',this.value)" placeholder="Digite a indicação clínica...">${escHtml(e.indicacao)}</textarea>
     </div>
+  </div>
+  <div class="block"><div class="block-title">Técnica do Exame</div>
+    <div style="padding:14px;">
+      <textarea class="achados" oninput="setTextVal('geral','tecnica',this.value)" placeholder="Deixe em branco para omitir a seção...">${escHtml(e.tecnica)}</textarea>
+    </div>
+  </div>
+  <div class="block"><div class="block-title">Ventres Musculares — opcional</div>
+    ${chk('geral','ventres','Incluir frase: ventres musculares tróficos com arquitetura fibrilar preservada')}
   </div>
   `;
 }
@@ -270,6 +293,7 @@ function renderGeral(){
 // ── DERRAME ARTICULAR ──
 function renderDerrame(){
   const e = estado.derrame;
+  const comInt = (e.sit==='derrame'||e.sit==='derrame_sinovite'||e.sit==='hemartrose');
   return `
   <div class="sec-title">Derrame Articular</div>
   <div class="block"><div class="block-title">Situação</div>
@@ -277,30 +301,36 @@ function renderDerrame(){
     ${radioVal('derrame','sit','pequena_distensao','Pequena distensão líquida','sit_der')}
     ${radioVal('derrame','sit','derrame','Derrame articular','sit_der')}
     ${radioVal('derrame','sit','derrame_sinovite','Derrame articular com sinovite','sit_der')}
+    ${radioVal('derrame','sit','hemartrose','Derrame com hemartrose','sit_der')}
     ${radioVal('derrame','sit','corpo_livre','Derrame com corpo livre','sit_der')}
   </div>
-  ${(e.sit==='derrame'||e.sit==='derrame_sinovite') ? `
+  ${comInt ? `
   <div class="block"><div class="block-title">Intensidade</div>
     ${radioVal('derrame','intensidade','pequeno','Pequeno','int_der')}
     ${radioVal('derrame','intensidade','moderado','Moderado','int_der')}
-    ${radioVal('derrame','intensidade','volumoso','Volumoso','int_der')}
+    ${radioVal('derrame','intensidade','volumoso','Acentuado','int_der')}
+  </div>` : ''}
+  ${(e.sit==='derrame'||e.sit==='derrame_sinovite') ? `
+  <div class="block"><div class="block-title">Característica do líquido</div>
+    ${radioVal('derrame','liquido','anecoico','Anecoico','liq_der')}
+    ${radioVal('derrame','liquido','heterogeneo','Heterogêneo','liq_der')}
+    ${radioVal('derrame','liquido','complexo','Espesso / complexo','liq_der')}
+  </div>` : ''}
+  ${e.sit==='derrame_sinovite' ? `
+  <div class="block"><div class="block-title">Fluxo ao Doppler (espessamento sinovial)</div>
+    ${radioVal('derrame','fluxoSinov','com','Com fluxo','fluxo_sin')}
+    ${radioVal('derrame','fluxoSinov','sem','Sem fluxo','fluxo_sin')}
+  </div>` : ''}
+  ${e.sit==='hemartrose' ? `
+  <div class="block"><div class="block-title">Aspecto do conteúdo</div>
+    ${radioVal('derrame','hemartrose','nivel','Nível líquido-líquido','hem_der')}
+    ${radioVal('derrame','hemartrose','debris','Debris ecogênicos organizados','hem_der')}
+    ${radioVal('derrame','hemartrose','ambos','Nível líquido-líquido e debris ecogênicos organizados','hem_der')}
   </div>` : ''}
   ${e.sit==='corpo_livre' ? `
   <div class="block"><div class="block-title">Medida do Corpo Livre</div><div class="dim-rows">
     ${dimInput('derrame','corpoLivreMed','Medida')}
   </div></div>` : ''}
-  <div class="block"><div class="block-title">Sinóvia — opcional (independente da situação acima)</div>
-    ${radioVal('derrame','sinovia','','Não avaliar','sinovia')}
-    ${radioVal('derrame','sinovia','sem_hipertrofia','Sem hipertrofia sinovial','sinovia')}
-    ${radioVal('derrame','sinovia','hipertrofia','Hipertrofia sinovial','sinovia')}
-  </div>
-  ${e.sinovia ? `
-  <div class="block"><div class="block-title">Doppler (sinóvia) — opcional</div>
-    ${radioVal('derrame','doppler','','Não utilizar Doppler','dop_der')}
-    ${radioVal('derrame','doppler','nao_realizado','Doppler não realizado','dop_der')}
-    ${radioVal('derrame','doppler','sem_aumento','Sem aumento de vascularização','dop_der')}
-    ${radioVal('derrame','doppler','com_aumento','Aumento de vascularização','dop_der')}
-  </div>` : ''}
   `;
 }
 
@@ -309,40 +339,85 @@ function renderAnterior(){
   const e = estado.anterior;
   return `
   <div class="sec-title">Compartimento Anterior</div>
-  <div class="block"><div class="block-title">Situação</div>
-    ${radioVal('anterior','sit','normal','Tendão quadríceps e ligamento patelar habituais','sit_ant')}
-    ${radioVal('anterior','sit','entesopatia_quad','Entesopatia do quadríceps','sit_ant')}
-    ${radioVal('anterior','sit','entesopatia_insercional','Entesopatia insercional do quadríceps','sit_ant')}
-    ${radioVal('anterior','sit','tendinopatia_patelar','Tendinopatia do patelar','sit_ant')}
-    ${radioVal('anterior','sit','tendinopatia_fissuras','Tendinopatia do patelar com fissuras','sit_ant')}
-    ${radioVal('anterior','sit','rotura_quad','Rotura completa do quadríceps','sit_ant')}
-    ${radioVal('anterior','sit','cicatricial_patelar','Aspecto cicatricial do patelar (cirurgia pregressa)','sit_ant')}
-    ${radioVal('anterior','sit','osgood','Osgood-Schlatter','sit_ant')}
-    ${radioVal('anterior','sit','posop_patelar','Alteração pós-operatória do patelar','sit_ant')}
-    ${radioVal('anterior','sit','posop_quad','Alteração pós-operatória do quadríceps','sit_ant')}
+  <div class="block"><div class="block-title">Tendão do Quadríceps</div>
+    ${radioVal('anterior','quad','habitual','Tendão quadríceps habitual','quad_sit')}
+    ${radioVal('anterior','quad','entesopatia','Entesopatia insercional do quadríceps','quad_sit')}
+    ${radioVal('anterior','quad','rotura_parcial','Rotura parcial do quadríceps','quad_sit')}
+    ${radioVal('anterior','quad','rotura_total','Rotura completa do quadríceps','quad_sit')}
+    ${radioVal('anterior','quad','posop','Alteração pós-operatória do quadríceps','quad_sit')}
   </div>
-  ${e.sit==='rotura_quad' ? `
-  <div class="block"><div class="block-title">Retração do Coto Tendíneo</div><div class="dim-rows">
-    ${dimInput('anterior','roturaMed','Distância do polo superior')}
-  </div></div>` : ''}
-  <div class="block"><div class="block-title">Bursa Pré-Patelar</div>
-    ${chk('anterior','bursitePre','Bursite pré-patelar')}
-    ${e.bursitePre ? chk('anterior','bursitePreConteudo','Conteúdo/debris no interior da bursa') : ''}
+  ${e.quad==='rotura_parcial' ? `
+  <div class="block"><div class="block-title">Rotura Parcial do Quadríceps</div>
+    ${radioVal('anterior','quadParcialFolheto','profundo','Folheto profundo','quad_fol')}
+    ${radioVal('anterior','quadParcialFolheto','medio','Folheto médio','quad_fol')}
+    ${radioVal('anterior','quadParcialFolheto','superficial','Folheto superficial','quad_fol')}
+    <div class="dim-rows">
+      ${dimInput('anterior','quadParcialDist','Distância do polo superior')}
+      ${dimInput('anterior','quadParcialExt','Extensão longitudinal')}
+      ${dimInput('anterior','quadParcialPct','Espessura acometida','%')}
+    </div></div>` : ''}
+  ${e.quad==='rotura_total' ? `
+  <div class="block"><div class="block-title">Rotura Completa do Quadríceps</div><div class="dim-rows">
+    ${dimInput('anterior','quadTotalDist','Distância do polo superior')}
+    ${dimInput('anterior','quadTotalRetr','Retração do coto proximal')}
   </div>
-  ${(e.sit==='tendinopatia_patelar'||e.sit==='tendinopatia_fissuras') ? `
+    ${radioVal('anterior','quadTotalConteudo','heterogeneo','Espaço entre os cotos: conteúdo heterogêneo','quad_cont')}
+    ${radioVal('anterior','quadTotalConteudo','hipoecoico','Espaço entre os cotos: conteúdo hipoecoico','quad_cont')}
+  </div>` : ''}
+  <div class="block"><div class="block-title">Tendão Patelar</div>
+    ${radioVal('anterior','patelar','habitual','Tendão patelar habitual','pat_sit')}
+    ${radioVal('anterior','patelar','tendinopatia','Tendinopatia do patelar','pat_sit')}
+    ${radioVal('anterior','patelar','tendinopatia_fissuras','Tendinopatia do patelar com fissuras','pat_sit')}
+    ${radioVal('anterior','patelar','rotura_parcial','Rotura parcial do patelar','pat_sit')}
+    ${radioVal('anterior','patelar','rotura_total','Rotura completa do patelar','pat_sit')}
+    ${radioVal('anterior','patelar','cicatricial','Aspecto cicatricial do patelar (cirurgia pregressa)','pat_sit')}
+    ${radioVal('anterior','patelar','posop','Alteração pós-operatória do patelar','pat_sit')}
+  </div>
+  ${e.patelar==='tendinopatia' ? `
+  <div class="block"><div class="block-title">Localização do Espessamento</div>
+    ${radioVal('anterior','patTendLocal','proximal','Focal — terço proximal','pat_loc')}
+    ${radioVal('anterior','patTendLocal','medio','Focal — terço médio','pat_loc')}
+    ${radioVal('anterior','patTendLocal','distal','Focal — terço distal','pat_loc')}
+    ${radioVal('anterior','patTendLocal','difuso','Difuso','pat_loc')}
+  </div>` : ''}
+  ${e.patelar==='rotura_parcial' ? `
+  <div class="block"><div class="block-title">Rotura Parcial do Patelar</div>
+    ${radioVal('anterior','patParcialLocal','origem','Junto à origem (porção proximal)','pat_parc_loc')}
+    ${radioVal('anterior','patParcialLocal','insercao','Junto à inserção (porção distal)','pat_parc_loc')}
+    <div class="dim-rows">${dimInput('anterior','patParcialPct','Espessura acometida','%')}</div>
+    ${radioVal('anterior','patParcialColecao','','Sem líquido/hematoma associado','pat_parc_col')}
+    ${radioVal('anterior','patParcialColecao','liquido','Pequena quantidade de líquido adjacente','pat_parc_col')}
+    ${radioVal('anterior','patParcialColecao','hematoma','Pequena quantidade de hematoma adjacente','pat_parc_col')}
+  </div>` : ''}
+  ${e.patelar==='rotura_total' ? `
+  <div class="block"><div class="block-title">Rotura Completa do Patelar</div><div class="dim-rows">
+    ${dimInput('anterior','patTotalDist','Distância do polo inferior da patela')}
+    ${dimInput('anterior','patTotalGap','Afastamento entre os cotos')}
+  </div>
+    ${radioVal('anterior','patTotalFase','aguda','Hematoma em fase aguda','pat_fase')}
+    ${radioVal('anterior','patTotalFase','subaguda','Hematoma em fase subaguda','pat_fase')}
+    ${radioVal('anterior','patTotalSem','organizacao','Sem sinais de organização','pat_sem')}
+    ${radioVal('anterior','patTotalSem','calcificacao','Sem sinais de calcificação','pat_sem')}
+  </div>` : ''}
+  ${(e.patelar==='tendinopatia'||e.patelar==='tendinopatia_fissuras') ? `
   <div class="block"><div class="block-title">Doppler (tendinopatia) — opcional</div>
     ${radioVal('anterior','dopplerTend','','Não utilizar Doppler','dop_ant_tend')}
     ${radioVal('anterior','dopplerTend','nao_realizado','Doppler não realizado','dop_ant_tend')}
     ${radioVal('anterior','dopplerTend','sem_aumento','Sem aumento de vascularização','dop_ant_tend')}
     ${radioVal('anterior','dopplerTend','com_aumento','Aumento de vascularização','dop_ant_tend')}
   </div>` : ''}
-  ${e.bursitePre ? `
-  <div class="block"><div class="block-title">Doppler (bursite) — opcional</div>
-    ${radioVal('anterior','dopplerBursite','','Não utilizar Doppler','dop_ant_burs')}
-    ${radioVal('anterior','dopplerBursite','nao_realizado','Doppler não realizado','dop_ant_burs')}
-    ${radioVal('anterior','dopplerBursite','sem_aumento','Sem aumento de vascularização','dop_ant_burs')}
-    ${radioVal('anterior','dopplerBursite','com_aumento','Aumento de vascularização','dop_ant_burs')}
-  </div>` : ''}
+  <div class="block"><div class="block-title">Osgood-Schlatter</div>
+    ${chk('anterior','osgood','Osgood-Schlatter')}
+  </div>
+  <div class="block"><div class="block-title">Bursa Pré-Patelar</div>
+    ${radioVal('anterior','bursitePre','','Sem bursite','bur_pre')}
+    ${radioVal('anterior','bursitePre','aguda','Bursite pré-patelar aguda','bur_pre')}
+    ${radioVal('anterior','bursitePre','cronica','Bursite pré-patelar crônica','bur_pre')}
+    ${e.bursitePre==='aguda' ? chk('anterior','bursaHemat','Conteúdo hipoecoico heterogêneo, sugestivo de hemático (trauma agudo)') : ''}
+    ${e.bursitePre==='cronica' ? `
+    ${radioVal('anterior','bursaCronDoppler','discreta','Doppler de energia: vascularização discreta','bur_dop')}
+    ${radioVal('anterior','bursaCronDoppler','ausente','Doppler de energia: vascularização ausente','bur_dop')}` : ''}
+  </div>
   <div class="block"><div class="block-title">Avaliação — opcional</div>
     ${chk('anterior','naoAvaliado','Estrutura não avaliada neste exame')}
   </div>
@@ -366,6 +441,7 @@ function renderCompartimento(lado){
   <div class="block"><div class="block-title">Medidas do Cisto Parameniscal</div><div class="dim-rows">
     ${dimInput(lado,'cistoX','Med 1')}
     ${dimInput(lado,'cistoY','Med 2')}
+    ${dimInput(lado,'cistoZ','Med 3')}
   </div></div>` : ''}
   ${lado==='lateral' ? `
   <div class="block"><div class="block-title">Trato Iliotibial — opcional</div>
@@ -393,6 +469,8 @@ function renderCompartimento(lado){
     ${radioVal('lateral','biceps_sit','rotura_parcial','Rotura parcial','biceps_sit')}
     ${radioVal('lateral','biceps_sit','rotura_completa','Rotura completa','biceps_sit')}
   </div>
+  ${e.biceps_sit==='rotura_parcial' ? `<div class="block"><div class="block-title">Extensão da rotura parcial do bíceps femoral</div><div class="dim-rows">${dimInput('lateral','biceps_pct','Espessura acometida','%')}</div></div>` : ''}
+  ${e.biceps_sit==='rotura_completa' ? `<div class="block"><div class="block-title">Retração do coto do bíceps femoral</div><div class="dim-rows">${dimInput('lateral','biceps_cm','Afastamento','cm')}</div></div>` : ''}
   <div class="block"><div class="block-title">Tendão Poplíteo — opcional</div>
     ${radioVal('lateral','popliteo_sit','','Não avaliar','popliteo_sit')}
     ${radioVal('lateral','popliteo_sit','habitual','Aspecto habitual','popliteo_sit')}
@@ -417,30 +495,16 @@ function renderPosterior(){
     ${radioVal('posterior','sit','ausente','Ausência de cisto poplíteo','sit_post')}
     ${radioVal('posterior','sit','baker','Cisto de Baker','sit_post')}
     ${radioVal('posterior','sit','baker_sinovite','Cisto de Baker com sinovite','sit_post')}
+    ${radioVal('posterior','sit','baker_complexo','Cisto de Baker complexo','sit_post')}
     ${radioVal('posterior','sit','rotura_total','Rotura total do cisto','sit_post')}
     ${radioVal('posterior','sit','rotura_parcial','Rotura parcial do cisto','sit_post')}
   </div>
-  ${(e.sit==='baker'||e.sit==='baker_sinovite') ? `
-  <div class="block"><div class="block-title">Medidas do Cisto</div><div class="dim-rows">
+  ${(e.sit==='baker'||e.sit==='baker_sinovite'||e.sit==='baker_complexo') ? `
+  <div class="block"><div class="block-title">Medidas do Cisto — preencha 1, 2 ou 3</div><div class="dim-rows">
     ${dimInput('posterior','bakerX','Med 1')}
     ${dimInput('posterior','bakerY','Med 2')}
     ${dimInput('posterior','bakerZ','Med 3')}
   </div></div>` : ''}
-  <div class="block"><div class="block-title">Achados Adicionais</div>
-    ${chk('posterior','lamina','Lâmina líquida na bursa (gastrocnêmio/semimembranoso)')}
-    ${chk('posterior','tendinopatia','Tendinopatia do gastrocnêmio/semimembranoso')}
-  </div>
-  ${(e.sit==='baker'||e.sit==='baker_sinovite') ? `
-  <div class="block"><div class="block-title">Caracterização do Cisto — opcional</div>
-    ${radioVal('posterior','caracteristica','','Não caracterizar','baker_carac')}
-    ${radioVal('posterior','caracteristica','simples','Simples','baker_carac')}
-    ${radioVal('posterior','caracteristica','septado','Septado','baker_carac')}
-    ${radioVal('posterior','caracteristica','lobulado','Lobulado','baker_carac')}
-    ${chk('posterior','debris','Com debris/conteúdo')}
-  </div>` : ''}
-  <div class="block"><div class="block-title">Sinais de Rotura/Extravasamento — opcional</div>
-    ${chk('posterior','extravasamento','Sinais sugestivos de rotura com extravasamento para os planos mioadiposos adjacentes')}
-  </div>
   <div class="block"><div class="block-title">Avaliação — opcional</div>
     ${chk('posterior','naoAvaliado','Estrutura não avaliada neste exame')}
   </div>
@@ -482,33 +546,49 @@ function renderPata(){
 // ── LIGAMENTOS COLATERAIS ──
 function renderLigamentos(){
   const e = estado.ligamentos;
-  const le = e.lateralExtra;
+  const det = (lado, tipo, p, nome) => {
+    if(tipo==='estiramento') return `
+  <div class="block"><div class="block-title">Estiramento do LC ${nome}</div>
+    ${radioVal('ligamentos',p+'Edema','sem','Sem edema adjacente','lig_'+p+'_ed')}
+    ${radioVal('ligamentos',p+'Edema','com','Com edema adjacente','lig_'+p+'_ed')}
+  </div>`;
+    if(tipo==='lesao_parcial') return `
+  <div class="block"><div class="block-title">Rotura Parcial do LC ${nome}</div>
+    ${radioVal('ligamentos',p+'Porcao','proximal','Porção proximal','lig_'+p+'_por')}
+    ${radioVal('ligamentos',p+'Porcao','media','Porção média','lig_'+p+'_por')}
+    ${radioVal('ligamentos',p+'Porcao','distal','Porção distal','lig_'+p+'_por')}
+    <div class="dim-rows">${dimInput('ligamentos',p+'Pct','Espessura acometida','%')}</div>
+  </div>`;
+    if(tipo==='rotura_completa') return `
+  <div class="block"><div class="block-title">Rotura Completa do LC ${nome}</div>
+    ${radioVal('ligamentos',p+'Porcao','proximal','Porção proximal','lig_'+p+'_por')}
+    ${radioVal('ligamentos',p+'Porcao','media','Porção média','lig_'+p+'_por')}
+    ${radioVal('ligamentos',p+'Porcao','distal','Porção distal','lig_'+p+'_por')}
+    <div class="dim-rows">${dimInput('ligamentos',p+'Gap','Gap entre os cotos')}</div>
+    ${radioVal('ligamentos',p+'Retracao','discreta','Retração discreta','lig_'+p+'_ret')}
+    ${radioVal('ligamentos',p+'Retracao','moderada','Retração moderada','lig_'+p+'_ret')}
+    ${radioVal('ligamentos',p+'Retracao','importante','Retração importante','lig_'+p+'_ret')}
+  </div>`;
+    return '';
+  };
   return `
   <div class="sec-title">Ligamentos Colaterais</div>
   <div class="block"><div class="block-title">Ligamento Colateral Medial</div>
     ${radioVal('ligamentos','medial','preservado','Preservado','lig_med')}
-    ${radioVal('ligamentos','medial','lesao_parcial','Lesão parcial','lig_med')}
+    ${radioVal('ligamentos','medial','estiramento','Estiramento','lig_med')}
+    ${radioVal('ligamentos','medial','lesao_parcial','Rotura parcial','lig_med')}
     ${radioVal('ligamentos','medial','rotura_completa','Rotura completa','lig_med')}
     ${radioVal('ligamentos','medial','cicatricial','Espessamento cicatricial','lig_med')}
   </div>
+  ${det('medial', e.medial, 'med', 'Medial')}
   <div class="block"><div class="block-title">Ligamento Colateral Lateral</div>
     ${radioVal('ligamentos','lateral','preservado','Preservado','lig_lat')}
-    ${radioVal('ligamentos','lateral','lesao_parcial','Lesão parcial','lig_lat')}
+    ${radioVal('ligamentos','lateral','estiramento','Estiramento','lig_lat')}
+    ${radioVal('ligamentos','lateral','lesao_parcial','Rotura parcial','lig_lat')}
     ${radioVal('ligamentos','lateral','rotura_completa','Rotura completa','lig_lat')}
     ${radioVal('ligamentos','lateral','cicatricial','Espessamento cicatricial','lig_lat')}
   </div>
-  ${e.lateral==='rotura_completa' ? `
-  <div class="block"><div class="block-title">Caracterização Adicional LCL — opcional</div>
-    <div style="padding:4px 0;">
-    ${radioVal2Nested('lateralExtra','localizacao','','Não especificar','lcl_loc')}
-    ${radioVal2Nested('lateralExtra','localizacao','proximal','Proximal/femoral','lcl_loc')}
-    ${radioVal2Nested('lateralExtra','localizacao','media','Porção média','lcl_loc')}
-    ${radioVal2Nested('lateralExtra','localizacao','distal','Distal/fibular','lcl_loc')}
-    </div>
-    ${chkNested('lateralExtra','desinsercao','Desinserção')}
-    ${chkNested('lateralExtra','retracao','Retração')}
-    ${chkNested('lateralExtra','hematoma','Hematoma adjacente')}
-  </div>` : ''}
+  ${det('lateral', e.lateral, 'lat', 'Lateral')}
   <div class="block"><div class="block-title">Avaliação — opcional</div>
     ${chk('ligamentos','naoAvaliado','Estrutura não avaliada neste exame')}
   </div>
@@ -536,6 +616,7 @@ function renderBursasCartilagem(){
   </div>
   ${e.usar ? `
   <div class="block"><div class="block-title">Bursa Pré-Patelar</div>
+    ${estado.anterior.bursitePre ? '<div style="padding:10px 14px;font-size:12px;color:var(--text-3)">Bursite pré-patelar já registrada em "Compart. Anterior". As opções abaixo são ignoradas no laudo para evitar duplicidade.</div>' : ''}
     ${radioVal('bursascart','prepatelar','','Não avaliar','bc_pre')}
     ${radioVal('bursascart','prepatelar','sem_distensao','Sem distensão','bc_pre')}
     ${radioVal('bursascart','prepatelar','distensao','Distensão líquida','bc_pre')}
@@ -581,19 +662,19 @@ function renderFossa(){
   </div>
   ${e.usar ? `
   <div class="block"><div class="block-title">Artéria Poplítea</div><div style="padding:10px 14px;">
-    <textarea class="achados" style="height:50px" oninput="setTextVal('fossa','arteria',this.value)" placeholder="Descreva o achado...">${e.arteria}</textarea>
+    <textarea class="achados" style="height:50px" oninput="setTextVal('fossa','arteria',this.value)" placeholder="Descreva o achado...">${escHtml(e.arteria)}</textarea>
   </div></div>
   <div class="block"><div class="block-title">Veia Poplítea</div><div style="padding:10px 14px;">
-    <textarea class="achados" style="height:50px" oninput="setTextVal('fossa','veia',this.value)" placeholder="Descreva o achado...">${e.veia}</textarea>
+    <textarea class="achados" style="height:50px" oninput="setTextVal('fossa','veia',this.value)" placeholder="Descreva o achado...">${escHtml(e.veia)}</textarea>
   </div></div>
   <div class="block"><div class="block-title">Nervo Tibial</div><div style="padding:10px 14px;">
-    <textarea class="achados" style="height:50px" oninput="setTextVal('fossa','nervoTibial',this.value)" placeholder="Descreva o achado...">${e.nervoTibial}</textarea>
+    <textarea class="achados" style="height:50px" oninput="setTextVal('fossa','nervoTibial',this.value)" placeholder="Descreva o achado...">${escHtml(e.nervoTibial)}</textarea>
   </div></div>
   <div class="block"><div class="block-title">Nervo Fibular Comum</div><div style="padding:10px 14px;">
-    <textarea class="achados" style="height:50px" oninput="setTextVal('fossa','nervoFibular',this.value)" placeholder="Descreva o achado...">${e.nervoFibular}</textarea>
+    <textarea class="achados" style="height:50px" oninput="setTextVal('fossa','nervoFibular',this.value)" placeholder="Descreva o achado...">${escHtml(e.nervoFibular)}</textarea>
   </div></div>
   <div class="block"><div class="block-title">Massas/Coleções na Fossa Poplítea</div><div style="padding:10px 14px;">
-    <textarea class="achados" style="height:50px" oninput="setTextVal('fossa','massas',this.value)" placeholder="Descreva o achado...">${e.massas}</textarea>
+    <textarea class="achados" style="height:50px" oninput="setTextVal('fossa','massas',this.value)" placeholder="Descreva o achado...">${escHtml(e.massas)}</textarea>
   </div></div>
   ` : ''}
   `;
@@ -615,7 +696,7 @@ function renderComparacao(){
     ${radioVal('comparacao','opcao','especifica','Comparação específica de uma estrutura','comp_op')}
   </div>
   <div class="block"><div class="block-title">Detalhe (opcional)</div><div style="padding:10px 14px;">
-    <textarea class="achados" style="height:60px" oninput="setTextVal('comparacao','detalhe',this.value)" placeholder="Detalhe a comparação, se aplicável...">${e.detalhe}</textarea>
+    <textarea class="achados" style="height:60px" oninput="setTextVal('comparacao','detalhe',this.value)" placeholder="Detalhe a comparação, se aplicável...">${escHtml(e.detalhe)}</textarea>
   </div></div>
   ` : ''}
   `;
@@ -659,7 +740,7 @@ function renderCorpos(){
     ${dimInput('corpos','medida','Medida')}
   </div></div>
   <div class="block"><div class="block-title">Localização</div><div style="padding:10px 14px;">
-    <textarea class="achados" style="height:50px" oninput="setTextVal('corpos','localizacao',this.value)" placeholder="Localização...">${e.localizacao}</textarea>
+    <textarea class="achados" style="height:50px" oninput="setTextVal('corpos','localizacao',this.value)" placeholder="Localização...">${escHtml(e.localizacao)}</textarea>
   </div></div>
   <div class="block"><div class="block-title">Mobilidade</div>
     ${radioVal('corpos','movel','movel','Móvel','corp_mov')}
@@ -682,10 +763,10 @@ function renderMassas(){
   </div>
   ${e.usar ? `
   <div class="block"><div class="block-title">Localização</div><div style="padding:10px 14px;">
-    <textarea class="achados" style="height:50px" oninput="setTextVal('massas','localizacao',this.value)" placeholder="Localização...">${e.localizacao}</textarea>
+    <textarea class="achados" style="height:50px" oninput="setTextVal('massas','localizacao',this.value)" placeholder="Localização...">${escHtml(e.localizacao)}</textarea>
   </div></div>
   <div class="block"><div class="block-title">Dimensões</div><div style="padding:10px 14px;">
-    <textarea class="achados" style="height:40px" oninput="setTextVal('massas','dimensoes',this.value)" placeholder="Dimensões...">${e.dimensoes}</textarea>
+    <textarea class="achados" style="height:40px" oninput="setTextVal('massas','dimensoes',this.value)" placeholder="Dimensões...">${escHtml(e.dimensoes)}</textarea>
   </div></div>
   <div class="block"><div class="block-title">Tipo</div>
     ${radioVal('massas','tipo','solida','Sólida','massa_tipo')}
@@ -699,10 +780,10 @@ function renderMassas(){
     ${radioVal('massas','doppler','com_aumento','Vascularização ao Doppler','massa_dop')}
   </div>
   <div class="block"><div class="block-title">Conteúdo</div><div style="padding:10px 14px;">
-    <textarea class="achados" style="height:40px" oninput="setTextVal('massas','conteudo',this.value)" placeholder="Conteúdo...">${e.conteudo}</textarea>
+    <textarea class="achados" style="height:40px" oninput="setTextVal('massas','conteudo',this.value)" placeholder="Conteúdo...">${escHtml(e.conteudo)}</textarea>
   </div></div>
   <div class="block"><div class="block-title">Relação com Estruturas Adjacentes</div><div style="padding:10px 14px;">
-    <textarea class="achados" style="height:40px" oninput="setTextVal('massas','relacao',this.value)" placeholder="Relação com estruturas adjacentes...">${e.relacao}</textarea>
+    <textarea class="achados" style="height:40px" oninput="setTextVal('massas','relacao',this.value)" placeholder="Relação com estruturas adjacentes...">${escHtml(e.relacao)}</textarea>
   </div></div>
   ` : ''}
   `;
@@ -714,7 +795,7 @@ function renderAdicionais(){
   <div class="sec-title">Achados Adicionais</div>
   <div class="block"><div class="block-title">Texto Livre</div>
     <div style="padding:14px;">
-      <textarea class="achados" id="txt-adicionais" oninput="setTextVal('adicionais','texto',this.value)" placeholder="Digite aqui...">${estado.adicionais.texto}</textarea>
+      <textarea class="achados" id="txt-adicionais" oninput="setTextVal('adicionais','texto',this.value)" placeholder="Digite aqui...">${escHtml(estado.adicionais.texto)}</textarea>
     </div>
   </div>
   <div class="block"><div class="block-title">Recomendação — opcional</div>
@@ -736,9 +817,14 @@ function toggleArrChk(sec, field, val){
 
 // ── HELPERS DE TEXTO ──
 function cap(s){ return s ? s.charAt(0).toUpperCase()+s.slice(1) : s; }
+function escHtml(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function escTxt(s){ return escHtml(s).replace(/\r?\n/g,'<br>'); }
+// medida: valor escapado, ou marcador visível de pendência quando vazio
+function med(v){ return (v!=null && String(v).trim()) ? escHtml(String(v).trim()) : '<span class="pendente">??</span>'; }
 
 // ── GERADOR DE LAUDO ──
 function updateLaudo(){
+  if(laudoEditado){ salvarRascunho(); atualizarAvisos(); return; }
   const eG = estado.geral;
   const eD = estado.derrame;
   const eA = estado.anterior;
@@ -773,124 +859,167 @@ function updateLaudo(){
     return `${semPontoFinal}, ${clause}.`;
   };
 
+  const pend = '<span class="pendente">??</span>';
+  const escolha = (v, mapa) => (v && mapa[v]) ? mapa[v] : pend;
+  const fmtMed = (vals) => {
+    const v = vals.map(x=>String(x==null?'':x).trim()).filter(Boolean).map(escHtml);
+    return v.length ? v.join(' x ') : pend;
+  };
+  const degBoth = eM.degenerativas && eL.degenerativas && !eM.naoAvaliado && !eL.naoAvaliado;
+
+  const naoAval = [];
+  if(eA.naoAvaliado) naoAval.push('compartimento anterior');
+  if(eM.naoAvaliado) naoAval.push('compartimento medial');
+  if(eL.naoAvaliado) naoAval.push('compartimento lateral');
+  if(eP.naoAvaliado) naoAval.push('compartimento posterior / fossa poplítea');
+  if(ePt.naoAvaliado) naoAval.push('pata anserina');
+  if(eLig.naoAvaliado) naoAval.push('ligamentos colaterais');
+
   // linhas/opinioes são segmentadas por prioridade (req. 17): principais > associados > incidentais
   let linhas = [];
+  const L = {};
   let opinioesPrincipais = [];
   let opinioesAssociados = [];
   let opinioesIncidentais = [];
 
-  // BURSITE PRÉ-PATELAR (entra logo após "análise", primeira linha)
-  if(eA.bursitePre){
-    let fraseBursPre = integraDoppler('Distensão líquida da bursa pré-patelar com espessamento sinovial, indicando bursite.', eA.dopplerBursite, 'periférica');
-    if(eA.bursitePreConteudo) fraseBursPre += ' Observa-se conteúdo/debris em seu interior.';
-    linhas.push(fraseBursPre);
-    opinioesAssociados.push('Bursite pré-patelar.');
+  // BURSITE PRÉ-PATELAR
+  linhas = (L.bursitePre = []);
+  if(eA.bursitePre==='aguda'){
+    const conteudoBursa = eA.bursaHemat ? 'hipoecoico heterogêneo, sugestivo de conteúdo hemático, em contexto de trauma agudo' : 'predominantemente anecoico';
+    linhas.push(`Bursa pré-patelar distendida por conteúdo ${conteudoBursa}, sem septações grosseiras. Parede da bursa com espessamento discreto e regular. Nota-se edema hiperecogênico do tecido celular subcutâneo adjacente. Ao Doppler, evidencia-se hipervascularização da parede da bursa e dos tecidos moles periféricos, compatível com processo inflamatório em atividade.`);
+    opinioesAssociados.push('Bursite pré-patelar aguda.');
+  } else if(eA.bursitePre==='cronica'){
+    const dopBursa = escolha(eA.bursaCronDoppler, {discreta:'vascularização discreta', ausente:'ausência de vascularização'});
+    linhas.push(`Bursa pré-patelar distendida por conteúdo hipoecoico heterogêneo, com debris/septações internas. Parede da bursa espessada de forma irregular e proeminente, achado mais característico do processo crônico. Associa-se discreto edema hiperecogênico do tecido celular subcutâneo adjacente. Ao Doppler de energia, nota-se ${dopBursa} na parede da bursa, podendo corresponder a processo crônico.`);
+    opinioesAssociados.push('Bursite pré-patelar crônica.');
   }
 
   // DERRAME
+  linhas = (L.derrame = []);
+  const derrIntF = {pequeno:'Pequena', moderado:'Moderada', volumoso:'Acentuada'};
+  const derrIntM = {pequeno:'Pequeno', moderado:'Moderado', volumoso:'Acentuado'};
+  const derrLiq = escolha(eD.liquido, {
+    anecoico:'anecoico',
+    heterogeneo:'heterogêneo, com ecos internos de baixa amplitude difusamente distribuídos, sem septações grosseiras',
+    complexo:'espesso e heterogêneo, contendo debris ecogênicos em suspensão e presença de septações finas de permeio'});
   if(eD.sit==='ausente'){
     linhas.push('Ausência de derrame articular.');
   } else if(eD.sit==='pequena_distensao'){
     linhas.push('Pequena quantidade de líquido articular, sem derrame em volume significativo.');
     // Mantém impressão igual do exame normal
   } else if(eD.sit==='derrame'){
-    linhas.push(`${cap(eD.intensidade)} derrame articular.`);
-    opinioesPrincipais.push(`${cap(eD.intensidade)} derrame articular.`);
+    linhas.push(`${derrIntF[eD.intensidade]} distensão do recesso suprapatelar por conteúdo líquido ${derrLiq}, sem sinal de fluxo ao Doppler colorido, compatível com derrame articular. Não se observa espessamento sinovial hipoecoico associado.`);
+    opinioesPrincipais.push(`${derrIntM[eD.intensidade]} derrame articular.`);
   } else if(eD.sit==='derrame_sinovite'){
-    linhas.push(`${cap(eD.intensidade)} derrame articular com sinais de sinovite.`);
-    opinioesPrincipais.push(`${cap(eD.intensidade)} derrame articular com sinais de sinovite.`);
+    linhas.push(`${derrIntF[eD.intensidade]} distensão do recesso suprapatelar por conteúdo líquido ${derrLiq}, compatível com derrame articular. Nota-se espessamento sinovial associado, ${escolha(eD.fluxoSinov,{com:'com',sem:'sem'})} fluxo ao estudo Doppler.`);
+    opinioesPrincipais.push(`${derrIntM[eD.intensidade]} derrame articular com sinais de sinovite.`);
+  } else if(eD.sit==='hemartrose'){
+    const achadoHem = escolha(eD.hemartrose, {
+      nivel:'nível líquido-líquido sugestivo de componente hemático (coágulos)',
+      debris:'debris ecogênicos organizados sugestivos de componente hemático (coágulos)',
+      ambos:'nível líquido-líquido e debris ecogênicos organizados sugestivos de componente hemático (coágulos)'});
+    linhas.push(`${derrIntM[eD.intensidade]} derrame articular com conteúdo heterogêneo, notando-se ${achadoHem}, achado que pode ser sugestivo de hemartrose, na dependência de estreita correlação clínica.`);
+    opinioesPrincipais.push(`${derrIntM[eD.intensidade]} derrame articular com conteúdo sugestivo de hemartrose.`);
   } else if(eD.sit==='corpo_livre'){
-    linhas.push(`Derrame articular com sinovite, destacando-se imagem hiperecogênica produtora de sombra acústica posterior, medindo cerca de ${eD.corpoLivreMed||'??'} cm, sugestiva de corpo livre.`);
-    opinioesPrincipais.push('Derrame articular com sinovite associado a imagem sugestiva de corpo livre.');
-  }
-  // Sinóvia/Doppler novos (opcionais, aditivos — não alteram o comportamento acima)
-  if(eD.sinovia==='hipertrofia'){
-    linhas.push(integraDoppler('Hipertrofia sinovial, achado compatível com sinovite.', eD.doppler, 'sinovial'));
-    opinioesPrincipais.push('Sinovite.');
-  } else if(eD.sinovia==='sem_hipertrofia'){
-    linhas.push(integraDoppler('Sem hipertrofia sinovial.', eD.doppler, 'sinovial'));
+    linhas.push(`Derrame articular, destacando-se imagem hiperecogênica produtora de sombra acústica posterior, medindo cerca de ${med(eD.corpoLivreMed)} cm, sugestiva de corpo livre.`);
+    opinioesPrincipais.push('Derrame articular associado a imagem sugestiva de corpo livre.');
   }
 
   // COMPARTIMENTO ANTERIOR
+  linhas = (L.anterior = []);
   if(eA.naoAvaliado){
     linhas.push('Compartimento anterior não avaliado neste exame.');
-  } else if(eA.sit==='normal'){
-    linhas.push('Tendão quadríceps e tendão patelar com espessura e ecotextura habituais.');
-  } else if(eA.sit==='entesopatia_quad'){
-    linhas.push('Entesopatia do quadríceps, sem tendinopatias relevantes ou roturas.');
-    linhas.push('Tendão patelar com espessura e ecotextura habituais.');
-    opinioesAssociados.push('Entesopatia do quadríceps.');
-  } else if(eA.sit==='entesopatia_insercional'){
-    linhas.push('Entesopatia insercional do quadríceps e junto à origem do patelar, sem tendinopatias relevantes.');
-    opinioesAssociados.push('Entesopatia insercional do quadríceps e junto à origem do patelar.');
-  } else if(eA.sit==='tendinopatia_patelar'){
-    linhas.push(integraDoppler('Tendinopatia do tendão patelar, caracterizada por espessamento tendíneo, sem roturas.', eA.dopplerTend, ''));
-    linhas.push('Tendão do quadríceps com espessura e ecotextura habituais.');
-    opinioesAssociados.push('Tendinopatia do tendão patelar.');
-  } else if(eA.sit==='tendinopatia_fissuras'){
-    linhas.push(integraDoppler('Tendinopatia do tendão patelar, caracterizada por espessamento de seu terço proximal e origem, com focos de fissuras intrassubstanciais, sem transfixações ou desinserções.', eA.dopplerTend, ''));
-    linhas.push('Tendão do quadríceps com espessura e ecotextura habituais.');
-    opinioesAssociados.push('Tendinopatia do tendão patelar com focos de fissuras intrassubstanciais.');
-  } else if(eA.sit==='rotura_quad'){
-    linhas.push(`Rotura completa do tendão quadríceps, estando o coto tendíneo degenerado e retraído à cerca de ${eA.roturaMed||'??'} cm do polo superior da patela.`);
-    linhas.push('Tendão patelar com espessura e ecotextura habituais.');
-    opinioesPrincipais.push('Rotura completa do tendão quadríceps.');
-  } else if(eA.sit==='cicatricial_patelar'){
-    linhas.push('Espessamento e irregularidades de aspecto cicatricial do tendão patelar, por provável manipulação cirúrgica pregressa, associado a irregularidades corticais no polo inferior da patela e tuberosidade anterior da tíbia.');
-    linhas.push('Tendão do quadríceps com espessura e ecotextura habituais.');
-    opinioesAssociados.push('Espessamento e irregularidades de aspecto cicatricial do tendão patelar.');
-  } else if(eA.sit==='osgood'){
-    linhas.push('Irregularidades corticais com aparente fragmentação da tuberosidade anterior da tíbia na topografia de inserção do tendão patelar, de aspecto assimétrico quando comparado ao lado contralateral, provavelmente relacionado à apofisite por tração (Osgood Schlatter).');
-    linhas.push('Tendão quadríceps e demais porções do tendão patelar com espessura e ecotextura habituais.');
-    opinioesIncidentais.push('Achados sugestivos de apofisite por tração da tuberosidade anterior da tíbia (Osgood-Schlatter).');
-  } else if(eA.sit==='posop_patelar'){
-    linhas.push('Alterações pós-operatórias do tendão patelar caracterizadas por espessamento, heterogeneidade e irregularidade dos contornos, não sendo caracterizadas de transfixações ou desinserções.');
-    linhas.push('Tendão do quadríceps com espessura e ecotextura habituais.');
-    opinioesAssociados.push('Alterações pós-operatórias do tendão patelar.');
-  } else if(eA.sit==='posop_quad'){
-    linhas.push('Alterações pós-operatórias do tendão quadríceps caracterizadas por espessamento, heterogeneidade e irregularidade dos contornos, não sendo caracterizadas de transfixações ou desinserções.');
-    linhas.push('Tendão patelar com espessura e ecotextura habituais.');
-    opinioesAssociados.push('Alterações pós-operatórias do tendão quadríceps.');
+  } else {
+    const qN = eA.quad==='habitual', pN = eA.patelar==='habitual';
+    // — Quadríceps —
+    if(eA.quad==='entesopatia'){
+      linhas.push('Ao nível da inserção do tendão quadricipital na patela, observa-se espessamento focal da êntese, associado a perda da arquitetura fibrilar habitual e áreas de hipoecogenicidade e focos hiperecoicos compatíveis com entesófitos.');
+      opinioesAssociados.push('Entesopatia insercional do quadríceps.');
+    } else if(eA.quad==='rotura_parcial'){
+      const folheto = escolha(eA.quadParcialFolheto, {profundo:'profundo', medio:'médio', superficial:'superficial'});
+      linhas.push(`Tendão quadricipital com solução de continuidade parcial das fibras, acometendo o folheto ${folheto}, localizada a ${med(eA.quadParcialDist)} cm do polo superior da patela, com extensão longitudinal de ${med(eA.quadParcialExt)} cm e comprometimento estimado de ${med(eA.quadParcialPct)}% da espessura tendínea, sugestivo de rotura parcial.`);
+      opinioesPrincipais.push('Rotura parcial do tendão do quadríceps.');
+    } else if(eA.quad==='rotura_total'){
+      const contQuad = escolha(eA.quadTotalConteudo, {heterogeneo:'heterogêneo', hipoecoico:'hipoecoico'});
+      linhas.push(`Tendão quadricipital com solução de continuidade completa de suas fibras, envolvendo a totalidade dos folhetos (superficial, médio e profundo), localizada a ${med(eA.quadTotalDist)} cm do polo superior da patela.`);
+      linhas.push(`Observa-se descontinuidade completa do tendão, com retração do coto proximal em ${med(eA.quadTotalRetr)} cm, determinando espaço acústico entre os cotos preenchido por conteúdo ${contQuad}, compatível com hematoma organizado. Coto distal residual junto à inserção patelar de aspecto irregular.`);
+      opinioesPrincipais.push('Rotura completa do tendão quadricipital.');
+    } else if(eA.quad==='posop'){
+      linhas.push('Alterações pós-operatórias do tendão quadríceps caracterizadas por espessamento, heterogeneidade e irregularidade dos contornos, não sendo caracterizadas de transfixações ou desinserções.');
+      opinioesAssociados.push('Alterações pós-operatórias do tendão quadríceps.');
+    }
+    // — Patelar —
+    if(eA.patelar==='tendinopatia'){
+      const espess = eA.patTendLocal==='difuso' ? 'espessamento difuso'
+        : `espessamento focal em ${escolha(eA.patTendLocal, {proximal:'terço proximal', medio:'terço médio', distal:'terço distal'})}`;
+      linhas.push(integraDoppler(`Tendão patelar apresenta ${espess} com perda da ecogenicidade e da ecotextura fibrilar habitual, compatíveis com tendinopatia patelar.`, eA.dopplerTend, ''));
+      opinioesAssociados.push('Tendinopatia do tendão patelar.');
+    } else if(eA.patelar==='tendinopatia_fissuras'){
+      linhas.push(integraDoppler('Tendinopatia do tendão patelar, caracterizada por espessamento de seu terço proximal e origem, com focos de fissuras intrassubstanciais, sem transfixações ou desinserções.', eA.dopplerTend, ''));
+      opinioesAssociados.push('Tendinopatia do tendão patelar com focos de fissuras intrassubstanciais.');
+    } else if(eA.patelar==='rotura_parcial'){
+      let fp = `Espessamento e heterogeneidade do tendão patelar, com área focal de desorganização e descontinuidade parcial do padrão fibrilar, comprometendo aproximadamente ${med(eA.patParcialPct)}% da espessura tendínea, localizada junto à ${escolha(eA.patParcialLocal, {origem:'origem', insercao:'inserção'})}. Mantém-se continuidade das fibras remanescentes, sem evidências de rotura transfixante.`;
+      if(eA.patParcialColecao==='liquido') fp += ' Associa-se pequena quantidade de líquido adjacente ao foco de rotura.';
+      if(eA.patParcialColecao==='hematoma') fp += ' Associa-se pequena quantidade de hematoma adjacente ao foco de rotura.';
+      linhas.push(fp);
+      opinioesPrincipais.push(`Rotura parcial do tendão patelar em sua porção ${escolha(eA.patParcialLocal, {origem:'proximal', insercao:'distal'})}, associada a tendinopatia.`);
+    } else if(eA.patelar==='rotura_total'){
+      const faseHem = escolha(eA.patTotalFase, {aguda:'aguda', subaguda:'subaguda'});
+      const semSinais = escolha(eA.patTotalSem, {organizacao:'organização', calcificacao:'calcificação'});
+      linhas.push(`Tendão patelar apresentando solução de continuidade completa e transfixante de suas fibras, localizada a ${med(eA.patTotalDist)} cm do polo inferior da patela, com extensão transversal acometendo toda a espessura do tendão.`);
+      linhas.push(`Observa-se afastamento entre o coto proximal e o coto distal do tendão, medindo aproximadamente ${med(eA.patTotalGap)} cm em repouso. O espaço interposto entre os cotos tendíneos encontra-se preenchido por conteúdo heterogêneo, com áreas de ecogenicidade mista, compatível com hematoma em fase ${faseHem}, sem sinais de ${semSinais} neste momento.`);
+      linhas.push('As extremidades tendíneas (cotos proximal e distal) apresentam-se espessadas, com contornos irregulares e retraídos, com ecotextura heterogênea nas margens da lesão.');
+      linhas.push('A patela encontra-se em posição elevada em relação à sua topografia habitual (patela alta), com o polo inferior distanciado da linha articular.');
+      opinioesPrincipais.push('Rotura completa do tendão patelar, com afastamento das extremidades tendíneas e hematoma interposto, associada a patela alta.');
+    } else if(eA.patelar==='cicatricial'){
+      linhas.push('Espessamento e irregularidades de aspecto cicatricial do tendão patelar, por provável manipulação cirúrgica pregressa, associado a irregularidades corticais no polo inferior da patela e tuberosidade anterior da tíbia.');
+      opinioesAssociados.push('Espessamento e irregularidades de aspecto cicatricial do tendão patelar.');
+    } else if(eA.patelar==='posop'){
+      linhas.push('Alterações pós-operatórias do tendão patelar caracterizadas por espessamento, heterogeneidade e irregularidade dos contornos, não sendo caracterizadas de transfixações ou desinserções.');
+      opinioesAssociados.push('Alterações pós-operatórias do tendão patelar.');
+    }
+    // — Osgood-Schlatter (tópico separado) —
+    if(eA.osgood){
+      linhas.push('Irregularidades corticais com aparente fragmentação da tuberosidade anterior da tíbia na topografia de inserção do tendão patelar, de aspecto assimétrico quando comparado ao lado contralateral, provavelmente relacionado à apofisite por tração (Osgood Schlatter).');
+      opinioesIncidentais.push('Achados sugestivos de apofisite por tração da tuberosidade anterior da tíbia (Osgood-Schlatter).');
+    }
+    // — Segmentos habituais —
+    if(qN && pN && !eA.osgood) linhas.push('Tendão quadríceps e tendão patelar com espessura e ecotextura habituais.');
+    else if(qN && pN && eA.osgood) linhas.push('Tendão quadríceps e demais porções do tendão patelar com espessura e ecotextura habituais.');
+    else if(qN) linhas.push('Tendão do quadríceps com espessura e ecotextura habituais.');
+    else if(pN) linhas.push(eA.osgood ? 'Demais porções do tendão patelar com espessura e ecotextura habituais.' : 'Tendão patelar com espessura e ecotextura habituais.');
   }
 
   // LIGAMENTOS COLATERAIS
-  const fraseLigMedial = (tipo) => {
-    if(tipo==='lesao_parcial') return 'Lesão parcial do ligamento colateral medial, caracterizada por espessamento e perda do padrão fibrilar, com halo anecoico circunjacente, sem nítidas transfixações ou desinserções.';
-    if(tipo==='rotura_completa') return 'Sinais de rotura completa do ligamento colateral medial caracterizada por desinserção tibial com retração proximal e interposição dos tendões da pata anserina na área de rotura.';
-    if(tipo==='cicatricial') return 'Espessamento cicatricial do ligamento colateral medial, sem transfixações ou desinserções.';
-    return '';
-  };
-  const fraseLigLateral = (tipo) => {
-    if(tipo==='lesao_parcial') return 'Lesão parcial do ligamento colateral lateral, caracterizada por espessamento e perda do padrão fibrilar, com halo anecoico circunjacente, sem nítidas transfixações ou desinserções.';
-    if(tipo==='rotura_completa'){
-      // BUG CORRIGIDO: antes mencionava incorretamente "ligamento colateral medial" para uma rotura de LCL
-      let f = 'Sinais de rotura completa do ligamento colateral lateral caracterizada por desinserção fibular com retração proximal.';
-      const le = eLig.lateralExtra;
-      const partes = [];
-      if(le.localizacao==='proximal') partes.push('acometendo predominantemente sua porção proximal/femoral');
-      if(le.localizacao==='media') partes.push('acometendo predominantemente sua porção média');
-      if(le.localizacao==='distal') partes.push('acometendo predominantemente sua porção distal/fibular');
-      if(le.desinsercao) partes.push('com desinserção evidente');
-      if(le.retracao) partes.push('com retração do coto tendíneo');
-      if(le.hematoma) partes.push('associada a hematoma adjacente');
-      if(partes.length) f += ' ' + cap(partes.join(', ')) + '.';
-      return f;
+  linhas = (L.ligamentos = []);
+  const fraseLig = (lado, tipo) => {
+    const p = lado==='medial' ? 'med' : 'lat';
+    const N = `Ligamento colateral ${lado}`;
+    const porcao = escolha(eLig[p+'Porcao'], {proximal:'proximal', media:'média', distal:'distal'});
+    if(tipo==='estiramento'){
+      let f = `${N} apresentando discreto espessamento e heterogeneidade do padrão fibrilar, com áreas de redução da ecogenicidade, mantendo-se preservada a continuidade de suas fibras e sem evidências de descontinuidade ligamentar.`;
+      if(eLig[p+'Edema']==='com') f += ' Observa-se discreto edema dos tecidos moles adjacentes ao ligamento.';
+      return f + ` Achados compatíveis com estiramento do ligamento colateral ${lado}.`;
     }
-    if(tipo==='cicatricial') return 'Espessamento cicatricial do ligamento colateral lateral, sem transfixações ou desinserções.';
+    if(tipo==='lesao_parcial') return `${N} com espessamento e desorganização parcial de seu padrão fibrilar, observando-se área focal de descontinuidade das fibras, comprometendo aproximadamente ${med(eLig[p+'Pct'])}% da espessura ligamentar, localizada em sua porção ${porcao}. Mantém-se preservada a continuidade das fibras remanescentes. Associado edema adjacente, sem evidências de desinserção completa.`;
+    if(tipo==='rotura_completa'){
+      const ret = escolha(eLig[p+'Retracao'], {discreta:'discreta', moderada:'moderada', importante:'importante'});
+      return `Identifica-se rotura completa do ligamento colateral ${lado}, com descontinuidade de todas as suas fibras na porção ${porcao}, determinando formação de gap entre os cotos ligamentares, medindo aproximadamente ${med(eLig[p+'Gap'])} cm. Os cotos apresentam aspecto espessado e heterogêneo, com retração ${ret}. O defeito é parcialmente preenchido por líquido e/ou conteúdo hemático. Associa-se edema significativo dos tecidos moles periligamentares, sem coleção organizada.`;
+    }
+    if(tipo==='cicatricial') return `Espessamento cicatricial do ligamento colateral ${lado}, sem transfixações ou desinserções.`;
     return '';
   };
-  const opLigMedial = (tipo) => {
-    if(tipo==='lesao_parcial') return 'Lesão parcial do ligamento colateral medial.';
-    if(tipo==='rotura_completa') return 'Rotura completa do ligamento colateral medial.';
-    if(tipo==='cicatricial') return 'Espessamento cicatricial do ligamento colateral medial.';
+  const opLig = (lado, tipo) => {
+    if(tipo==='estiramento') return `Achados ultrassonográficos compatíveis com estiramento do ligamento colateral ${lado}, sem sinais de rotura completa.`;
+    if(tipo==='lesao_parcial') return `Rotura parcial do ligamento colateral ${lado}.`;
+    if(tipo==='rotura_completa') return `Rotura completa do ligamento colateral ${lado}.`;
+    if(tipo==='cicatricial') return `Espessamento cicatricial do ligamento colateral ${lado}.`;
     return '';
   };
-  const opLigLateral = (tipo) => {
-    if(tipo==='lesao_parcial') return 'Lesão parcial do ligamento colateral lateral.';
-    if(tipo==='rotura_completa') return 'Rotura completa do ligamento colateral lateral.';
-    if(tipo==='cicatricial') return 'Espessamento cicatricial do ligamento colateral lateral.';
-    return '';
-  };
+  const fraseLigMedial = (t) => fraseLig('medial', t);
+  const fraseLigLateral = (t) => fraseLig('lateral', t);
+  const opLigMedial = (t) => opLig('medial', t);
+  const opLigLateral = (t) => opLig('lateral', t);
   const prioridadeLig = (tipo) => tipo==='cicatricial' ? opinioesAssociados : opinioesPrincipais;
 
   if(eLig.naoAvaliado){
@@ -916,6 +1045,7 @@ function updateLaudo(){
   }
 
   // PATA ANSERINA
+  linhas = (L.pata = []);
   if(ePt.naoAvaliado){
     linhas.push('Pata anserina não avaliada neste exame.');
   } else {
@@ -931,29 +1061,28 @@ function updateLaudo(){
     }
   }
 
-  // VENTRES MUSCULARES (fixo)
-  linhas.push('Ventres musculares tróficos com arquitetura fibrilar preservada.');
+  // VENTRES MUSCULARES (opcional; padrão ligado)
+  linhas = (L.ventres = []);
+  if(eG.ventres) linhas.push('Ventres musculares tróficos com arquitetura fibrilar preservada.');
 
   // COMPARTIMENTO POSTERIOR
+  linhas = (L.posterior = []);
   if(eP.naoAvaliado){
     linhas.push('Compartimento posterior / fossa poplítea não avaliados neste exame.');
   } else {
-    const bakerCarac = () => {
-      const partes = [];
-      if(eP.caracteristica==='simples') partes.push('de aspecto simples');
-      if(eP.caracteristica==='septado') partes.push('septado');
-      if(eP.caracteristica==='lobulado') partes.push('lobulado');
-      if(eP.debris) partes.push('com debris/conteúdo em seu interior');
-      return partes.length ? (' Cisto ' + partes.join(', ') + '.') : '';
-    };
+    const bakerMed = fmtMed([eP.bakerX, eP.bakerY, eP.bakerZ]);
+    const bakerLocal = 'localizada na topografia posteromedial do joelho, entre os tendões do músculo semimembranoso e a cabeça medial do músculo gastrocnêmio';
     if(eP.sit==='ausente'){
       linhas.push('Ausência de cisto poplíteo.');
     } else if(eP.sit==='baker'){
-      linhas.push(`Cisto de Baker, medindo cerca de ${eP.bakerX||'??'} x ${eP.bakerY||'??'} x ${eP.bakerZ||'??'} cm.` + bakerCarac());
-      opinioesAssociados.push('Cisto de Baker.');
+      linhas.push(`Identifica-se formação anecoica, de contornos regulares e bem definidos, ${bakerLocal}, com reforço acústico posterior, sem componente sólido, septações espessas ou vascularização ao estudo Doppler, medindo ${bakerMed} cm, compatível com cisto de Baker (poplíteo).`);
+      opinioesAssociados.push('Cisto de Baker (poplíteo), sem sinais ultrassonográficos de complicação.');
     } else if(eP.sit==='baker_sinovite'){
-      linhas.push(`Cisto de Baker com contornos lobulados, finas septações e sinovite de permeio, medindo cerca de ${eP.bakerX||'??'} x ${eP.bakerY||'??'} x ${eP.bakerZ||'??'} cm.` + bakerCarac());
-      opinioesPrincipais.push('Cisto de Baker associado a sinais sugestivos de sinovite.');
+      linhas.push(`Identifica-se formação predominantemente anecoica, de contornos regulares, ${bakerLocal}, com reforço acústico posterior, compatível com cisto de Baker. Em seu interior, observa-se espessamento da membrana sinovial, de aspecto hipoecoico e não compressível, associado a aumento da vascularização ao estudo Doppler, medindo ${bakerMed} cm, achados compatíveis com sinovite associada.`);
+      opinioesPrincipais.push('Cisto de Baker associado a sinais de sinovite, podendo corresponder a processo inflamatório ativo.');
+    } else if(eP.sit==='baker_complexo'){
+      linhas.push(`Identifica-se formação cística ${bakerLocal.replace('localizada na','na')}, de contornos lobulados, apresentando conteúdo heterogêneo, com septações internas e debris ecogênicos em suspensão, sem sinais evidentes de vascularização ao estudo Doppler colorido nas áreas sólidas/espessadas, medindo ${bakerMed} cm, compatível com cisto de Baker de aspecto complexo.`);
+      opinioesPrincipais.push('Cisto de Baker de aspecto complexo.');
     } else if(eP.sit==='rotura_total'){
       linhas.push('Rotura de cisto poplíteo com lâmina líquida na bursa do gastrocnêmio medial / semimembranoso, associado extravasamento de líquido para os planos mioadiposos adjacentes, que se estende para o terço superior da perna.');
       opinioesPrincipais.push('Rotura de cisto poplíteo (Baker), com extravasamento de conteúdo líquido para os planos mioadiposos adjacentes.');
@@ -961,88 +1090,75 @@ function updateLaudo(){
       linhas.push('Cisto poplíteo com irregularidades do contorno inferior associado extravasamento de líquido para os planos mioadiposos adjacentes, com sinais sugestivos de rotura.');
       opinioesPrincipais.push('Sinais sugestivos de rotura parcial de cisto poplíteo, com extravasamento de líquido para os planos mioadiposos adjacentes.');
     }
-    if(eP.extravasamento){
-      linhas.push('Cisto poplíteo com sinais sugestivos de rotura, associado a extravasamento de líquido para os planos mioadiposos adjacentes.');
-      opinioesPrincipais.push('Cisto poplíteo com sinais sugestivos de rotura e extravasamento de líquido para os planos mioadiposos adjacentes.');
-    }
-    if(eP.lamina){
-      linhas.push('Lâmina líquida na bursa do gastrocnêmio medial / semimembranoso, sem configuração cística.');
-      // não altera a impressão
-    }
-    if(eP.tendinopatia){
-      linhas.push('Sinais de tendinopatia junto à origem do gastrocnêmico medial e inserção do semimembranoso.');
-      opinioesAssociados.push('Sinais de tendinopatia junto à origem do gastrocnêmico medial e inserção do semimembranoso.');
-    }
   }
 
-  // OSTEOFITOSE (bilateral quando marcada em medial e lateral)
+  // OSTEOFITOSE (uma única frase quando marcada em medial e lateral)
+  linhas = (L.osteofitose = []);
+  const fraseOsteofito = 'Nota-se irregularidade e proeminência da margem óssea cortical femorotibial, caracterizada por focos hiperecogênicos projetando-se além do contorno articular esperado, compatível com osteofitose marginal.';
   if(eM.osteofitose && eL.osteofitose){
-    linhas.push('Osteofitose marginal nos compartimentos femorotibiais.');
-    opinioesAssociados.push('Osteofitose marginal nos compartimentos femorotibiais.');
+    linhas.push(fraseOsteofito);
+    opinioesAssociados.push('Osteofitose marginal femorotibial bilateral (medial e lateral).');
   } else {
     if(eM.osteofitose){
-      linhas.push('Osteofitose marginal no compartimento femorotibial medial.');
-      opinioesAssociados.push('Osteofitose marginal no compartimento femorotibial medial.');
+      linhas.push(fraseOsteofito);
+      opinioesAssociados.push('Osteofitose marginal medial.');
     }
     if(eL.osteofitose){
-      linhas.push('Osteofitose marginal no compartimento femorotibial lateral.');
-      opinioesAssociados.push('Osteofitose marginal no compartimento femorotibial lateral.');
+      linhas.push(fraseOsteofito);
+      opinioesAssociados.push('Osteofitose marginal lateral.');
     }
   }
+  if(degBoth){
+    linhas.push('Evidenciam-se alterações degenerativas nos compartimentos femorotibiais medial e lateral, caracterizadas por irregularidade das superfícies ósseas marginais e formação de osteófitos marginais, associadas a redução do espaço articular no segmento acessível à avaliação ultrassonográfica.');
+    opinioesIncidentais.push('Alterações degenerativas femorotibiais bilaterais (medial e lateral), compatíveis com osteoartrose.');
+  }
 
-  // COMPARTIMENTO MEDIAL (demais achados - entram no final)
+  // Achados meniscais / degenerativos / cisto parameniscal (medial e lateral)
+  const ressalvaMenisco = 'Ressalta-se que a avaliação ultrassonográfica do menisco é limitada ao seu corpo periférico, não permitindo caracterização adequada de cornos, raiz meniscal e superfície articular. Correlação com ressonância magnética é recomendada para avaliação morfológica completa do menisco e triagem de rotura associada.';
+  const achadosCompartimento = (lado, e) => {
+    if(e.extrusao){
+      const lcm = lado==='medial' ? ' e determinando abaulamento do ligamento colateral medial suprajacente ao segmento extrudido' : '';
+      linhas.push(`Corpo do menisco ${lado} com deslocamento radial em relação à margem cortical do platô tibial, ultrapassando o contorno ósseo tibial${lcm}. ${ressalvaMenisco}`);
+      opinioesAssociados.push(`Extrusão do menisco ${lado}.`);
+    }
+    if(e.degenerativas && !degBoth){
+      linhas.push(`Evidenciam-se alterações degenerativas no compartimento femorotibial ${lado}, caracterizadas por irregularidade das superfícies ósseas marginais e formação de osteófitos marginais, associadas a redução do espaço articular no segmento acessível à avaliação ultrassonográfica.`);
+      opinioesIncidentais.push(`Alterações degenerativas do compartimento femorotibial ${lado}, compatíveis com osteoartrose.`);
+    }
+    if(e.rotura){
+      linhas.push(`Menisco ${lado} apresenta-se com contorno irregular, perda da morfologia triangular habitual e presença de linha hipoecogênica de permeio ao seu parênquima, estendendo-se até sua superfície articular, podendo corresponder a solução de continuidade.`);
+      opinioesPrincipais.push(`Achados ultrassonográficos que podem corresponder a rotura do menisco ${lado}. Ressalta-se que a avaliação meniscal pelo ultrassom é limitada, especialmente do corno posterior e do compartimento intercondilar, sendo a ressonância magnética o método de escolha para confirmação diagnóstica e caracterização do achado.`);
+    }
+    if(e.cistoParam){
+      linhas.push(`Identifica-se formação cística de contornos regulares, conteúdo predominantemente anecoico e paredes finas, localizada junto à margem periférica do menisco ${lado}, medindo aproximadamente ${fmtMed([e.cistoX, e.cistoY, e.cistoZ])} cm. Não se observam componentes sólidos ou vascularização interna ao estudo Doppler. Aspecto compatível com cisto parameniscal.`);
+      opinioesAssociados.push(`Cisto parameniscal junto à margem periférica do menisco ${lado}.`);
+    }
+  };
+
+  // COMPARTIMENTO MEDIAL
+  linhas = (L.medial = []);
   if(eM.naoAvaliado){
     linhas.push('Compartimento medial não avaliado neste exame.');
   } else {
-    if(eM.extrusao){
-      linhas.push('Extrusão do menisco medial em relação à interlinha articular.');
-      opinioesAssociados.push('Extrusão do menisco medial em relação à interlinha articular.');
-    }
-    if(eM.degenerativas){
-      // BUG CORRIGIDO: não menciona mais automaticamente osteofitose/extrusão que não foram selecionados
-      linhas.push('Alterações degenerativas do compartimento femorotibial medial.');
-      opinioesIncidentais.push('Alterações degenerativas do compartimento femorotibial medial.');
-    }
-    if(eM.rotura){
-      linhas.push('Traço anecoico no interior do corpo do menisco medial, provavelmente relacionado à rotura sendo a relevância desse achado dependente de correlação com os dados clínicos.');
-      opinioesPrincipais.push('Alteração linear intrameniscal no corpo do menisco medial, sugestiva de rotura, recomendando-se correlação com os achados clínicos.');
-    }
-    if(eM.cistoParam){
-      linhas.push(`Formação cística parameniscal, medindo cerca de ${eM.cistoX||'??'} x ${eM.cistoY||'??'} cm.`);
-      opinioesAssociados.push('Formação cística parameniscal.');
-    }
+    achadosCompartimento('medial', eM);
   }
 
-  // COMPARTIMENTO LATERAL (demais achados - entram no final)
+  // COMPARTIMENTO LATERAL
+  linhas = (L.lateral = []);
   if(eL.naoAvaliado){
     linhas.push('Compartimento lateral não avaliado neste exame.');
   } else {
-  if(eL.extrusao){
-    linhas.push('Extrusão do menisco lateral em relação à interlinha articular.');
-    opinioesAssociados.push('Extrusão do menisco lateral em relação à interlinha articular.');
-  }
-  if(eL.degenerativas){
-    // BUG CORRIGIDO: não menciona mais automaticamente osteofitose/extrusão que não foram selecionados
-    linhas.push('Alterações degenerativas do compartimento femorotibial lateral.');
-    opinioesIncidentais.push('Alterações degenerativas do compartimento femorotibial lateral.');
-  }
-  if(eL.rotura){
-    linhas.push('Traço anecoico no interior do corpo do menisco lateral, provavelmente relacionado à rotura sendo a relevância desse achado dependente de correlação com os dados clínicos.');
-    opinioesPrincipais.push('Alteração linear intrameniscal no corpo do menisco lateral, sugestiva de rotura, recomendando-se correlação com os achados clínicos.');
-  }
-  if(eL.cistoParam){
-    linhas.push(`Formação cística parameniscal, medindo cerca de ${eL.cistoX||'??'} x ${eL.cistoY||'??'} cm.`);
-    opinioesAssociados.push('Formação cística parameniscal.');
-  }
+  achadosCompartimento('lateral', eL);
   // NOVO: Trato iliotibial, bíceps femoral distal, tendão poplíteo (opcionais)
   if(eL.trato_sit){
     const map = {habitual:'Trato iliotibial de aspecto habitual.', espessamento:'Trato iliotibial com espessura aumentada em relação ao contralateral/padrão habitual, em sua porção distal, próximo à inserção no côndilo femoral lateral e no tubérculo de Gerdy, sem afilamento das margens.',
       ecotextura:'Trato iliotibial com perda da ecotextura fibrilar normal, apresentando áreas de heterogeneidade e hipoecogenicidade.', atrito:'Trato iliotibial espessado e com ecotextura heterogênea em seu segmento distal, notando-se discreta coleção líquida laminar/edema dos tecidos moles profundos ao trato, na interface com o côndilo femoral lateral, compatível com sinais de atrito (síndrome do trato iliotibial). Ao exame dinâmico, observa-se deslizamento anômalo da estrutura sobre a proeminência óssea condilar durante a flexoextensão do joelho.',
-      bursite:'Bursite associada ao trato iliotibial.', tendinopatia:'Trato iliotibial com espessamento e heterogeneidade da ecotextura em sua inserção distal, associado a discreta hipervascularização ao estudo Doppler, achados compatíveis com tendinopatia.'};
+      bursite:'Bursite associada ao trato iliotibial.', tendinopatia:'Trato iliotibial com espessamento e heterogeneidade da ecotextura em sua inserção distal, achados compatíveis com tendinopatia.'};
+    const opTrato = {espessamento:'Espessamento do trato iliotibial distal.', ecotextura:'Alteração da ecotextura do trato iliotibial.', atrito:'Sinais de atrito do trato iliotibial (síndrome do trato iliotibial).', bursite:'Bursite associada ao trato iliotibial.', tendinopatia:'Tendinopatia do trato iliotibial.'};
     let f = map[eL.trato_sit] || '';
     if(f){
       if(eL.trato_sit!=='habitual'){
-        opinioesAssociados.push(f);
+        opinioesAssociados.push(opTrato[eL.trato_sit]);
         f = integraDoppler(f, eL.trato_doppler, eL.trato_sit==='bursite' ? 'periférica' : '');
         linhas.push(f);
       } else {
@@ -1051,14 +1167,16 @@ function updateLaudo(){
     }
   }
   if(eL.biceps_sit){
-    const map = {habitual:'Tendão distal do bíceps femoral de aspecto habitual.', tendinopatia:'Tendão distal do bíceps femoral com espessamento e heterogeneidade da ecotextura fibrilar, sem solução de continuidade, associado a discreta hipervascularização ao estudo Doppler, achados compatíveis com tendinopatia.',
+    const map = {habitual:'Tendão distal do bíceps femoral de aspecto habitual.', tendinopatia:'Tendão distal do bíceps femoral com espessamento e heterogeneidade da ecotextura fibrilar, sem solução de continuidade, achados compatíveis com tendinopatia.',
       entesopatia:'Inserção distal do tendão do bíceps femoral na cabeça da fíbula com espessamento e irregularidade das margens, associada a irregularidade do contorno ósseo adjacente (espículas/entesófitos), sem evidência de solução de continuidade das fibras tendíneas, achados compatíveis com entesopatia insercional.', fibrilar:'Tendão distal do bíceps femoral com perda focal da ecotextura fibrilar habitual, notando-se área linear hipoecogênica de permeio às fibras, sem retração ou afastamento significativo dos cotos, compatível com fissura/microrrotura intrassubstancial.',
       rotura_parcial:'Tendão distal do bíceps femoral com descontinuidade parcial de suas fibras, identificando-se solução de continuidade que acomete cerca de ___% da espessura tendínea, com afilamento e retração discreta do coto acometido, associada a coleção líquida/hematoma adjacente, achados compatíveis com rotura parcial.', rotura_completa:'Tendão distal do bíceps femoral com descontinuidade completa de suas fibras em toda a sua espessura, notando-se retração do coto proximal (afastamento estimado de aproximadamente ___ cm em relação à inserção na cabeça da fíbula), associada a volumosa coleção líquida/hematoma na topografia da lesão, achados compatíveis com rotura completa.'};
-    const f = map[eL.biceps_sit];
+    const opBiceps = {tendinopatia:'Tendinopatia do tendão distal do bíceps femoral.', entesopatia:'Entesopatia insercional do tendão distal do bíceps femoral.', fibrilar:'Fissura/microrrotura intrassubstancial do tendão distal do bíceps femoral.', rotura_parcial:'Rotura parcial do tendão distal do bíceps femoral.', rotura_completa:'Rotura completa do tendão distal do bíceps femoral.'};
+    let f = map[eL.biceps_sit];
     if(f){
+      f = f.replace('___%', med(eL.biceps_pct)+'%').replace('___ cm', med(eL.biceps_cm)+' cm');
       linhas.push(f);
-      if(eL.biceps_sit==='rotura_completa') opinioesPrincipais.push(f);
-      else if(eL.biceps_sit!=='habitual') opinioesAssociados.push(f);
+      if(eL.biceps_sit==='rotura_completa') opinioesPrincipais.push(opBiceps[eL.biceps_sit]);
+      else if(eL.biceps_sit!=='habitual') opinioesAssociados.push(opBiceps[eL.biceps_sit]);
     }
   }
   if(eL.popliteo_sit){
@@ -1074,8 +1192,9 @@ function updateLaudo(){
   } // fim else compartimento lateral (naoAvaliado)
 
   // NOVO — BURSAS PRÉ/INFRAPATELARES E CARTILAGEM (seção opcional, só entra se "usar" marcado)
+  linhas = (L.bursascart = []);
   if(eBc.usar){
-    if(eBc.prepatelar){
+    if(eBc.prepatelar && !eA.bursitePre){
       const map = {sem_distensao:'Bursa pré-patelar sem distensão.', distensao:'Distensão líquida da bursa pré-patelar.', bursite:'Bursa pré-patelar apresentando distensão por conteúdo anecoico, associada a espessamento e hiperecogenicidade de suas paredes.'};
       let f = map[eBc.prepatelar] || '';
       if(f){
@@ -1108,15 +1227,18 @@ function updateLaudo(){
     }
   }
 
+  // ORDEM ANATÔMICA DA ANÁLISE
+  linhas = [].concat(L.derrame, L.anterior, L.bursitePre, L.osteofitose, L.medial, L.lateral, L.bursascart, L.ligamentos, L.pata, L.posterior, L.ventres);
+
   // NOVO — FOSSA POPLÍTEA / NEUROVASCULAR (opcional, não entra no laudo padrão)
   let fossaHtml = '';
   if(eFo.usar){
     const itens = [];
-    if(eFo.arteria.trim()) itens.push(`<div class="doc-p">Artéria poplítea: ${eFo.arteria}</div>`);
-    if(eFo.veia.trim()) itens.push(`<div class="doc-p">Veia poplítea: ${eFo.veia}</div>`);
-    if(eFo.nervoTibial.trim()) itens.push(`<div class="doc-p">Nervo tibial: ${eFo.nervoTibial}</div>`);
-    if(eFo.nervoFibular.trim()) itens.push(`<div class="doc-p">Nervo fibular comum: ${eFo.nervoFibular}</div>`);
-    if(eFo.massas.trim()) itens.push(`<div class="doc-p">Massas/coleções na fossa poplítea: ${eFo.massas}</div>`);
+    if(eFo.arteria.trim()) itens.push(`<div class="doc-p">Artéria poplítea: ${escTxt(eFo.arteria)}</div>`);
+    if(eFo.veia.trim()) itens.push(`<div class="doc-p">Veia poplítea: ${escTxt(eFo.veia)}</div>`);
+    if(eFo.nervoTibial.trim()) itens.push(`<div class="doc-p">Nervo tibial: ${escTxt(eFo.nervoTibial)}</div>`);
+    if(eFo.nervoFibular.trim()) itens.push(`<div class="doc-p">Nervo fibular comum: ${escTxt(eFo.nervoFibular)}</div>`);
+    if(eFo.massas.trim()) itens.push(`<div class="doc-p">Massas/coleções na fossa poplítea: ${escTxt(eFo.massas)}</div>`);
     if(itens.length){
       fossaHtml = `<div class="doc-secao"><span class="doc-label">FOSSA POPLÍTEA / ESTRUTURAS NEUROVASCULARES:</span>${itens.join('')}</div>`;
     }
@@ -1128,7 +1250,7 @@ function updateLaudo(){
     const map = {semelhante:'Aspecto semelhante ao lado contralateral.', assimetria:'Assimetria em relação ao lado contralateral.',
       apenas_lado:'Achado presente apenas no lado examinado.', especifica:'Comparação específica de estrutura, conforme descrito.'};
     let f = map[eCo.opcao] || '';
-    if(eCo.detalhe.trim()) f += ` ${eCo.detalhe}`;
+    if(eCo.detalhe.trim()) f += ` ${escTxt(eCo.detalhe)}`;
     if(f) comparacaoHtml = `<div class="doc-secao"><span class="doc-label">COMPARAÇÃO CONTRALATERAL:</span><div class="doc-p">${f}</div></div>`;
   }
 
@@ -1147,15 +1269,15 @@ function updateLaudo(){
     const partes = [];
     if(eCl.quantidade==='unico') partes.push('corpo livre único');
     if(eCl.quantidade==='multiplos') partes.push('corpos livres múltiplos');
-    if(eCl.medida) partes.push(`medindo cerca de ${eCl.medida} cm`);
-    if(eCl.localizacao.trim()) partes.push(`localizado(s) em ${eCl.localizacao}`);
+    if(eCl.medida) partes.push(`medindo cerca de ${escHtml(eCl.medida)} cm`);
+    if(eCl.localizacao.trim()) partes.push(`localizado(s) em ${escHtml(eCl.localizacao)}`);
     if(eCl.movel==='movel') partes.push('móvel(is)');
     if(eCl.movel==='nao_movel') partes.push('não móvel(is)');
     if(eCl.sombra) partes.push('com sombra acústica posterior');
     if(partes.length){
       const f = `Presença de ${partes.join(', ')}.`;
       corposHtml = `<div class="doc-secao"><span class="doc-label">CORPOS LIVRES:</span><div class="doc-p">${f}</div></div>`;
-      opinioesPrincipais.push('Corpo(s) livre(s) intra-articular(es).');
+      if(eD.sit!=='corpo_livre') opinioesPrincipais.push('Corpo(s) livre(s) intra-articular(es).');
     }
   }
 
@@ -1163,8 +1285,8 @@ function updateLaudo(){
   let massasHtml = '';
   if(eMa.usar){
     const itens = [];
-    if(eMa.localizacao.trim()) itens.push(`Localização: ${eMa.localizacao}.`);
-    if(eMa.dimensoes.trim()) itens.push(`Dimensões: ${eMa.dimensoes}.`);
+    if(eMa.localizacao.trim()) itens.push(`Localização: ${escTxt(eMa.localizacao)}.`);
+    if(eMa.dimensoes.trim()) itens.push(`Dimensões: ${escTxt(eMa.dimensoes)}.`);
     if(eMa.tipo){
       const map = {solida:'Sólida.', cistica:'Cística.', complexa:'Complexa.'};
       itens.push(map[eMa.tipo]);
@@ -1173,8 +1295,8 @@ function updateLaudo(){
       const map = {nao_realizado:'Doppler: não realizado.', sem_aumento:'Doppler: sem aumento de vascularização.', com_aumento:'Doppler: com aumento de vascularização.'};
       itens.push(map[eMa.doppler]);
     }
-    if(eMa.conteudo.trim()) itens.push(`Conteúdo: ${eMa.conteudo}.`);
-    if(eMa.relacao.trim()) itens.push(`Relação com estruturas adjacentes: ${eMa.relacao}.`);
+    if(eMa.conteudo.trim()) itens.push(`Conteúdo: ${escTxt(eMa.conteudo)}.`);
+    if(eMa.relacao.trim()) itens.push(`Relação com estruturas adjacentes: ${escTxt(eMa.relacao)}.`);
     if(itens.length){
       massasHtml = `<div class="doc-secao"><span class="doc-label">MASSAS / COLEÇÕES:</span><div class="doc-p">${itens.join(' ')}</div></div>`;
       opinioesPrincipais.push('Formação nodular/massa de partes moles a esclarecer, conforme descrito.');
@@ -1182,7 +1304,7 @@ function updateLaudo(){
   }
 
   // ADICIONAIS
-  let adic = eAd.texto.trim() ? `<div class="doc-p">Achados adicionais: ${eAd.texto}</div>` : '';
+  let adic = eAd.texto.trim() ? `<div class="doc-p">Achados adicionais: ${escTxt(eAd.texto)}</div>` : '';
 
   // RECOMENDAÇÃO DE RM (opcional, só entra se explicitamente marcada — não é automática)
   let rmHtml = eAd.sugerirRM ? `<div class="doc-secao"><div class="doc-p">Na presença de persistência dos sintomas ou dúvida diagnóstica, considerar complementação por ressonância magnética.</div></div>` : '';
@@ -1194,14 +1316,16 @@ function updateLaudo(){
   let indicacaoHtml = eG.indicacao.trim() ? `
     <div class="doc-secao">
       <span class="doc-label">INDICAÇÃO CLÍNICA:</span>
-      <div class="doc-p">${eG.indicacao}</div>
+      <div class="doc-p">${escTxt(eG.indicacao)}</div>
     </div>` : '';
 
   // CONCLUSÃO FINAL (ordenada por prioridade: principais > associados > incidentais — req. 17)
   let opFinal = '';
   const opinioesOrdenadas = [...new Set([...opinioesPrincipais, ...opinioesAssociados, ...opinioesIncidentais])];
   if(opinioesOrdenadas.length===0){
-    opFinal = 'Exame ecográfico dentro dos padrões da normalidade.';
+    opFinal = naoAval.length
+      ? 'Sem alterações ecográficas nas estruturas avaliadas. Não avaliado(s) neste exame: ' + naoAval.join(', ') + '.'
+      : 'Exame ecográfico dentro dos padrões da normalidade.';
   } else {
     opFinal = opinioesOrdenadas.join('<br>');
   }
@@ -1209,10 +1333,10 @@ function updateLaudo(){
   document.getElementById('laudo-doc').innerHTML=`
     <div class="doc-titulo">ULTRASSONOGRAFIA DO JOELHO ${ladoTxt}</div>
     ${indicacaoHtml}
-    <div class="doc-secao">
+    ${eG.tecnica.trim() ? `<div class="doc-secao">
       <span class="doc-label">TÉCNICA DO EXAME:</span>
-      <div class="doc-p">Exame realizado com transdutor linear multifrequencial de alta resolução.</div>
-    </div>
+      <div class="doc-p">${escTxt(eG.tecnica)}</div>
+    </div>` : ''}
     <div class="doc-secao">
       <span class="doc-label">ANÁLISE:</span>
       ${linhas.map(l=>`<div class="doc-p">${l}</div>`).join('')}
@@ -1228,7 +1352,63 @@ function updateLaudo(){
       <div class="doc-p">${opFinal}</div>
     </div>
     ${rmHtml}`;
+  salvarRascunho();
+  atualizarAvisos();
 }
+
+// ── EDIÇÃO MANUAL, PENDÊNCIAS E RASCUNHO ──
+let laudoEditado = false;
+const CHAVE_RASCUNHO = 'rascunhoJoelho_v1';
+const VALIDADE_RASCUNHO_MS = 12*60*60*1000; // rascunho expira em 12h (dados clínicos no navegador)
+
+function contarPendencias(){ return document.querySelectorAll('#laudo-doc .pendente').length; }
+function confirmarPendencias(){
+  const n = contarPendencias();
+  if(!n) return true;
+  return confirm('Há ' + n + ' campo(s) pendente(s), marcado(s) com "??" no laudo. Deseja continuar mesmo assim?');
+}
+function atualizarAvisos(){
+  const n = contarPendencias();
+  const p = document.getElementById('aviso-pend');
+  if(p){ p.style.display = n ? 'inline-block' : 'none'; p.textContent = n + ' campo(s) pendente(s)'; }
+  const b = document.getElementById('aviso-edicao');
+  if(b) b.style.display = laudoEditado ? 'flex' : 'none';
+}
+function regenerarLaudo(){
+  if(!confirm('Regenerar o laudo a partir do formulário? As edições manuais serão perdidas.')) return;
+  laudoEditado = false;
+  updateLaudo();
+}
+function mesclar(base, src){
+  Object.keys(src||{}).forEach(k=>{
+    if(base[k] && typeof base[k]==='object' && !Array.isArray(base[k]) && src[k] && typeof src[k]==='object') mesclar(base[k], src[k]);
+    else if(k in base) base[k] = src[k];
+  });
+  return base;
+}
+function salvarRascunho(){
+  try{
+    localStorage.setItem(CHAVE_RASCUNHO, JSON.stringify({
+      ts: Date.now(), estado: estado, editado: laudoEditado,
+      html: laudoEditado ? document.getElementById('laudo-doc').innerHTML : null
+    }));
+  }catch(e){}
+}
+function limparRascunho(){ try{ localStorage.removeItem(CHAVE_RASCUNHO); }catch(e){} }
+function restaurarRascunho(){
+  try{
+    const raw = localStorage.getItem(CHAVE_RASCUNHO);
+    if(!raw) return false;
+    const d = JSON.parse(raw);
+    if(!d || !d.estado || (Date.now() - (d.ts||0)) > VALIDADE_RASCUNHO_MS){ limparRascunho(); return false; }
+    estado = mesclar(estadoInicial(), d.estado);
+    if(d.editado && d.html){ laudoEditado = true; document.getElementById('laudo-doc').innerHTML = d.html; }
+    return true;
+  }catch(e){ return false; }
+}
+document.getElementById('laudo-doc').addEventListener('input', function(){
+  laudoEditado = true; salvarRascunho(); atualizarAvisos();
+});
 
 function toggleDark(){
   const isDark = document.body.classList.toggle('dark');
@@ -1242,7 +1422,11 @@ function toggleDark(){
 function copiar() {
   var el = document.getElementById('laudo-doc');
   if (!el) return;
+  if (!confirmarPendencias()) return;
+  el.classList.add('sem-destaque');
+  setTimeout(function(){ el.classList.remove('sem-destaque'); }, 3000);
   _copyLaudoRichText(el, function(ok) {
+    el.classList.remove('sem-destaque');
     if (ok) {
       showToast('Laudo copiado para a área de transferência!');
     } else {
@@ -1262,11 +1446,13 @@ document.getElementById('laudo-doc').addEventListener('copy', function(e) {
 
 function showToast(msg) {
   let t = document.getElementById('toast-notification');
+  if(!t) return;
   t.innerText = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 function imprimir(){
+  if(!confirmarPendencias()) return;
   const h=document.getElementById('laudo-doc').innerHTML;
   const w=window.open('','_blank');
   w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Helvetica,Arial,sans-serif;font-size:10pt;padding:32px;color:#111;line-height:1.65;}.doc-titulo{text-align:center;font-weight:700;text-transform:uppercase;margin-bottom:16px;}.doc-label{font-weight:700;}.doc-p{margin-bottom:8px;}.doc-secao{margin-bottom:14px;}*{color:#111 !important;}.laudo-doc:focus { outline: none; }
@@ -1277,11 +1463,16 @@ function imprimir(){
   w.print();
 }
 function reiniciar(){
+  if(!confirm('Descartar o laudo atual e reiniciar o formulário?')) return;
   estado = estadoInicial();
+  laudoEditado = false;
+  limparRascunho();
   showSection('geral');
 }
 
+const _rascunhoRestaurado = restaurarRascunho();
 showSection('geral');
+if(_rascunhoRestaurado) window.addEventListener('load', function(){ showToast('Rascunho anterior restaurado.'); });
 </script>
 
 <div id="toast-notification" class="toast-notification">Laudo copiado!</div>
