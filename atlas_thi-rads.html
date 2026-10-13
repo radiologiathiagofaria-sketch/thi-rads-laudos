@@ -1,0 +1,1014 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atlas - Ultrassonografia Musculoesquelética</title>
+<style>
+    :root {
+        --bg: #0a0f1e;
+        --card-bg: rgba(255,255,255,0.06);
+        --card-border: rgba(255,255,255,0.1);
+        --text-color: #e0e6f0;
+        --subtext-color: #b0b8c8;
+        --search-bg: rgba(255,255,255,0.08);
+        --search-border: rgba(255,255,255,0.15);
+        --glow: #4fc3f7;
+        --accent: #29b6f6;
+        --bar-bg: rgba(10,15,30,0.8);
+        --bar-text: #e0e6f0;
+        --bar-subtext: #b0b8c8;
+        --categoria-bg: rgba(79,195,247,0.1);
+        --categoria-text: #4fc3f7;
+        --overlay: rgba(0,0,0,0.92);
+    }
+    body.light-mode {
+        --bg: #f0f4f8;
+        --card-bg: rgba(255,255,255,0.7);
+        --card-border: rgba(0,0,0,0.1);
+        --text-color: #1a2a3a;
+        --subtext-color: #4a5568;
+        --search-bg: white;
+        --search-border: #cbd5e0;
+        --glow: #0288d1;
+        --accent: #0277bd;
+        --bar-bg: rgba(255,255,255,0.8);
+        --bar-text: #1a2a3a;
+        --bar-subtext: #4a5568;
+        --categoria-bg: rgba(2,136,209,0.08);
+        --categoria-text: #0288d1;
+        --overlay: rgba(255,255,255,0.95);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        background: var(--bg);
+        background-image:
+            radial-gradient(ellipse at 20% 50%, rgba(79,195,247,0.08) 0%, transparent 50%),
+            radial-gradient(ellipse at 80% 20%, rgba(2,136,209,0.06) 0%, transparent 50%);
+        min-height: 100vh;
+        transition: background 0.5s, color 0.5s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        padding-top: 110px;
+        color: var(--text-color);
+    }
+
+    .top-logo {
+        position: fixed; top: 0; left: 0; width: 100%; height: 60px;
+        background: var(--bar-bg); backdrop-filter: blur(15px);
+        box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        display: flex; justify-content: center; align-items: center; z-index: 1000;
+        gap: 24px; transition: background 0.5s;
+        border-bottom: 1px solid var(--card-border);
+    }
+
+    .top-bar {
+        position: fixed; top: 80px; right: 20px; display: flex; gap: 12px; z-index: 1001;
+    }
+    .icon-btn {
+        background: var(--card-bg); backdrop-filter: blur(10px);
+        border: 1px solid var(--card-border); border-radius: 50%;
+        width: 45px; height: 45px; font-size: 20px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        color: var(--text-color); transition: all 0.3s;
+    }
+    .icon-btn:hover { background: var(--accent); color: white; border-color: var(--accent); transform: scale(1.08); }
+
+    .container { max-width: 1300px; width: 100%; }
+
+    h1 {
+        text-align: center; font-size: 2.5em; font-weight: 300; letter-spacing: 2px;
+        background: linear-gradient(135deg, var(--glow), var(--accent));
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        background-clip: text; margin-bottom: 5px;
+    }
+    .subtitulo { text-align: center; color: var(--subtext-color); font-size: 0.95em; margin-bottom: 35px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.85; }
+
+    .search-wrapper { display: flex; justify-content: center; margin-bottom: 45px; }
+    .search-input {
+        width: 100%; max-width: 550px; padding: 14px 24px;
+        font-size: 1.05em; border: 2px solid var(--search-border);
+        border-radius: 40px; background: var(--search-bg);
+        backdrop-filter: blur(10px); color: var(--text-color); outline: none;
+        transition: all 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    .search-input:focus { border-color: var(--glow); box-shadow: 0 0 20px rgba(79,195,247,0.3); }
+    .search-input::placeholder { color: var(--subtext-color); opacity: 0.7; }
+
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 25px;
+        justify-items: center;
+    }
+    .card {
+        background: var(--card-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--card-border);
+        border-radius: 24px; padding: 35px 20px;
+        width: 100%; cursor: pointer;
+        transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+        text-align: center;
+        position: relative; overflow: hidden;
+        color: var(--text-color);
+    }
+    .card::before {
+        content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+        background: radial-gradient(circle at 50% 0%, var(--glow), transparent 70%);
+        opacity: 0; transition: opacity 0.4s;
+    }
+    .card:hover::before { opacity: 0.08; }
+    .card:hover {
+        transform: translateY(-8px);
+        border-color: var(--glow);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 30px rgba(79,195,247,0.2);
+    }
+    .card-icone {
+        width: 64px; height: 64px; margin: 0 auto 15px auto;
+        position: relative; z-index: 1;
+        color: var(--glow);
+        filter: drop-shadow(0 0 8px rgba(79,195,247,0.5));
+        display: flex; align-items: center; justify-content: center;
+    }
+    .card-icone svg {
+        width: 100%; height: 100%;
+        stroke: currentColor; fill: none;
+        stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .card h3 {
+        font-size: 1.1em; font-weight: 600; margin: 0 0 6px 0;
+        position: relative; z-index: 1;
+    }
+    .card .contagem {
+        font-size: 0.8em; color: var(--subtext-color);
+        position: relative; z-index: 1; opacity: 0.8;
+    }
+    .hidden { display: none; }
+
+    .voltar-btn {
+        background: none; border: 2px solid var(--accent); color: var(--accent);
+        padding: 10px 24px; border-radius: 30px; cursor: pointer; font-weight: 600;
+        margin-top: 30px; transition: all 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .voltar-btn:hover { background: var(--accent); color: white; }
+
+    /* ============ VISÃO DA GALERIA ============ */
+    #galeriaView { display: none; }
+    #galeriaView.ativa { display: block; }
+    #cardsView.oculta { display: none; }
+
+    .galeria-header {
+        display: flex; align-items: center; gap: 15px;
+        margin-bottom: 30px; flex-wrap: wrap;
+    }
+    .btn-voltar-inline {
+        background: var(--card-bg); border: 1px solid var(--card-border);
+        color: var(--text-color); padding: 10px 18px; border-radius: 30px;
+        cursor: pointer; font-weight: 600; font-size: 0.9em;
+        display: inline-flex; align-items: center; gap: 8px;
+        transition: all 0.3s;
+    }
+    .btn-voltar-inline:hover { background: var(--accent); color: white; border-color: var(--accent); }
+    .galeria-titulo {
+        font-size: 1.8em; font-weight: 300; letter-spacing: 2px;
+        background: linear-gradient(135deg, var(--glow), var(--accent));
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .galeria-contador { color: var(--subtext-color); font-size: 0.9em; margin-left: auto; }
+
+    .galeria-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 18px;
+    }
+    .galeria-item {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.3s;
+        position: relative;
+        aspect-ratio: 4 / 3;
+    }
+    .galeria-item:hover {
+        border-color: var(--glow);
+        transform: translateY(-4px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.3), 0 0 20px rgba(79,195,247,0.2);
+    }
+    .galeria-item img {
+        width: 100%; height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.4s;
+    }
+    .galeria-item:hover img { transform: scale(1.06); }
+    .galeria-item .legenda {
+        position: absolute; bottom: 0; left: 0; right: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+        color: #fff; padding: 22px 12px 10px 12px;
+        font-size: 0.85em; font-weight: 500;
+        opacity: 0; transition: opacity 0.3s;
+    }
+    .galeria-item:hover .legenda { opacity: 1; }
+
+    .vazio {
+        text-align: center; padding: 80px 20px;
+        color: var(--subtext-color);
+    }
+    .vazio svg { opacity: 0.3; margin-bottom: 20px; }
+    .vazio p { font-size: 1.1em; margin-bottom: 8px; }
+    .vazio small { opacity: 0.7; }
+
+    /* ============ LIGHTBOX ============ */
+    .lightbox {
+        position: fixed; inset: 0; z-index: 2000;
+        background: var(--overlay);
+        backdrop-filter: blur(20px);
+        display: none;
+        align-items: center; justify-content: center;
+        padding: 40px;
+        animation: fadeIn 0.3s ease;
+    }
+    .lightbox.ativo { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .lightbox-img {
+        max-width: 90vw; max-height: 85vh;
+        object-fit: contain;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        user-select: none; -webkit-user-drag: none;
+        touch-action: none; cursor: grab;
+        transform-origin: center center;
+        transition: transform 0.18s ease-out;
+        will-change: transform;
+    }
+    .lightbox-img.arrastando { transition: none; cursor: grabbing; }
+    .lightbox-img.zoomado { cursor: grab; }
+
+    .lb-tools {
+        position: fixed; top: 25px; left: 25px;
+        display: flex; align-items: center; gap: 8px;
+        background: rgba(0,0,0,0.6); border-radius: 30px; padding: 5px 8px;
+        backdrop-filter: blur(10px); z-index: 2;
+    }
+    .lb-tools button {
+        background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+        color: #fff; width: 36px; height: 36px; border-radius: 50%;
+        cursor: pointer; display: flex; align-items: center; justify-content: center;
+        transition: all 0.2s; font-size: 12px; font-weight: 600;
+    }
+    .lb-tools button:hover { background: var(--accent); border-color: var(--accent); }
+    .lb-tools .lb-zoom-pct { color: #fff; font-size: 0.8em; min-width: 46px; text-align: center; }
+    .lightbox-loading {
+        position: fixed; top: 50%; left: 50%; width: 40px; height: 40px; margin: -20px 0 0 -20px;
+        border: 3px solid rgba(255,255,255,0.2); border-top-color: var(--glow);
+        border-radius: 50%; animation: lbspin 0.8s linear infinite; display: none; pointer-events: none;
+    }
+    .lightbox-loading.ativo { display: block; }
+    @keyframes lbspin { to { transform: rotate(360deg); } }
+    .lightbox-legenda {
+        position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+        color: #fff; font-size: 0.95em; background: rgba(0,0,0,0.6);
+        padding: 8px 20px; border-radius: 30px;
+        max-width: 80vw; text-align: center;
+    }
+    .lightbox-contador {
+        position: fixed; top: 25px; left: 50%; transform: translateX(-50%);
+        color: #fff; font-size: 0.95em; background: rgba(0,0,0,0.6);
+        padding: 6px 16px; border-radius: 20px;
+    }
+    .lightbox-fechar, .lightbox-prev, .lightbox-next {
+        position: fixed;
+        background: rgba(255,255,255,0.12);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #fff; border-radius: 50%;
+        width: 50px; height: 50px;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; transition: all 0.3s;
+        backdrop-filter: blur(10px);
+    }
+    .lightbox-fechar:hover, .lightbox-prev:hover, .lightbox-next:hover {
+        background: var(--accent); border-color: var(--accent);
+        transform: scale(1.08);
+    }
+    .lightbox-fechar { top: 25px; right: 25px; }
+    .lightbox-prev { left: 25px; top: 50%; transform: translateY(-50%); }
+    .lightbox-next { right: 25px; top: 50%; transform: translateY(-50%); }
+    .lightbox-prev:hover { transform: translateY(-50%) scale(1.08); }
+    .lightbox-next:hover { transform: translateY(-50%) scale(1.08); }
+
+    @media (max-width: 600px) {
+        .cards-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+        .galeria-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+        h1 { font-size: 1.8em; }
+        .lightbox { padding: 20px; }
+        .lightbox-prev { left: 10px; }
+        .lightbox-next { right: 10px; }
+        .lightbox-fechar { top: 15px; right: 15px; }
+        .lb-tools { top: 15px; left: 10px; }
+        .lightbox-contador { top: 70px; }
+    }
+</style>
+</head>
+<body>
+
+    <header class="top-logo">
+        <svg viewBox="0 0 64 64" width="46" height="46" fill="none" stroke="var(--glow)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 8px rgba(79,195,247,0.4));">
+            <path d="M32 26 L32 40 M22 26 L42 26" stroke-width="3" />
+            <path d="M22 18 C28 14, 36 14, 42 18" />
+            <path d="M14 10 C24 2, 40 2, 50 10" />
+            <path d="M22 46 C28 50, 36 50, 42 46" />
+            <path d="M14 54 C24 62, 40 62, 50 54" />
+        </svg>
+        <div style="width: 2px; height: 42px; background: var(--glow); opacity: 0.6; filter: drop-shadow(0 0 4px rgba(79,195,247,0.5)); border-radius: 2px;"></div>
+        <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center; line-height: 1;">
+            <div style="font-family: 'Segoe UI', system-ui, sans-serif; font-size: 2em; font-weight: 300; letter-spacing: 7px; margin-bottom: 4px;">
+                <span style="color: var(--bar-text);">ATLAS</span><span style="color: var(--glow);">-MSK</span>
+            </div>
+            <div style="font-size: 0.7em; font-weight: 400; letter-spacing: 2.5px; color: var(--bar-subtext); text-transform: uppercase;">
+                Atlas de Imagens em Ultrassonografia
+            </div>
+        </div>
+    </header>
+
+    <div class="top-bar">
+        <button class="icon-btn" id="themeBtn" onclick="alternarTema()" title="Alternar tema"></button>
+        <button class="icon-btn" onclick="window.location.href='laudo-thirads.html'" title="Voltar">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </button>
+        <button class="icon-btn" onclick="window.location.href='index.html'" title="Sair">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+    </div>
+
+    <div class="container">
+
+        <!-- ============ VISTA DE CARDS (regiões) ============ -->
+        <div id="cardsView">
+            <h1>Atlas de Imagens</h1>
+            <p class="subtitulo">Selecione uma região para visualizar as imagens</p>
+
+            <div class="search-wrapper">
+                <div style="position: relative; width: 100%; max-width: 550px; display: flex; align-items: center;">
+                    <svg style="position: absolute; left: 18px; color: var(--subtext-color);" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" id="searchInput" class="search-input" style="padding-left: 50px; width: 100%; max-width: none;" placeholder="Buscar região..." oninput="filtrarCards()">
+                </div>
+            </div>
+
+            <div id="cardsContainer" class="cards-grid"></div>
+
+            <div style="text-align:center;">
+                <button class="voltar-btn" onclick="window.location.href='laudo-thirads.html'">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                    Voltar para THI-RADS
+                </button>
+            </div>
+        </div>
+
+        <!-- ============ VISTA DA GALERIA (imagens da região) ============ -->
+        <div id="galeriaView">
+            <div class="galeria-header">
+                <button class="btn-voltar-inline" onclick="voltarParaCards()">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                    Voltar
+                </button>
+                <div class="galeria-titulo" id="galeriaTitulo">Região</div>
+                <div class="galeria-contador" id="galeriaContador"></div>
+            </div>
+            <div id="galeriaConteudo"></div>
+        </div>
+
+    </div>
+
+    <!-- ============ LIGHTBOX (imagem tela cheia) ============ -->
+    <div class="lightbox" id="lightbox" onclick="if(event.target===this) fecharLightbox()">
+        <div class="lightbox-contador" id="lbContador"></div>
+        <div class="lb-tools">
+            <button onclick="zoomPasso(1/1.4)" title="Diminuir (-)"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+            <span class="lb-zoom-pct" id="lbZoomPct">100%</span>
+            <button onclick="zoomPasso(1.4)" title="Aumentar (+)"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+            <button onclick="resetZoom()" title="Ajustar à tela (0)">1:1</button>
+        </div>
+        <div class="lightbox-loading" id="lbLoading"></div>
+        <button class="lightbox-fechar" onclick="fecharLightbox()" title="Fechar (Esc)">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <button class="lightbox-prev" onclick="navegarLightbox(-1)" title="Anterior (←)">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <img class="lightbox-img" id="lbImg" src="" alt="">
+        <button class="lightbox-next" onclick="navegarLightbox(1)" title="Próxima (→)">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="lightbox-legenda" id="lbLegenda"></div>
+    </div>
+
+<script>
+/* ==========================================================================
+   ⚙️  CONFIGURAÇÃO — REGIÕES (cards)
+   ==========================================================================
+   As imagens são carregadas AUTOMATICAMENTE de atlas/atlas.json.
+   Esse arquivo é gerado pelo script gerar_atlas.py a partir das pastas
+   atlas/<Nome do card>/*.png. Não é preciso listar imagens aqui.
+   ========================================================================== */
+
+const REGIOES = [
+    {
+        nome: "Ombro",
+        icone: "ombro",
+        imagens: [
+            { src: "atlas/OMBRO/1.png", thumb: "atlas/OMBRO/1.png", titulo: "1" },
+            { src: "atlas/OMBRO/2.png", thumb: "atlas/OMBRO/2.png", titulo: "2" },
+            { src: "atlas/OMBRO/3.png", thumb: "atlas/OMBRO/3.png", titulo: "3" },
+            { src: "atlas/OMBRO/4.png", thumb: "atlas/OMBRO/4.png", titulo: "4" },
+            { src: "atlas/OMBRO/5.png", thumb: "atlas/OMBRO/5.png", titulo: "5" },
+            { src: "atlas/OMBRO/6.png", thumb: "atlas/OMBRO/6.png", titulo: "6" },
+            { src: "atlas/OMBRO/7.png", thumb: "atlas/OMBRO/7.png", titulo: "7" },
+            { src: "atlas/OMBRO/8.png", thumb: "atlas/OMBRO/8.png", titulo: "8" },
+            { src: "atlas/OMBRO/9.png", thumb: "atlas/OMBRO/9.png", titulo: "9" },
+            { src: "atlas/OMBRO/10.png", thumb: "atlas/OMBRO/10.png", titulo: "10" },
+            { src: "atlas/OMBRO/11.png", thumb: "atlas/OMBRO/11.png", titulo: "11" },
+            { src: "atlas/OMBRO/12.png", thumb: "atlas/OMBRO/12.png", titulo: "12" },
+            { src: "atlas/OMBRO/13.png", thumb: "atlas/OMBRO/13.png", titulo: "13" },
+            { src: "atlas/OMBRO/14.png", thumb: "atlas/OMBRO/14.png", titulo: "14" },
+            { src: "atlas/OMBRO/15.png", thumb: "atlas/OMBRO/15.png", titulo: "15" },
+            { src: "atlas/OMBRO/16.png", thumb: "atlas/OMBRO/16.png", titulo: "16" },
+            { src: "atlas/OMBRO/17.png", thumb: "atlas/OMBRO/17.png", titulo: "17" },
+            { src: "atlas/OMBRO/18.png", thumb: "atlas/OMBRO/18.png", titulo: "18" },
+            { src: "atlas/OMBRO/19.png", thumb: "atlas/OMBRO/19.png", titulo: "19" },
+            { src: "atlas/OMBRO/20.png", thumb: "atlas/OMBRO/20.png", titulo: "20" }
+        ]
+    },
+    {
+        nome: "Braço",
+        icone: "braco",
+        imagens: [
+            { src: "atlas/bra%C3%A7o/1.png", thumb: "atlas/bra%C3%A7o/1.png", titulo: "1" },
+            { src: "atlas/bra%C3%A7o/2.png", thumb: "atlas/bra%C3%A7o/2.png", titulo: "2" },
+            { src: "atlas/bra%C3%A7o/3.png", thumb: "atlas/bra%C3%A7o/3.png", titulo: "3" },
+            { src: "atlas/bra%C3%A7o/4.png", thumb: "atlas/bra%C3%A7o/4.png", titulo: "4" },
+            { src: "atlas/bra%C3%A7o/5.png", thumb: "atlas/bra%C3%A7o/5.png", titulo: "5" },
+            { src: "atlas/bra%C3%A7o/6.png", thumb: "atlas/bra%C3%A7o/6.png", titulo: "6" },
+            { src: "atlas/bra%C3%A7o/7.png", thumb: "atlas/bra%C3%A7o/7.png", titulo: "7" },
+            { src: "atlas/bra%C3%A7o/8.png", thumb: "atlas/bra%C3%A7o/8.png", titulo: "8" },
+            { src: "atlas/bra%C3%A7o/9.png", thumb: "atlas/bra%C3%A7o/9.png", titulo: "9" },
+            { src: "atlas/bra%C3%A7o/10.png", thumb: "atlas/bra%C3%A7o/10.png", titulo: "10" },
+            { src: "atlas/bra%C3%A7o/11.png", thumb: "atlas/bra%C3%A7o/11.png", titulo: "11" },
+            { src: "atlas/bra%C3%A7o/12.png", thumb: "atlas/bra%C3%A7o/12.png", titulo: "12" },
+            { src: "atlas/bra%C3%A7o/13.png", thumb: "atlas/bra%C3%A7o/13.png", titulo: "13" }
+        ]
+    },
+    {
+        nome: "Cotovelo",
+        icone: "cotovelo",
+        imagens: [
+            { src: "atlas/cotovelo/1.png", thumb: "atlas/cotovelo/1.png", titulo: "1" },
+            { src: "atlas/cotovelo/2.png", thumb: "atlas/cotovelo/2.png", titulo: "2" },
+            { src: "atlas/cotovelo/3.png", thumb: "atlas/cotovelo/3.png", titulo: "3" },
+            { src: "atlas/cotovelo/4.png", thumb: "atlas/cotovelo/4.png", titulo: "4" },
+            { src: "atlas/cotovelo/5.png", thumb: "atlas/cotovelo/5.png", titulo: "5" },
+            { src: "atlas/cotovelo/6.png", thumb: "atlas/cotovelo/6.png", titulo: "6" },
+            { src: "atlas/cotovelo/7.png", thumb: "atlas/cotovelo/7.png", titulo: "7" },
+            { src: "atlas/cotovelo/8.png", thumb: "atlas/cotovelo/8.png", titulo: "8" },
+            { src: "atlas/cotovelo/9.png", thumb: "atlas/cotovelo/9.png", titulo: "9" },
+            { src: "atlas/cotovelo/10.png", thumb: "atlas/cotovelo/10.png", titulo: "10" },
+            { src: "atlas/cotovelo/11.png", thumb: "atlas/cotovelo/11.png", titulo: "11" }
+        ]
+    },
+    {
+        nome: "Punho",
+        icone: "punho",
+        imagens: [
+            { src: "atlas/punho/1.png", thumb: "atlas/punho/1.png", titulo: "1" },
+            { src: "atlas/punho/2.png", thumb: "atlas/punho/2.png", titulo: "2" },
+            { src: "atlas/punho/3.png", thumb: "atlas/punho/3.png", titulo: "3" },
+            { src: "atlas/punho/4.png", thumb: "atlas/punho/4.png", titulo: "4" },
+            { src: "atlas/punho/5.png", thumb: "atlas/punho/5.png", titulo: "5" },
+            { src: "atlas/punho/6.png", thumb: "atlas/punho/6.png", titulo: "6" },
+            { src: "atlas/punho/7.png", thumb: "atlas/punho/7.png", titulo: "7" },
+            { src: "atlas/punho/8.png", thumb: "atlas/punho/8.png", titulo: "8" },
+            { src: "atlas/punho/9.png", thumb: "atlas/punho/9.png", titulo: "9" },
+            { src: "atlas/punho/10.png", thumb: "atlas/punho/10.png", titulo: "10" },
+            { src: "atlas/punho/11.png", thumb: "atlas/punho/11.png", titulo: "11" },
+            { src: "atlas/punho/12.png", thumb: "atlas/punho/12.png", titulo: "12" },
+            { src: "atlas/punho/13.png", thumb: "atlas/punho/13.png", titulo: "13" }
+        ]
+    },
+    {
+        nome: "Mão",
+        icone: "mao",
+        imagens: [
+            { src: "atlas/m%C3%A3o/14.png", thumb: "atlas/m%C3%A3o/14.png", titulo: "14" },
+            { src: "atlas/m%C3%A3o/15.png", thumb: "atlas/m%C3%A3o/15.png", titulo: "15" },
+            { src: "atlas/m%C3%A3o/16.png", thumb: "atlas/m%C3%A3o/16.png", titulo: "16" },
+            { src: "atlas/m%C3%A3o/17.png", thumb: "atlas/m%C3%A3o/17.png", titulo: "17" },
+            { src: "atlas/m%C3%A3o/18.png", thumb: "atlas/m%C3%A3o/18.png", titulo: "18" },
+            { src: "atlas/m%C3%A3o/19.png", thumb: "atlas/m%C3%A3o/19.png", titulo: "19" },
+            { src: "atlas/m%C3%A3o/20.png", thumb: "atlas/m%C3%A3o/20.png", titulo: "20" },
+            { src: "atlas/m%C3%A3o/21.png", thumb: "atlas/m%C3%A3o/21.png", titulo: "21" },
+            { src: "atlas/m%C3%A3o/22.png", thumb: "atlas/m%C3%A3o/22.png", titulo: "22" },
+            { src: "atlas/m%C3%A3o/23.png", thumb: "atlas/m%C3%A3o/23.png", titulo: "23" },
+            { src: "atlas/m%C3%A3o/24.png", thumb: "atlas/m%C3%A3o/24.png", titulo: "24" },
+            { src: "atlas/m%C3%A3o/25.png", thumb: "atlas/m%C3%A3o/25.png", titulo: "25" },
+            { src: "atlas/m%C3%A3o/26.png", thumb: "atlas/m%C3%A3o/26.png", titulo: "26" },
+            { src: "atlas/m%C3%A3o/27.png", thumb: "atlas/m%C3%A3o/27.png", titulo: "27" },
+            { src: "atlas/m%C3%A3o/28.png", thumb: "atlas/m%C3%A3o/28.png", titulo: "28" },
+            { src: "atlas/m%C3%A3o/29.png", thumb: "atlas/m%C3%A3o/29.png", titulo: "29" },
+            { src: "atlas/m%C3%A3o/30.png", thumb: "atlas/m%C3%A3o/30.png", titulo: "30" },
+            { src: "atlas/m%C3%A3o/31.png", thumb: "atlas/m%C3%A3o/31.png", titulo: "31" },
+            { src: "atlas/m%C3%A3o/32.png", thumb: "atlas/m%C3%A3o/32.png", titulo: "32" },
+            { src: "atlas/m%C3%A3o/33.png", thumb: "atlas/m%C3%A3o/33.png", titulo: "33" },
+            { src: "atlas/m%C3%A3o/34.png", thumb: "atlas/m%C3%A3o/34.png", titulo: "34" },
+            { src: "atlas/m%C3%A3o/35.png", thumb: "atlas/m%C3%A3o/35.png", titulo: "35" },
+            { src: "atlas/m%C3%A3o/36.png", thumb: "atlas/m%C3%A3o/36.png", titulo: "36" },
+            { src: "atlas/m%C3%A3o/37.png", thumb: "atlas/m%C3%A3o/37.png", titulo: "37" }
+        ]
+    },
+    {
+        nome: "Quadril",
+        icone: "quadril",
+        imagens: [
+            { src: "atlas/quadril/1.png", thumb: "atlas/quadril/1.png", titulo: "1" },
+            { src: "atlas/quadril/2.png", thumb: "atlas/quadril/2.png", titulo: "2" },
+            { src: "atlas/quadril/3.png", thumb: "atlas/quadril/3.png", titulo: "3" },
+            { src: "atlas/quadril/4.png", thumb: "atlas/quadril/4.png", titulo: "4" },
+            { src: "atlas/quadril/5.png", thumb: "atlas/quadril/5.png", titulo: "5" },
+            { src: "atlas/quadril/6.png", thumb: "atlas/quadril/6.png", titulo: "6" },
+            { src: "atlas/quadril/7.png", thumb: "atlas/quadril/7.png", titulo: "7" },
+            { src: "atlas/quadril/8.png", thumb: "atlas/quadril/8.png", titulo: "8" },
+            { src: "atlas/quadril/9.png", thumb: "atlas/quadril/9.png", titulo: "9" },
+            { src: "atlas/quadril/10.png", thumb: "atlas/quadril/10.png", titulo: "10" },
+            { src: "atlas/quadril/11.png", thumb: "atlas/quadril/11.png", titulo: "11" },
+            { src: "atlas/quadril/12.png", thumb: "atlas/quadril/12.png", titulo: "12" },
+            { src: "atlas/quadril/13.png", thumb: "atlas/quadril/13.png", titulo: "13" },
+            { src: "atlas/quadril/14.png", thumb: "atlas/quadril/14.png", titulo: "14" },
+            { src: "atlas/quadril/15.png", thumb: "atlas/quadril/15.png", titulo: "15" },
+            { src: "atlas/quadril/16.png", thumb: "atlas/quadril/16.png", titulo: "16" }
+        ]
+    },
+    {
+        nome: "Coxa Anterior",
+        icone: "coxaAnterior",
+        imagens: [
+            { src: "atlas/coxa%20anterior/1.png", thumb: "atlas/coxa%20anterior/1.png", titulo: "1" },
+            { src: "atlas/coxa%20anterior/2.png", thumb: "atlas/coxa%20anterior/2.png", titulo: "2" },
+            { src: "atlas/coxa%20anterior/3.png", thumb: "atlas/coxa%20anterior/3.png", titulo: "3" },
+            { src: "atlas/coxa%20anterior/4.png", thumb: "atlas/coxa%20anterior/4.png", titulo: "4" },
+            { src: "atlas/coxa%20anterior/5.png", thumb: "atlas/coxa%20anterior/5.png", titulo: "5" },
+            { src: "atlas/coxa%20anterior/6.png", thumb: "atlas/coxa%20anterior/6.png", titulo: "6" },
+            { src: "atlas/coxa%20anterior/7.png", thumb: "atlas/coxa%20anterior/7.png", titulo: "7" },
+            { src: "atlas/coxa%20anterior/8.png", thumb: "atlas/coxa%20anterior/8.png", titulo: "8" },
+            { src: "atlas/coxa%20anterior/9.png", thumb: "atlas/coxa%20anterior/9.png", titulo: "9" },
+            { src: "atlas/coxa%20anterior/10.png", thumb: "atlas/coxa%20anterior/10.png", titulo: "10" },
+            { src: "atlas/coxa%20anterior/11.png", thumb: "atlas/coxa%20anterior/11.png", titulo: "11" },
+            { src: "atlas/coxa%20anterior/12.png", thumb: "atlas/coxa%20anterior/12.png", titulo: "12" },
+            { src: "atlas/coxa%20anterior/13.png", thumb: "atlas/coxa%20anterior/13.png", titulo: "13" },
+            { src: "atlas/coxa%20anterior/14.png", thumb: "atlas/coxa%20anterior/14.png", titulo: "14" },
+            { src: "atlas/coxa%20anterior/15.png", thumb: "atlas/coxa%20anterior/15.png", titulo: "15" },
+            { src: "atlas/coxa%20anterior/16.png", thumb: "atlas/coxa%20anterior/16.png", titulo: "16" },
+            { src: "atlas/coxa%20anterior/17.png", thumb: "atlas/coxa%20anterior/17.png", titulo: "17" },
+            { src: "atlas/coxa%20anterior/18.png", thumb: "atlas/coxa%20anterior/18.png", titulo: "18" },
+            { src: "atlas/coxa%20anterior/19.png", thumb: "atlas/coxa%20anterior/19.png", titulo: "19" },
+            { src: "atlas/coxa%20anterior/20.png", thumb: "atlas/coxa%20anterior/20.png", titulo: "20" }
+        ]
+    },
+    {
+        nome: "Coxa Posterior",
+        icone: "coxaPosterior",
+        imagens: [
+            { src: "atlas/coxa%20posterior/1.png", thumb: "atlas/coxa%20posterior/1.png", titulo: "1" },
+            { src: "atlas/coxa%20posterior/2.png", thumb: "atlas/coxa%20posterior/2.png", titulo: "2" },
+            { src: "atlas/coxa%20posterior/3.png", thumb: "atlas/coxa%20posterior/3.png", titulo: "3" },
+            { src: "atlas/coxa%20posterior/4.png", thumb: "atlas/coxa%20posterior/4.png", titulo: "4" },
+            { src: "atlas/coxa%20posterior/5.png", thumb: "atlas/coxa%20posterior/5.png", titulo: "5" },
+            { src: "atlas/coxa%20posterior/6.png", thumb: "atlas/coxa%20posterior/6.png", titulo: "6" },
+            { src: "atlas/coxa%20posterior/7.png", thumb: "atlas/coxa%20posterior/7.png", titulo: "7" },
+            { src: "atlas/coxa%20posterior/8.png", thumb: "atlas/coxa%20posterior/8.png", titulo: "8" },
+            { src: "atlas/coxa%20posterior/9.png", thumb: "atlas/coxa%20posterior/9.png", titulo: "9" },
+            { src: "atlas/coxa%20posterior/10.png", thumb: "atlas/coxa%20posterior/10.png", titulo: "10" },
+            { src: "atlas/coxa%20posterior/11.png", thumb: "atlas/coxa%20posterior/11.png", titulo: "11" }
+        ]
+    },
+    {
+        nome: "Joelho",
+        icone: "joelho",
+        imagens: [
+            { src: "atlas/joelho/1.png", thumb: "atlas/joelho/1.png", titulo: "1" },
+            { src: "atlas/joelho/2.png", thumb: "atlas/joelho/2.png", titulo: "2" },
+            { src: "atlas/joelho/3.png", thumb: "atlas/joelho/3.png", titulo: "3" },
+            { src: "atlas/joelho/4.png", thumb: "atlas/joelho/4.png", titulo: "4" },
+            { src: "atlas/joelho/5.png", thumb: "atlas/joelho/5.png", titulo: "5" },
+            { src: "atlas/joelho/6.png", thumb: "atlas/joelho/6.png", titulo: "6" },
+            { src: "atlas/joelho/7.png", thumb: "atlas/joelho/7.png", titulo: "7" },
+            { src: "atlas/joelho/8.png", thumb: "atlas/joelho/8.png", titulo: "8" },
+            { src: "atlas/joelho/9.png", thumb: "atlas/joelho/9.png", titulo: "9" },
+            { src: "atlas/joelho/10.png", thumb: "atlas/joelho/10.png", titulo: "10" },
+            { src: "atlas/joelho/11.png", thumb: "atlas/joelho/11.png", titulo: "11" },
+            { src: "atlas/joelho/12.png", thumb: "atlas/joelho/12.png", titulo: "12" },
+            { src: "atlas/joelho/13.png", thumb: "atlas/joelho/13.png", titulo: "13" },
+            { src: "atlas/joelho/14.png", thumb: "atlas/joelho/14.png", titulo: "14" },
+            { src: "atlas/joelho/15.png", thumb: "atlas/joelho/15.png", titulo: "15" }
+        ]
+    },
+    {
+        nome: "Perna Anterior",
+        icone: "pernaAnterior",
+        imagens: [
+            { src: "atlas/Perna%20anterior/1.png", thumb: "atlas/Perna%20anterior/1.png", titulo: "1" },
+            { src: "atlas/Perna%20anterior/2.png", thumb: "atlas/Perna%20anterior/2.png", titulo: "2" },
+            { src: "atlas/Perna%20anterior/3.png", thumb: "atlas/Perna%20anterior/3.png", titulo: "3" }
+        ]
+    },
+    {
+        nome: "Perna Posterior",
+        icone: "pernaPosterior",
+        imagens: [
+            { src: "atlas/perna%20posterior/1.png", thumb: "atlas/perna%20posterior/1.png", titulo: "1" }
+        ]
+    },
+    {
+        nome: "Tornozelo e Pé",
+        icone: "tornozelo",
+        imagens: [
+            { src: "atlas/tornozelo%20e%20p%C3%A9/1.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/1.png", titulo: "1" },
+            { src: "atlas/tornozelo%20e%20p%C3%A9/2.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/2.png", titulo: "2" },
+            { src: "atlas/tornozelo%20e%20p%C3%A9/3.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/3.png", titulo: "3" },
+            { src: "atlas/tornozelo%20e%20p%C3%A9/4.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/4.png", titulo: "4" },
+            { src: "atlas/tornozelo%20e%20p%C3%A9/5.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/5.png", titulo: "5" },
+            { src: "atlas/tornozelo%20e%20p%C3%A9/6.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/6.png", titulo: "6" },
+            { src: "atlas/tornozelo%20e%20p%C3%A9/7.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/7.png", titulo: "7" },
+            { src: "atlas/tornozelo%20e%20p%C3%A9/8.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/8.png", titulo: "8" },
+            { src: "atlas/tornozelo%20e%20p%C3%A9/9.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/9.png", titulo: "9" },
+            { src: "atlas/tornozelo%20e%20p%C3%A9/10.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/10.png", titulo: "10" },
+            { src: "atlas/tornozelo%20e%20p%C3%A9/11.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/11.png", titulo: "11" },
+            { src: "atlas/tornozelo%20e%20p%C3%A9/12.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/12.png", titulo: "12" },
+            { src: "atlas/tornozelo%20e%20p%C3%A9/13.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/13.png", titulo: "13" },
+            { src: "atlas/tornozelo%20e%20p%C3%A9/14.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/14.png", titulo: "14" },
+            { src: "atlas/tornozelo%20e%20p%C3%A9/15.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/15.png", titulo: "15" },
+            { src: "atlas/tornozelo%20e%20p%C3%A9/16.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/16.png", titulo: "16" },
+            { src: "atlas/tornozelo%20e%20p%C3%A9/17.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/17.png", titulo: "17" },
+            { src: "atlas/tornozelo%20e%20p%C3%A9/18.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/18.png", titulo: "18" },
+            { src: "atlas/tornozelo%20e%20p%C3%A9/19.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/19.png", titulo: "19" },
+            { src: "atlas/tornozelo%20e%20p%C3%A9/20.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/20.png", titulo: "20" },
+            { src: "atlas/tornozelo%20e%20p%C3%A9/21.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/21.png", titulo: "21" },
+            { src: "atlas/tornozelo%20e%20p%C3%A9/22.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/22.png", titulo: "22" },
+            { src: "atlas/tornozelo%20e%20p%C3%A9/23.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/23.png", titulo: "23" },
+            { src: "atlas/tornozelo%20e%20p%C3%A9/24.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/24.png", titulo: "24" },
+            { src: "atlas/tornozelo%20e%20p%C3%A9/25.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/25.png", titulo: "25" },
+            { src: "atlas/tornozelo%20e%20p%C3%A9/26.png", thumb: "atlas/tornozelo%20e%20p%C3%A9/26.png", titulo: "26" }
+        ]
+    }
+];
+
+/* ==========================================================================
+   ÍCONES SVG
+   ========================================================================== */
+const ICONES = {
+    ombro: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="20" r="8"/><path d="M16 26 C 12 36, 16 48, 24 54"/><path d="M32 20 L 48 26"/><path d="M48 26 L 52 44"/><path d="M40 24 C 42 32, 40 42, 36 50"/></svg>`,
+    cotovelo: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M20 12 L 20 28 C 20 34, 28 38, 32 38 C 36 38, 44 34, 44 28 L 44 12"/><path d="M32 38 L 32 54"/><circle cx="32" cy="38" r="3"/></svg>`,
+    punho: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M22 50 L 22 34 C 22 26, 28 22, 30 14 L 30 10"/><path d="M42 50 L 42 34 C 42 26, 36 22, 34 14 L 34 10"/><path d="M26 38 L 38 38"/><path d="M28 26 L 36 26"/><path d="M32 46 L 32 34"/></svg>`,
+    quadril: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="22" cy="22" r="7"/><circle cx="42" cy="22" r="7"/><path d="M22 29 C 22 40, 26 48, 30 54"/><path d="M42 29 C 42 40, 38 48, 34 54"/></svg>`,
+    joelho: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M24 16 L 24 28 C 24 34, 40 34, 40 28 L 40 16"/><path d="M28 48 L 28 36 C 28 32, 36 32, 36 36 L 36 48"/><circle cx="32" cy="32" r="3"/></svg>`,
+    tornozelo: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M24 12 L 24 32 C 24 36, 20 40, 20 44 C 20 50, 26 54, 32 54 C 44 54, 48 46, 44 40"/><path d="M24 32 L 40 26"/><circle cx="26" cy="46" r="2"/></svg>`,
+    braco: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="14" r="6"/><path d="M29 20 L29 46 M35 20 L35 46"/><path d="M25 46 C25 56 39 56 39 46"/></svg>`,
+    mao: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M24 34 L24 12 M31 34 L31 8 M38 34 L38 10 M45 36 L45 16"/><path d="M24 34 C22 34 22 36 22 38 L22 46 C22 54 30 56 36 54 C44 52 46 46 46 36"/><path d="M22 40 L14 30"/></svg>`,
+    coxaAnterior: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M28 12 C24 12 24 18 28 19 L28 45 C24 46 24 52 28 52 C30 52 31 51 32 50 C33 51 34 52 36 52 C40 52 40 46 36 45 L36 19 C40 18 40 12 36 12 C34 12 33 13 32 14 C31 13 30 12 28 12 Z"/><path d="M46 20 C50 28 50 36 46 44"/></svg>`,
+    coxaPosterior: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M28 12 C24 12 24 18 28 19 L28 45 C24 46 24 52 28 52 C30 52 31 51 32 50 C33 51 34 52 36 52 C40 52 40 46 36 45 L36 19 C40 18 40 12 36 12 C34 12 33 13 32 14 C31 13 30 12 28 12 Z"/><path d="M18 20 C14 28 14 36 18 44"/></svg>`,
+    pernaAnterior: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M23 10 L31 10 M27 10 L27 54 M23 54 L31 54"/><path d="M37 12 L43 12 M40 12 L40 52 M37 52 L43 52"/><path d="M50 20 C54 28 54 36 50 44"/></svg>`,
+    pernaPosterior: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M23 10 L31 10 M27 10 L27 54 M23 54 L31 54"/><path d="M37 12 L43 12 M40 12 L40 52 M37 52 L43 52"/><path d="M14 20 C10 28 10 36 14 44"/></svg>`,
+    imagem: `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="14" width="44" height="36" rx="4"/><circle cx="22" cy="24" r="3"/><path d="M10 42 L 24 30 L 34 38 L 44 28 L 54 40"/></svg>`
+};
+
+/* ==========================================================================
+   RENDERIZAÇÃO DOS CARDS
+   ========================================================================== */
+const cardsContainer = document.getElementById("cardsContainer");
+
+function renderizarCards() {
+    cardsContainer.innerHTML = "";
+    REGIOES.forEach(regiao => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.setAttribute("data-regiao", regiao.nome);
+        const qtd = regiao.imagens.length;
+        card.innerHTML = `
+            <div class="card-icone">${ICONES[regiao.icone] || ICONES.imagem}</div>
+            <h3>${regiao.nome}</h3>
+            <div class="contagem">${qtd} ${qtd === 1 ? 'imagem' : 'imagens'}</div>
+        `;
+        card.onclick = () => abrirGaleria(regiao.nome);
+        cardsContainer.appendChild(card);
+    });
+}
+
+/* ==========================================================================
+   GALERIA
+   ========================================================================== */
+let regiaoAtual = null;
+let imagensAtuais = [];
+let indiceLightbox = 0;
+
+function abrirGaleria(nomeRegiao) {
+    const regiao = REGIOES.find(r => r.nome === nomeRegiao);
+    if (!regiao) return;
+
+    regiaoAtual = regiao;
+    imagensAtuais = regiao.imagens;
+
+    document.getElementById("cardsView").classList.add("oculta");
+    document.getElementById("galeriaView").classList.add("ativa");
+    document.getElementById("galeriaTitulo").textContent = regiao.nome;
+    document.getElementById("galeriaContador").textContent =
+        imagensAtuais.length + " " + (imagensAtuais.length === 1 ? "imagem" : "imagens");
+
+    const conteudo = document.getElementById("galeriaConteudo");
+
+    if (imagensAtuais.length === 0) {
+        conteudo.innerHTML = `
+            <div class="vazio">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <path d="M21 15l-5-5L5 21"/>
+                </svg>
+                <p>Nenhuma imagem cadastrada para <strong>${regiao.nome}</strong> ainda.</p>
+                <small>Adicione imagens no objeto <code>REGIOES</code> dentro do arquivo HTML.</small>
+            </div>
+        `;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+    }
+
+    const grid = document.createElement("div");
+    grid.className = "galeria-grid";
+
+    imagensAtuais.forEach((img, i) => {
+        const item = document.createElement("div");
+        item.className = "galeria-item";
+        item.innerHTML = `
+            <img src="${img.thumb || img.src}" alt="${img.titulo || ''}" loading="lazy" decoding="async"
+                 onerror="this.parentElement.style.display='none'">
+            <div class="legenda">${img.titulo || ''}</div>
+        `;
+        item.onclick = () => abrirLightbox(i);
+        grid.appendChild(item);
+    });
+
+    conteudo.innerHTML = "";
+    conteudo.appendChild(grid);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function voltarParaCards() {
+    document.getElementById("galeriaView").classList.remove("ativa");
+    document.getElementById("cardsView").classList.remove("oculta");
+    regiaoAtual = null;
+    imagensAtuais = [];
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ==========================================================================
+   LIGHTBOX (tela cheia)
+   ========================================================================== */
+const lightbox = document.getElementById("lightbox");
+const lbImg = document.getElementById("lbImg");
+const lbLegenda = document.getElementById("lbLegenda");
+const lbContador = document.getElementById("lbContador");
+
+/* --- estado de zoom/pan --- */
+let zoom = 1, panX = 0, panY = 0;
+const ZOOM_MIN = 1, ZOOM_MAX = 8;
+const lbLoading = document.getElementById("lbLoading");
+const lbZoomPct = document.getElementById("lbZoomPct");
+const ponteiros = new Map();
+let arrastoInicio = null, pinchDistIni = 0, pinchZoomIni = 1;
+let ultimoToque = 0, ultimoToqueX = 0, ultimoToqueY = 0, moveu = false;
+
+function aplicarTransform(animar = true) {
+    lbImg.classList.toggle("arrastando", !animar);
+    lbImg.classList.toggle("zoomado", zoom > 1);
+    lbImg.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+    lbZoomPct.textContent = Math.round(zoom * 100) + "%";
+}
+
+function limitarPan() {
+    // impede que a imagem saia totalmente da tela
+    const maxX = Math.max(0, (lbImg.offsetWidth * zoom - window.innerWidth) / 2 + lbImg.offsetWidth * 0.25);
+    const maxY = Math.max(0, (lbImg.offsetHeight * zoom - window.innerHeight) / 2 + lbImg.offsetHeight * 0.25);
+    panX = Math.min(maxX, Math.max(-maxX, panX));
+    panY = Math.min(maxY, Math.max(-maxY, panY));
+    if (zoom <= 1) { panX = 0; panY = 0; }
+}
+
+/* dá zoom mantendo o ponto (cx, cy) da tela fixo sob o cursor/dedos */
+function zoomEm(novoZoom, cx, cy, animar = true) {
+    novoZoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, novoZoom));
+    const ox = cx - window.innerWidth / 2;
+    const oy = cy - window.innerHeight / 2;
+    const k = novoZoom / zoom;
+    panX = ox - k * (ox - panX);
+    panY = oy - k * (oy - panY);
+    zoom = novoZoom;
+    limitarPan();
+    aplicarTransform(animar);
+}
+
+function zoomPasso(fator) { zoomEm(zoom * fator, window.innerWidth / 2, window.innerHeight / 2); }
+function resetZoom() { zoom = 1; panX = 0; panY = 0; aplicarTransform(true); }
+
+function abrirLightbox(indice) {
+    indiceLightbox = indice;
+    atualizarLightbox();
+    lightbox.classList.add("ativo");
+    document.body.style.overflow = "hidden";
+}
+
+function atualizarLightbox() {
+    const img = imagensAtuais[indiceLightbox];
+    if (!img) return;
+    zoom = 1; panX = 0; panY = 0; aplicarTransform(false);
+    lbLoading.classList.add("ativo");
+    lbImg.style.opacity = "0.35";
+    lbImg.onload = lbImg.onerror = () => { lbLoading.classList.remove("ativo"); lbImg.style.opacity = "1"; };
+    lbImg.src = img.src;
+    lbImg.alt = img.titulo || "";
+    lbLegenda.textContent = img.titulo || "";
+    lbContador.textContent = (indiceLightbox + 1) + " / " + imagensAtuais.length;
+    // pré-carrega vizinhas
+    [-1, 1].forEach(d => {
+        const v = imagensAtuais[(indiceLightbox + d + imagensAtuais.length) % imagensAtuais.length];
+        if (v) new Image().src = v.src;
+    });
+}
+
+function navegarLightbox(delta) {
+    if (imagensAtuais.length === 0) return;
+    indiceLightbox = (indiceLightbox + delta + imagensAtuais.length) % imagensAtuais.length;
+    atualizarLightbox();
+}
+
+function fecharLightbox() {
+    lightbox.classList.remove("ativo");
+    document.body.style.overflow = "";
+    ponteiros.clear();
+}
+
+/* --- scroll do mouse / trackpad: zoom no ponto do cursor --- */
+lightbox.addEventListener("wheel", e => {
+    e.preventDefault();
+    const fator = Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0018));
+    zoomEm(zoom * fator, e.clientX, e.clientY, false);
+}, { passive: false });
+
+/* --- arrastar (mouse/toque) e pinça (2 dedos) --- */
+lbImg.addEventListener("pointerdown", e => {
+    e.preventDefault();
+    lbImg.setPointerCapture(e.pointerId);
+    ponteiros.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    moveu = false;
+    if (ponteiros.size === 1) {
+        arrastoInicio = { x: e.clientX, y: e.clientY, panX, panY };
+    } else if (ponteiros.size === 2) {
+        const [p1, p2] = [...ponteiros.values()];
+        pinchDistIni = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+        pinchZoomIni = zoom;
+        arrastoInicio = null;
+    }
+    aplicarTransform(false);
+});
+
+lbImg.addEventListener("pointermove", e => {
+    if (!ponteiros.has(e.pointerId)) return;
+    ponteiros.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (ponteiros.size === 2) {
+        const [p1, p2] = [...ponteiros.values()];
+        const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+        zoomEm(pinchZoomIni * (dist / pinchDistIni), (p1.x + p2.x) / 2, (p1.y + p2.y) / 2, false);
+        moveu = true;
+    } else if (arrastoInicio) {
+        const dx = e.clientX - arrastoInicio.x, dy = e.clientY - arrastoInicio.y;
+        if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moveu = true;
+        if (zoom > 1) {
+            panX = arrastoInicio.panX + dx;
+            panY = arrastoInicio.panY + dy;
+            limitarPan();
+            aplicarTransform(false);
+        }
+    }
+});
+
+function fimPonteiro(e) {
+    if (!ponteiros.has(e.pointerId)) return;
+    const ini = arrastoInicio;
+    ponteiros.delete(e.pointerId);
+    aplicarTransform(true);
+    if (ponteiros.size === 1) {
+        const [p] = [...ponteiros.values()];
+        arrastoInicio = { x: p.x, y: p.y, panX, panY };
+        return;
+    }
+    if (ponteiros.size > 0) return;
+    arrastoInicio = null;
+
+    // deslizar para o lado (zoom 1) troca de imagem
+    if (ini && zoom <= 1.01) {
+        const dx = e.clientX - ini.x, dy = e.clientY - ini.y;
+        if (Math.abs(dx) > 70 && Math.abs(dy) < 60) { navegarLightbox(dx < 0 ? 1 : -1); return; }
+    }
+    // duplo clique / duplo toque: alterna zoom
+    if (!moveu) {
+        const agora = Date.now();
+        const perto = Math.hypot(e.clientX - ultimoToqueX, e.clientY - ultimoToqueY) < 30;
+        if (agora - ultimoToque < 320 && perto) {
+            if (zoom > 1.01) resetZoom(); else zoomEm(3, e.clientX, e.clientY);
+            ultimoToque = 0;
+        } else {
+            ultimoToque = agora; ultimoToqueX = e.clientX; ultimoToqueY = e.clientY;
+        }
+    }
+}
+lbImg.addEventListener("pointerup", fimPonteiro);
+lbImg.addEventListener("pointercancel", fimPonteiro);
+
+document.addEventListener("keydown", e => {
+    if (!lightbox.classList.contains("ativo")) return;
+    if (e.key === "Escape") fecharLightbox();
+    else if (e.key === "ArrowLeft") navegarLightbox(-1);
+    else if (e.key === "ArrowRight") navegarLightbox(1);
+    else if (e.key === "+" || e.key === "=") zoomPasso(1.4);
+    else if (e.key === "-" || e.key === "_") zoomPasso(1 / 1.4);
+    else if (e.key === "0") resetZoom();
+});
+
+window.addEventListener("resize", () => { limitarPan(); aplicarTransform(false); });
+
+/* ==========================================================================
+   BUSCA
+   ========================================================================== */
+function removerAcentos(str) {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+function filtrarCards() {
+    const termo = removerAcentos(document.getElementById("searchInput").value.toLowerCase().trim());
+    document.querySelectorAll(".card").forEach(card => {
+        const nome = removerAcentos(card.getAttribute("data-regiao").toLowerCase());
+        card.classList.toggle("hidden", !nome.includes(termo));
+    });
+}
+
+/* ==========================================================================
+   TEMA
+   ========================================================================== */
+const body = document.body;
+const themeBtn = document.getElementById("themeBtn");
+const temaSalvo = localStorage.getItem("tema-thirads") || "dark";
+
+const iconeSol = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+const iconeLua = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+
+if (temaSalvo === "light") {
+    body.classList.add("light-mode");
+    themeBtn.innerHTML = iconeLua;
+} else {
+    themeBtn.innerHTML = iconeSol;
+}
+
+function alternarTema() {
+    body.classList.toggle("light-mode");
+    if (body.classList.contains("light-mode")) {
+        localStorage.setItem("tema-thirads", "light");
+        themeBtn.innerHTML = iconeLua;
+    } else {
+        localStorage.setItem("tema-thirads", "dark");
+        themeBtn.innerHTML = iconeSol;
+    }
+}
+
+/* ==========================================================================
+   INICIALIZAÇÃO
+   ========================================================================== */
+/* Carrega atlas/atlas.json (gerado pelo script gerar_atlas.py) e
+   associa cada pasta ao card de mesmo nome (ignora acentos, maiúsculas, _ e -). */
+function normalizarNome(str) {
+    return removerAcentos(str.toLowerCase()).replace(/[_\-]+/g, " ").replace(/\s+/g, " ").trim();
+}
+
+renderizarCards();
+</script>
+</body>
+</html>
+
+
+
+
+
+
+

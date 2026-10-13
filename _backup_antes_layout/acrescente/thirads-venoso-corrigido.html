@@ -1,0 +1,1527 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THI-RADS | US Doppler Venoso</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#1a56db;--blue-dark:#1140a6;--blue-light:#e8f0fe;--blue-mid:#dbeafe;
+  --surface:#f4f6fb;--border:#e2e6ef;--border-strong:#c8cfe0;
+  --text:#1a1f2e;--text-2:#4b5570;--text-3:#8892a4;
+  --white:#ffffff;--green:#059669;--red:#dc2626;--amber:#b45309;--amber-bg:#fffbeb;--amber-border:#fde68a;
+  --radius:8px;--radius-lg:12px;
+}
+body.dark{
+  --blue:#4d86f5;--blue-dark:#3a6fd4;--blue-light:#1e2d4a;--blue-mid:#1e2d4a;
+  --surface:#141820;--border:#2a2f3d;--border-strong:#3a4155;
+  --text:#e2e6f0;--text-2:#9aa3b8;--text-3:#5d6680;
+  --white:#1e2230;--green:#34d399;--red:#f87171;--amber:#fbbf24;--amber-bg:#1c1810;--amber-border:#78350f;
+}
+body.dark .laudo-doc{color:#e2e6f0;}
+body.dark .laudo-panel{background:#1e2230;border-left-color:var(--border);}
+body.dark .laudo-body{background:#1e2230;}
+body.dark .laudo-header{background:#1e2230;border-bottom-color:var(--border);}
+body.dark .info-box{background:#1a2040;border-color:#2a4460;color:#a0b4d0;}
+@media print{body.dark .laudo-doc,body.dark .laudo-doc *{color:#111 !important;}}
+.btn-dark{margin-left:auto;}
+body.dark .btn-dark{background:#2a2f3d;border-color:#3a4155;color:#e2e6f0;}
+body.dark .btn-dark:hover{background:#343a4d;color:#fff;}
+body.dark .dim-input,body.dark .ff select,body.dark .ff input[type=text]{background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .radio-mark{background:var(--white);}
+body.dark .check-box{background:var(--white);}
+body.dark .toolbar{background:var(--white);border-bottom-color:var(--border);}
+body.dark .sidebar{background:var(--white);border-right-color:var(--border);}
+body.dark .sidebar-hd{border-bottom-color:var(--border);}
+body.dark .block{background:var(--white);border-color:var(--border);}
+body.dark .block-title{background:var(--white);border-bottom-color:var(--border);}
+body.dark .radio-opt:hover{background:#1e2d4a;}
+body.dark .radio-opt.selected{background:#1e2d4a;}
+body.dark .check-row{background:#1a1f2e;}
+body.dark .check-row:hover{background:#1e2d4a;}
+body.dark .check-row.selected{background:#1e2d4a;}
+body.dark .module-btn{background:#1a1f2e;border-color:var(--border-strong);color:var(--text-2);}
+body.dark .module-btn.active{background:var(--blue);color:#fff;}
+body.dark .amber-box{background:#1c1810;border-color:#78350f;color:#fbbf24;}
+body.dark .nav-group-hd{color:var(--text-3);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',system-ui,sans-serif;font-size:13px;background:var(--surface);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+.toolbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:10px;height:48px;flex-shrink:0;}
+.logo{display:flex;align-items:baseline;gap:6px;margin-right:12px;}
+.logo-name{font-size:17px;font-weight:600;color:var(--blue);letter-spacing:-.3px;}
+.logo-sub{font-size:11px;color:var(--text-3);font-weight:400;letter-spacing:.2px;}
+.tb-sep{width:1px;height:20px;background:var(--border);margin:0 4px;}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid var(--border);font-weight:500;transition:all .13s;background:var(--white);color:var(--text-2);}
+.btn:hover{background:var(--surface);border-color:var(--border-strong);color:var(--text);}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue);}
+.btn-primary:hover{background:var(--blue-dark);border-color:var(--blue-dark);color:#fff;}
+.btn-danger{background:#fff5f5;color:var(--red);border-color:#fecaca;}
+body.dark .btn-danger{background:#2d1a1a;border-color:#6b2929;}
+.btn-danger:hover{background:#fee2e2;border-color:#fca5a5;}
+.btn svg{width:13px;height:13px;flex-shrink:0;}
+.body{display:flex;flex:1;overflow:hidden;}
+.sidebar{width:190px;background:var(--white);border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;}
+.sidebar-hd{padding:10px 12px 8px;border-bottom:1px solid var(--border);}
+.sidebar-tipo{font-size:9px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;}
+.sidebar-titulo{font-size:11px;font-weight:600;color:var(--text);}
+.module-switch{display:flex;gap:5px;padding:9px 10px;border-bottom:1px solid var(--border);}
+.module-btn{flex:1;padding:7px 4px;text-align:center;font-size:10.3px;font-weight:600;border-radius:6px;cursor:pointer;color:var(--text-2);background:var(--surface);border:1px solid var(--border);transition:all .12s;line-height:1.3;}
+.module-btn:hover{border-color:var(--blue);color:var(--blue);}
+.module-btn.active{background:var(--blue);color:#fff;border-color:var(--blue);}
+.nav-group{padding:4px 0 8px;}
+.nav-group-hd{padding:8px 12px 3px;font-size:9px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;margin-top:2px;}
+.nav-item{display:flex;align-items:center;gap:7px;padding:6px 12px;font-size:11.5px;color:var(--text-2);cursor:pointer;transition:all .12s;border-left:2px solid transparent;}
+.nav-item:hover{background:var(--blue-light);color:var(--blue);}
+.nav-item.active{background:var(--blue-light);color:var(--blue);border-left-color:var(--blue);font-weight:600;}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.4;flex-shrink:0;}
+.nav-item.active .nav-dot{opacity:1;}
+.nav-dot.alert{background:var(--red);opacity:1;}
+.nav-dot.warn{background:var(--amber);opacity:1;}
+.ff select{min-width:120px;}
+.panel{width:490px;flex-shrink:0;overflow-y:auto;padding:14px 14px 20px;background:var(--surface);}
+.sec-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.sec-title::before{content:'';display:block;width:3px;height:16px;background:var(--blue);border-radius:2px;}
+.block{margin-bottom:10px;background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden;}
+.block-title{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.7px;padding:8px 14px 7px;border-bottom:1px solid var(--border);background:var(--white);}
+.radio-opt{display:flex;align-items:flex-start;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;position:relative;}
+.radio-opt:last-child{border-bottom:none;}
+.radio-opt:hover{background:#f5f8ff;}
+.radio-opt.selected{background:var(--blue-light);}
+.radio-opt input[type=radio]{position:absolute;opacity:0;pointer-events:none;}
+.radio-label{display:flex;align-items:center;gap:10px;width:100%;padding:9px 14px;font-size:12.5px;color:var(--text-2);line-height:1.4;cursor:pointer;}
+.radio-opt.selected .radio-label{color:var(--blue);font-weight:500;}
+.radio-mark{width:16px;height:16px;border-radius:50%;border:2px solid var(--border-strong);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.radio-opt:hover .radio-mark{border-color:var(--blue);}
+.radio-opt.selected .radio-mark{border-color:var(--blue);background:var(--blue);}
+.radio-mark::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff;opacity:0;transition:opacity .15s;}
+.radio-opt.selected .radio-mark::after{opacity:1;}
+.check-row{display:flex;align-items:center;border-bottom:1px solid var(--border);cursor:pointer;background:#fafbff;}
+.check-row:last-child{border-bottom:none;}
+.check-row:hover{background:#f0f5ff;}
+.check-row.selected{background:#e6eeff;}
+.check-row input[type=checkbox]{position:absolute;opacity:0;pointer-events:none;}
+.check-label{display:flex;align-items:center;gap:10px;width:100%;padding:8px 14px;font-size:12px;color:var(--text-2);cursor:pointer;}
+.check-row.selected .check-label{color:var(--blue);font-weight:500;}
+.check-box{width:15px;height:15px;border-radius:4px;border:2px solid var(--border-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.check-row:hover .check-box{border-color:var(--blue);}
+.check-row.selected .check-box{border-color:var(--blue);background:var(--blue);}
+.check-box svg{display:none;width:9px;height:9px;}
+.check-row.selected .check-box svg{display:block;}
+.ff-grid{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;padding:0 14px;}
+.ff{display:flex;flex-direction:column;gap:2px;}
+.ff label{font-size:9px;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
+.ff select,.ff input[type=text]{font-size:11px;padding:4px 7px;border:1px solid var(--border-strong);border-radius:5px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);}
+.ff select:focus,.ff input:focus{outline:none;border-color:var(--blue);}
+.ff input[type=text]{width:100%;}
+.info-box{padding:8px 14px;font-size:11px;color:#1e40af;background:#eff6ff;border-top:1px solid #bfdbfe;line-height:1.6;}
+.amber-box{padding:8px 14px;font-size:11px;color:var(--amber);background:var(--amber-bg);border-top:1px solid var(--amber-border);line-height:1.6;}
+.laudo-panel{flex:1;min-width:0;background:var(--white);display:flex;flex-direction:column;border-left:1px solid var(--border);}
+.laudo-header{padding:9px 20px 8px;border-bottom:1px solid var(--border);background:var(--white);display:flex;align-items:center;}
+.laudo-header-title{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.6px;}
+.laudo-body{flex:1;overflow-y:auto;padding:22px 28px;}
+.laudo-doc{font-family:Helvetica,Arial,sans-serif;font-size:10pt;line-height:1.65;color:#111;max-width:740px;}
+.doc-titulo{text-align:center;font-weight:700;font-size:10pt;margin-bottom:16px;text-transform:uppercase;letter-spacing:.3px;}
+.doc-label{font-weight:700;font-size:10pt;display:block;margin-bottom:2px;}
+.doc-p{margin-bottom:8px;font-size:10pt;}
+.doc-secao{margin-bottom:14px;}
+.laudo-doc:focus{outline:none;}
+.toast-notification{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:#fff;padding:10px 18px;border-radius:8px;font-size:12px;font-weight:500;opacity:0;pointer-events:none;transition:all .25s;z-index:999;box-shadow:0 6px 18px rgba(0,0,0,.18);}
+.toast-notification.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.msc-overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;z-index:1200;padding:20px;}
+.msc-overlay.show{display:flex;}
+.msc-card{background:var(--white);color:var(--text);border-radius:var(--radius-lg);max-width:460px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.28);}
+.msc-header{padding:16px 20px;border-bottom:1px solid var(--border);font-weight:700;font-size:13.5px;}
+.msc-header.normal{color:var(--blue);}
+.msc-header.atencao{color:var(--amber);}
+.msc-header.critico{color:var(--red);}
+.msc-body{padding:16px 20px;font-size:12.5px;line-height:1.6;color:var(--text-2);}
+.msc-body strong{color:var(--text);}
+.msc-list{margin:8px 0 0 18px;padding:0;}
+.msc-list li{margin-bottom:4px;}
+.msc-footer{padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="logo" style="cursor: pointer;" onclick="window.location.href='../laudo-thirads.html'"><span class="logo-name">THI-RADS</span><span class="logo-sub">Doppler Venoso</span></div>
+  <button class="btn" onclick="window.location.href='../laudo-thirads.html'"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 2L4 8l6 6"/></svg>Voltar</button>
+  <div class="tb-sep"></div>
+  <button class="btn" onclick="copiar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>Copiar laudo</button>
+  <button class="btn btn-primary" onclick="imprimir()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6V2h8v4M4 12H2V7h12v5h-2M4 9h8M4 12v2h8v-2"/></svg>Imprimir</button>
+  <button class="btn btn-dark" id="btn-dark-toggle" onclick="toggleDark()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro</button>
+  <button class="btn btn-danger" onclick="reiniciar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8a6 6 0 1 0 1.5-3.9M2 4v4h4"/></svg>Reiniciar</button>
+</div>
+
+<div class="body">
+  <div class="sidebar">
+    <div class="sidebar-hd"><div class="sidebar-tipo">US Doppler Venoso</div><div class="sidebar-titulo" id="sidebar-titulo">Membro Superior</div></div>
+    <div class="module-switch">
+      <div class="module-btn" id="mod-superior" onclick="setModulo('superior')">Membro<br>Superior</div>
+      <div class="module-btn" id="mod-inferior" onclick="setModulo('inferior')">Membro<br>Inferior</div>
+    </div>
+    <div id="sidebar-nav"></div>
+  </div>
+
+  <div class="panel" id="main-panel"></div>
+
+  <div class="laudo-panel">
+    <div class="laudo-header"><span class="laudo-header-title">Pré-visualização do laudo</span></div>
+    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc" contenteditable="true"></div></div>
+  </div>
+</div>
+
+<div id="toast-notification" class="toast-notification">Laudo copiado!</div>
+
+<div id="modal-seguranca-copia" class="msc-overlay" onclick="if(event.target===this) fecharModalSeguranca()">
+  <div class="msc-card">
+    <div id="msc-header" class="msc-header"></div>
+    <div id="msc-body" class="msc-body"></div>
+    <div id="msc-footer" class="msc-footer"></div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   THI-RADS · US DOPPLER VENOSO — Membros Superiores e Inferiores
+   Estrutura: estado global -> configuração de veias -> componentes de
+   UI reutilizáveis -> geração do laudo -> eventos -> tema/copiar/imprimir
+   ===================================================================== */
+
+// ── CONFIGURAÇÃO DE VEIAS (dado, não código duplicado) ──
+// sistema: 'profundo' | 'superficial' — determina a lógica de geração (TVP vs TVS)
+const VEINS = {
+  superior: {
+    profundo: [
+      ['jugularInterna','Jugular interna'],
+      ['subclavia','Subclávia'],
+      ['axilar','Axilar'],
+      ['braquiais','Braquial']
+    ],
+    profundoOpcional: [
+      ['radiais','Radial'],
+      ['ulnares','Ulnar']
+    ],
+    superficial: [
+      ['cefalica','Cefálica'],
+      ['basilica','Basílica']
+    ],
+    superficialOpcional: []
+  },
+  inferior: {
+    profundo: [
+      ['femoralComum','Femoral comum'],
+      ['femoralProximal','Femoral proximal'],
+      ['femoralMedia','Femoral média'],
+      ['femoralDistal','Femoral distal'],
+      ['femoralProfunda','Femoral profunda'],
+      ['poplitea','Poplítea'],
+      ['tibialPosterior','Tibial posterior'],
+      ['fibular','Fibular']
+    ],
+    profundoOpcional: [
+      ['tibialAnterior','Tibial anterior'],
+      ['gastrocnemias','Gastrocnêmia'],
+      ['soleares','Solear']
+    ],
+    superficial: [
+      ['jsf','Junção safenofemoral (JSF)'],
+      ['safenaMagna','Safena magna'],
+      ['safenaParva','Safena parva']
+    ],
+    superficialOpcional: [
+      ['tributaria','Veia tributária/superficial acessória']
+    ]
+  }
+};
+
+// veias cuja compressão manual direta é limitada por estrutura óssea (ex.: clavícula) —
+// não se deve gerar/exigir frase de "compressibilidade preservada" como nas veias de membro
+const VEIAS_SEM_COMPRESSAO_DIRETA = new Set(['subclavia']);
+
+const AVALIACAO_OPTS = [
+  ['normal','Normal'],
+  ['trombose','Trombose'],
+  ['limitada','Avaliação limitada'],
+  ['nao_avaliada','Não avaliada / não visualizada']
+];
+const OCLUSAO_OPTS = [ ['','Não especificada'], ['oclusiva','Oclusiva'], ['nao_oclusiva','Não oclusiva'] ];
+const TEMPORALIDADE_OPTS = [
+  ['','Não especificada'],
+  ['aguda','Aguda'],
+  ['indeterminada','Indeterminada'],
+  ['pos_tromboticas','Alterações pós-trombóticas crônicas']
+];
+const ECOGENICIDADE_OPTS = [ ['','Não especificada'], ['hipoecoico','Hipoecoico'], ['heterogêneo','Heterogêneo'], ['hiperecoico','Hiperecoico'], ['isoecoico','Isoecoico'] ];
+const COMPRESS_OPTS = [ ['','Não avaliada'], ['normal','Preservada'], ['reduzida','Reduzida'], ['ausente','Ausente'] ];
+const FLUXO_ESP_OPTS = [ ['','Não avaliado'], ['presente','Presente'], ['reduzido','Reduzido'], ['ausente','Ausente'] ];
+const FASICIDADE_OPTS = [ ['','Não avaliada'], ['preservada','Preservada'], ['reduzida','Reduzida'], ['ausente','Ausente'] ];
+const EXT_PROFUNDO_OPTS = [ ['','Não especificada'], ['sim','Sim'], ['nao','Não'], ['nao_avaliada','Não avaliada'] ];
+
+const INDICACOES = [
+  ['tvp-suspeita','Suspeita de trombose venosa profunda (TVP)'],
+  ['dor','Investigação de dor'],
+  ['edema','Investigação de edema'],
+  ['posop','Acompanhamento pós-operatório'],
+  ['cateter','Presença de cateter / dispositivo vascular'],
+  ['tvs-suspeita','Suspeita de trombose venosa superficial (TVS)'],
+  ['tvp-tvs-suspeita','Suspeita de trombose venosa profunda e superficial (TVP + TVS)'],
+  ['tvp-conhecida','Trombose venosa conhecida — avaliação/extensão'],
+  ['controle','Trombose prévia / controle'],
+  ['outro','Outra']
+];
+
+const ACHADOS_SIMPLES_LABELS = {
+  colecoes:'Coleção líquida de permeio às estruturas avaliadas',
+  hematomas:'Hematoma de partes moles',
+  edemaSubcutaneo:'Edema subcutâneo difuso'
+};
+
+const MORFOLOGIA_LINFONODO_OPTS = [ ['','Não especificada'], ['preservada, hilo gorduroso identificável','Morfologia preservada, hilo gorduroso identificável'], ['alterada, hilo não identificável','Morfologia alterada, hilo não identificável'], ['espessamento cortical','Espessamento cortical'] ];
+
+// ── FÁBRICAS DE ESTADO ──
+function defaultVeia(){
+  return {
+    avaliacao: 'normal', // normal | trombose | limitada | nao_avaliada
+    trombo: {
+      oclusao: '',
+      temporalidade: '',
+      segmento: '',
+      extensaoCm: '',
+      ecogenicidade: '',
+      extensaoProfundo: '',
+      segmentoProfundoAcometido: '',
+      distanciaSFJcm: '',
+      distanciaSPJcm: '',
+      tributariasEnvolvidas: false
+    },
+    compressibilidade: '',
+    fluxoEspontaneo: '',
+    fasicidade: '',
+    colaterais: false,
+    duplicidade: false,
+    observacoes: ''
+  };
+}
+function todasChavesVeia(modulo){
+  const v = VEINS[modulo];
+  return v.profundo.concat(v.profundoOpcional, v.superficial, v.superficialOpcional).map(x => x[0]);
+}
+function defaultVeiasSide(modulo){
+  const obj = {};
+  todasChavesVeia(modulo).forEach(k => obj[k] = defaultVeia());
+  return obj;
+}
+function defaultLimitacoes(){
+  return { biotipo:false, curativos:false, dorIntensa:false, mobilidadeReduzida:false, gesso:false, edemaImportante:false };
+}
+function defaultOpcionais(modulo){
+  const obj = {};
+  VEINS[modulo].profundoOpcional.concat(VEINS[modulo].superficialOpcional).forEach(([k]) => obj[k] = false);
+  return obj;
+}
+function defaultAchados(){
+  return {
+    linfonodos: { presente:false, localizacao:'', tamanhoCm:'', morfologia:'', observacoes:'' },
+    colecoes:false, hematomas:false, edemaSubcutaneo:false,
+    cistoBaker: { presente:false, dimensoes:'', conteudo:'', comunicacao:false, complicacao:false }
+  };
+}
+function defaultModuloState(modulo){
+  return {
+    indicacao:'tvp-suspeita', indicacaoOutro:'',
+    lateralidade:'direito',
+    urgencia:'ambulatorial',
+    limitacoes: defaultLimitacoes(),
+    opcionais: defaultOpcionais(modulo),
+    veias: { D: defaultVeiasSide(modulo), E: defaultVeiasSide(modulo) },
+    achados: defaultAchados()
+  };
+}
+
+let estado = {
+  moduloAtual: 'superior',
+  superior: defaultModuloState('superior'),
+  inferior: defaultModuloState('inferior')
+};
+
+let secaoAtual = 'geral';
+
+// ── HELPERS DE ACESSO AO ESTADO ──
+function modState(m){ return estado[m || estado.moduloAtual]; }
+function getVeia(side, key){ return modState().veias[side][key]; }
+function veinInfo(modulo, key){
+  const v = VEINS[modulo];
+  const all = v.profundo.map(x=>[...x,'profundo']).concat(
+    v.profundoOpcional.map(x=>[...x,'profundo']),
+    v.superficial.map(x=>[...x,'superficial']),
+    v.superficialOpcional.map(x=>[...x,'superficial'])
+  );
+  const found = all.find(x => x[0] === key);
+  return found ? { key: found[0], label: found[1], sistema: found[2] } : { key, label:key, sistema:'profundo' };
+}
+function veinLabel(modulo, key){ return veinInfo(modulo, key).label; }
+function isProfunda(modulo, key){ return veinInfo(modulo, key).sistema === 'profundo'; }
+
+// lista de veias efetivamente incluídas no exame (obrigatórias + opcionais ativadas)
+function veinsAtivos(modulo, sistema){
+  const st = modState(modulo);
+  const base = VEINS[modulo][sistema].slice();
+  const opcKey = sistema + 'Opcional';
+  (VEINS[modulo][opcKey] || []).forEach(([k,l]) => { if(st.opcionais[k]) base.push([k,l]); });
+  return base;
+}
+
+// ── SIDEBAR / NAVEGAÇÃO ──
+function setModulo(m){
+  estado.moduloAtual = m;
+  document.getElementById('mod-superior').classList.toggle('active', m === 'superior');
+  document.getElementById('mod-inferior').classList.toggle('active', m === 'inferior');
+  document.getElementById('sidebar-titulo').innerText = m === 'superior' ? 'Membro Superior' : 'Membro Inferior';
+  buildSidebar();
+  showSection('geral');
+}
+
+function dotClasse(side, key){
+  const av = getVeia(side, key).avaliacao;
+  if(av === 'trombose') return 'nav-dot alert';
+  if(av === 'limitada' || av === 'nao_avaliada') return 'nav-dot warn';
+  return 'nav-dot';
+}
+
+function buildSidebar(){
+  const m = estado.moduloAtual;
+  const st = modState(m);
+  const lat = st.lateralidade;
+  const sides = lat === 'bilateral' ? ['D','E'] : (lat === 'direito' ? ['D'] : ['E']);
+  const sideLabel = { D:'Direito', E:'Esquerdo' };
+
+  let html = `<div class="nav-group">
+    <div class="nav-group-hd">Geral</div>
+    <div class="nav-item" id="nav-geral" onclick="showSection('geral')"><span class="nav-dot"></span>Suspeita Clínica / Lateralidade</div>
+    <div class="nav-item" id="nav-limitacoes" onclick="showSection('limitacoes')"><span class="nav-dot"></span>Limitações e Urgência</div>
+  </div>`;
+
+  html += `<div class="nav-group"><div class="nav-group-hd">Sistema Venoso Profundo</div>`;
+  sides.forEach(side => {
+    if(sides.length > 1) html += `<div class="nav-group-hd" style="padding-top:4px;font-size:8.5px;opacity:.75">${sideLabel[side]}</div>`;
+    veinsAtivos(m,'profundo').forEach(([key,label]) => {
+      html += `<div class="nav-item" id="nav-v_${side}_${key}" onclick="showSection('v_${side}_${key}')"><span class="${dotClasse(side,key)}"></span>${label}${sides.length>1?' '+side:''}</div>`;
+    });
+  });
+  html += `</div>`;
+
+  html += `<div class="nav-group"><div class="nav-group-hd">Sistema Venoso Superficial</div>`;
+  sides.forEach(side => {
+    if(sides.length > 1) html += `<div class="nav-group-hd" style="padding-top:4px;font-size:8.5px;opacity:.75">${sideLabel[side]}</div>`;
+    veinsAtivos(m,'superficial').forEach(([key,label]) => {
+      html += `<div class="nav-item" id="nav-v_${side}_${key}" onclick="showSection('v_${side}_${key}')"><span class="${dotClasse(side,key)}"></span>${label}${sides.length>1?' '+side:''}</div>`;
+    });
+  });
+  html += `</div>`;
+
+  html += `<div class="nav-group">
+    <div class="nav-group-hd">Achados</div>
+    <div class="nav-item" id="nav-achados" onclick="showSection('achados')"><span class="nav-dot"></span>Achados Adicionais</div>
+  </div>`;
+
+  document.getElementById('sidebar-nav').innerHTML = html;
+}
+
+function showSection(sec){
+  secaoAtual = sec;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const el = document.getElementById('nav-' + sec);
+  if(el) el.classList.add('active');
+  renderPanel(sec);
+  updateLaudo();
+}
+
+function renderPanel(sec){
+  const p = document.getElementById('main-panel');
+  let html = '';
+  if(sec === 'geral'){ html = '<div class="sec-title">Suspeita Clínica e Lateralidade</div>' + renderGeral(); }
+  else if(sec === 'limitacoes'){ html = '<div class="sec-title">Limitações Técnicas e Urgência</div>' + renderLimitacoes(); }
+  else if(sec === 'achados'){ html = '<div class="sec-title">Achados Adicionais</div>' + renderAchados(); }
+  else if(sec.startsWith('v_')){
+    const [, side, key] = sec.split('_');
+    const info = veinInfo(estado.moduloAtual, key);
+    const sideLabel = side === 'D' ? ' Direita' : side === 'E' ? ' Esquerda' : '';
+    html = `<div class="sec-title">Veia ${info.label}${sideLabel}</div>` + renderVeiaPanel(side, key);
+  }
+  p.innerHTML = html;
+}
+
+// ── COMPONENTES REUTILIZÁVEIS ──
+function radioOpt(id, label, selected, onclickCall){
+  return `<div class="radio-opt ${selected?'selected':''}" id="ro-${id}" onclick="${onclickCall}"><input type="radio"><label class="radio-label"><span class="radio-mark"></span>${label}</label></div>`;
+}
+function checkRow(id, label, checked, onclickCall){
+  return `<div class="check-row ${checked?'selected':''}" id="cr-${id}" onclick="${onclickCall}"><input type="checkbox" ${checked?'checked':''}><label class="check-label"><span class="check-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.8"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg></span>${label}</label></div>`;
+}
+function selectField(id, label, value, options, onchangeCall){
+  const opts = options.map(([v,l]) => `<option value="${v}" ${value===v?'selected':''}>${l}</option>`).join('');
+  return `<div class="ff"><label>${label}</label><select id="${id}" onchange="${onchangeCall}">${opts}</select></div>`;
+}
+function textField(id, label, value, placeholder, oninputCall, flexBasis){
+  return `<div class="ff" style="${flexBasis?'flex:'+flexBasis:''}"><label>${label}</label><input type="text" id="${id}" value="${value||''}" placeholder="${placeholder||''}" oninput="${oninputCall}"></div>`;
+}
+
+// ── SEÇÃO: GERAL ──
+function renderGeral(){
+  const st = modState();
+  let html = `<div class="block"><div class="block-title">Suspeita Clínica</div>`;
+  INDICACOES.forEach(([v,l]) => html += radioOpt('ind-'+v, l, st.indicacao===v, `setGeral('indicacao','${v}')`));
+  if(st.indicacao === 'outro'){
+    html += `<div class="ff-grid" style="padding:10px 14px">${textField('ind-outro','Especificar',st.indicacaoOutro,'',`setGeral('indicacaoOutro', this.value, true)`,'1')}</div>`;
+  }
+  html += `</div>`;
+  html += `<div class="info-box">A avaliação de insuficiência venosa/refluxo e o mapeamento para varizes não fazem parte desta versão e serão implementados em etapa futura.</div>`;
+
+  html += `<div class="block"><div class="block-title">Lateralidade do Exame</div>`;
+  html += radioOpt('lat-direito','Membro direito', st.lateralidade==='direito', `setGeral('lateralidade','direito')`);
+  html += radioOpt('lat-esquerdo','Membro esquerdo', st.lateralidade==='esquerdo', `setGeral('lateralidade','esquerdo')`);
+  html += radioOpt('lat-bilateral','Bilateral', st.lateralidade==='bilateral', `setGeral('lateralidade','bilateral')`);
+  html += `</div>`;
+  html += `<div class="info-box">A alteração da lateralidade reorganiza automaticamente as veias disponíveis para avaliação na barra lateral.</div>`;
+
+  const modulo = estado.moduloAtual;
+  const opcProf = VEINS[modulo].profundoOpcional;
+  const opcSup = VEINS[modulo].superficialOpcional;
+  if(opcProf.length || opcSup.length){
+    html += `<div class="block"><div class="block-title">Segmentos Adicionais do Exame</div>`;
+    opcProf.concat(opcSup).forEach(([k,l]) => {
+      html += checkRow('opc-'+k, l, st.opcionais[k], `toggleOpcional('${k}')`);
+    });
+    html += `</div>`;
+    html += `<div class="info-box">Ative apenas os segmentos efetivamente avaliados no exame. Eles passam a constar na barra lateral e na geração do laudo.</div>`;
+  }
+  return html;
+}
+
+function setGeral(field, value, isText){
+  const st = modState();
+  st[field] = value;
+  if(field === 'lateralidade') buildSidebar();
+  if(!isText) renderPanel(secaoAtual);
+  updateLaudo();
+}
+
+function toggleOpcional(k){
+  const st = modState();
+  st.opcionais[k] = !st.opcionais[k];
+  buildSidebar();
+  renderPanel(secaoAtual);
+  updateLaudo();
+}
+
+// ── SEÇÃO: LIMITAÇÕES E URGÊNCIA ──
+const LIMIT_LABELS = {
+  biotipo:'Biotipo do paciente (obesidade / panículo adiposo espesso)',
+  curativos:'Presença de curativos / bandagens',
+  dorIntensa:'Dor intensa referida pelo paciente',
+  mobilidadeReduzida:'Mobilidade reduzida do paciente',
+  gesso:'Presença de imobilização gessada',
+  edemaImportante:'Edema importante de subcutâneo'
+};
+const URGENCIA_OPTS = [ ['ambulatorial','Ambulatorial'], ['pronto-socorro','Pronto-Socorro'], ['internacao','Internação'], ['uti','UTI'] ];
+
+function renderLimitacoes(){
+  const st = modState();
+  let html = `<div class="block"><div class="block-title">Limitações Técnicas</div>`;
+  Object.keys(LIMIT_LABELS).forEach(k => {
+    html += checkRow('lim-'+k, LIMIT_LABELS[k], st.limitacoes[k], `toggleLimitacao('${k}')`);
+  });
+  html += `</div>`;
+  html += `<div class="block"><div class="block-title">Contexto / Urgência</div>`;
+  URGENCIA_OPTS.forEach(([v,l]) => html += radioOpt('urg-'+v, l, st.urgencia===v, `setGeral('urgencia','${v}')`));
+  html += `</div>`;
+  return html;
+}
+function toggleLimitacao(k){
+  const st = modState();
+  st.limitacoes[k] = !st.limitacoes[k];
+  renderPanel(secaoAtual);
+  updateLaudo();
+}
+
+// ── SEÇÃO: PAINEL DE VEIA (COMPONENTE REUTILIZÁVEL) ──
+function renderVeiaPanel(side, key){
+  const modulo = estado.moduloAtual;
+  const v = getVeia(side, key);
+  const info = veinInfo(modulo, key);
+  const semCompressaoDireta = VEIAS_SEM_COMPRESSAO_DIRETA.has(key);
+
+  let html = `<div class="block"><div class="block-title">Avaliação do Segmento</div>`;
+  AVALIACAO_OPTS.forEach(([val,label]) => html += radioOpt('av-'+val, label, v.avaliacao===val, `setVeiaAvaliacao('${side}','${key}','${val}')`));
+  html += `</div>`;
+
+  if(v.avaliacao === 'normal'){
+    if(semCompressaoDireta){
+      html += `<div class="info-box">Veia pérvia. Compressão manual direta limitada pela interposição óssea (clavícula); avaliação baseada em modo B, fluxo espontâneo e fasicidade respiratória, preservados ao Doppler.</div>`;
+    } else {
+      html += `<div class="info-box">Veia pérvia, compressível, com fluxo espontâneo e fásico preservado ao Doppler. Sem evidência de trombos.</div>`;
+    }
+    return html;
+  }
+
+  if(v.avaliacao === 'nao_avaliada'){
+    html += `<div class="amber-box">Segmento não avaliado / não visualizado neste exame. Não será incluído na afirmação de ausência de trombose e não entrará na frase "demais segmentos normais".</div>`;
+    html += `<div class="block"><div class="block-title">Observações</div><div class="ff-grid" style="padding-top:8px">${textField('obs','Motivo / observação (opcional)', v.observacoes, 'ex: segmento não acessível ao exame', `setVeiaText('${side}','${key}','observacoes', this.value)`,'1')}</div></div>`;
+    return html;
+  }
+
+  if(v.avaliacao === 'limitada'){
+    html += `<div class="amber-box">Avaliação tecnicamente limitada deste segmento. Preencha apenas os dados efetivamente obtidos — campos não preenchidos não serão citados no laudo.</div>`;
+    html += renderCamposDoppler(side, key, v, semCompressaoDireta);
+    html += `<div class="block"><div class="block-title">Observações</div><div class="ff-grid" style="padding-top:8px">${textField('obs','Motivo da limitação (opcional)', v.observacoes, 'ex: interposição gasosa, edema importante', `setVeiaText('${side}','${key}','observacoes', this.value)`,'1')}</div></div>`;
+    return html;
+  }
+
+  // v.avaliacao === 'trombose'
+  html += `<div class="block"><div class="block-title">Trombo — Localização e Características</div><div class="ff-grid" style="padding-top:8px">`;
+  html += textField('seg','Segmento (opcional)', v.trombo.segmento, 'ex: proximal', `setVeiaTromboText('${side}','${key}','segmento', this.value)`,'1');
+  html += textField('ext','Extensão aprox. (cm)', v.trombo.extensaoCm, 'ex: 4', `setVeiaTromboText('${side}','${key}','extensaoCm', this.value)`,'1');
+  html += `</div><div class="ff-grid">`;
+  html += selectField('eco','Ecogenicidade', v.trombo.ecogenicidade, ECOGENICIDADE_OPTS, `setVeiaTromboField('${side}','${key}','ecogenicidade', this.value)`);
+  html += selectField('ocl','Oclusão', v.trombo.oclusao, OCLUSAO_OPTS, `setVeiaTromboField('${side}','${key}','oclusao', this.value)`);
+  html += selectField('temp','Temporalidade', v.trombo.temporalidade, TEMPORALIDADE_OPTS, `setVeiaTromboField('${side}','${key}','temporalidade', this.value)`);
+  html += `</div></div>`;
+
+  html += renderCamposDoppler(side, key, v, semCompressaoDireta);
+
+  if(info.sistema === 'superficial'){
+    html += `<div class="block"><div class="block-title">Trombose Venosa Superficial — Dados Complementares</div><div class="ff-grid" style="padding-top:8px">`;
+    if(modulo === 'inferior'){
+      html += textField('sfj','Distância até a JSF (cm)', v.trombo.distanciaSFJcm, 'opcional', `setVeiaTromboText('${side}','${key}','distanciaSFJcm', this.value)`,'1');
+      html += textField('spj','Distância até a JSP (cm)', v.trombo.distanciaSPJcm, 'opcional', `setVeiaTromboText('${side}','${key}','distanciaSPJcm', this.value)`,'1');
+    }
+    html += `</div>`;
+    html += checkRow('trib','Envolvimento de tributárias', v.trombo.tributariasEnvolvidas, `toggleVeiaTromboBool('${side}','${key}','tributariasEnvolvidas')`);
+    html += `<div class="ff-grid" style="padding-top:8px">`;
+    html += selectField('extp','Extensão para o sistema profundo', v.trombo.extensaoProfundo, EXT_PROFUNDO_OPTS, `setVeiaTromboField('${side}','${key}','extensaoProfundo', this.value)`);
+    html += `</div>`;
+    if(v.trombo.extensaoProfundo === 'sim'){
+      html += `<div class="ff-grid">${textField('segp','Segmento profundo acometido', v.trombo.segmentoProfundoAcometido, 'ex: veia femoral comum', `setVeiaTromboText('${side}','${key}','segmentoProfundoAcometido', this.value)`,'1')}</div>`;
+    }
+    html += `</div>`;
+  }
+
+  html += `<div class="block"><div class="block-title">Achados Associados</div>`;
+  html += checkRow('cl','Colaterais venosos', v.colaterais, `toggleVeiaBool('${side}','${key}','colaterais')`);
+  if(modulo === 'inferior' && info.sistema === 'profundo'){
+    html += checkRow('dp','Duplicidade venosa', v.duplicidade, `toggleVeiaBool('${side}','${key}','duplicidade')`);
+  }
+  html += `</div>`;
+
+  html += `<div class="block"><div class="block-title">Observações</div><div class="ff-grid" style="padding-top:8px">${textField('obs','Observações adicionais (opcional)', v.observacoes, '', `setVeiaText('${side}','${key}','observacoes', this.value)`,'1')}</div></div>`;
+
+  return html;
+}
+
+function renderCamposDoppler(side, key, v, semCompressaoDireta){
+  let html = '';
+  if(!semCompressaoDireta){
+    html += `<div class="block"><div class="block-title">Compressibilidade</div><div class="ff-grid" style="padding-top:8px">`;
+    html += selectField('cp','Compressibilidade', v.compressibilidade, COMPRESS_OPTS, `setVeiaField('${side}','${key}','compressibilidade', this.value)`);
+    html += `</div></div>`;
+  }
+  html += `<div class="block"><div class="block-title">Doppler</div><div class="ff-grid" style="padding-top:8px">`;
+  html += selectField('fe','Fluxo espontâneo', v.fluxoEspontaneo, FLUXO_ESP_OPTS, `setVeiaField('${side}','${key}','fluxoEspontaneo', this.value)`);
+  html += selectField('fa','Fasicidade respiratória', v.fasicidade, FASICIDADE_OPTS, `setVeiaField('${side}','${key}','fasicidade', this.value)`);
+  html += `</div></div>`;
+  if(semCompressaoDireta){
+    html += `<div class="info-box">Compressão manual direta desta veia é limitada pela interposição óssea (clavícula); priorize os parâmetros de Doppler acima.</div>`;
+  }
+  return html;
+}
+
+function setVeiaAvaliacao(side, key, value){
+  getVeia(side, key).avaliacao = value;
+  buildSidebar();
+  const nav = document.getElementById('nav-v_'+side+'_'+key);
+  if(nav) nav.classList.add('active');
+  renderPanel(secaoAtual);
+  updateLaudo();
+}
+function setVeiaField(side, key, field, value){
+  getVeia(side, key)[field] = value;
+  buildSidebar();
+  renderPanel(secaoAtual);
+  updateLaudo();
+}
+function setVeiaText(side, key, field, value){
+  getVeia(side, key)[field] = value;
+  updateLaudo();
+}
+function setVeiaTromboField(side, key, field, value){
+  getVeia(side, key).trombo[field] = value;
+  buildSidebar();
+  renderPanel(secaoAtual);
+  updateLaudo();
+}
+function setVeiaTromboText(side, key, field, value){
+  getVeia(side, key).trombo[field] = value;
+  updateLaudo();
+}
+function toggleVeiaBool(side, key, field){
+  const v = getVeia(side, key);
+  v[field] = !v[field];
+  renderPanel(secaoAtual);
+  updateLaudo();
+}
+function toggleVeiaTromboBool(side, key, field){
+  const v = getVeia(side, key);
+  v.trombo[field] = !v.trombo[field];
+  renderPanel(secaoAtual);
+  updateLaudo();
+}
+
+// ── SEÇÃO: ACHADOS ADICIONAIS ──
+function renderAchados(){
+  const st = modState();
+  const modulo = estado.moduloAtual;
+  let html = `<div class="block"><div class="block-title">Linfonodos</div>`;
+  html += checkRow('linf-presente','Linfonodo(s) identificado(s)', st.achados.linfonodos.presente, `toggleLinfonodo()`);
+  if(st.achados.linfonodos.presente){
+    html += `<div class="ff-grid" style="padding:10px 14px">`;
+    html += textField('linf-loc','Localização', st.achados.linfonodos.localizacao, 'ex: cadeia inguinal', `setAchadoLinfonodo('localizacao', this.value)`,'1');
+    html += textField('linf-tam','Tamanho máximo (cm)', st.achados.linfonodos.tamanhoCm, 'ex: 1,2', `setAchadoLinfonodo('tamanhoCm', this.value)`,'1');
+    html += `</div><div class="ff-grid">`;
+    html += selectField('linf-morf','Morfologia', st.achados.linfonodos.morfologia, MORFOLOGIA_LINFONODO_OPTS, `setAchadoLinfonodoSelect(this.value)`);
+    html += `</div><div class="ff-grid">`;
+    html += textField('linf-obs','Observações (opcional)', st.achados.linfonodos.observacoes, 'linguagem neutra — etiologia é questão clínica', `setAchadoLinfonodo('observacoes', this.value)`,'1');
+    html += `</div>`;
+  }
+  html += `</div>`;
+
+  html += `<div class="block"><div class="block-title">Outros Achados</div>`;
+  Object.keys(ACHADOS_SIMPLES_LABELS).forEach(k => {
+    html += checkRow('ach-'+k, ACHADOS_SIMPLES_LABELS[k], st.achados[k], `toggleAchado('${k}')`);
+  });
+  html += `</div>`;
+
+  if(modulo === 'inferior'){
+    html += `<div class="block"><div class="block-title">Cisto de Baker</div>`;
+    html += checkRow('baker-presente','Cisto de Baker identificado', st.achados.cistoBaker.presente, `toggleCistoBaker()`);
+    if(st.achados.cistoBaker.presente){
+      html += `<div class="ff-grid" style="padding:10px 14px">`;
+      html += textField('baker-dim','Dimensões (opcional)', st.achados.cistoBaker.dimensoes, 'ex: 2,1 x 1,0 cm', `setCistoBaker('dimensoes', this.value)`,'1');
+      html += textField('baker-cont','Conteúdo (opcional)', st.achados.cistoBaker.conteudo, 'ex: anecoico', `setCistoBaker('conteudo', this.value)`,'1');
+      html += `</div>`;
+      html += checkRow('baker-com','Comunicação com bursa/recesso articular', st.achados.cistoBaker.comunicacao, `toggleCistoBakerBool('comunicacao')`);
+      html += checkRow('baker-comp','Sinais sugestivos de complicação/rotura', st.achados.cistoBaker.complicacao, `toggleCistoBakerBool('complicacao')`);
+    }
+    html += `</div>`;
+  }
+
+  html += `<div class="info-box">A trombose venosa superficial (TVS) não precisa ser marcada aqui — é gerada automaticamente sempre que uma veia do sistema superficial for marcada com avaliação "Trombose".</div>`;
+  return html;
+}
+function toggleAchado(k){
+  modState().achados[k] = !modState().achados[k];
+  renderPanel(secaoAtual);
+  updateLaudo();
+}
+function toggleLinfonodo(){
+  const a = modState().achados.linfonodos;
+  a.presente = !a.presente;
+  renderPanel(secaoAtual);
+  updateLaudo();
+}
+function setAchadoLinfonodo(field, value){
+  modState().achados.linfonodos[field] = value;
+  updateLaudo();
+}
+function setAchadoLinfonodoSelect(value){
+  modState().achados.linfonodos.morfologia = value;
+  updateLaudo();
+}
+function toggleCistoBaker(){
+  const a = modState().achados.cistoBaker;
+  a.presente = !a.presente;
+  renderPanel(secaoAtual);
+  updateLaudo();
+}
+function setCistoBaker(field, value){
+  modState().achados.cistoBaker[field] = value;
+  updateLaudo();
+}
+function toggleCistoBakerBool(field){
+  const a = modState().achados.cistoBaker;
+  a[field] = !a[field];
+  renderPanel(secaoAtual);
+  updateLaudo();
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  GERAÇÃO DO LAUDO
+// ══════════════════════════════════════════════════════════════════
+
+function sidesFor(st){
+  return st.lateralidade === 'bilateral' ? ['D','E'] : [st.lateralidade === 'direito' ? 'D' : 'E'];
+}
+
+function tituloExame(modulo, lat){
+  if(modulo === 'superior'){
+    if(lat === 'bilateral') return 'ULTRASSONOGRAFIA COM DOPPLER VENOSO DOS MEMBROS SUPERIORES';
+    return 'ULTRASSONOGRAFIA COM DOPPLER VENOSO DO MEMBRO SUPERIOR ' + (lat === 'direito' ? 'DIREITO' : 'ESQUERDO');
+  }
+  if(lat === 'bilateral') return 'ULTRASSONOGRAFIA COM DOPPLER VENOSO DOS MEMBROS INFERIORES';
+  return 'ULTRASSONOGRAFIA COM DOPPLER VENOSO DO MEMBRO INFERIOR ' + (lat === 'direito' ? 'DIREITO' : 'ESQUERDO');
+}
+
+function textIndicacao(st){
+  const map = {
+    'tvp-suspeita':'Exame direcionado para pesquisa de trombose venosa profunda.',
+    dor:'Investigação de dor no membro avaliado.',
+    edema:'Investigação de edema no membro avaliado.',
+    posop:'Acompanhamento pós-operatório venoso.',
+    cateter:'Avaliação relacionada à presença de cateter/dispositivo vascular.',
+    'tvs-suspeita':'Exame direcionado para pesquisa de trombose venosa superficial (TVS).',
+    'tvp-tvs-suspeita':'Exame direcionado para pesquisa de trombose venosa profunda e superficial (TVP e TVS).',
+    'tvp-conhecida':'Avaliação de trombose venosa profunda conhecida.',
+    controle:'Exame de controle/evolução de trombose venosa.',
+    outro: st.indicacaoOutro ? st.indicacaoOutro : 'Indicação clínica não especificada.'
+  };
+  return map[st.indicacao] || map['tvp-suspeita'];
+}
+
+function textTecnica(st){
+  let txt = 'Exame realizado com transdutor linear de alta frequência, utilizando imagens em modo B, Doppler colorido e, quando indicado, Doppler espectral, com avaliação da perviedade venosa, compressibilidade e características do fluxo nos segmentos avaliados';
+  const frases = {
+    biotipo:'pelo biotipo do paciente', curativos:'pela presença de curativos/bandagens',
+    dorIntensa:'por dor intensa referida pelo paciente', mobilidadeReduzida:'pela mobilidade reduzida do paciente',
+    gesso:'pela presença de imobilização gessada', edemaImportante:'pelo edema importante de subcutâneo'
+  };
+  const ativos = Object.keys(frases).filter(k => st.limitacoes[k]).map(k => frases[k]);
+  if(ativos.length) txt += `, com limitação técnica parcial ${ativos.join(' e ')}`;
+  txt += '.';
+  if(st.urgencia !== 'ambulatorial'){
+    const urgLabel = { 'pronto-socorro':'Pronto-Socorro', internacao:'Internação', uti:'Unidade de Terapia Intensiva' }[st.urgencia];
+    txt += ` Exame realizado em caráter de urgência (${urgLabel}).`;
+  }
+  return txt;
+}
+
+function listaComE(labels){
+  if(labels.length === 1) return labels[0];
+  if(labels.length === 2) return labels.join(' e ');
+  return labels.slice(0,-1).join(', ') + ' e ' + labels[labels.length-1];
+}
+function sideAdj(side, plural){
+  if(side === 'D') return plural ? 'direitas' : 'direita';
+  return plural ? 'esquerdas' : 'esquerda';
+}
+
+// assinatura clínica completa — usada para decidir se dois segmentos podem ser agrupados
+// na mesma frase (mesmo status, mesmos achados de trombo/doppler)
+function assinatura(v){
+  return JSON.stringify({
+    avaliacao: v.avaliacao,
+    trombo: v.trombo,
+    compressibilidade: v.compressibilidade,
+    fluxoEspontaneo: v.fluxoEspontaneo,
+    fasicidade: v.fasicidade,
+    colaterais: v.colaterais,
+    duplicidade: v.duplicidade
+  });
+}
+
+// agrupa uma lista de {key,label,v} pela assinatura clínica
+function agruparPorAssinatura(items){
+  const grupos = [];
+  const mapa = {};
+  items.forEach(item => {
+    const chave = assinatura(item.v);
+    if(!mapa[chave]){ mapa[chave] = { v: item.v, labels: [] }; grupos.push(mapa[chave]); }
+    mapa[chave].labels.push(item.label.toLowerCase());
+  });
+  return grupos;
+}
+
+// clausulas de Doppler/compressibilidade, geradas SOMENTE a partir de campos preenchidos
+function clausulasDoppler(v){
+  const c = [];
+  if(v.compressibilidade === 'ausente') c.push('ausência de compressibilidade');
+  else if(v.compressibilidade === 'reduzida') c.push('compressibilidade reduzida (veia parcialmente compressível)');
+  else if(v.compressibilidade === 'normal') c.push('compressibilidade preservada');
+
+  if(v.fluxoEspontaneo === 'ausente') c.push('ausência de fluxo espontâneo ao Doppler');
+  else if(v.fluxoEspontaneo === 'reduzido') c.push('fluxo espontâneo reduzido ao Doppler');
+  else if(v.fluxoEspontaneo === 'presente') c.push('fluxo espontâneo presente ao Doppler');
+
+  if(v.fasicidade === 'ausente') c.push('ausência de fasicidade respiratória');
+  else if(v.fasicidade === 'reduzida') c.push('fasicidade respiratória reduzida');
+  else if(v.fasicidade === 'preservada') c.push('fasicidade respiratória preservada');
+
+  return c;
+}
+
+function fraseAchadosAssociados(v, plural){
+  const extras = [];
+  if(v.colaterais) extras.push(`notam-se colaterais venosos associados`);
+  if(v.duplicidade) extras.push(`identifica-se duplicidade venosa n${plural?'as veias avaliadas':'a veia avaliada'}`);
+  if(!extras.length) return '';
+  return ' ' + extras.map(e => e.charAt(0).toUpperCase()+e.slice(1)+'.').join(' ');
+}
+
+// frase para trombose de segmento(s) do sistema PROFUNDO (TVP)
+function fraseTVP(labels, side, v){
+  const plural = labels.length > 1;
+  const adj = sideAdj(side, plural);
+  const labelTxt = listaComE(labels);
+  const artigoContr = plural ? 'as' : 'a';
+
+  if(v.trombo.temporalidade === 'pos_tromboticas'){
+    let f = `Alterações pós-trombóticas crônicas n${artigoContr} veia${plural?'s':''} ${labelTxt} ${adj}, caracterizadas por espessamento parietal e material ecogênico residual`;
+    const cc = [];
+    if(v.compressibilidade === 'reduzida') cc.push('redução de sua complacência/compressibilidade');
+    else if(v.compressibilidade === 'ausente') cc.push('compressibilidade ausente');
+    if(cc.length) f += `, com ${cc.join(' e ')}`;
+    f += '.';
+    f += fraseAchadosAssociados(v, plural);
+    return f;
+  }
+
+  let f = `Nota-se conteúdo intraluminal${v.trombo.ecogenicidade ? ' '+v.trombo.ecogenicidade : ''} n${artigoContr} veia${plural?'s':''} ${labelTxt} ${adj}`;
+  if(v.trombo.segmento) f += `, no segmento ${v.trombo.segmento}`;
+  if(v.trombo.extensaoCm) f += `, com extensão aproximada de ${v.trombo.extensaoCm} cm`;
+  const clausulas = clausulasDoppler(v);
+  if(clausulas.length) f += `, ${clausulas.join(', ')}`;
+
+  if(v.trombo.oclusao === 'oclusiva') f += ', determinando oclusão luminal, compatível com trombose venosa profunda';
+  else if(v.trombo.oclusao === 'nao_oclusiva') f += ', compatível com trombose venosa profunda não oclusiva';
+  else f += ', compatível com trombose venosa profunda';
+
+  if(v.trombo.temporalidade === 'aguda') f += ' aguda';
+  else if(v.trombo.temporalidade === 'indeterminada') f += ' de cronologia indeterminada';
+  f += '.';
+  f += fraseAchadosAssociados(v, plural);
+  return f;
+}
+
+// frase para trombose de segmento(s) do sistema SUPERFICIAL (TVS)
+function fraseTVS(labels, side, v){
+  const plural = labels.length > 1;
+  const adj = sideAdj(side, plural);
+  const labelTxt = listaComE(labels);
+  const artigoContr = plural ? 'as' : 'a';
+
+  if(v.trombo.temporalidade === 'pos_tromboticas'){
+    let f = `Alterações residuais pós-trombóticas n${artigoContr} veia${plural?'s':''} ${labelTxt} ${adj} do sistema venoso superficial, caracterizadas por espessamento parietal e material ecogênico residual.`;
+    f += fraseAchadosAssociados(v, plural);
+    return f;
+  }
+
+  let f = `Material trombótico${v.trombo.ecogenicidade ? ' '+v.trombo.ecogenicidade : ''} n${artigoContr} veia${plural?'s':''} ${labelTxt} ${adj}`;
+  if(v.trombo.segmento) f += `, no segmento ${v.trombo.segmento}`;
+  if(v.trombo.extensaoCm) f += `, com extensão aproximada de ${v.trombo.extensaoCm} cm`;
+  if(v.trombo.distanciaSFJcm) f += `, situado a aproximadamente ${v.trombo.distanciaSFJcm} cm da junção safenofemoral`;
+  if(v.trombo.distanciaSPJcm) f += `, situado a aproximadamente ${v.trombo.distanciaSPJcm} cm da junção safenopoplítea`;
+
+  const clausulas = clausulasDoppler(v);
+  if(clausulas.length) f += `, ${clausulas.join(', ')}`;
+
+  if(v.trombo.oclusao === 'oclusiva') f += ', determinando oclusão luminal';
+  else if(v.trombo.oclusao === 'nao_oclusiva') f += ', de aspecto não oclusivo';
+
+  if(v.trombo.tributariasEnvolvidas) f += ', com envolvimento de tributárias';
+
+  if(v.trombo.extensaoProfundo === 'nao') f += ', sem extensão para o sistema venoso profundo';
+  else if(v.trombo.extensaoProfundo === 'sim') f += `, com extensão para o sistema venoso profundo${v.trombo.segmentoProfundoAcometido ? ' ('+v.trombo.segmentoProfundoAcometido+')' : ''}`;
+  else if(v.trombo.extensaoProfundo === 'nao_avaliada') f += ', sem avaliação conclusiva quanto à extensão para o sistema venoso profundo';
+
+  f += ', compatível com trombose venosa superficial (TVS)';
+  if(v.trombo.temporalidade === 'aguda') f += ' aguda';
+  else if(v.trombo.temporalidade === 'indeterminada') f += ' de cronologia indeterminada';
+  f += '.';
+  f += fraseAchadosAssociados(v, plural);
+  return f;
+}
+
+function fraseSegmentoLimitado(labels, side, v){
+  const plural = labels.length > 1;
+  const adj = sideAdj(side, plural);
+  let f = `Avaliação tecnicamente limitada d${plural?'as veias':'a veia'} ${listaComE(labels)} ${adj}`;
+  if(v.observacoes) f += `, ${v.observacoes}`;
+  f += '.';
+  return f;
+}
+function fraseSegmentoNaoAvaliado(labels, side, v){
+  const plural = labels.length > 1;
+  const adj = sideAdj(side, plural);
+  let f = `${plural?'Veias':'Veia'} ${listaComE(labels)} ${adj} não avaliada${plural?'s':''} / não visualizada${plural?'s':''} no presente exame`;
+  if(v.observacoes) f += `, ${v.observacoes}`;
+  f += '.';
+  return f;
+}
+
+function fraseSegmentosPreservados(side, houveOutraAlteracaoNoLado){
+  const sideTxt = side ? ` no membro ${side==='D'?'direito':'esquerdo'}` : '';
+  const sujeito = houveOutraAlteracaoNoLado
+    ? 'Os demais segmentos venosos avaliados como normais'
+    : 'Os segmentos venosos avaliados';
+  return `${sujeito}${sideTxt} apresentam trajeto, calibre e contornos preservados, compressibilidade preservada às manobras habituais (quando aplicável) e fluxo venoso característico ao estudo Doppler, sem evidências de trombose.`;
+}
+
+function todasVeiasNormais(modulo, sides){
+  return sides.every(side =>
+    veinsAtivos(modulo,'profundo').concat(veinsAtivos(modulo,'superficial')).every(([key]) => getVeia(side, key).avaliacao === 'normal')
+  );
+}
+
+// Enumeração anatômica fixa do membro inferior para a frase-padrão de sistemas venosos avaliados.
+// A femoral proximal/média/distal (segmentos individuais, mantidos para avaliação segmento a segmento)
+// são representadas de forma unificada como "femoral" nesta frase-resumo. A JSF não entra na
+// enumeração do sistema superficial aqui (permanece disponível para avaliação específica de TVS).
+function nomesProfundoInferiorFixo(modulo){
+  const fixo = ['femoral comum','femoral','femoral profunda','poplítea','tibiais posteriores','fibulares'];
+  const opcAtivos = VEINS[modulo].profundoOpcional
+    .filter(([k]) => modState(modulo).opcionais[k])
+    .map(([,l]) => l.toLowerCase());
+  return fixo.concat(opcAtivos).join(', ');
+}
+function nomesSuperficialInferiorFixo(modulo){
+  const fixo = ['safena magna','safena parva'];
+  const opcAtivos = VEINS[modulo].superficialOpcional
+    .filter(([k]) => modState(modulo).opcionais[k])
+    .map(([,l]) => l.toLowerCase());
+  return listaComE(fixo.concat(opcAtivos));
+}
+
+// Texto fixo da máscara oficial, usado somente quando 100% dos segmentos ativos estão marcados como normais
+function textAnaliseMascara(modulo, st){
+  const sides = sidesFor(st);
+  const sideLabel = { D:'direito', E:'esquerdo' };
+  const regiao = modulo === 'superior' ? 'membro superior' : 'membro inferior';
+  const regiaoPlural = modulo === 'superior' ? 'membros superiores' : 'membros inferiores';
+  const sufixoLateralidade = st.lateralidade === 'bilateral'
+    ? `${regiaoPlural}, bilateralmente`
+    : `${regiao} ${sideLabel[sides[0]]}`;
+  const prefixoD = st.lateralidade === 'bilateral' ? 'os' : 'o';
+
+  if(modulo === 'superior'){
+    const nomesProfundo = veinsAtivos(modulo,'profundo').map(v=>v[1].toLowerCase()).join(', ');
+    const nomesSuperficial = veinsAtivos(modulo,'superficial').map(v=>v[1].toLowerCase()).join(' e ');
+    return `<div class="doc-p">Avaliados os sistemas venosos profundo (veias ${nomesProfundo}) e superficial (veias ${nomesSuperficial}) d${prefixoD} ${sufixoLateralidade}.</div>`
+      + `<div class="doc-p">Os segmentos venosos avaliados mostram trajeto, calibre e contornos preservados.</div>`
+      + `<div class="doc-p">Compressibilidade preservada às manobras habituais nos segmentos passíveis de compressão direta.</div>`
+      + `<div class="doc-p">Ao ecodoppler nota-se fluxo espontâneo e fasicidade respiratória preservados nos segmentos avaliados.</div>`
+      + `<div class="doc-p">Não há evidência de trombos.</div>`;
+  }
+
+  const nomesProfundo = nomesProfundoInferiorFixo(modulo);
+  const nomesSuperficial = nomesSuperficialInferiorFixo(modulo);
+  return `<div class="doc-p">Avaliados os sistemas venosos profundo (veias ${nomesProfundo}) e superficial (${nomesSuperficial}) d${prefixoD} ${sufixoLateralidade}.</div>`
+    + `<div class="doc-p">Os segmentos venosos avaliados mostram trajeto, calibre e contornos preservados.</div>`
+    + `<div class="doc-p">Compressibilidade preservada às manobras habituais.</div>`
+    + `<div class="doc-p">Ao ecodoppler nota-se fluxo venoso característico, com fasicidade respiratória preservada.</div>`
+    + `<div class="doc-p">Não há evidência de trombos.</div>`;
+}
+
+function textAnalise(modulo, st){
+  const sides = sidesFor(st);
+  const sideLabel = { D:'direito', E:'esquerdo' };
+
+  if(todasVeiasNormais(modulo, sides)){
+    return textAnaliseMascara(modulo, st);
+  }
+
+  const nomesProfundo = modulo === 'inferior' ? nomesProfundoInferiorFixo(modulo) : veinsAtivos(modulo,'profundo').map(v=>v[1].toLowerCase()).join(', ');
+  const nomesSuperficial = modulo === 'inferior' ? nomesSuperficialInferiorFixo(modulo) : veinsAtivos(modulo,'superficial').map(v=>v[1].toLowerCase()).join(' e ');
+  const prefixoSuperficial = modulo === 'inferior' ? '' : 'veias ';
+  const regiao = modulo === 'superior' ? 'membro superior' : 'membro inferior';
+  const regiaoPlural = modulo === 'superior' ? 'membros superiores' : 'membros inferiores';
+
+  let html = `<div class="doc-p">Avaliados os sistemas venosos profundo (veias ${nomesProfundo}) e superficial (${prefixoSuperficial}${nomesSuperficial}) d${st.lateralidade==='bilateral'?'os':'o'} ${st.lateralidade==='bilateral' ? regiaoPlural + ', bilateralmente' : regiao + ' ' + sideLabel[sides[0]]}.</div>`;
+
+  const frasesTrombose = [];
+  const frasesLimitadoNaoAvaliado = [];
+  const frasesNormais = [];
+
+  sides.forEach(side => {
+    const profundo = veinsAtivos(modulo,'profundo').map(([key,label]) => ({ key, label, v: getVeia(side,key) }));
+    const superficial = veinsAtivos(modulo,'superficial').map(([key,label]) => ({ key, label, v: getVeia(side,key) }));
+
+    const profTrombose = profundo.filter(i => i.v.avaliacao === 'trombose');
+    const supTrombose = superficial.filter(i => i.v.avaliacao === 'trombose');
+    const todosLimitados = profundo.concat(superficial).filter(i => i.v.avaliacao === 'limitada');
+    const todosNaoAvaliados = profundo.concat(superficial).filter(i => i.v.avaliacao === 'nao_avaliada');
+    const todosNormais = profundo.concat(superficial).filter(i => i.v.avaliacao === 'normal');
+
+    agruparPorAssinatura(profTrombose).forEach(g => frasesTrombose.push(fraseTVP(g.labels, side, g.v)));
+    agruparPorAssinatura(supTrombose).forEach(g => frasesTrombose.push(fraseTVS(g.labels, side, g.v)));
+    agruparPorAssinatura(todosLimitados).forEach(g => frasesLimitadoNaoAvaliado.push(fraseSegmentoLimitado(g.labels, side, g.v)));
+    agruparPorAssinatura(todosNaoAvaliados).forEach(g => frasesLimitadoNaoAvaliado.push(fraseSegmentoNaoAvaliado(g.labels, side, g.v)));
+
+    const houveOutraAlteracao = (profTrombose.length + supTrombose.length + todosLimitados.length + todosNaoAvaliados.length) > 0;
+    if(todosNormais.length > 0){
+      frasesNormais.push(fraseSegmentosPreservados(sides.length>1?side:null, houveOutraAlteracao));
+    }
+  });
+
+  if(frasesTrombose.length) html += `<div class="doc-p">${frasesTrombose.join(' ')}</div>`;
+  if(frasesLimitadoNaoAvaliado.length) html += `<div class="doc-p">${frasesLimitadoNaoAvaliado.join(' ')}</div>`;
+  if(frasesNormais.length) html += `<div class="doc-p">${frasesNormais.join(' ')}</div>`;
+
+  return html;
+}
+
+function textAchadosAdicionaisSecao(st){
+  const frases = [];
+  const l = st.achados.linfonodos;
+  if(l && l.presente){
+    let f = 'Linfonodo(s) identificado(s)';
+    if(l.localizacao) f += ` em topografia ${l.localizacao}`;
+    if(l.tamanhoCm) f += `, medindo até ${l.tamanhoCm} cm no maior eixo`;
+    if(l.morfologia) f += `, ${l.morfologia}`;
+    f += '.';
+    if(l.observacoes) f += ` ${l.observacoes}`;
+    frases.push(f);
+  }
+  Object.keys(ACHADOS_SIMPLES_LABELS).forEach(k => {
+    if(st.achados[k]) frases.push(ACHADOS_SIMPLES_LABELS[k] + '.');
+  });
+  const cb = st.achados.cistoBaker;
+  if(cb && cb.presente){
+    let f = 'Cisto de Baker';
+    const det = [];
+    if(cb.dimensoes) det.push(`medindo ${cb.dimensoes}`);
+    if(cb.conteudo) det.push(`conteúdo ${cb.conteudo}`);
+    if(cb.comunicacao) det.push('com comunicação com a bursa/recesso articular');
+    if(det.length) f += ', ' + det.join(', ');
+    f += '.';
+    if(cb.complicacao) f += ' Sinais sugestivos de complicação/rotura associados.';
+    frases.push(f);
+  }
+  if(!frases.length) return '';
+  return `<div class="doc-secao"><span class="doc-label">ACHADOS ADICIONAIS:</span><div class="doc-p">${frases.join(' ')}</div></div>`;
+}
+
+// monta a frase diagnóstica de um grupo (título + veias por lado), unindo os lados quando necessário
+function fraseDiagnosticoGrupo(titulo, labelsBySide){
+  const sidesComAlteracao = Object.keys(labelsBySide).filter(s => labelsBySide[s] && labelsBySide[s].length);
+  if(!sidesComAlteracao.length) return '';
+
+  if(sidesComAlteracao.length === 1){
+    const side = sidesComAlteracao[0];
+    const labels = labelsBySide[side];
+    const plural = labels.length > 1;
+    return plural
+      ? `${titulo} envolvendo as veias ${listaComE(labels)} ${sideAdj(side, plural)}`
+      : `${titulo} da veia ${labels[0]} ${sideAdj(side, false)}`;
+  }
+
+  const labelsD = labelsBySide.D || [];
+  const labelsE = labelsBySide.E || [];
+  const mesmasVeias = labelsD.length && labelsE.length && labelsD.length === labelsE.length
+    && labelsD.every((l,i) => l === labelsE[i]);
+
+  if(mesmasVeias){
+    const plural = labelsD.length > 1;
+    return plural
+      ? `${titulo} bilateral envolvendo as veias ${listaComE(labelsD)}`
+      : `${titulo} bilateral da veia ${labelsD[0]}`;
+  }
+
+  const partes = sidesComAlteracao.map(side => {
+    const labels = labelsBySide[side];
+    const plural = labels.length > 1;
+    return `${plural ? listaComE(labels) : labels[0]} ${sideAdj(side, plural)}`;
+  });
+  return `${titulo} bilateral envolvendo as veias ${partes.join(' e ')}`;
+}
+
+function coletarPorTemporalidade(modulo, sides, sistema){
+  const grupos = { aguda:[], indeterminada:[], naoEspecificada:[], posTromb:[] };
+  sides.forEach(side => {
+    veinsAtivos(modulo, sistema).forEach(([key,label]) => {
+      const v = getVeia(side,key);
+      if(v.avaliacao !== 'trombose') return;
+      const entry = { side, label };
+      if(v.trombo.temporalidade === 'pos_tromboticas') grupos.posTromb.push(entry);
+      else if(v.trombo.temporalidade === 'aguda') grupos.aguda.push(entry);
+      else if(v.trombo.temporalidade === 'indeterminada') grupos.indeterminada.push(entry);
+      else grupos.naoEspecificada.push(entry);
+    });
+  });
+  return grupos;
+}
+
+function labelsBySideFromEntries(entries){
+  const bySide = { D:[], E:[] };
+  entries.forEach(e => bySide[e.side].push(e.label.toLowerCase()));
+  return bySide;
+}
+
+function textConclusao(modulo, st){
+  const sides = sidesFor(st);
+
+  // segmentos não avaliados / limitados — condicionam a segurança da conclusão de ausência de TVP
+  let existeSegmentoIncompleto = false;
+  sides.forEach(side => {
+    veinsAtivos(modulo,'profundo').concat(veinsAtivos(modulo,'superficial')).forEach(([key]) => {
+      const av = getVeia(side,key).avaliacao;
+      if(av === 'limitada' || av === 'nao_avaliada') existeSegmentoIncompleto = true;
+    });
+  });
+
+  const profGrupos = coletarPorTemporalidade(modulo, sides, 'profundo');
+  const supGrupos = coletarPorTemporalidade(modulo, sides, 'superficial');
+
+  const frases = [];
+
+  if(profGrupos.aguda.length){
+    frases.push(fraseDiagnosticoGrupo('Trombose venosa profunda aguda', labelsBySideFromEntries(profGrupos.aguda)) + '.');
+  }
+  if(profGrupos.indeterminada.length){
+    frases.push(fraseDiagnosticoGrupo('Trombose venosa profunda de cronologia indeterminada', labelsBySideFromEntries(profGrupos.indeterminada)) + '.');
+  }
+  if(profGrupos.naoEspecificada.length){
+    frases.push(fraseDiagnosticoGrupo('Trombose venosa profunda', labelsBySideFromEntries(profGrupos.naoEspecificada)) + '.');
+  }
+  if(profGrupos.posTromb.length){
+    frases.push(fraseDiagnosticoGrupo('Alterações pós-trombóticas crônicas', labelsBySideFromEntries(profGrupos.posTromb)) + '.');
+  }
+
+  const supTodasEntries = supGrupos.aguda.concat(supGrupos.indeterminada, supGrupos.naoEspecificada);
+  if(supTodasEntries.length){
+    let fraseTvsConclusao = fraseDiagnosticoGrupo('Trombose venosa superficial (TVS)', labelsBySideFromEntries(supTodasEntries));
+    // extensão para o sistema profundo, se houver em qualquer segmento superficial
+    const houveExtensao = sides.some(side =>
+      veinsAtivos(modulo,'superficial').some(([key]) => {
+        const v = getVeia(side,key);
+        return v.avaliacao === 'trombose' && v.trombo.extensaoProfundo === 'sim';
+      })
+    );
+    frases.push(fraseTvsConclusao + (houveExtensao ? ', com extensão para o sistema venoso profundo.' : '.'));
+  }
+  if(supGrupos.posTromb.length){
+    frases.push(fraseDiagnosticoGrupo('Alterações pós-trombóticas crônicas do sistema venoso superficial', labelsBySideFromEntries(supGrupos.posTromb)) + '.');
+  }
+
+  const houveQualquerTrombose = frases.length > 0;
+
+  // A conclusão negativa (ausência de trombose) respeita a suspeita clínica informada: um exame
+  // direcionado para pesquisa de TVP não deve afirmar automaticamente ausência de TVS, e vice-versa,
+  // exceto quando a suspeita clínica contemplar explicitamente ambos os sistemas.
+  const sistemaAlvo = st.indicacao === 'tvs-suspeita' ? 'superficial'
+    : st.indicacao === 'tvp-tvs-suspeita' ? 'profunda ou superficial'
+    : 'profunda';
+
+  if(!houveQualquerTrombose){
+    if(existeSegmentoIncompleto){
+      frases.push(`Não foram identificados sinais de trombose venosa ${sistemaAlvo} nos segmentos adequadamente avaliados. Exame com avaliação parcial/limitada em um ou mais segmentos, conforme descrito na análise — a ausência de trombose não pode ser afirmada para os segmentos não avaliados ou com avaliação limitada.`);
+    } else {
+      frases.push(`Ausência de sinais de trombose venosa ${sistemaAlvo} nos segmentos avaliados.`);
+    }
+  } else if(existeSegmentoIncompleto){
+    frases.push('Exame com avaliação parcial/limitada em um ou mais segmentos, conforme descrito na análise.');
+  }
+
+  if(modulo === 'inferior' && st.achados.cistoBaker && st.achados.cistoBaker.presente && !profGrupos.aguda.length && !profGrupos.indeterminada.length && !profGrupos.naoEspecificada.length){
+    let f = 'Presença de cisto de Baker';
+    if(st.achados.cistoBaker.complicacao) f += ', com sinais sugestivos de complicação/rotura';
+    f += '.';
+    frases.push(f);
+  }
+
+  return frases.join(' ');
+}
+
+function buildLaudo(){
+  const modulo = estado.moduloAtual;
+  const st = modState(modulo);
+  let html = `<div class="doc-titulo">${tituloExame(modulo, st.lateralidade)}</div>`;
+  html += `<div class="doc-secao"><span class="doc-label">INDICAÇÃO:</span><div class="doc-p">${textIndicacao(st)}</div></div>`;
+  html += `<div class="doc-secao"><span class="doc-label">TÉCNICA:</span><div class="doc-p">${textTecnica(st)}</div></div>`;
+  html += `<div class="doc-secao"><span class="doc-label">ANÁLISE:</span>${textAnalise(modulo, st)}</div>`;
+  html += textAchadosAdicionaisSecao(st);
+  html += `<br><div class="doc-secao"><span class="doc-label">CONCLUSÃO:</span><div class="doc-p">${textConclusao(modulo, st)}</div></div>`;
+  return html;
+}
+
+function updateLaudo(){
+  document.getElementById('laudo-doc').innerHTML = buildLaudo();
+}
+
+
+// ══════════════════════════════════════════════════════════════════
+//  TOOLBAR: TEMA, COPIAR, IMPRIMIR, REINICIAR
+// ══════════════════════════════════════════════════════════════════
+function toggleDark(){
+  const isDark = document.body.classList.toggle('dark');
+  const btn = document.getElementById('btn-dark-toggle');
+  btn.innerHTML = isDark
+    ? '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 8.5A5.5 5.5 0 0 1 6 3c0-.18.01-.36.03-.53A6 6 0 1 0 13.97 9.5c-.15.01-.31.01-.47 0z"/></svg>Modo claro'
+    : '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro';
+  localStorage.setItem('darkModeVenoso', isDark ? '1' : '0');
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast-notification');
+  t.innerText = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Mecanismo de cópia original — inalterado, apenas passou a ser chamado
+// somente após a confirmação da camada de segurança (ver copiar() abaixo).
+function executarCopia() {
+  fecharModalSeguranca();
+  var el = document.getElementById('laudo-doc');
+  if (!el) return;
+  _copyLaudoRichText(el, function(ok) {
+    if (ok) {
+      showToast('Laudo copiado para a Ã¡rea de transferÃªncia!');
+    } else {
+      showToast('Falha ao copiar. Pressione CTRL+C apÃ³s o texto ser selecionado.');
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  CAMADA DE SEGURANÇA — CONFIRMAÇÃO ANTES DE COPIAR
+//  Lê exclusivamente o estado já existente (estado/modState/VEINS) para
+//  detectar lateralidade, trombose, segmentos incompletos e possíveis
+//  inconsistências. Não introduz nenhuma regra clínica nova.
+// ══════════════════════════════════════════════════════════════════
+
+function labelLateralidadeDisplay(modulo, lat){
+  const regiao = modulo === 'superior' ? 'MEMBRO SUPERIOR' : 'MEMBRO INFERIOR';
+  const regiaoPlural = modulo === 'superior' ? 'MEMBROS SUPERIORES' : 'MEMBROS INFERIORES';
+  if(lat === 'bilateral') return regiaoPlural + ' BILATERAIS';
+  return regiao + ' ' + (lat === 'direito' ? 'DIREITO' : 'ESQUERDO');
+}
+
+// veias com trombose nos lados efetivamente incluídos no exame
+function coletarTromboses(modulo, st){
+  const sides = sidesFor(st);
+  const achados = [];
+  sides.forEach(side => {
+    veinsAtivos(modulo,'profundo').concat(veinsAtivos(modulo,'superficial')).forEach(([key,label]) => {
+      const v = getVeia(side, key);
+      if(v.avaliacao === 'trombose'){
+        achados.push({ side, key, label, sistema: veinInfo(modulo,key).sistema, v });
+      }
+    });
+  });
+  return achados;
+}
+
+// segmentos "limitada" ou "não avaliada" nos lados efetivamente incluídos no exame
+function coletarSegmentosIncompletos(modulo, st){
+  const sides = sidesFor(st);
+  const out = [];
+  sides.forEach(side => {
+    veinsAtivos(modulo,'profundo').concat(veinsAtivos(modulo,'superficial')).forEach(([key,label]) => {
+      const v = getVeia(side, key);
+      if(v.avaliacao === 'limitada' || v.avaliacao === 'nao_avaliada'){
+        out.push({ side, key, label, status: v.avaliacao });
+      }
+    });
+  });
+  return out;
+}
+
+// detecta dados preenchidos em veias de um lado que NÃO está incluído na
+// lateralidade atualmente selecionada (ex.: exame configurado como direito,
+// mas com achados registrados no lado esquerdo)
+function coletarAchadosForaDoLado(modulo, st){
+  const sides = sidesFor(st);
+  const ladosForaDoExame = ['D','E'].filter(s => !sides.includes(s));
+  const def = defaultVeia();
+  const out = [];
+  ladosForaDoExame.forEach(side => {
+    todasChavesVeia(modulo).forEach(key => {
+      const v = getVeia(side, key);
+      const alterado = v.avaliacao !== 'normal' || v.compressibilidade || v.fluxoEspontaneo || v.fasicidade
+        || v.colaterais || v.duplicidade || v.observacoes || JSON.stringify(v.trombo) !== JSON.stringify(def.trombo);
+      if(alterado) out.push({ side, key, label: veinInfo(modulo,key).label });
+    });
+  });
+  return out;
+}
+
+// um lado é considerado "sem nenhuma informação preenchida" quando todas as
+// suas veias permanecem exatamente no estado padrão (defaultVeia)
+function ladoTotalmenteDefault(modulo, side){
+  const def = defaultVeia();
+  return todasChavesVeia(modulo).every(key => {
+    const v = getVeia(side, key);
+    return v.avaliacao === 'normal' && v.compressibilidade === '' && v.fluxoEspontaneo === '' && v.fasicidade === ''
+      && !v.colaterais && !v.duplicidade && !v.observacoes && JSON.stringify(v.trombo) === JSON.stringify(def.trombo);
+  });
+}
+
+// em exame bilateral, sinaliza quando um dos lados está totalmente sem
+// preenchimento enquanto o outro já possui dados registrados
+function verificarAssimetriaBilateral(modulo, st){
+  if(st.lateralidade !== 'bilateral') return null;
+  const dVazio = ladoTotalmenteDefault(modulo, 'D');
+  const eVazio = ladoTotalmenteDefault(modulo, 'E');
+  if(dVazio && !eVazio) return 'D';
+  if(eVazio && !dVazio) return 'E';
+  return null;
+}
+
+// analisa o estado atual e classifica o exame antes da cópia:
+// normal (🟢) | atencao (🟡) | critico (🔴)
+function validarSegurancaAntesDeCopiar(){
+  const modulo = estado.moduloAtual;
+  const st = modState(modulo);
+  const tromboses = coletarTromboses(modulo, st);
+  const incompletos = coletarSegmentosIncompletos(modulo, st);
+  const foraDoLado = coletarAchadosForaDoLado(modulo, st);
+  const ladoAssimetrico = verificarAssimetriaBilateral(modulo, st);
+
+  let severidade = 'normal';
+  if(tromboses.length || foraDoLado.length) severidade = 'critico';
+  else if(incompletos.length || ladoAssimetrico) severidade = 'atencao';
+
+  return { modulo, st, tromboses, incompletos, foraDoLado, ladoAssimetrico, severidade };
+}
+
+function fecharModalSeguranca(){
+  const overlay = document.getElementById('modal-seguranca-copia');
+  if(overlay) overlay.classList.remove('show');
+}
+
+function abrirModalSeguranca(headerHtml, bodyHtml, footerHtml, headerClasse){
+  const overlay = document.getElementById('modal-seguranca-copia');
+  const header = document.getElementById('msc-header');
+  const body = document.getElementById('msc-body');
+  const footer = document.getElementById('msc-footer');
+  header.className = 'msc-header ' + headerClasse;
+  header.innerHTML = headerHtml;
+  body.innerHTML = bodyHtml;
+  footer.innerHTML = footerHtml;
+  overlay.classList.add('show');
+}
+
+// Última barreira antes da cópia: valida o estado atual e exige confirmação
+// do usuário. Somente após a confirmação a cópia de fato acontece
+// (ver executarCopia).
+function copiar(){
+  const r = validarSegurancaAntesDeCopiar();
+  const modulo = r.modulo, st = r.st;
+  const latLabel = labelLateralidadeDisplay(modulo, st.lateralidade);
+
+  if(r.severidade === 'normal'){
+    abrirModalSeguranca(
+      '⚠️ Confirmação de lateralidade',
+      `<p>Este laudo foi configurado para o:</p>`
+      + `<p style="margin-top:6px;font-weight:700;font-size:13.5px;color:var(--text)">${latLabel}</p>`
+      + `<p style="margin-top:10px">A lateralidade está correta?</p>`,
+      `<button class="btn" onclick="fecharModalSeguranca()">Voltar e revisar</button>`
+      + `<button class="btn btn-primary" onclick="executarCopia()">Sim, copiar</button>`,
+      'normal'
+    );
+    return;
+  }
+
+  let corpo = `<p><strong>Lateralidade:</strong> ${latLabel}</p>`;
+  corpo += `<p style="margin-top:6px"><strong>Indicação:</strong> ${textIndicacao(st)}</p>`;
+
+  if(r.tromboses.length){
+    corpo += `<p style="margin-top:12px;color:var(--red);font-weight:600">🔴 Achado de trombose</p>`;
+    corpo += '<ul class="msc-list">';
+    r.tromboses.forEach(t => {
+      const sideLabel = t.side === 'D' ? 'Direita' : 'Esquerda';
+      const sistemaLabel = t.sistema === 'profundo' ? 'Venoso profundo' : 'Venoso superficial';
+      let li = `<strong>${sideLabel}</strong> — Sistema ${sistemaLabel} — Veia ${t.label}`;
+      if(t.v.trombo.segmento) li += `, segmento ${t.v.trombo.segmento}`;
+      if(t.v.trombo.extensaoCm) li += `, extensão aproximada de ${t.v.trombo.extensaoCm} cm`;
+      if(t.sistema === 'superficial'){
+        if(t.v.trombo.distanciaSFJcm) li += `, a ${t.v.trombo.distanciaSFJcm} cm da JSF`;
+        if(t.v.trombo.distanciaSPJcm) li += `, a ${t.v.trombo.distanciaSPJcm} cm da JSP`;
+        if(t.v.trombo.tributariasEnvolvidas) li += `, com tributárias envolvidas`;
+        if(t.v.trombo.extensaoProfundo === 'sim') li += `, com extensão para o sistema profundo`;
+      }
+      corpo += `<li>${li}</li>`;
+    });
+    corpo += '</ul>';
+  }
+
+  if(r.foraDoLado.length){
+    corpo += `<p style="margin-top:12px;color:var(--red);font-weight:600">🔴 Inconsistência de lateralidade</p>`;
+    corpo += `<p>Exame configurado para ${latLabel}, porém há dados preenchidos em veias do lado não incluído no exame:</p>`;
+    corpo += '<ul class="msc-list">';
+    r.foraDoLado.forEach(f => {
+      const sideLabel = f.side === 'D' ? 'direito' : 'esquerdo';
+      corpo += `<li>Veia ${f.label} (lado ${sideLabel})</li>`;
+    });
+    corpo += '</ul>';
+  }
+
+  if(r.incompletos.length){
+    corpo += `<p style="margin-top:12px;color:var(--amber);font-weight:600">⚠️ Exame com avaliação limitada</p>`;
+    corpo += '<ul class="msc-list">';
+    r.incompletos.forEach(i => {
+      const sideLabel = i.side === 'D' ? 'direita' : 'esquerda';
+      const statusLabel = i.status === 'nao_avaliada' ? 'não avaliada' : 'avaliação limitada';
+      corpo += `<li>Veia ${i.label} ${sideLabel} — ${statusLabel}</li>`;
+    });
+    corpo += '</ul>';
+    corpo += `<p style="margin-top:8px">A ausência de trombose não pode ser afirmada para segmentos não avaliados ou com avaliação limitada.</p>`;
+  }
+
+  if(r.ladoAssimetrico){
+    const ladoLabel = r.ladoAssimetrico === 'D' ? 'direito' : 'esquerdo';
+    corpo += `<p style="margin-top:12px;color:var(--amber);font-weight:600">⚠️ Exame bilateral</p>`;
+    corpo += `<p>O exame está configurado para avaliação bilateral, mas o lado ${ladoLabel} não apresenta nenhuma informação preenchida. Verifique se ambos os membros foram adequadamente avaliados.</p>`;
+  }
+
+  corpo += `<p style="margin-top:14px">Confirme os achados antes de copiar o laudo.</p>`;
+
+  const critico = r.severidade === 'critico';
+  const headerTxt = critico ? '🔴 Achado de trombose / inconsistência' : '⚠️ Atenção — revisão necessária';
+  const rotuloConfirmar = critico ? 'Confirmar e copiar' : 'Copiar mesmo assim';
+
+  abrirModalSeguranca(
+    headerTxt,
+    corpo,
+    `<button class="btn" onclick="fecharModalSeguranca()">Revisar</button>`
+    + `<button class="btn ${critico ? 'btn-danger' : 'btn-primary'}" onclick="executarCopia()">${rotuloConfirmar}</button>`,
+    critico ? 'critico' : 'atencao'
+  );
+}
+
+// Intercepta copy manual no dark mode para remover fundo escuro
+document.getElementById('laudo-doc').addEventListener('copy', function(e) {
+  if (!document.body.classList.contains('dark')) return;
+  document.body.classList.remove('dark');
+  document.body.offsetHeight;
+  setTimeout(function() {
+    document.body.classList.add('dark');
+  }, 0);
+});
+
+function imprimir(){
+  const h = document.getElementById('laudo-doc').innerHTML;
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Helvetica,Arial,sans-serif;font-size:10pt;padding:32px;color:#111;line-height:1.65;max-width:820px;margin:auto}.doc-titulo{text-align:center;font-weight:700;text-transform:uppercase;margin-bottom:16px}.doc-label{font-weight:700;display:block;margin-bottom:2px}.doc-p{margin-bottom:8px}.doc-secao{margin-bottom:14px}*{color:#111!important}</style></head><body>${h}</body></html>`);
+  w.document.close();
+  w.print();
+}
+
+function reiniciar(){
+  estado.superior = defaultModuloState('superior');
+  estado.inferior = defaultModuloState('inferior');
+  buildSidebar();
+  showSection('geral');
+}
+
+// ── INIT ──
+(function(){
+  if(localStorage.getItem('darkModeVenoso') === '1') toggleDark();
+  document.getElementById('mod-superior').classList.add('active');
+  buildSidebar();
+  showSection('geral');
+})();
+</script>
+<script src="../js/copy-pacs.js"></script>
+</body>
+</html>

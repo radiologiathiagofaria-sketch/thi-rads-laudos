@@ -1,0 +1,16 @@
+﻿<!DOCTYPE html>
+<html><body>
+<div style="height: 2000px; background: linear-gradient(blue, red);"></div>
+<script>
+if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
+let st;
+window.addEventListener('scroll', () => {
+    clearTimeout(st);
+    st = setTimeout(() => { history.replaceState({ scroll: window.scrollY }, ""); }, 100);
+});
+if (history.state && history.state.scroll) {
+    window.scrollTo(0, history.state.scroll);
+    console.log("Restored:", history.state.scroll);
+}
+</script>
+</body></html>
