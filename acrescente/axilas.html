@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>THI-RADS | US Axilas</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#0e6a83;--blue-dark:#0c566b;--surface:#e1e6ee;--border:#c9d1de;--bs:#9eacc2;--text:#1b2538;--text2:#34425b;--text3:#5c6a83;--white:#f3f5f9;--red:#c93a3a;--hover:#dfeaf0;--sel:#cbe3ec;--ring:rgba(14,106,131,.22);--onblue:#fff;--dbg:#f6e6e8;--info:#e8f1f5;--paper:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--blue:#2fa9c2;--blue-dark:#2490a8;--surface:#090e19;--border:#1a263b;--bs:#33445f;--text:#c9d2e0;--text2:#a3afc4;--text3:#7a879f;--white:#0e1626;--red:#e07a7a;--hover:#13203a;--sel:#12324a;--ring:rgba(47,169,194,.28);--onblue:#06202b;--dbg:#2d1a1f;--info:#12293d;--paper:#0e1626}}
+:root[data-theme="dark"]{--blue:#2fa9c2;--blue-dark:#2490a8;--surface:#090e19;--border:#1a263b;--bs:#33445f;--text:#c9d2e0;--text2:#a3afc4;--text3:#7a879f;--white:#0e1626;--red:#e07a7a;--hover:#13203a;--sel:#12324a;--ring:rgba(47,169,194,.28);--onblue:#06202b;--dbg:#2d1a1f;--info:#12293d;--paper:#0e1626}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'DM Sans',system-ui,sans-serif;font-size:14px;background:var(--surface);color:var(--text);display:flex;flex-direction:column;overflow:hidden}
+.toolbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 22px;display:flex;align-items:center;gap:10px;min-height:58px;flex-shrink:0;flex-wrap:wrap}
+.logo{display:flex;align-items:baseline;gap:8px;margin-right:14px}.logo-name{font-size:20px;font-weight:600;color:var(--blue);letter-spacing:-.3px}.logo-sub{font-size:13px;color:var(--text3)}
+.tb-sep{width:1px;height:24px;background:var(--border);margin:0 4px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:8px;font:500 14px 'DM Sans',sans-serif;cursor:pointer;border:1px solid var(--bs);background:var(--white);color:var(--text);transition:all .13s}
+.btn:hover{background:var(--hover);border-color:var(--blue);color:var(--blue)}
+.btn-primary{background:var(--blue);color:var(--onblue);border-color:var(--blue);font-weight:600}.btn-primary:hover{background:var(--blue-dark);color:var(--onblue)}
+.btn-danger{background:var(--dbg);color:var(--red);border-color:var(--red)}.btn-danger:hover{color:var(--red)}
+.btn svg{width:16px;height:16px}.btn-dark{margin-left:auto}
+.btn:focus-visible,.nav-item:focus-visible,.radio-opt:focus-visible,.check-row:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.body{display:flex;flex:1;overflow:hidden;min-height:0}
+.sidebar{width:208px;background:var(--white);border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0}
+.sidebar-hd{padding:16px;border-bottom:1px solid var(--border)}.sidebar-tipo{font-size:12px;font-weight:600;color:var(--text3);margin-bottom:3px}.sidebar-titulo{font-size:19px;font-weight:600}
+.nav-group{padding:8px 0}.nav-group-hd{padding:8px 16px 3px;font-size:12px;font-weight:600;color:var(--text3)}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:15px;color:var(--text2);cursor:pointer;border-left:3px solid transparent;line-height:1.25}
+.nav-item:hover{background:var(--hover);color:var(--text)}.nav-item.active{background:var(--sel);color:var(--blue);border-left-color:var(--blue);font-weight:600}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.4;flex-shrink:0}.nav-item.active .nav-dot{opacity:1}.nav-item.alt .nav-dot{background:var(--red);opacity:1}
+.panel{width:560px;flex-shrink:0;overflow-y:auto;padding:18px 18px 26px;background:var(--surface)}
+.sec-title{font-size:19px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:9px}.sec-title::before{content:'';width:4px;height:22px;background:var(--blue);border-radius:2px}
+.block{margin-bottom:14px;background:var(--white);border-radius:14px;border:1px solid var(--border);overflow:hidden}
+.block-title{font-size:14px;font-weight:600;color:var(--text2);padding:11px 16px 10px;border-bottom:1px solid var(--border)}
+.radio-opt,.check-row{display:flex;border-bottom:1px solid var(--border);cursor:pointer}.radio-opt:last-child,.check-row:last-child{border-bottom:0}
+.radio-opt:hover,.check-row:hover{background:var(--hover)}.radio-opt.selected,.check-row.selected{background:var(--sel)}
+.radio-label,.check-label{display:flex;align-items:center;gap:12px;width:100%;padding:12px 16px;font-size:15px;line-height:1.4;cursor:pointer}
+.radio-opt.selected .radio-label,.check-row.selected .check-label{color:var(--blue);font-weight:600}
+.radio-mark,.check-box{width:20px;height:20px;border:2px solid var(--bs);flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--white);color:transparent}
+.radio-mark{border-radius:50%}.check-box{border-radius:5px}.check-box svg{width:12px;height:12px}
+.radio-opt.selected .radio-mark{border-color:var(--blue);background:var(--blue);box-shadow:inset 0 0 0 4px var(--blue),inset 0 0 0 10px var(--onblue)}
+.check-row.selected .check-box{border-color:var(--blue);background:var(--blue);color:var(--onblue)}
+.ff-grid{display:flex;gap:12px;flex-wrap:wrap;padding:12px 16px}.ff{display:flex;flex-direction:column;gap:4px}
+.ff label{font-size:13px;color:var(--text2);font-weight:600}
+.sel,.num,.txt{font:14px 'DM Sans',sans-serif;padding:8px 10px;border:1px solid var(--bs);border-radius:8px;background:var(--white);color:var(--text)}
+.num{width:84px;text-align:center}.txt{width:100%;resize:vertical;min-height:90px}
+.sel:focus,.num:focus,.txt:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--ring)}
+.info{padding:10px 16px;font-size:13px;line-height:1.6;color:var(--text2);background:var(--info);border-top:1px solid var(--border)}.info:first-child{border-top:0}
+.laudo-panel{flex:1;min-width:0;background:var(--white);display:flex;flex-direction:column;border-left:1px solid var(--border)}
+.laudo-header{padding:10px 20px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;color:var(--text3)}
+.laudo-body{flex:1;overflow-y:auto;padding:22px 28px}
+.laudo-doc{font:10pt/1.65 Helvetica,Arial,sans-serif;max-width:720px;color:var(--text)}.laudo-doc:focus{outline:none}
+.doc-titulo{text-align:center;font-weight:700;margin-bottom:16px}.doc-label{font-weight:700}.doc-p{margin-bottom:8px}.doc-secao{margin-bottom:14px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(12px);background:var(--text);color:var(--white);font-size:13px;padding:10px 18px;border-radius:8px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:9}.toast.show{opacity:1;transform:translateX(-50%)}
+@media (max-width:900px){html,body{height:auto}body{overflow:auto}.body{flex-direction:column;overflow:visible}.sidebar{width:auto;display:flex;overflow-x:auto;border-right:0;border-bottom:1px solid var(--border)}.sidebar-hd,.nav-group-hd{display:none}.nav-group{display:flex;padding:4px}.nav-item{white-space:nowrap;border-left:0;border-bottom:3px solid transparent}.nav-item.active{border-bottom-color:var(--blue)}.panel{width:auto}.laudo-panel{border-left:0}.laudo-body{padding:18px}.toolbar{padding:8px 14px}}
+.ff-grid .btn{padding:7px 12px;font-size:13px}.block-title .btn{padding:5px 12px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <div class="logo"><span class="logo-name">THI-RADS</span><span class="logo-sub">laudo estruturado</span></div>
+  <div class="tb-sep"></div>
+  <button class="btn" onclick="copiar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>Copiar laudo</button>
+  <button class="btn btn-primary" onclick="imprimir()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6V2h8v4M4 12H2V7h12v5h-2M4 9h8M4 12v2h8v-2"/></svg>Imprimir</button>
+  <button class="btn btn-dark" onclick="tema()">Alternar tema</button>
+  <button class="btn btn-danger" onclick="reiniciar()">Reiniciar</button>
+</div>
+<div class="body">
+  <div class="sidebar"><div class="sidebar-hd"><div class="sidebar-tipo">Ultrassonografia</div><div class="sidebar-titulo">Axilas</div></div><div id="nav"></div></div>
+  <div class="panel" id="panel"></div>
+  <div class="laudo-panel"><div class="laudo-header">Pré-visualização do laudo</div><div class="laudo-body"><div class="laudo-doc" id="doc" contenteditable="true"></div></div></div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const LADOS={direita:'DIREITA',esquerda:'ESQUERDA',bilateral:'BILATERAL'};
+const LAB={direita:'axila direita',esquerda:'axila esquerda'};
+const LIM=[['ede','edema','por acentuado edema'],['bio','biotipo (obesidade)','pela intensa atenuação do feixe acústico inerente ao biotipo'],['dor','dor à compressão pelo transdutor','por dor à compressão pelo transdutor'],['pos','limitação do posicionamento do membro superior','pela limitação do posicionamento do membro superior'],['cic','alterações cutâneas / cicatriz pós-operatória','por alterações cutâneas / cicatriz pós-operatória'],['cur','curativo ou ferida no local','pela presença de curativo ou ferida no local'],['lnf','linfedema do membro superior','por linfedema do membro superior']];
+const IND=['rastreamento oncológico mamário (complemento à mamografia/ressonância)','avaliação de linfonodos axilares aumentados','avaliação pós-mastectomia','seguimento de câncer de mama conhecido','investigação de suspeita de recidiva tumoral','avaliação pré-estadiamento','guia para procedimento (PAAF / core biopsy)','investigação de linfedema de membro superior','avaliação de massa axilar palpável'];
+const MET=['ultrassonografia','mamografia','ressonância magnética','tomografia computadorizada'];
+const COMP=['estável, sem alterações significativas','aumento do achado prévio','redução do achado prévio','surgimento de novo achado','resolução do achado prévio','achado prévio não identificado no exame atual'];
+const COMP_D=['','com aumento dimensional do achado previamente descrito','com redução dimensional do achado previamente descrito','com identificação de novo achado no exame atual','com resolução do achado previamente descrito','não se identificando, no exame atual, correspondência com o achado previamente descrito'];
+const COMP_C=['Achado estável em relação ao exame prévio.','Aumento dimensional do achado em relação ao exame prévio.','Redução dimensional do achado em relação ao exame prévio.','Surgimento de novo achado em relação ao exame prévio.','Resolução do achado previamente descrito.','Não caracterizado, no exame atual, o achado previamente descrito.'];
+const REC=[['clin','correlação clínica','Correlação clínica.'],['rm','ressonância magnética','Ressonância magnética para complementação.'],['tc','tomografia computadorizada','Tomografia computadorizada.'],['ac','acompanhamento ultrassonográfico seriado','Acompanhamento ultrassonográfico seriado.'],['bx','biópsia / punção de linfonodo axilar','Biópsia / punção de linfonodo axilar para avaliação anatomopatológica.']];
+const SEC=[['lat','Lateralidade','Geral'],['tec','Técnica'],['ind','Indicação'],['pele','Pele e Subcutâneo','Achados'],['mus','Plano Muscular'],['lin','Linfonodos'],['ace','Mama Acessória'],['cmp','Exames Comparativos','Complementos'],['ach','Achados Adicionais'],['rec','Recomendações']];
+const PL=['subcutâneo','subcutâneo profundo','subcutâneo e muscular','muscular'];
+const EST={'subcutâneo':'Tecido celular subcutâneo','subcutâneo profundo':'Tecido celular subcutâneo profundo','subcutâneo e muscular':'Tecido celular subcutâneo e plano muscular','muscular':'Plano muscular'};
+const DOP=[['não citar',''],['ausente',', sem vascularização ao Doppler'],['discreto',', com discreta vascularização ao Doppler'],['periférico',', com discreta vascularização periférica ao Doppler'],['central',', com discreta vascularização central ao Doppler'],['periférico e central',', com vascularização periférica e central ao Doppler'],['intenso',', com intensa vascularização ao Doppler']];
+const DOPL=DOP.map(x=>x[0]);
+const FORMA=['ovalada','irregular','lobulada','fusiforme'],MARG=['bem definidas','parcialmente definidas','mal definidas'],PAR=['finas','espessas'],CONT=['anecoico','hipoecoico/espesso','heterogêneo'],ECO=['hipoecoica','isoecoica','hiperecoica'];
+const MUSC=['não citar','peitoral maior','peitoral menor','latíssimo do dorso','serrátil anterior','subescapular','redondo maior'];
+const ASP={'semelhante à gordura':'isoecogênico à gordura subcutânea, com finas linhas ecogênicas internas','hiperecogênico, linhas proeminentes':'hiperecogênico, com linhas ecogênicas proeminentes','hiperecoico, homogêneo':'hiperecoico, homogêneo','heterogêneo, septações internas':'heterogêneo, com septações internas','heterogêneo, septações espessas':'heterogêneo, com septações espessas','hipoecoico, heterogêneo':'hipoecoico, heterogêneo'};
+const M3=[['m1','medida 1','num','cm'],['m2','medida 2','num','cm'],['m3','medida 3','num','cm'],['dist','distância da pele','num','cm']];
+const PLF=['pl','plano','sel',PL],DOPF=['dop','Doppler','sel',DOPL];
+
+const nm=v=>parseFloat(String(v).replace(',','.'));
+const f=v=>{const x=nm(v);return isNaN(x)?'_':x.toFixed(1).replace('.',',')};
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+const jn=a=>a.length<2?(a[0]||''):a.slice(0,-1).join(', ')+' e '+a[a.length-1];
+const esc=x=>String(x).replace(/</g,'&lt;');
+const dc=l=>(DOP.find(x=>x[0]===l)||['',''])[1];
+const med=s=>{const p=['m1','m2','m3'].filter(k=>s[k]!==''&&!isNaN(nm(s[k]))).map(k=>f(s[k]));return p.length?p.join(' x ')+' cm':'_ x _ cm'};
+const vol=s=>{const p=['m1','m2','m3'].map(k=>nm(s[k]));return p.some(isNaN)?'_':(p[0]*p[1]*p[2]*0.52).toFixed(1).replace('.',',')};
+const dist=s=>s.dist!==''&&!isNaN(nm(s.dist))?`, distando ${f(s.dist)} cm da pele`:'';
+const mm=s=>s.mu&&s.mu!=='não citar'?` do músculo ${s.mu}`:'';
+const no=s=>s.mu&&s.mu!=='não citar'?` no músculo ${s.mu}`:'';
+
+const P={
+ infsup:{l:'Edema / espessamento dos planos superficiais',fl:[['dop','Doppler','sel',['com hiperemia/vascularização ao Doppler','sem vascularização ao Doppler']],['cob','padrão em paralelepípedo','chk'],['lin','linfonodos adjacentes de aspecto reacional','chk']],
+  d:s=>{let t=s.dop[0]==='c'?'Pele e tecido celular subcutâneo espessados, com aumento difuso da ecogenicidade, edema e densificação do subcutâneo e hiperemia ao estudo Doppler.':'Pele e tecido celular subcutâneo espessados, com edema difuso do subcutâneo, sem coleções ou sinais de processo inflamatório ativo ao estudo Doppler.';if(s.cob)t=t.replace(/\.$/,'')+', em padrão de paralelepípedo.';if(s.lin)t+=' Linfonodos adjacentes de aspecto reacional.';return t},
+  c:(s,x)=>s.dop[0]==='c'?(x.abs?null:'Celulite.'):'Edema dos planos superficiais, sem sinais inflamatórios ativos.'},
+ areainf:{l:'Área infiltrativa',fl:[PLF,['eco','ecotextura','sel',['heterogênea','predominantemente hipoecoica','mista']],['pp','planos profundos','sel',['não citar','contato com planos profundos','planos profundos preservados']],['dp','Doppler','sel',['não citar','com hiperemia ao Doppler','sem vascularização significativa ao Doppler']],['sc','sem coleção líquida organizada de permeio','chk']],
+  d:s=>`${EST[s.pl]} com área mal delimitada de ecotextura ${s.eco}, de aspecto infiltrativo, sem formação nodular definida${s.dp[0]==='c'?', com hiperemia ao estudo Doppler':s.dp[0]==='s'?', sem vascularização significativa ao Doppler':''}${s.pp[0]==='c'?', em contato com planos profundos':s.pp[0]==='p'?', com planos profundos preservados':''}${s.sc?', sem coleção líquida organizada de permeio':''}.`,
+  c:s=>`Área infiltrativa no plano ${s.pl}${s.sc?', sem coleção organizada':''}.`},
+ lipoma:{l:'Lesão lipomatosa',fl:[['pre','tipo','sel',['lipoma típico','angiolipoma','fibrolipoma','lipoma mixoide','lipoma atípico']],['cont','contornos','sel',MARG],['asp','aspecto','sel',Object.keys(ASP)],DOPF,...M3,['ep','de eixo paralelo à pele','chk'],['cm','compressível à compressão dinâmica','chk'],['si','sem sinais de invasão dos planos profundos','chk']],
+  d:s=>{const b=[s.ep&&'de eixo paralelo à pele',s.cm&&'compressível à compressão dinâmica',s.si&&'sem sinais de invasão dos planos profundos'].filter(Boolean);return `Tecido celular subcutâneo com lesão lipomatosa de contornos ${s.cont.replace('definidas','definidos')}, aspecto ${ASP[s.asp]}${dc(s.dop)}${b.length?', '+jn(b):''}, medindo ${med(s)}${dist(s)}.`},
+  c:s=>({'lipoma típico':'Lesão com características ecográficas compatíveis com lipoma.','angiolipoma':'Lesão com características ecográficas compatíveis com angiolipoma.','fibrolipoma':'Lesão com características ecográficas compatíveis com fibrolipoma.','lipoma mixoide':'Lesão lipomatosa com componente mixoide ao estudo ecográfico.','lipoma atípico':'Lesão lipomatosa com características ecográficas atípicas.'})[s.pre]},
+ nodulo:{l:'Nódulo',fl:[['pre','tipo','sel',['inespecífico','dermatofibroma','pilomatricoma','tumor de origem neural']],PLF,['eco','ecotextura','sel',ECO],['forma','forma','sel',FORMA],['marg','margens','sel',MARG],DOPF,...M3],
+  d:s=>`${EST[s.pl]} com lesão nodular de forma ${s.forma}, margens ${s.marg}, ecotextura ${s.eco}${dc(s.dop)}, medindo ${med(s)}${dist(s)}.`,
+  c:s=>({'inespecífico':'Nódulo sólido de características inespecíficas.','dermatofibroma':'Nódulo compatível com dermatofibroma.','pilomatricoma':'Nódulo compatível com pilomatricoma.','tumor de origem neural':'Nódulo em plano neural, compatível com tumor de origem neural.'})[s.pre]},
+ cisto:{l:'Lesão cística',fl:[['pre','tipo','sel',['cisto epidermoide','cisto epidermoide inflamado','cisto epidermoide roto','cisto sinovial','lesão cística inespecífica']],PLF,['forma','forma','sel',FORMA],['marg','margens','sel',MARG],['cont','conteúdo','sel',CONT],['par','paredes','sel',PAR],DOPF,...M3],
+  d:s=>`${EST[s.pl]} com lesão cística de forma ${s.forma}, margens ${s.marg}, conteúdo ${s.cont}, paredes ${s.par}${dc(s.dop)}, medindo ${med(s)}${dist(s)}.`,
+  c:s=>({'cisto epidermoide':'Cisto epidermoide.','cisto epidermoide inflamado':'Cisto epidermoide inflamado.','cisto epidermoide roto':'Cisto epidermoide roto.','cisto sinovial':'Cisto sinovial.','lesão cística inespecífica':'Lesão cística de características inespecíficas.'})[s.pre]},
+ org:{l:'Coleção organizada',fl:[['pre','tipo','sel',['coleção simples','hematoma','sero-hematoma agudo','sero-hematoma crônico','abscesso','coleção inespecífica']],PLF,['par','paredes','sel',PAR],['cont','conteúdo','sel',CONT],...M3],
+  d:s=>`${EST[s.pl]} com coleção organizada de paredes ${s.par} e conteúdo ${s.cont}, medindo ${med(s)} (volume de ${vol(s)} cm³)${dist(s)}.`,
+  c:(s,x)=>s.pre==='abscesso'?(x.cel?`Celulite com abscesso no plano ${s.pl}.`:`Abscesso no plano ${s.pl}.`):({'coleção simples':'Coleção simples','hematoma':'Hematoma','sero-hematoma agudo':'Sero-hematoma agudo','sero-hematoma crônico':'Sero-hematoma crônico','coleção inespecífica':'Coleção de características inespecíficas'})[s.pre]+` no plano ${s.pl}.`},
+ morel:{l:'Lesão de Morel-Lavallée',fl:[['fase','fase','sel',['não especificada','aguda','crônica (encapsulada)']],...M3],
+  d:s=>`Tecido celular subcutâneo profundo com coleção líquida alongada entre a gordura subcutânea e a fáscia muscular, de aspecto laminar ao longo do plano fascial, sem vascularização interna ao Doppler, medindo ${med(s)} (volume de ${vol(s)} cm³)${dist(s)}.`,
+  c:s=>s.fase[0]==='a'?'Lesão de Morel-Lavallée, em fase aguda, no contexto de antecedente traumático.':s.fase[0]==='c'?'Lesão de Morel-Lavallée, em fase crônica (encapsulada), no contexto de antecedente traumático.':'Lesão de Morel-Lavallée, no contexto de antecedente traumático.'},
+ nao:{l:'Coleção não organizada',fl:[['pre','tipo','sel',['abscesso','coleção inespecífica']],PLF,DOPF,...M3],
+  d:s=>`${EST[s.pl]} com coleção não organizada de contornos imprecisos e conteúdo heterogêneo, medindo ${med(s)} (volume de ${vol(s)} cm³)${dist(s)}${dc(s.dop)}.`,
+  c:(s,x)=>s.pre==='abscesso'?(x.cel?`Celulite com abscesso no plano ${s.pl}.`:`Abscesso no plano ${s.pl}.`):`Coleção de características inespecíficas no plano ${s.pl}.`},
+ vasc:{l:'Lesão vascular',fl:[['pre','tipo','sel',['fístula arteriovenosa','malformação arteriovenosa','pseudoaneurisma']],PLF,...M3],
+  d:s=>`${EST[s.pl]} com ${s.pre[0]==='f'?'trajeto fistuloso de comunicação arteriovenosa, caracterizado por fluxo turbulento de alta velocidade ao Doppler colorido, padrão em mosaico e arterialização do fluxo venoso de drenagem ao Doppler espectral':s.pre[0]==='m'?'emaranhado de estruturas vasculares tubulares anecoicas (nidus), exibindo intenso fluxo ao Doppler colorido, componentes arterial e venoso de permeio e baixa resistência ao Doppler espectral, sem componente sólido dominante':'formação sacular anecoica ligada à luz arterial adjacente por colo definido, exibindo fluxo turbilhonar em padrão "vai-e-vem" (to-and-fro) no colo e em yin-yang ao Doppler colorido'}, medindo ${med(s)}${dist(s)}.`,
+  c:s=>`${cap(s.pre)} no plano ${s.pl}.`},
+ fistc:{l:'Trajeto fistuloso / fístula cutânea',fl:[['dest','tipo','sel',['trajeto fistuloso cutâneo','comunicação com foco de osteomielite','comunicação com coleção/abscesso profundo','trajeto sinusal de fundo cego']],['m1','medida','num','cm']],
+  d:s=>`Pele e tecido celular subcutâneo com trajeto fistuloso, sob a forma de estrutura tubular hipoecoica${s.dest.startsWith('comunicação com foco')?', em comunicação com foco de osteomielite subjacente':s.dest.startsWith('comunicação com coleção')?', em comunicação com coleção/abscesso profundo':s.dest.startsWith('trajeto sinusal')?', de fundo cego':''}${s.m1!==''?`, medindo ${f(s.m1)} cm`:''}.`,
+  c:s=>({'trajeto fistuloso cutâneo':'Trajeto fistuloso cutâneo.','comunicação com foco de osteomielite':'Trajeto fistuloso cutâneo em comunicação com foco de osteomielite subjacente.','comunicação com coleção/abscesso profundo':'Trajeto fistuloso cutâneo em comunicação com coleção/abscesso profundo.','trajeto sinusal de fundo cego':'Trajeto sinusal cutâneo, de fundo cego.'})[s.dest]},
+ hidra:{l:'Hidradenite supurativa',fl:[['hur','estágio de Hurley','sel',['não especificado','I','II','III']],['col','coleção anecogênica de conteúdo espesso','chk'],['trj','trajetos hipoecogênicos interconectados','chk'],['dpl','hipervascularização ao Doppler','chk'],['m1','medida do maior','num','cm'],['m2','medida 2','num','cm']],
+  d:s=>`Pele e tecido celular subcutâneo com espessamento e redução da ecogenicidade, contendo nódulos hipoecogênicos de contornos irregulares${s.col?', associados a coleção anecogênica de conteúdo espesso':''}${s.trj?', entremeados por trajetos hipoecogênicos lineares interconectados':''}${s.dpl?', exibindo hipervascularização ao mapeamento Doppler colorido':''}, medindo o maior ${s.m1!==''?f(s.m1)+(s.m2!==''?' x '+f(s.m2):'')+' cm':'_ cm'}.`,
+  c:s=>s.hur==='não especificado'?'Hidradenite supurativa.':`Hidradenite supurativa, estágio ${s.hur} de Hurley.`}
+};
+const MU=['mu','músculo','sel',MUSC];
+const M={
+ trof:{l:'Trofismo muscular preservado',fl:[MU],d:s=>`Ventres musculares${mm(s)} tróficos com arquitetura fibrilar preservada.`,c:()=>null},
+ hipo:{l:'Hipotrofia muscular',fl:[MU],d:s=>`Ventres musculares${mm(s)} com discreta redução volumétrica, associada a leve aumento da ecogenicidade, com preservação parcial da arquitetura fibrilar.`,c:s=>mm(s)?`Hipotrofia${mm(s)}.`:'Hipotrofia muscular.'},
+ atro:{l:'Atrofia muscular',fl:[MU],d:s=>`Ventres musculares${mm(s)} com redução volumétrica acentuada, aumento da ecogenicidade e rarefação do padrão fibrilar.`,c:s=>mm(s)?`Atrofia${mm(s)}.`:'Atrofia muscular.'},
+ lipo:{l:'Lipossubstituição muscular',fl:[MU,['gr','graduação de Strobel','sel',['sem graduação','leve','moderada','acentuada']]],
+  d:s=>({'sem graduação':`Ventres musculares${mm(s)} com aumento difuso da ecogenicidade, associado a redução do volume muscular e perda do padrão fibrilar habitual.`,'leve':`Ventres musculares${mm(s)} com discreto aumento da ecogenicidade, com padrão penado e tendão central ainda identificáveis, caracterizando lipossubstituição leve na graduação ultrassonográfica de Strobel.`,'moderada':`Ventres musculares${mm(s)} com aumento da ecogenicidade e padrão penado e tendão central mal definidos, caracterizando lipossubstituição moderada na graduação ultrassonográfica de Strobel.`,'acentuada':`Ventres musculares${mm(s)} com acentuado aumento da ecogenicidade, sem identificação do padrão penado e do tendão central, caracterizando lipossubstituição acentuada na graduação ultrassonográfica de Strobel.`})[s.gr],
+  c:s=>s.gr==='sem graduação'?(mm(s)?`Lipossubstituição${mm(s)}.`:'Lipossubstituição muscular.'):`Lipossubstituição muscular ${s.gr}${mm(s)}.`},
+ tend:{l:'Tendinopatia / alteração do padrão fibrilar',fl:[MU],d:s=>`Perda parcial do padrão fibrilar habitual${mm(s)}, com borramento e redução da ecogenicidade das fibras.`,c:s=>`Alteração do padrão fibrilar${mm(s)}.`},
+ les1:{l:'Lesão muscular grau 1',fl:[MU],d:s=>`Espessamento e alteração ecotextural focal do músculo${s.mu!=='não citar'?' '+s.mu:''}, sem descontinuidade fibrilar.`,c:s=>s.mu!=='não citar'?`Estiramento${mm(s)} (lesão grau 1), sem evidência de rotura fibrilar.`:'Achados compatíveis com estiramento muscular (lesão grau 1), sem evidência de rotura fibrilar.'},
+ les2:{l:'Rotura muscular parcial',fl:[MU],d:s=>`Área de descontinuidade parcial das fibras musculares${mm(s)}, associada a hematoma intramuscular.`,c:s=>s.mu!=='não citar'?`Rotura parcial${mm(s)}.`:'Achados compatíveis com rotura muscular parcial.'},
+ les3:{l:'Rotura muscular completa',fl:[MU,['gap','afastamento dos cotos','num','cm']],d:s=>`Rotura completa das fibras musculares${mm(s)}${s.gap!==''?', com afastamento dos cotos de '+f(s.gap)+' cm':', com afastamento dos cotos'}.`,c:s=>s.mu!=='não citar'?`Rotura completa${mm(s)}.`:'Achados compatíveis com rotura muscular completa.'},
+ esp:{l:'Espessamento inflamatório',fl:[MU,['dp','vascularização ao Doppler','sel',['discreta','periférica','central','variável','ausente']]],
+  d:s=>`Espessamento ${mm(s)?'inflamatório'+mm(s):'do plano muscular, de aspecto inflamatório'}, ${s.dp==='ausente'?'sem vascularização ao Doppler':`associado a vascularização ${s.dp} ao Doppler`}.`,c:s=>`Sinais ecográficos de processo inflamatório${mm(s)}.`},
+ inf:{l:'Área infiltrativa no plano muscular',fl:[MU,['eco','ecotextura','sel',['heterogênea','predominantemente hipoecoica','mista']],['dp','vascularização ao Doppler','sel',['discreta','periférica','central','variável','ausente']]],
+  d:s=>`Área mal delimitada ${no(s)?no(s).trim():'no plano muscular'}, de ecotextura ${s.eco}, ${s.dp==='ausente'?'sem vascularização ao Doppler':`com vascularização ${s.dp} ao Doppler`}, sem formação nodular definida.`,c:s=>`Lesão de aspecto infiltrativo${no(s)||' no plano muscular'}, de características ecográficas indeterminadas.`},
+ nod:{l:'Nódulo no plano muscular',fl:[MU,['forma','forma','sel',FORMA],['cont','contornos','sel',MARG],['eco','ecotextura','sel',ECO],DOPF,...M3],
+  d:s=>`Formação nodular${no(s)||' no plano muscular'}, de forma ${s.forma}, contornos ${s.cont.replace('definidas','definidos')}, ecotextura ${s.eco}${dc(s.dop)}, medindo ${med(s)}${dist(s)}.`,c:s=>`Lesão nodular${no(s)||' no plano muscular'}, com características ecográficas inespecíficas ao método.`},
+ org:{l:'Coleção organizada no plano muscular',fl:[MU,['par','paredes','sel',PAR],['cont','conteúdo','sel',CONT],...M3],
+  d:s=>`${no(s)?'Nota-se coleção'+no(s):'No plano muscular, nota-se coleção'}, de paredes ${s.par} e conteúdo ${s.cont}, medindo ${med(s)}${dist(s)}.`,c:s=>`Coleção organizada${no(s)||' no plano muscular'}.`},
+ nao:{l:'Coleção não organizada no plano muscular',fl:[MU,['pre','tipo','sel',['abscesso','coleção em organização','coleção não organizada']],DOPF,...M3],
+  d:s=>`${no(s)?'Nota-se coleção não organizada'+no(s):'No plano muscular, nota-se coleção não organizada'}, de aspecto heterogêneo, medindo ${med(s)}${dist(s)}${dc(s.dop)}.`,c:s=>s.pre==='abscesso'?`Coleção${no(s)||' no plano muscular'} com características ecográficas de abscesso.`:s.pre==='coleção em organização'?`Coleção em organização${no(s)||' no plano muscular'}.`:`Coleção não organizada${no(s)||' no plano muscular'}.`}
+};
+const CAT={pele:P,mus:M};
+const mkL=()=>({pad:'típico',lat:'bilateralmente',mult:false,m1:'',m2:'',m3:'',cort:'',ren:false,hil:false,dop:false,esp:false,rhil:false,rdop:false,arr:false,foc:false,dif:false,difmm:'',lob:false,het:false,desl:false,apag:false,daus:false,dper:false,ddes:false,nec:false,calc:false,paaf:false});
+let E,cur='lat',uid=0;
+function init(){E={lat:'bilateral',sonda:'linear',lim:{},ind:{},indOut:'',pele:{hab:true,aus:true,l:[]},mus:{hab:true,nv:true,l:[]},lin:{l:[]},ace:{sit:'ausente',lat:'à direita'},cmp:{nd:false,on:false,mod:MET[0],data:'',ach:false,desc:'',comp:COMP[0],conc:true},ach:'',rec:{inc:false,c:{},t:{},custom:''}}}
+const g=p=>p.split('.').reduce((o,x)=>o[x],E);
+function put(p,v){const k=p.split('.');let o=E;k.slice(0,-1).forEach(x=>o=o[x]);o[k.pop()]=v}
+function S(p,v){put(p,v);show(cur)}
+function I(p,v){put(p,v);laudo();navMark()}
+const rad=(p,v,l)=>`<div class="radio-opt ${g(p)===v?'selected':''}" tabindex="0" onclick="S('${p}','${v}')"><label class="radio-label"><span class="radio-mark"></span>${esc(l)}</label></div>`;
+const chk=(p,l,fn)=>`<div class="check-row ${g(p)?'selected':''}" tabindex="0" onclick="${fn||`S('${p}',${!g(p)})`}"><label class="check-label"><span class="check-box"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg></span>${esc(l)}</label></div>`;
+const sel=(p,o,l)=>`<div class="ff"><label>${l}</label><select class="sel" onchange="S('${p}',this.value)">${o.map(x=>`<option ${g(p)===x?'selected':''}>${esc(x)}</option>`).join('')}</select></div>`;
+const num=(p,l,u)=>`<div class="ff"><label>${l} (${u})</label><input class="num" inputmode="decimal" value="${g(p)}" oninput="I('${p}',this.value)"></div>`;
+const blk=(t,b)=>`<div class="block"><div class="block-title">${t}</div>${b}</div>`;
+const info=t=>`<div class="info">${t}</div>`;
+const note=(p,v)=>`<div class="ff-grid"><textarea class="txt" oninput="I('${p}',this.value)">${esc(v)}</textarea></div>`;
+
+function fields(p,fl){return `<div class="ff-grid">${fl.filter(x=>x[2]!=='chk').map(x=>x[2]==='sel'?sel(p+'.'+x[0],x[3],x[1]):num(p+'.'+x[0],x[1],x[3])).join('')}</div>`+fl.filter(x=>x[2]==='chk').map(x=>chk(p+'.'+x[0],x[1])).join('')}
+function add(c,t){const d=CAT[c][t],o={t,lado:'direita'};d.fl.forEach(x=>o[x[0]]=x[2]==='sel'?x[3][0]:x[2]==='chk'?false:'');E[c].l.push(o);show(c)}
+function addL(){E.lin.l.push(mkL());show('lin')}
+function del(c,i){E[c].l.splice(i,1);show(c)}
+const lado=p=>E.lat==='bilateral'?`<div class="ff-grid">${sel(p+'.lado',['direita','esquerda','bilateral'],'axila')}</div>`:'';
+function card(c,i){const s=E[c].l[i],d=CAT[c][s.t],p=`${c}.l.${i}`;return `<div class="block"><div class="block-title" style="display:flex;justify-content:space-between;align-items:center"><span>${d.l}</span><button class="btn" onclick="del('${c}',${i})">Remover</button></div>${lado(p)}${fields(p,d.fl)}</div>`}
+function cat(c,titulo){const h=E[c];let o='';if(c==='pele')o+=blk('Sem achados focais',chk('pele.hab','citar pele e tecido subcutâneo habituais')+chk('pele.aus','citar ausência de nódulos, massas ou coleções'));else o+=blk('Sem achados focais',chk('mus.hab','citar planos musculares preservados')+chk('mus.nv','citar feixes neurais e vasculares habituais'));
+ o+=blk('Adicionar achado',`<div class="ff-grid">${Object.keys(CAT[c]).map(k=>`<button class="btn" onclick="add('${c}','${k}')">+ ${CAT[c][k].l}</button>`).join('')}</div>`);
+ return o+h.l.map((x,i)=>card(c,i)).join('')}
+const L_OPTS=['à direita','à esquerda','bilateralmente'];
+function linCard(i){const s=E.lin.l[i],p='lin.l.'+i,pd={típico:'t',reacional:'r',atípico:'a'}[s.pad];let b=`<div class="ff-grid">${sel(p+'.pad',['típico','reacional','atípico'],'padrão')}${sel(p+'.lat',L_OPTS,'lateralidade')}${num(p+'.m1','medida 1','cm')}${num(p+'.m2','medida 2','cm')}${num(p+'.m3','medida 3','cm')}${num(p+'.cort','córtex','mm')}</div>`+chk(p+'.mult','múltiplos');
+ if(pd==='t')b+=chk(p+'.ren','morfologia reniforme, com córtex fino e homogêneo')+chk(p+'.hil','hilo gorduroso central preservado')+chk(p+'.dop','vascularização hilar predominante ao Doppler');
+ if(pd==='r')b+=chk(p+'.esp','morfologia reniforme com espessamento cortical difuso e homogêneo')+chk(p+'.rhil','hilo gorduroso central preservado')+chk(p+'.rdop','vascularização hilar preservada ao Doppler');
+ if(pd==='a')b+=[['arr','arredondado (relação eixo longo/curto < 2)'],['foc','espessamento cortical focal'],['dif','espessamento cortical difuso'],['lob','espessamento cortical lobulado'],['het','córtex heterogêneo'],['desl','hilo gorduroso deslocado para a periferia'],['apag','hilo gorduroso apagado'],['daus','ausência de vascularização hilar'],['dper','fluxo subcapsular e periférico'],['ddes','fluxo desorganizado'],['nec','áreas císticas intranodais'],['calc','microcalcificações'],['paaf','sugerir PAAF']].map(x=>chk(p+'.'+x[0],x[1])).join('')+(s.dif?`<div class="ff-grid">${num(p+'.difmm','espessamento cortical difuso','mm')}</div>`+info('≥ 3 mm atipia | ≥ 4 mm alta suspeição'):'');
+ return `<div class="block"><div class="block-title" style="display:flex;justify-content:space-between;align-items:center"><span>Linfonodo ${i+1}</span><button class="btn" onclick="del('lin',${i})">Remover</button></div>${b}</div>`}
+
+function nav(){let h='',gr='';SEC.forEach(s=>{if(s[2]){if(gr)h+='</div>';gr=s[2];h+=`<div class="nav-group"><div class="nav-group-hd">${gr}</div>`}h+=`<div class="nav-item ${s[0]===cur?'active':''}" id="n-${s[0]}" tabindex="0" onclick="show('${s[0]}')"><span class="nav-dot"></span>${s[1]}</div>`});document.getElementById('nav').innerHTML=h+'</div>';navMark()}
+function navMark(){const m={pele:E.pele.l.length,mus:E.mus.l.length,lin:E.lin.l.length,ace:E.ace.sit==='presente'};Object.keys(m).forEach(k=>{const e=document.getElementById('n-'+k);if(e)e.classList.toggle('alt',!!m[k])})}
+function show(k){cur=k;document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.id==='n-'+k));document.getElementById('panel').innerHTML=`<div class="sec-title">${SEC.find(s=>s[0]===k)[1]}</div>`+body(k);laudo();navMark()}
+function body(k){
+ if(k==='lat')return blk('Axila(s) a ser(em) examinada(s)',rad('lat','direita','direita')+rad('lat','esquerda','esquerda')+rad('lat','bilateral','bilateral'));
+ if(k==='tec')return blk('Sonda',rad('sonda','linear','sonda linear')+rad('sonda','convexa','sonda convexa')+rad('sonda','nc','não citar'))+blk('Técnica',info('Exame realizado em aparelho dinâmico com transdutor linear de alta frequência.'))+blk('Limitações mais comuns',LIM.map(x=>chk('lim.'+x[0],x[1])).join(''));
+ if(k==='ind')return blk('Indicações mais comuns',IND.map((x,i)=>chk('ind.i'+i,x)).join('')+chk('ind.out','outra indicação')+(E.ind.out?`<div class="ff-grid"><input class="txt" style="min-height:0" placeholder="Descreva a indicação" value="${esc(E.indOut)}" oninput="I('indOut',this.value)"></div>`:''));
+ if(k==='pele'||k==='mus')return cat(k);
+ if(k==='lin')return blk('Linfonodos',info('Sem itens, o laudo traz linfonodos axilares fusiformes, sem espessamento cortical ou apagamento hilar.')+`<div class="ff-grid"><button class="btn" onclick="addL()">+ Adicionar linfonodo</button></div>`)+E.lin.l.map((x,i)=>linCard(i)).join('');
+ if(k==='ace'){const o=E.lat==='direita'?['à direita']:E.lat==='esquerda'?['à esquerda']:L_OPTS;if(!o.includes(E.ace.lat))E.ace.lat=o[0];return blk('Situação',rad('ace.sit','ausente','ausente')+rad('ace.sit','presente','presente'))+(E.ace.sit==='presente'?blk('Lateralidade',`<div class="ff-grid">${sel('ace.lat',o,'mama acessória')}</div>`):'')}
+ if(k==='cmp'){const c=E.cmp;let h=blk('Disponibilidade',chk('cmp.nd','exames anteriores não disponíveis para comparação'));if(!c.nd){h+=blk('Exame anterior',chk('cmp.on','citar exame anterior')+(c.on?`<div class="ff-grid">${sel('cmp.mod',MET,'método')}<div class="ff"><label>data</label><input class="num" style="width:120px" placeholder="dd/mm/aaaa" value="${esc(c.data)}" oninput="I('cmp.data',this.value)"></div></div>`+chk('cmp.ach','achado descrito no exame anterior')+(c.ach?`<div class="ff-grid"><input class="txt" style="min-height:0" placeholder="Descrição do achado prévio" value="${esc(c.desc)}" oninput="I('cmp.desc',this.value)"></div>`:''):''));if(c.on)h+=blk('Comparação com exame atual',`<div class="ff-grid">${sel('cmp.comp',COMP,'evolução')}</div>`+chk('cmp.conc','incluir na conclusão'))}return h}
+ if(k==='ach')return blk('Descreva os achados',note('ach',E.ach));
+ return blk('Bloco no laudo',chk('rec.inc','incluir bloco de RECOMENDAÇÕES no laudo final'))+blk('Complementares',REC.map(r=>chk('rec.c.'+r[0],r[1],`R('${r[0]}')`)).join('')+info('Sugestões automáticas conforme os achados. Marque ou desmarque para sobrescrever.'))+blk('Recomendações adicionais',note('rec.custom',E.rec.custom))}
+function R(k){E.rec.t[k]=1;E.rec.c[k]=!E.rec.c[k];show('rec')}
+
+function linTxt(s){const R=s.lat==='à direita'?'Região axilar direita':s.lat==='à esquerda'?'Região axilar esquerda':'Regiões axilares',ms=['m1','m2','m3'].filter(k=>!isNaN(nm(s[k]))&&s[k]!=='').map(k=>f(s[k])),mc=ms.length?`, medindo ${ms.join(' x ')} cm`:'',ct=nm(s.cort)>0?`, com espessura cortical de ${f(s.cort)} mm`:'',pl=s.mult;let t='',c=null;
+ const L=a=>jn(a);
+ if(s.pad==='típico'){const p=[s.ren&&'morfologia reniforme, com córtex fino e homogêneo',s.hil&&'hilo gorduroso central preservado',s.dop&&'vascularização hilar predominante ao Doppler'].filter(Boolean);
+  if(!pl){t=`${R} com linfonodo${mc}${ct}.`;if(p.length)t+=` Apresenta ${L(p)}.`}else{t=`${R} com linfonodos difusos, todos de morfologia semelhante.`;if(mc||ct||p.length){t+=` O maior${mc}${ct}`;if(p.length)t+=`, apresentando ${L(p)}`;t+='.'}}}
+ if(s.pad==='reacional'){const p=[s.esp&&'morfologia reniforme com espessamento cortical difuso e homogêneo',s.rhil&&'hilo gorduroso central preservado',s.rdop&&'vascularização hilar preservada ao Doppler'].filter(Boolean);
+  if(!pl){t=`${R} com linfonodomegalia${mc}${ct}.`;if(p.length)t+=` Apresenta ${L(p)}.`;t+=' Aspecto compatível com linfonodo reacional.'}else{t=`${R} com linfonodomegalias difusas, todas de morfologia semelhante.`;if(mc||ct||p.length){t+=` A maior${mc}${ct}`;if(p.length)t+=`, apresentando ${L(p)}`;t+='. Aspecto compatível com linfonodos reacionais.'}else t+=' Aspecto compatível com linfonodos reacionais.'}
+  c=pl?`Linfonodomegalias axilares reacionais ${s.lat}.`:`Linfonodomegalia axilar reacional ${s.lat}.`}
+ if(s.pad==='atípico'){const m=[s.arr&&'arredondamento',s.foc&&'espessamento cortical focal',s.dif&&(!isNaN(nm(s.difmm))&&s.difmm!==''?`espessamento cortical difuso de ${f(s.difmm)} mm`:'espessamento cortical difuso'),s.lob&&'espessamento cortical lobulado',s.het&&'córtex heterogêneo',s.desl&&'hilo gorduroso deslocado para a periferia',s.apag&&'apagamento do hilo gorduroso',s.nec&&'áreas císticas intranodais',s.calc&&'microcalcificações'].filter(Boolean),d=[s.daus&&'ausência de fluxo hilar',s.dper&&'fluxo subcapsular e periférico',s.ddes&&'padrão vascular desorganizado'].filter(Boolean);
+  if(!pl){t=`${R} com linfonodomegalia atípica${mc}${ct}. Apresenta alterações morfológicas atípicas`}else{t=`${R} com linfonodomegalias atípicas difusas.`;if(mc||ct)t+=` A maior${mc}${ct}. Apresenta alterações morfológicas atípicas`;else t+=' Apresentam alterações morfológicas atípicas'}
+  if(m.length)t+=`, caracterizadas por ${L(m)}`;t+='.';if(d.length)t+=` Ao estudo Doppler, observa-se ${L(d)}.`;t+=' Achados suspeitos para acometimento linfonodal axilar.';
+  c=pl?`Linfonodomegalias axilares atípicas ${s.lat}, suspeitas para acometimento neoplásico.`:`Linfonodomegalia axilar atípica ${s.lat}, suspeita para acometimento neoplásico.`}
+ return{t,c}}
+
+function autoRec(){const sug={};E.lin.l.forEach(s=>{if(s.pad==='atípico')sug.bx=1});REC.forEach(r=>{if(!E.rec.t[r[0]])E.rec.c[r[0]]=!!sug[r[0]]})}
+function build(){autoRec();const e=E,P_=t=>`<div class="doc-p">${t}</div>`,Sx=(l,b)=>`<div class="doc-secao"><span class="doc-label">${l}</span>${b}</div>`,bi=e.lat==='bilateral';
+ let h=`<div class="doc-titulo">ULTRASSONOGRAFIA AXILAR ${LADOS[e.lat]}</div>`;
+ const li=LIM.filter(x=>e.lim[x[0]]).map(x=>x[2]);let t=e.sonda==='nc'?'Exame realizado em aparelho dinâmico':'Exame realizado em aparelho dinâmico com '+(e.sonda==='linear'?'transdutor linear de alta frequência':'transdutor convexo');if(li.length)t+=', limitado parcialmente '+jn(li);
+ if(e.sonda!=='nc'||li.length)h+=Sx('TÉCNICA:',P_(t+'.'));
+ const ind=IND.map((x,i)=>e.ind['i'+i]&&cap(x)+'.').filter(Boolean);if(e.ind.out&&e.indOut.trim())ind.push(cap(e.indOut.trim().replace(/[.!?]$/,''))+'.');if(ind.length)h+=Sx('INDICAÇÃO:',P_(ind.join(' ')));
+ const cc=[],pre=s=>bi?`${cap(LAB[s.lado]||'ambas as axilas')}: `:'',suf=(s,c)=>bi&&c?c.replace(/\.$/,'')+` (${s.lado==='bilateral'?'bilateral':LAB[s.lado]}).`:c;
+ let an='';
+ const run=(c,hab,aus)=>{const l=E[c].l,D=CAT[c],x={abs:false,cel:false};
+  if(c==='pele'){x.abs=l.some(s=>(s.t==='org'||s.t==='nao')&&s.pre==='abscesso');x.cel=l.some(s=>s.t==='infsup'&&s.dop[0]==='c')&&x.abs}
+  if(!l.length){hab.forEach(a=>{if(a[0])an+=P_(a[1])});return}
+  l.forEach(s=>{an+=P_(pre(s)+D[s.t].d(s));const cx=D[s.t].c(s,{abs:x.cel,cel:x.cel});if(cx){const z=suf(s,cx);if(!cc.includes(z))cc.push(z)}})};
+ run('pele',[[e.pele.hab,'Pele e tecido celular subcutâneo com espessura e ecogenicidade preservadas.'],[e.pele.aus,'Não se identificam formações nodulares, massas ou coleções líquidas.']]);
+ run('mus',[[e.mus.hab,'Ventres musculares tróficos com arquitetura fibrilar preservada.']]);
+ if(e.mus.nv)an+=P_('Feixes neurais e vasculares com trajeto habitual, sem compressões extrínsecas.');
+ an+=P_('Vasos axilares pérvios, com calibre e fluxo habituais.');
+ if(!e.lin.l.length)an+=P_('Linfonodos axilares fusiformes sem espessamento cortical ou apagamento hilar.');else e.lin.l.forEach(s=>{const r=linTxt(s);an+=P_(r.t);if(r.c){cc.push(r.c)}});
+ const a=e.ace,rg=a.sit==='presente'?(a.lat==='à direita'?'Região axilar direita':a.lat==='à esquerda'?'Região axilar esquerda':'Regiões axilares'):(e.lat==='direita'?'Região axilar direita':e.lat==='esquerda'?'Região axilar esquerda':'Regiões axilares');
+ an+=P_(a.sit==='presente'?`${rg} com tecido de aspecto glandular, apresentando ecotextura semelhante ao parênquima mamário, compatível com mama acessória, sem nódulos ou outras alterações focais identificáveis ao exame ultrassonográfico.`:`${rg} sem parênquima glandular mamário extranumerário.`);
+ if(a.sit==='presente')cc.push(`Tecido mamário ectópico ${a.lat}.`);
+ h+=Sx('ANÁLISE:',an);
+ const c=e.cmp;let ct='';
+ if(c.nd)ct='Exames anteriores não disponíveis para comparação, o que limita a caracterização de estabilidade dos achados.';
+ else if(c.on){const i=COMP.indexOf(c.comp),cd=i===0?(c.ach?'mantendo-se a estabilidade dimensional e morfológica dos achados descritos':'sem alterações em relação ao exame anterior'):COMP_D[i];ct=`Comparação com ${c.mod} prévia${c.data?' de '+c.data:''}, ${c.ach?(c.desc.trim()?'que evidenciava '+c.desc.trim().replace(/[.]$/,''):'que evidenciava achado previamente descrito')+', ':''}${cd}.`;if(c.conc)cc.push(i===0&&!c.ach?'Sem alterações em relação ao exame prévio.':COMP_C[i])}
+ if(ct)h+=Sx('EXAMES COMPARATIVOS:',P_(ct));
+ h+=Sx('OPINIÃO DO RELATÓRIO:',P_(cc.length?cc.join('<br>'):'Estudo ecográfico sem evidentes anormalidades apreciáveis ao método.'));
+ if(e.ach.trim())h+=Sx('ACHADOS ADICIONAIS:',P_(esc(e.ach.trim()).replace(/\n/g,'<br>')));
+ if(e.rec.inc){const it=REC.filter(r=>e.rec.c[r[0]]).map(r=>r[2]);if(e.rec.custom.trim())it.push(esc(e.rec.custom.trim()));if(it.length)h+=Sx('RECOMENDAÇÕES:',P_(it.join('<br>')))}
+ return h}
+function laudo(){document.getElementById('doc').innerHTML=build()}
+
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800)}
+async function copiar(){const el=document.getElementById('doc');try{await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([el.innerHTML],{type:'text/html'}),'text/plain':new Blob([el.innerText],{type:'text/plain'})})]);toast('Laudo copiado para a área de transferência')}catch(x){try{const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r);document.execCommand('copy');s.removeAllRanges();toast('Laudo copiado para a área de transferência')}catch(y){toast('Não foi possível copiar. Selecione o texto e use Ctrl+C.')}}}
+function imprimir(){const w=window.open('','_blank');if(!w){toast('Libere pop-ups para imprimir.');return}w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Laudo</title><style>body{font:10pt/1.65 Helvetica,Arial,sans-serif;padding:32px;color:#111;max-width:820px;margin:auto}.doc-titulo{text-align:center;font-weight:700;margin-bottom:16px}.doc-label{font-weight:700;display:block;margin-bottom:2px}.doc-p{margin-bottom:8px}.doc-secao{margin-bottom:14px}</style></head><body>${document.getElementById('doc').innerHTML}</body></html>`);w.document.close();w.print()}
+function tema(){const r=document.documentElement,d=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=d?'light':'dark';try{localStorage.setItem('thirads-axilas-tema',r.dataset.theme)}catch(x){}}
+function reiniciar(){init();show('lat')}
+try{const t=localStorage.getItem('thirads-axilas-tema');if(t)document.documentElement.dataset.theme=t}catch(x){}
+init();nav();show('lat');
+</script>
+</body>
+</html>

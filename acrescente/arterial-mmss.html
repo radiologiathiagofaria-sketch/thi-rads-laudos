@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>THI-RADS | US Doppler Arterial de Membro Superior</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#0e6a83;--blue-dark:#0c566b;--surface:#e1e6ee;--border:#c9d1de;--bs:#9eacc2;--text:#1b2538;--text2:#34425b;--text3:#5c6a83;--white:#f3f5f9;--red:#c93a3a;--hover:#dfeaf0;--sel:#cbe3ec;--ring:rgba(14,106,131,.22);--onblue:#fff;--dbg:#f6e6e8;--info:#e8f1f5;--paper:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--blue:#2fa9c2;--blue-dark:#2490a8;--surface:#090e19;--border:#1a263b;--bs:#33445f;--text:#c9d2e0;--text2:#a3afc4;--text3:#7a879f;--white:#0e1626;--red:#e07a7a;--hover:#13203a;--sel:#12324a;--ring:rgba(47,169,194,.28);--onblue:#06202b;--dbg:#2d1a1f;--info:#12293d;--paper:#0e1626}}
+:root[data-theme="dark"]{--blue:#2fa9c2;--blue-dark:#2490a8;--surface:#090e19;--border:#1a263b;--bs:#33445f;--text:#c9d2e0;--text2:#a3afc4;--text3:#7a879f;--white:#0e1626;--red:#e07a7a;--hover:#13203a;--sel:#12324a;--ring:rgba(47,169,194,.28);--onblue:#06202b;--dbg:#2d1a1f;--info:#12293d;--paper:#0e1626}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'DM Sans',system-ui,sans-serif;font-size:14px;background:var(--surface);color:var(--text);display:flex;flex-direction:column;overflow:hidden}
+.toolbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 22px;display:flex;align-items:center;gap:10px;min-height:58px;flex-shrink:0;flex-wrap:wrap}
+.logo{display:flex;align-items:baseline;gap:8px;margin-right:14px}.logo-name{font-size:20px;font-weight:600;color:var(--blue);letter-spacing:-.3px}.logo-sub{font-size:13px;color:var(--text3)}
+.tb-sep{width:1px;height:24px;background:var(--border);margin:0 4px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:8px;font:500 14px 'DM Sans',sans-serif;cursor:pointer;border:1px solid var(--bs);background:var(--white);color:var(--text);transition:all .13s}
+.btn:hover{background:var(--hover);border-color:var(--blue);color:var(--blue)}
+.btn-primary{background:var(--blue);color:var(--onblue);border-color:var(--blue);font-weight:600}.btn-primary:hover{background:var(--blue-dark);color:var(--onblue)}
+.btn-danger{background:var(--dbg);color:var(--red);border-color:var(--red)}.btn-danger:hover{color:var(--red)}
+.btn svg{width:16px;height:16px}.btn-dark{margin-left:auto}
+.btn:focus-visible,.nav-item:focus-visible,.radio-opt:focus-visible,.check-row:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.body{display:flex;flex:1;overflow:hidden;min-height:0}
+.sidebar{width:208px;background:var(--white);border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0}
+.sidebar-hd{padding:16px;border-bottom:1px solid var(--border)}.sidebar-tipo{font-size:12px;font-weight:600;color:var(--text3);margin-bottom:3px}.sidebar-titulo{font-size:19px;font-weight:600}
+.nav-group{padding:8px 0}.nav-group-hd{padding:8px 16px 3px;font-size:12px;font-weight:600;color:var(--text3)}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:15px;color:var(--text2);cursor:pointer;border-left:3px solid transparent;line-height:1.25}
+.nav-item:hover{background:var(--hover);color:var(--text)}.nav-item.active{background:var(--sel);color:var(--blue);border-left-color:var(--blue);font-weight:600}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.4;flex-shrink:0}.nav-item.active .nav-dot{opacity:1}.nav-item.alt .nav-dot{background:var(--red);opacity:1}
+.panel{width:560px;flex-shrink:0;overflow-y:auto;padding:18px 18px 26px;background:var(--surface)}
+.sec-title{font-size:19px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:9px}.sec-title::before{content:'';width:4px;height:22px;background:var(--blue);border-radius:2px}
+.block{margin-bottom:14px;background:var(--white);border-radius:14px;border:1px solid var(--border);overflow:hidden}
+.block-title{font-size:14px;font-weight:600;color:var(--text2);padding:11px 16px 10px;border-bottom:1px solid var(--border)}
+.radio-opt,.check-row{display:flex;border-bottom:1px solid var(--border);cursor:pointer}.radio-opt:last-child,.check-row:last-child{border-bottom:0}
+.radio-opt:hover,.check-row:hover{background:var(--hover)}.radio-opt.selected,.check-row.selected{background:var(--sel)}
+.radio-label,.check-label{display:flex;align-items:center;gap:12px;width:100%;padding:12px 16px;font-size:15px;line-height:1.4;cursor:pointer}
+.radio-opt.selected .radio-label,.check-row.selected .check-label{color:var(--blue);font-weight:600}
+.radio-mark,.check-box{width:20px;height:20px;border:2px solid var(--bs);flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--white);color:transparent}
+.radio-mark{border-radius:50%}.check-box{border-radius:5px}.check-box svg{width:12px;height:12px}
+.radio-opt.selected .radio-mark{border-color:var(--blue);background:var(--blue);box-shadow:inset 0 0 0 4px var(--blue),inset 0 0 0 10px var(--onblue)}
+.check-row.selected .check-box{border-color:var(--blue);background:var(--blue);color:var(--onblue)}
+.ff-grid{display:flex;gap:12px;flex-wrap:wrap;padding:12px 16px}.ff{display:flex;flex-direction:column;gap:4px}
+.ff label{font-size:13px;color:var(--text2);font-weight:600}
+.sel,.num,.txt{font:14px 'DM Sans',sans-serif;padding:8px 10px;border:1px solid var(--bs);border-radius:8px;background:var(--white);color:var(--text)}
+.num{width:84px;text-align:center}.txt{width:100%;resize:vertical;min-height:90px}
+.sel:focus,.num:focus,.txt:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--ring)}
+.info{padding:10px 16px;font-size:13px;line-height:1.6;color:var(--text2);background:var(--info);border-top:1px solid var(--border)}.info:first-child{border-top:0}
+.laudo-panel{flex:1;min-width:0;background:var(--white);display:flex;flex-direction:column;border-left:1px solid var(--border)}
+.laudo-header{padding:10px 20px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;color:var(--text3)}
+.laudo-body{flex:1;overflow-y:auto;padding:22px 28px}
+.laudo-doc{font:10pt/1.65 Helvetica,Arial,sans-serif;max-width:720px;color:var(--text)}.laudo-doc:focus{outline:none}
+.doc-titulo{text-align:center;font-weight:700;margin-bottom:16px}.doc-label{font-weight:700}.doc-p{margin-bottom:8px}.doc-secao{margin-bottom:14px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(12px);background:var(--text);color:var(--white);font-size:13px;padding:10px 18px;border-radius:8px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:9}.toast.show{opacity:1;transform:translateX(-50%)}
+@media (max-width:900px){html,body{height:auto}body{overflow:auto}.body{flex-direction:column;overflow:visible}.sidebar{width:auto;display:flex;overflow-x:auto;border-right:0;border-bottom:1px solid var(--border)}.sidebar-hd,.nav-group-hd{display:none}.nav-group{display:flex;padding:4px}.nav-item{white-space:nowrap;border-left:0;border-bottom:3px solid transparent}.nav-item.active{border-bottom-color:var(--blue)}.panel{width:auto}.laudo-panel{border-left:0}.laudo-body{padding:18px}.toolbar{padding:8px 14px}}
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <div class="logo"><span class="logo-name">THI-RADS</span><span class="logo-sub">laudo estruturado</span></div>
+  <div class="tb-sep"></div>
+  <button class="btn" onclick="copiar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>Copiar laudo</button>
+  <button class="btn btn-primary" onclick="imprimir()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6V2h8v4M4 12H2V7h12v5h-2M4 9h8M4 12v2h8v-2"/></svg>Imprimir</button>
+  <button class="btn btn-dark" onclick="tema()">Alternar tema</button>
+  <button class="btn btn-danger" onclick="reiniciar()">Reiniciar</button>
+</div>
+<div class="body">
+  <div class="sidebar"><div class="sidebar-hd"><div class="sidebar-tipo">US Doppler</div><div class="sidebar-titulo">Arterial de MMSS</div></div><div id="nav"></div></div>
+  <div class="panel" id="panel"></div>
+  <div class="laudo-panel"><div class="laudo-header">Pré-visualização do laudo</div><div class="laudo-body"><div class="laudo-doc" id="doc" contenteditable="true"></div></div></div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const LAT={direito:'DIREITO',esquerdo:'ESQUERDO'};
+const ART=[['sc','A. Subclávia','artéria subclávia',0],['ax','A. Axilar','artéria axilar',0],['br','A. Braquial','artéria braquial',0],['ra','A. Radial','artéria radial',0],['ul','A. Ulnar','artéria ulnar',0],['ap','Arcos Palmares','arcos palmares',1]];
+const SITS=[['normal','sem alterações significativas'],['ateromatose','estenose arterial mínima/moderada (< 50%)'],['estenose','estenose arterial grave (≥ 50%)'],['occ','oclusão arterial aterotrombótica crônica'],['oce','oclusão arterial de origem embólica'],['tardus','alteração hemodinâmica distal (padrão tardus-parvus)'],['aneur','aneurisma verdadeiro'],['pseudo','pseudoaneurisma'],['fistula','fístula arteriovenosa'],['trauma','trauma vascular']];
+const FAT=['obesidade','calcificações parietais extensas com cone de sombra','edema','feridas abertas','curativos ou limitação de posicionamento'];
+const BIF=['exercício físico recente','hiperemia reativa','aquecimento do membro'];
+const PLACA=['calcificadas','fibrocalcificadas','hipoecogênicas'];
+const GRAU=['mínima (< 30%)','moderada (30% a 49%)'];
+const FONTE=['fonte emboligênica proximal avaliada','fonte emboligênica proximal não definida'];
+const SEGM=['proximal','médio','distal'];
+const ST=['pérvio, sem alterações','hiperplasia / estenose','fratura / defeito','oclusão'];
+const ST_D=['O stent apresenta-se permeável, bem posicionado, aberto, cobrindo a lesão e sem sinais de hiperplasia endoluminal limitante.','Observa-se hiperplasia da neoíntima no interior do stent, determinando estenose focal.','Nota-se defeito de abertura ou sinais de fratura na malha estrutural do stent.','O stent encontra-se ocluído por material trombótico, sem detecção de fluxo ao estudo Doppler.'];
+const ST_C=['pérvio e sem complicações.','com estenose por hiperplasia.','com sinais de fratura/defeito estrutural.','com sinais de oclusão.'];
+const BS=['pérvia, sem alterações','coleção periprotética','estenose moderada (50% a 70%)','estenose grave (> 70%)','oclusão da ponte','complicação anastomótica'];
+const BS_D=['A ponte apresenta-se permeável, com trajeto harmonioso, sem anomalias nas anastomoses e fluxo sem acelerações focais.','Nota-se coleção hipoecogênica periprotética adjacente ao corpo da ponte.','Elevação da velocidade sistólica, indicando estenose entre 50% e 70%.','Elevação acentuada da velocidade, indicando estenose hemodinamicamente grave maior que 70%.','Ausência de fluxo com material trombótico no lúmen, configurando oclusão da ponte.','Identifica-se dilatação aneurismática ou pseudoaneurisma na anastomose da ponte.'];
+const BS_C=['pérvia e sem anormalidades hemodinâmicas.','com coleção periprotética.','com estenose moderada.','com estenose grave.','ocluída.','com complicação anastomótica.'];
+const BT={'subclávio-axilar':['a artéria subclávia à artéria axilar',0],'axilo-braquial':['a artéria axilar à artéria braquial',0],'braquiorradial':['a artéria braquial à artéria radial',0],'braquioulnar':['a artéria braquial à artéria ulnar',0],'radial-palmar':['a artéria radial ao arco palmar',0],'ulnar-palmar':['a artéria ulnar ao arco palmar',0],'axilo-axilar cruzada':['a artéria axilar de um lado à axilar contralateral',1],'subclávio-subclávia cruzada':['a artéria subclávia de um lado à subclávia contralateral',1],'axilo-unibraquial':['a artéria axilar a uma artéria braquial',1],'axilo-bibraquial':['a artéria axilar às duas artérias braquiais',1]};
+const MAT=['veia safena (in situ ou invertida)','veia de um braço','enxerto sintético (tipo Dacron)','politetrafluoretileno / PTFE (tipo Gore-Tex)'];
+const IND=['doença arterial obstrutiva periférica','suspeita de isquemia de membro superior','síndrome do desfiladeiro torácico','avaliação de acesso vascular (FAV / cateter)','fenômeno de Raynaud','vasculite','avaliação pré-implante de stent','acompanhamento pós-revascularização'];
+const MET=['ultrassonografia','tomografia computadorizada','ressonância magnética','radiografia','angiografia','ecocardiograma'];
+const COMP=['estável, sem alterações significativas','aumento do achado prévio','redução do achado prévio','surgimento de novo achado','resolução do achado prévio','achado prévio não identificado no exame atual'];
+const COMP_D=['','com aumento dimensional do achado previamente descrito','com redução dimensional do achado previamente descrito','com identificação de novo achado no exame atual','com resolução do achado previamente descrito','não se identificando, no exame atual, correspondência com o achado previamente descrito'];
+const COMP_C=['Achado estável em relação ao exame prévio.','Aumento dimensional do achado em relação ao exame prévio.','Redução dimensional do achado em relação ao exame prévio.','Surgimento de novo achado em relação ao exame prévio.','Resolução do achado previamente descrito.','Não caracterizado, no exame atual, o achado previamente descrito.'];
+const REC=[['clin','correlação clínica','Correlação clínica.'],['tc','angiotomografia complementar','Angiotomografia complementar.'],['rm','angiorressonância complementar','Angiorressonância complementar.'],['cv','avaliação com equipe de cirurgia vascular','Avaliação com equipe de cirurgia vascular.'],['ac','acompanhamento ultrassonográfico seriado','Acompanhamento ultrassonográfico seriado.']];
+const SEC=[['lat','Lateralidade','Geral'],['tec','Técnica'],['ind','Indicação'],...ART.map(a=>[a[0],a[1],'Artérias']),['cmp','Exames Comparativos','Complementos'],['ach','Achados Adicionais'],['rec','Recomendações']];
+const def=()=>({sit:'normal',lim:false,sp:false,sm:false,sd:false,fat:FAT[0],bif:false,bc:BIF[0],placa:PLACA[0],grau:GRAU[0],pre:'',pos:'',dir:true,col:true,fe:false,fonte:FONTE[0],cp:false,ap:'',tr:'',luz:'',seg:'proximal',tm:false,m1:'',m2:'',sp2:true,tp:false,fh:true,pf:true,em:false,rev:'ausente',st:ST[0],bt:'subclávio-axilar',mat:MAT[0],bs:BS[0]});
+let E,cur='lat';
+function init(){E={lat:'direito',sonda:'linear',edema:false,biot:false,ind:{},indOut:'',arts:{},cmp:{nd:false,on:false,mod:MET[0],data:'',ach:false,desc:'',comp:COMP[0],conc:true},ach:'',rec:{inc:false,c:{},t:{},custom:''}};ART.forEach(a=>E.arts[a[0]]=def())}
+const g=p=>p.split('.').reduce((o,x)=>o[x],E);
+function S(p,v){const k=p.split('.');let o=E;k.slice(0,-1).forEach(x=>o=o[x]);o[k.pop()]=v;show(cur)}
+function I(p,v){const k=p.split('.');let o=E;k.slice(0,-1).forEach(x=>o=o[x]);o[k.pop()]=v;const r=document.getElementById('razao');if(r)r.value=razao(E.arts[cur]);laudo();navMark()}
+const esc=x=>String(x).replace(/</g,'&lt;');
+const rad=(p,v,l)=>`<div class="radio-opt ${g(p)===v?'selected':''}" tabindex="0" onclick="S('${p}','${v}')"><label class="radio-label"><span class="radio-mark"></span>${esc(l)}</label></div>`;
+const chk=(p,l,fn)=>`<div class="check-row ${g(p)?'selected':''}" tabindex="0" onclick="${fn||`S('${p}',${!g(p)})`}"><label class="check-label"><span class="check-box"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg></span>${esc(l)}</label></div>`;
+const sel=(p,o,l)=>`<div class="ff"><label>${l}</label><select class="sel" onchange="S('${p}',this.value)">${o.map(x=>`<option ${g(p)===x?'selected':''}>${esc(x)}</option>`).join('')}</select></div>`;
+const num=(p,l,u)=>`<div class="ff"><label>${l} (${u})</label><input class="num" inputmode="decimal" value="${g(p)}" oninput="I('${p}',this.value)"></div>`;
+const info=t=>`<div class="info">${t}</div>`;
+const blk=(t,b)=>`<div class="block"><div class="block-title">${t}</div>${b}</div>`;
+const nm=v=>parseFloat(String(v).replace(',','.'));
+const f=v=>{const x=nm(v);return isNaN(x)?'_':x.toFixed(1).replace('.',',')};
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+const jn=a=>a.length<2?(a[0]||''):a.slice(0,-1).join(', ')+' e '+a[a.length-1];
+function razao(s){const a=nm(s.pre),b=nm(s.pos);return a>0&&!isNaN(b)?f(b/a):''}
+
+function nav(){let h='',gr='';SEC.forEach(s=>{if(s[2]){if(gr)h+='</div>';gr=s[2];h+=`<div class="nav-group"><div class="nav-group-hd">${gr}</div>`}h+=`<div class="nav-item ${s[0]===cur?'active':''}" id="n-${s[0]}" tabindex="0" onclick="show('${s[0]}')"><span class="nav-dot"></span>${s[1]}</div>`});document.getElementById('nav').innerHTML=h+'</div>';navMark()}
+function navMark(){ART.forEach(a=>{const s=E.arts[a[0]],e=document.getElementById('n-'+a[0]);if(e)e.classList.toggle('alt',s.sit!=='normal'||s.rev!=='ausente')})}
+function show(k){cur=k;document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.id==='n-'+k));const t=SEC.find(s=>s[0]===k)[1];document.getElementById('panel').innerHTML=`<div class="sec-title">${t}</div>`+body(k);laudo();navMark()}
+function body(k){
+ if(k==='lat')return blk('Membro a ser examinado',rad('lat','direito','membro superior direito')+rad('lat','esquerdo','membro superior esquerdo'));
+ if(k==='tec')return blk('Sonda',rad('sonda','linear','sonda linear')+rad('sonda','convexa','sonda convexa')+rad('sonda','nc','não citar'))+blk('Técnica',info('Exame realizado em aparelho dinâmico, utilizando manobras de aceleração de fluxo com compressão proximal e distal.'))+blk('Limitações mais comuns',chk('edema','edema')+chk('biot','biotipo (obesidade)'));
+ if(k==='ind')return blk('Indicações mais comuns',IND.map((x,i)=>chk('ind.i'+i,x)).join('')+chk('ind.out','outros')+(E.ind.out?`<div class="ff-grid"><input class="txt" style="min-height:0" placeholder="Descreva a indicação" value="${esc(E.indOut)}" oninput="I('indOut',this.value)"></div>`:''));
+ if(k==='cmp'){const c=E.cmp;let h=blk('Disponibilidade',chk('cmp.nd','exames anteriores não disponíveis para comparação'));if(!c.nd){h+=blk('Exame anterior',chk('cmp.on','citar exame anterior')+(c.on?`<div class="ff-grid">${sel('cmp.mod',MET,'método')}<div class="ff"><label>data</label><input class="num" style="width:120px" placeholder="dd/mm/aaaa" value="${esc(c.data)}" oninput="I('cmp.data',this.value)"></div></div>`+chk('cmp.ach','achado descrito no exame anterior')+(c.ach?`<div class="ff-grid"><input class="txt" style="min-height:0" placeholder="Descrição do achado prévio" value="${esc(c.desc)}" oninput="I('cmp.desc',this.value)"></div>`:''):''));if(c.on)h+=blk('Comparação com exame atual',`<div class="ff-grid">${sel('cmp.comp',COMP,'evolução')}</div>`+chk('cmp.conc','incluir na conclusão'))}return h}
+ if(k==='ach')return blk('Descreva os achados',`<div class="ff-grid"><textarea class="txt" style="min-height:180px" oninput="I('ach',this.value)">${esc(E.ach)}</textarea></div>`);
+ if(k==='rec'){return blk('Bloco no laudo',chk('rec.inc','incluir bloco de RECOMENDAÇÕES no laudo final'))+blk('Complementares',REC.map(r=>chk('rec.c.'+r[0],r[1],`R('${r[0]}')`)).join('')+info('Sugestões automáticas conforme os achados. Marque ou desmarque para sobrescrever.'))+blk('Recomendações adicionais',`<div class="ff-grid"><textarea class="txt" style="min-height:140px" oninput="I('rec.custom',this.value)">${esc(E.rec.custom)}</textarea></div>`)}
+ const a=ART.find(x=>x[0]===k),s=E.arts[k],p='arts.'+k+'.';let h=blk('Situação',SITS.map(x=>rad(p+'sit',x[0],x[1])).join(''));
+ if(s.sit==='normal'){let b=chk(p+'lim','limitação técnica');if(s.lim)b+=chk(p+'sp','segmento proximal')+chk(p+'sm','segmento médio')+chk(p+'sd','segmento distal')+`<div class="ff-grid">${sel(p+'fat',FAT,'fator')}</div>`;b+=chk(p+'bif','variação fisiológica com fluxo bifásico');if(s.bif)b+=`<div class="ff-grid">${sel(p+'bc',BIF,'causa do fluxo bifásico')}</div>`;h+=blk('Detalhes',b)}
+ if(s.sit==='ateromatose')h+=blk('Dados das placas',`<div class="ff-grid">${sel(p+'placa',PLACA,'tipo de placa')}${sel(p+'grau',GRAU,'estenose')}</div>`);
+ if(s.sit==='estenose')h+=blk('Dados da estenose',`<div class="ff-grid">${num(p+'pre','VPS pré-lesão','cm/s')}${num(p+'pos','VPS pós-lesão','cm/s')}<div class="ff"><label>razão</label><input class="num" id="razao" readonly value="${razao(s)}"></div></div>`+chk(p+'dir','sinais diretos (aliasing e velocidade)'));
+ if(s.sit==='occ')h+=blk('Dados da oclusão',chk(p+'col','colaterais'));
+ if(s.sit==='oce')h+=blk('Dados da oclusão embólica',chk(p+'fe','associação com fonte emboligênica')+(s.fe?`<div class="ff-grid">${sel(p+'fonte',FONTE,'fonte emboligênica')}</div>`:''));
+ if(s.sit==='tardus')h+=blk('Dados hemodinâmicos',chk(p+'cp','causa proximal não avaliada / fora da área'));
+ if(s.sit==='aneur')h+=blk('Dados do aneurisma',`<div class="ff-grid">${sel(p+'seg',SEGM,'segmento')}${num(p+'ap','diâmetro AP','cm')}${num(p+'tr','diâmetro transversal','cm')}${num(p+'luz','luz efetiva','cm')}</div>`+chk(p+'tm','trombo mural'));
+ if(s.sit==='pseudo')h+=blk('Dados do pseudoaneurisma',`<div class="ff-grid">${num(p+'m1','medida 1','cm')}${num(p+'m2','medida 2','cm')}</div>`+chk(p+'sp2','sinais clássicos de fluxo')+chk(p+'tp','trombose parcial'));
+ if(s.sit==='fistula')h+=blk('Dados da fístula',chk(p+'fh','alterações hemodinâmicas'));
+ if(s.sit==='trauma')h+=blk('Dados do trauma',chk(p+'pf','perfuração / sangramento')+chk(p+'em','embolia secundária'));
+ h+=blk('Revascularização',rad(p+'rev','ausente','ausente')+rad(p+'rev','stent','endoprótese / stent')+rad(p+'rev','bypass','ponte vascular / bypass'));
+ if(s.rev==='stent')h+=blk('Dados do stent',`<div class="ff-grid">${sel(p+'st',ST,'situação do stent')}</div>`);
+ if(s.rev==='bypass')h+=blk('Dados da ponte',`<div class="ff-grid">${sel(p+'bt',Object.keys(BT),'tipo de ponte')}${sel(p+'mat',MAT,'material')}${sel(p+'bs',BS,'situação da ponte')}</div>`+info('Conecta '+BT[s.bt][0]+'.'));
+ return h}
+function R(k){E.rec.t[k]=1;E.rec.c[k]=!E.rec.c[k];show('rec')}
+
+function txt(a){const [k,,n,pl]=a,s=E.arts[k],art=pl?'os arcos palmares':'a '+n,de=pl?'dos arcos palmares':'da '+n,na=pl?'nos arcos palmares':'na '+n,Su=cap(art),v=pl?'apresentam':'apresenta',pv=pl?'pérvios':'pérvia',d=[],c=[];
+ if(s.sit==='normal'){d.push(`${cap(pl?'arcos palmares':n)} ${pv}, sem lesões parietais significativas. Fluxo de repouso com padrão multifásico preservado ao estudo Doppler.`);
+  if(s.lim){const sg=SEGM.filter((x,i)=>s[['sp','sm','sd'][i]]);d.push(`A avaliação ecográfica esteve parcialmente limitada ${!sg.length?'no segmento não especificado':sg.length===1?'no segmento '+sg[0]:'nos segmentos '+jn(sg)} devido a fatores técnicos, tais como ${s.fat}.`)}
+  if(s.bif)d.push(`Nota-se perda do componente reverso do fluxo, adquirindo padrão bifásico, achado não patológico justificável no contexto de queda da resistência periférica por ${s.bc}.`)}
+ if(s.sit==='ateromatose'){const mn=s.grau===GRAU[0];d.push(`${Su} ${v} calibre conservado, notando-se espessamento médio-intimal e placas ateromatosas parietais ${s.placa}.`,mn?'As placas determinam redução luminal mínima (< 30%). Ao estudo Doppler, há apenas leve alargamento espectral, sem aumento relevante da velocidade de pico sistólico, com fluxo multifásico mantido.':'As placas determinam estenose moderada (30% a 49%). Ao estudo Doppler, nota-se aumento da velocidade de pico sistólico de até 100% em relação ao segmento normal, com alargamento espectral evidente e fluxo de padrão parcialmente bifásico.');c.push(`Ateromatose ${na} determinando estenose ${mn?'mínima':'moderada'}, sem repercussão hemodinâmica grave.`)}
+ if(s.sit==='estenose'){d.push(`Identifica-se placa ateromatosa determinando estenose luminal hemodinamicamente significativa ${na}.`);if(s.dir)d.push(`Ao mapeamento em cores, observa-se área de aliasing. Ao estudo espectral, a velocidade de pico sistólico pré-lesão é de ${f(s.pre)} cm/s e a pós-lesão é de ${f(s.pos)} cm/s, com razão de velocidades de ${razao(s)||'_'}, amplo alargamento espectral e perda da fase reversa do fluxo, compatível com estenose grave (≥ 50%).`);c.push(`Doença arterial obstrutiva com estenose grave (≥ 50%) ${na}.`)}
+ if(s.sit==='occ'){d.push(`${Su} ${v} lúmen totalmente preenchido por material de ecogenicidade variável, sem preenchimento colorido, sinal pulsado ou sinal acústico ao estudo Doppler.`);if(s.col)d.push('Observa-se recrutamento de vias de circulação colateral, com fluxo lento e monofásico, para compensar a isquemia local.');c.push(`Oclusão crônica ${de}.`)}
+ if(s.sit==='oce'){d.push('Observa-se material ecogênico no interior da luz vascular, com margens limpas e bem definidas. Ao Doppler, nota-se interrupção brusca do preenchimento de cor e ausência de fluxo espectral intraluminal.');if(s.fe)d.push(s.fonte===FONTE[1]?'Achado topograficamente associado a possível fonte emboligênica proximal, não caracterizada neste exame.':'Achado topograficamente associado a possível fonte emboligênica proximal avaliada.');c.push(`Oclusão aguda ${de}, de características ecográficas compatíveis com origem embólica.`)}
+ if(s.sit==='tardus'){d.push(`Na avaliação ${de}, o fluxo apresenta-se hemodinamicamente alterado, com perda da pulsatilidade normal, assumindo padrão espectral amortecido, lentificado e monofásico (padrão tardus-parvus).`);if(s.cp)d.push('Este padrão é compatível com doença arterial obstrutiva significativa em leito proximal, não avaliado no presente exame por estar fora da janela de insonação ou por limitação técnica.');c.push(`Fluxo com padrão tardus-parvus ${na}, indicativo de lesão obstrutiva hemodinamicamente significativa em segmento arterial proximal.`)}
+ if(s.sit==='aneur'){d.push(`Observa-se dilatação aneurismática verdadeira no segmento ${s.seg} ${de}, medindo ${f(s.ap)} cm no eixo ântero-posterior e ${f(s.tr)} cm no eixo transversal, correspondendo a mais de 1,5 vezes o diâmetro do segmento arterial proximal normal.`);if(s.tm)d.push(`Nota-se trombo mural ecogênico no interior do aneurisma, determinando estreitamento do lúmen e redução da luz efetiva para ${f(s.luz)} cm.`);c.push(`Aneurisma ${de}.`)}
+ if(s.sit==='pseudo'){const m=s.m1&&s.m2?`medindo ${f(s.m1)} x ${f(s.m2)} cm`:s.m1||s.m2?`medindo ${f(s.m1||s.m2)} cm`:'medindo _ x _ cm';d.push(`Nota-se coleção de sangue e trombo, de aspecto sacular, formada por ruptura da parede vascular, localizada fora do vaso, mas em comunicação com ${art} através de um colo, ${m}.`);if(s.sp2)d.push('O colo de comunicação exibe fluxo com padrão to-and-fro ao estudo espectral. Na cavidade do pseudoaneurisma, o Doppler colorido demonstra sangue em redemoinho (sinal do yin-yang / sinal da pepsi).');if(s.tp)d.push('Observa-se trombose parcial da cavidade do pseudoaneurisma no momento do exame.');c.push(`Achados ecográficos e hemodinâmicos típicos de pseudoaneurisma ${de}.`)}
+ if(s.sit==='fistula'){d.push(`Observa-se comunicação anômala entre ${art} e a veia adjacente de drenagem.`);if(s.fh)d.push('Ao Doppler, o fluxo no local da fístula apresenta-se acelerado e turbulento. Observa-se queda da resistência no território arterial e nítida arterialização da veia de drenagem.');c.push(`Sinais ecográficos de fístula arteriovenosa envolvendo ${art} e veia adjacente.`)}
+ if(s.sit==='trauma'){d.push(`No contexto de trauma do membro superior, o estudo direcionado para ${art} demonstra perda da integridade vascular normal.`);if(s.pf)d.push('Identificam-se sinais de perfuração da parede arterial com extravasamento/sangramento ativo no local.');if(s.em)d.push('Nota-se presença de isquemia distal decorrente de provável embolia pós-traumática secundária.');c.push(`Sinais ecográficos de lesão vascular traumática ${na}.`)}
+ if(s.rev==='stent'){const i=ST.indexOf(s.st);d.push(`Identifica-se stent posicionado ${na}. A malha é visível em forma de pontilhados hiperecogênicos aplicados contra a parede arterial.`,ST_D[i]);c.push(`Avaliação pós-revascularização revela stent ${na} ${ST_C[i]}`)}
+ if(s.rev==='bypass'){const i=BS.indexOf(s.bs),b=BT[s.bt];d.push(`Identifica-se ponte de revascularização ${b[1]?'extra-anatômica':'anatômica'} do tipo ${s.bt}, confeccionada com ${s.mat}, conectando ${b[0]}.`,BS_D[i]);c.push(`Ponte de revascularização no membro superior ${BS_C[i]}`)}
+ return{d,c}}
+
+function autoRec(){const sug={};ART.forEach(a=>{const s=E.arts[a[0]];if(['estenose','occ','oce','aneur','pseudo','fistula','trauma'].includes(s.sit)||(s.rev==='stent'&&s.st!==ST[0])||(s.rev==='bypass'&&s.bs!==BS[0])){sug.cv=sug.tc=1}if(s.sit==='tardus'){sug.tc=sug.clin=1}});REC.forEach(r=>{if(!E.rec.t[r[0]])E.rec.c[r[0]]=!!sug[r[0]]})}
+function build(){autoRec();const e=E,P=t=>`<div class="doc-p">${t}</div>`,Sx=(l,b)=>`<div class="doc-secao"><span class="doc-label">${l}</span>${b}</div>`;
+ let h=`<div class="doc-titulo">DOPPLER ARTERIAL DE MEMBRO SUPERIOR ${LAT[e.lat]}</div>`;
+ let t='Exame realizado em aparelho dinâmico'+(e.sonda==='linear'?' com transdutor linear de alta frequência':e.sonda==='convexa'?' com transdutor convexo':'')+', utilizando manobras de aceleração de fluxo com compressão proximal e distal';
+ const li=[];if(e.edema)li.push('por acentuado edema');if(e.biot)li.push('pela intensa atenuação do feixe acústico inerente ao biotipo');if(li.length)t+=', limitado parcialmente '+jn(li);
+ h+=Sx('TÉCNICA:',P(t+'.'));
+ const ind=IND.filter((x,i)=>e.ind['i'+i]);if(e.ind.out&&e.indOut.trim())ind.push(e.indOut.trim().replace(/[.!?]$/,''));
+ if(ind.length)h+=Sx('INDICAÇÃO:',P(cap(jn(ind))+'.'));
+ let an='',cc=[];ART.forEach(a=>{const r=txt(a);an+=P(r.d.join(' '));r.c.forEach(x=>{if(!cc.includes(x))cc.push(x)})});
+ h+=Sx('ANÁLISE:',an);
+ const c=e.cmp;let ct='';
+ if(c.nd)ct='Exames anteriores não disponíveis para comparação, o que limita a caracterização de estabilidade dos achados.';
+ else if(c.on){const i=COMP.indexOf(c.comp),eco=c.mod==='ecocardiograma',cd=i===0?(c.ach?'mantendo-se a estabilidade dimensional e morfológica dos achados descritos':'sem alterações em relação ao exame anterior'):COMP_D[i];ct=`Comparação com ${c.mod} prévi${eco?'o':'a'}${c.data?' de '+c.data:''}, ${c.ach?(c.desc.trim()?'que evidenciava '+c.desc.trim().replace(/[.]$/,''):'que evidenciava achado previamente descrito')+', ':''}${cd}.`;if(c.conc)cc.push(i===0&&!c.ach?'Sem alterações em relação ao exame prévio.':COMP_C[i])}
+ if(ct)h+=Sx('EXAMES COMPARATIVOS:',P(ct));
+ h+=Sx('OPINIÃO DO RELATÓRIO:',P(cc.length?cc.join('<br>'):'Estudo ecográfico sem evidentes anormalidades apreciáveis ao método.'));
+ if(e.ach.trim())h+=Sx('ACHADOS ADICIONAIS:',P(esc(e.ach.trim()).replace(/\n/g,'<br>')));
+ if(e.rec.inc){const it=REC.filter(r=>e.rec.c[r[0]]).map(r=>r[2]);if(e.rec.custom.trim())it.push(esc(e.rec.custom.trim()));if(it.length)h+=Sx('RECOMENDAÇÕES:',P(it.join('<br>')))}
+ return h}
+function laudo(){document.getElementById('doc').innerHTML=build()}
+
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800)}
+async function copiar(){const el=document.getElementById('doc');try{await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([el.innerHTML],{type:'text/html'}),'text/plain':new Blob([el.innerText],{type:'text/plain'})})]);toast('Laudo copiado para a área de transferência')}catch(x){try{const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r);document.execCommand('copy');s.removeAllRanges();toast('Laudo copiado para a área de transferência')}catch(y){toast('Não foi possível copiar. Selecione o texto e use Ctrl+C.')}}}
+function imprimir(){const w=window.open('','_blank');if(!w){toast('Libere pop-ups para imprimir.');return}w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Laudo</title><style>body{font:10pt/1.65 Helvetica,Arial,sans-serif;padding:32px;color:#111;max-width:820px;margin:auto}.doc-titulo{text-align:center;font-weight:700;margin-bottom:16px}.doc-label{font-weight:700;display:block;margin-bottom:2px}.doc-p{margin-bottom:8px}.doc-secao{margin-bottom:14px}</style></head><body>${document.getElementById('doc').innerHTML}</body></html>`);w.document.close();w.print()}
+function tema(){const r=document.documentElement,d=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=d?'light':'dark';try{localStorage.setItem('thirads-mmss-tema',r.dataset.theme)}catch(x){}}
+function reiniciar(){init();show('lat')}
+try{const t=localStorage.getItem('thirads-mmss-tema');if(t)document.documentElement.dataset.theme=t}catch(x){}
+init();nav();show('lat');
+</script>
+</body>
+</html>

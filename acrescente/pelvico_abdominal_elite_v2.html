@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THI-RADS — Laudo Estruturado</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===== Paleta alinhada ao app obstétrico (slate escuro + ciano) ===== */
+:root{
+  --blue:#0e6a83;--blue-dark:#0c566b;--blue-light:#d3e6ec;--blue-mid:#c0dce5;
+  --surface:#e1e6ee;--border:#c9d1de;--border-strong:#9eacc2;
+  --text:#1b2538;--text-2:#34425b;--text-3:#5c6a83;
+  --white:#f3f5f9;--green:#047857;--red:#c93a3a;--radius:10px;--radius-lg:14px;
+  --hover:#dfeaf0;--sel-bg:#cbe3ec;--focus-ring:rgba(14,106,131,.22);
+}
+body.dark{
+  --blue:#2fa9c2;--blue-dark:#2490a8;--blue-light:#12293d;--blue-mid:#12293d;
+  --surface:#090e19;--border:#1a263b;--border-strong:#33445f;
+  --text:#c9d2e0;--text-2:#a3afc4;--text-3:#7a879f;
+  --white:#0e1626;--green:#2fbf8c;--red:#e07a7a;
+  --hover:#13203a;--sel-bg:#12324a;--focus-ring:rgba(47,169,194,.28);
+}
+body.dark .laudo-doc{color:#e2e6f0;}
+body.dark .laudo-panel{background:var(--white);border-left-color:var(--border);}
+body.dark .laudo-body{background:var(--white);}
+body.dark .laudo-header{background:var(--white);border-bottom-color:var(--border);}
+@media print{
+  body.dark .laudo-doc,
+  body.dark .laudo-doc *{color:#111 !important;}
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',system-ui,sans-serif;font-size:14px;background:var(--surface);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+/* ----- Barra superior ----- */
+.toolbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 22px;display:flex;align-items:center;gap:10px;height:58px;flex-shrink:0;}
+.logo{display:flex;align-items:baseline;gap:8px;margin-right:14px;}
+.logo-name{font-size:20px;font-weight:600;color:var(--blue);letter-spacing:-.3px;}
+.logo-sub{font-size:13px;color:var(--text-3);font-weight:400;}
+.tb-sep{width:1px;height:24px;background:var(--border);margin:0 4px;}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid var(--border-strong);font-weight:500;transition:all .13s;background:var(--white);color:var(--text);}
+.btn:hover{background:var(--hover);border-color:var(--blue);color:var(--blue);}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600;}
+body.dark .btn-primary{color:#06202b;}
+.btn-primary:hover{background:var(--blue-dark);border-color:var(--blue-dark);color:#fff;}
+body.dark .btn-primary:hover{color:#06202b;}
+.btn-danger{background:#f6e6e8;color:var(--red);border-color:#e3a9ad;}
+body.dark .btn-danger{background:#2d1a1f;border-color:#7a3038;}
+.btn-danger:hover{background:#fee2e2;border-color:#f87171;color:var(--red);}
+body.dark .btn-danger:hover{background:#3a2026;}
+.btn svg{width:16px;height:16px;flex-shrink:0;}
+.btn-dark{margin-left:auto;}
+.btn:focus-visible,.nav-item:focus-visible{outline:2px solid var(--blue);outline-offset:2px;}
+
+.body{display:flex;flex:1;overflow:hidden;}
+
+/* ----- Coluna esquerda: navegação ----- */
+.sidebar{width:208px;background:var(--white);border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;}
+.sidebar-hd{padding:16px 16px 14px;border-bottom:1px solid var(--border);}
+.sidebar-tipo{font-size:12px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px;}
+.sidebar-titulo{font-size:19px;font-weight:600;color:var(--text);}
+.nav-group{padding:8px 0;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:15px;color:var(--text-2);cursor:pointer;transition:all .12s;border-left:3px solid transparent;line-height:1.25;}
+.nav-item:hover{background:var(--hover);color:var(--text);}
+.nav-item.active{background:var(--sel-bg);color:var(--blue);border-left-color:var(--blue);font-weight:600;}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.45;flex-shrink:0;}
+.nav-item.active .nav-dot{opacity:1;}
+
+/* ----- Coluna central: formulário ----- */
+.panel{width:560px;flex-shrink:0;overflow-y:auto;padding:18px 18px 26px;background:var(--surface);}
+.panel .doc-p{font-size:14px !important;}
+.sec-title{font-size:19px;font-weight:600;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:9px;}
+.sec-title::before{content:'';display:block;width:4px;height:22px;background:var(--blue);border-radius:2px;}
+.block{margin-bottom:14px;background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden;}
+.block-title{font-size:13px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.6px;padding:11px 16px 10px;border-bottom:1px solid var(--border);background:var(--white);}
+body.dark .block-title{border-bottom-color:var(--border);}
+
+.radio-opt{display:flex;align-items:flex-start;gap:0;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;position:relative;}
+.radio-opt:last-child{border-bottom:none;}
+.radio-opt:hover{background:var(--hover);}
+.radio-opt.selected{background:var(--sel-bg);}
+.radio-opt input[type=radio]{position:absolute;opacity:0;pointer-events:none;}
+.radio-label{display:flex;align-items:center;gap:12px;width:100%;padding:12px 16px;font-size:15px;color:var(--text);line-height:1.4;cursor:pointer;}
+.radio-opt.selected .radio-label{color:var(--blue);font-weight:600;}
+.radio-mark{width:20px;height:20px;border-radius:50%;border:2px solid var(--border-strong);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.radio-opt:hover .radio-mark{border-color:var(--blue);}
+.radio-opt.selected .radio-mark{border-color:var(--blue);background:var(--blue);}
+.radio-mark::after{content:'';width:8px;height:8px;border-radius:50%;background:#fff;opacity:0;transition:opacity .15s;}
+body.dark .radio-mark::after{background:#06202b;}
+.radio-opt.selected .radio-mark::after{opacity:1;}
+
+.check-row{display:flex;align-items:center;gap:0;border-bottom:1px solid var(--border);cursor:pointer;background:var(--surface);}
+.check-row:last-child{border-bottom:none;}
+.check-row:hover{background:var(--hover);}
+.check-row.selected{background:var(--sel-bg);}
+.check-row input[type=checkbox]{position:absolute;opacity:0;pointer-events:none;}
+.check-label{display:flex;align-items:center;gap:12px;width:100%;padding:11px 16px 11px 34px;font-size:14.5px;color:var(--text);cursor:pointer;}
+.check-row.selected .check-label{color:var(--blue);font-weight:600;}
+.check-box{width:19px;height:19px;border-radius:5px;border:2px solid var(--border-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.check-row:hover .check-box{border-color:var(--blue);}
+.check-row.selected .check-box{border-color:var(--blue);background:var(--blue);}
+.check-box svg{display:none;width:12px;height:12px;}
+.check-row.selected .check-box svg{display:block;}
+body.dark .check-box svg{stroke:#06202b;}
+.sel-tag{font-size:13px;border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);margin-left:6px;cursor:pointer;}
+
+.dim-rows{padding:12px 16px;display:flex;flex-direction:column;gap:9px;}
+.dim-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.dim-lbl{flex:1;font-size:14.5px;color:var(--text);}
+.dim-input{width:76px;padding:8px 10px;border:1px solid var(--border-strong);border-radius:8px;font-size:14.5px;font-family:'DM Sans',sans-serif;text-align:center;color:var(--text);background:var(--white);transition:border .12s;}
+.dim-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--focus-ring);}
+.dim-unit{font-size:14px;color:var(--text-3);}
+.nodulo-wrap{padding:12px 16px;display:flex;flex-direction:column;gap:10px;}
+
+.btn-add-lesao{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:600;transition:all .12s;border:1.5px dashed var(--blue);background:transparent;color:var(--blue);width:100%;justify-content:center;}
+.btn-add-lesao:hover{background:var(--sel-bg);}
+.lesao-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 14px;margin-bottom:10px;}
+.lesao-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;}
+.lesao-hd-title{font-size:13px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.5px;}
+.btn-rem{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:6px;font-size:12.5px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;border:1px solid #e3a9ad;background:#f6e6e8;color:var(--red);transition:all .12s;}
+body.dark .btn-rem{background:#2d1a1f;border-color:#7a3038;}
+.btn-rem:hover{background:#fee2e2;}
+body.dark .btn-rem:hover{background:#3a2026;}
+
+.ff-grid{display:flex;gap:11px;flex-wrap:wrap;margin-bottom:8px;}
+.ff{display:flex;flex-direction:column;gap:4px;}
+.ff label{font-size:12px;color:var(--text-2);font-weight:600;text-transform:uppercase;letter-spacing:.3px;}
+.ff select,.ff input[type=text],.ff input[type=number]{font-size:14px;padding:7px 9px;border:1px solid var(--border-strong);border-radius:7px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);}
+.ff select:focus,.ff input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--focus-ring);}
+.ff input[type=text],.ff input[type=number]{width:68px;text-align:center;}
+.inline-select{font-size:14px;padding:6px 9px;border:1px solid var(--border-strong);border-radius:7px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);margin-left:5px;}
+.inline-select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--focus-ring);}
+.inline-num{width:60px;font-size:14px;padding:6px 8px;border:1px solid var(--border-strong);border-radius:7px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);text-align:center;margin:0 2px;}
+.inline-num:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--focus-ring);}
+body.dark .sub-opts{background:var(--hover);border-bottom-color:var(--border);}
+.sub-opt-label{color:var(--text-2);}
+body.dark .sub-opt-label{background:var(--white);color:var(--text);}
+.panel select option{background:var(--white);color:var(--text);}
+
+/* ----- Coluna direita: LAUDO (fonte e estrutura preservadas) ----- */
+.laudo-panel{flex:1;min-width:0;background:var(--white);display:flex;flex-direction:column;border-left:1px solid var(--border);}
+.laudo-header{padding:9px 20px 8px;border-bottom:1px solid var(--border);background:var(--white);display:flex;align-items:center;}
+.laudo-header-title{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.6px;}
+.laudo-body{flex:1;overflow-y:auto;padding:22px 28px;}
+.laudo-doc{font-family:Helvetica,Arial,sans-serif;font-size:10pt;line-height:1.65;color:#111;max-width:720px;}
+.doc-titulo{text-align:center;font-weight:700;font-size:10pt;margin-bottom:16px;text-transform:uppercase;letter-spacing:.3px;}
+.doc-label{font-weight:700;font-size:10pt;}
+.doc-p{margin-bottom:8px;font-size:10pt;}
+.doc-secao{margin-bottom:14px;}
+.laudo-doc:focus { outline: none; }
+
+.toast-notification{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(12px);background:var(--text);color:var(--white);font-size:12.5px;font-weight:500;padding:10px 18px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.18);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;z-index:999;}
+.toast-notification.show{opacity:1;transform:translateX(-50%) translateY(0);}
+body.dark .toast-notification{background:#3a4155;color:#e2e6f0;}
+
+/* --- CUSTOM COMPONENTS RESTORED --- */
+body.dark .btn-dark {background:#2a2f3d;border-color:#3a4155;color:#e2e6f0;}
+body.dark .btn-dark:hover {background:#343a4d;color:#fff;}
+body.dark .dim-input,body.dark .ff select,body.dark .ff input[type=text],body.dark select.sel-tag,body.dark input.dim-input {background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .toolbar {background:var(--white);border-bottom-color:var(--border);}
+body.dark .sidebar {background:var(--white);border-right-color:var(--border);}
+body.dark .sidebar-hd {border-bottom-color:var(--border);}
+body.dark .radio-opt:hover {background:#1e2d4a;}
+body.dark .radio-opt.selected {background:#1e2d4a;}
+body.dark .check-row {background:#1a1f2e;}
+body.dark .check-row:hover {background:#1e2d4a;}
+body.dark .check-row.selected {background:#1e2d4a;}
+body.dark select {background:var(--white);color:var(--text);border-color:var(--border-strong);}
+.sub-opt-label:has(input:checked) {background:var(--blue);color:#fff;border-color:var(--blue);}
+.sub-opt-label input {position:absolute;opacity:0;pointer-events:none;}
+.dim-inline {display:flex;align-items:center;gap:6px;padding:9px 14px;font-size:12px;color:var(--text-2);flex-wrap:wrap;}
+.dim-inline .dim-input {width:54px;}
+.dim-inline .dim-unit {color:var(--text-3);}
+.inline-field {padding:9px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--border);font-size:12px;color:var(--text-2);}
+.inline-field:last-child {border-bottom:none;}
+.inline-field label {color:var(--text-2);}
+
+
+/* --- FIX TEXTAREA --- */
+textarea { background: var(--white); color: var(--text); }
+body.dark textarea { background: var(--white); color: var(--text); border-color: var(--border-strong); }
+</style>
+
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="logo" style="cursor:pointer" onclick="window.location.href='../laudo-thirads.html'"><span class="logo-name">THI-RADS</span><span class="logo-sub">laudo estruturado</span></div>
+  <button class="btn" onclick="window.location.href='../laudo-thirads.html'"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 2L4 8l6 6"/></svg>Voltar</button>
+  <div class="tb-sep"></div>
+  <button class="btn" onclick="copiar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>Copiar laudo</button>
+  <button class="btn btn-primary" onclick="imprimir()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6V2h8v4M4 12H2V7h12v5h-2M4 9h8M4 12v2h8v-2"/></svg>Imprimir</button>
+  <button class="btn btn-dark" id="btn-dark-toggle" onclick="toggleDark()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro</button>
+  <button class="btn btn-danger" onclick="reiniciar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8a6 6 0 1 0 1.5-3.9M2 4v4h4"/></svg>Reiniciar</button>
+</div>
+
+<div class="body">
+  <div class="sidebar">
+    <div class="sidebar-hd"><div class="sidebar-tipo">Ultrassonografia</div><div class="sidebar-titulo">Pélvica Abdominal</div></div>
+    <div class="nav-group">
+      <div class="nav-item" id="nav-antecedentes" onclick="showSection('antecedentes')"><span class="nav-dot"></span>Ant. Ginecológicos</div>
+      <div class="nav-item" id="nav-bexiga" onclick="showSection('bexiga')"><span class="nav-dot"></span>Bexiga</div>
+      <div class="nav-item" id="nav-utero" onclick="showSection('utero')"><span class="nav-dot"></span>Útero</div>
+      <div class="nav-item" id="nav-endometrio" onclick="showSection('endometrio')"><span class="nav-dot"></span>Endométrio</div>
+      <div class="nav-item" id="nav-ovarioD" onclick="showSection('ovarioD')"><span class="nav-dot"></span>Ovário Direito</div>
+      <div class="nav-item" id="nav-ovarioE" onclick="showSection('ovarioE')"><span class="nav-dot"></span>Ovário Esquerdo</div>
+      <div class="nav-item" id="nav-liquido" onclick="showSection('liquido')"><span class="nav-dot"></span>Líquido Livre</div>
+      <div class="nav-item" id="nav-achados" onclick="showSection('achados')"><span class="nav-dot"></span>Achados Adicionais</div>
+    </div>
+  </div>
+
+  <div class="panel" id="main-panel"></div>
+
+  <div class="laudo-panel">
+    <div class="laudo-header"><span class="laudo-header-title">Pré-visualização</span></div>
+    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc" contenteditable="true"></div></div>
+  </div>
+</div>
+
+<script>
+// ── Estado global ──
+const estado = {
+  antecedentes: { status:'fertil', gesta:'0', dum:'nc', dumData:'', dumValor:'10', dumUnidade:'dias' },
+  bexiga: { sit:'habitual', debris:false, coagulo:false, calculo:false, lesao:false, sonda:false, jatos:'nc' },
+  utero: { sit:'habitual', formato:'',desvio:'centrado', flexao:'ante', contornos:'regulares', d1:'', d2:'', d3:'',
+           miometrio:'homogeneo', adenomiose:false, nod1:false, nod1d1:'', nod1d2:'', nod1d3:'', nod1eco:'hipoecogenico', nod1loc:'intramural',
+           nod2:false, nod2d1:'', nod2d2:'', nod2d3:'', nod2eco:'hipoecogenico', nod2loc:'intramural',
+           nodMul:false, nodMulD1:'', nodMulD2:'', nodMulD3:'', nodMulEco:'hipoecogenico', nodMulLoc:'intramural',
+           colo:'habitual', coloCisto:false, coloColpite:false },
+  endometrio: { sit:'habitual', espessura:'', car:'habitual', diu:'nao', polipo:false, polipoDim:'', liquido:false },
+  ovarioD: { sit:'habitual', d1:'', d2:'', d3:'', loc:'nc', folFun:false, funD1:'', funD2:'', funD3:'',
+             cLuteo:false, lutD1:'', lutD2:'', lutD3:'',
+             cSimples:false, simD1:'', simD2:'', simD3:'',
+             cHem:false, hemD1:'', hemD2:'', hemD3:'',
+             endometrioma:false, endD1:'', endD2:'', endD3:'',
+             cDermoide:false, derD1:'', derD2:'', derD3:'',
+             ncMotivo:'nc', ncLivre:true, mulAte:'' },
+  ovarioE: { sit:'habitual', d1:'', d2:'', d3:'', loc:'nc', folFun:false, funD1:'', funD2:'', funD3:'',
+             cLuteo:false, lutD1:'', lutD2:'', lutD3:'',
+             cSimples:false, simD1:'', simD2:'', simD3:'',
+             cHem:false, hemD1:'', hemD2:'', hemD3:'',
+             endometrioma:false, endD1:'', endD2:'', endD3:'',
+             cDermoide:false, derD1:'', derD2:'', derD3:'',
+             ncMotivo:'nc', ncLivre:true, mulAte:'' },
+  liquido: { sit:'ausente', qtd:'discreta', aspecto:'anecoico', local:'pélvica' },
+  achados: { texto:'' },
+};
+
+let secaoAtual = 'antecedentes';
+
+// ── HELPERS ──
+function fmt(v){ return v||'_'; }
+function vol(a,b,c){
+  const x=parseFloat(a),y=parseFloat(b),z=parseFloat(c);
+  if(isNaN(x)||isNaN(y)||isNaN(z)) return null;
+  return (x*y*z*0.52).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1});
+}
+function medStr(d1,d2,d3){
+  if(!d1) return '_';
+  let s = fmt(d1);
+  if(d2) s+=' x '+fmt(d2);
+  if(d3) s+=' x '+fmt(d3);
+  return s+' cm';
+}
+
+function chkIcon(){return `<svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.8"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg>`;}
+
+function radioOpt(val,label,current,key,sub=''){
+  const sel=current===val?'selected':'';
+  return `<div class="radio-opt ${sel}" onclick="setV('${key}','sit','${val}')">
+    <input type="radio" name="r_${key}">
+    <label class="radio-label"><span class="radio-mark"></span>${label}${sub}</label>
+  </div>`;
+}
+function chkRow(id,label,checked,cb,indent=false){
+  const sel=checked?'selected':'';
+  const pad=indent?'padding-left:28px;':'';
+  return `<div class="check-row ${sel}" id="crow-${id}" onclick="${cb}">
+    <input type="checkbox" id="${id}" ${checked?'checked':''}>
+    <label class="check-label" style="${pad}"><span class="check-box">${chkIcon()}</span>${label}</label>
+  </div>`;
+}
+function dimInput(id,label,val,unit='cm',extra=''){
+  return `<div class="dim-row"><span class="dim-lbl">${label}</span>
+    <input class="dim-input" type="text" id="${id}" value="${val}" placeholder="—" oninput="${extra||'updateLaudo()'}">
+    <span class="dim-unit">${unit}</span></div>`;
+}
+function triDim(pre,label,d1,d2,d3,unit='cm'){
+  return `<div style="padding:9px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;font-size:12px;flex-wrap:wrap;color:var(--text-2);">
+    <span style="min-width:80px;">${label}</span>
+    <input class="dim-input" type="text" id="${pre}D1" value="${d1}" placeholder="—" style="width:50px" oninput="updateLaudo()">
+    <span style="color:var(--text-3)">×</span>
+    <input class="dim-input" type="text" id="${pre}D2" value="${d2}" placeholder="—" style="width:50px" oninput="updateLaudo()">
+    <span style="color:var(--text-3)">×</span>
+    <input class="dim-input" type="text" id="${pre}D3" value="${d3}" placeholder="—" style="width:50px" oninput="updateLaudo()">
+    <span style="color:var(--text-3)">${unit}</span>
+  </div>`;
+}
+
+function setV(sec, key, val){
+  estado[sec][key]=val;
+  renderPanel(secaoAtual);
+  updateLaudo();
+}
+function toggle(sec, key){
+  estado[sec][key]=!estado[sec][key];
+  renderPanel(secaoAtual);
+  updateLaudo();
+}
+
+// ── NAVEGAÇÃO ──
+function showSection(sec){
+  secaoAtual=sec;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('nav-'+sec).classList.add('active');
+  renderPanel(sec);
+  updateLaudo();
+}
+function renderPanel(sec){
+  const p=document.getElementById('main-panel');
+  const titles={antecedentes:'Antecedentes Ginecológicos',bexiga:'Bexiga',utero:'Útero',endometrio:'Endométrio',ovarioD:'Ovário Direito',ovarioE:'Ovário Esquerdo',liquido:'Líquido Livre',achados:'Achados Adicionais',tecnica:'Técnica',indicacao:'Indicação',miometrio:'Miométrio',anexos:'Região Anexial',recomend:'Recomendações'};
+  let html=`<div class="sec-title">${titles[sec]}</div>`;
+  if(sec==='antecedentes') html+=renderAntecedentes()+EXTRA.antX();
+  else if(sec==='bexiga') html+=renderBexiga()+EXTRA.bexX();
+  else if(sec==='utero') html+=renderUtero()+EXTRA.malf();
+  else if(sec==='endometrio') html+=renderEndometrio()+endExtra();
+  else if(sec==='ovarioD') html+=renderOvario('D')+ovExtra('D');
+  else if(sec==='ovarioE') html+=renderOvario('E')+ovExtra('E');
+  else if(sec==='liquido') html+=renderLiquido()+EXTRA.liqX();
+  else if(sec==='achados') html+=renderAchados()+EXTRA.achX();
+  else if(EXTRA[sec]) html+=EXTRA[sec]();
+  p.innerHTML=html;
+}
+
+// ── ANTECEDENTES ──
+function renderAntecedentes(){
+  const e=estado.antecedentes;
+  const isSit=(v)=>e.status===v?'selected':'';
+  const isDUM=(v)=>e.dum===v?'selected':'';
+  return `
+  <div class="block"><div class="block-title">Status Hormonal</div>
+    <div class="radio-opt ${isSit('fertil')}" onclick="setV('antecedentes','status','fertil')"><input type="radio" name="r_ant"><label class="radio-label"><span class="radio-mark"></span>Paciente em idade fértil, gesta
+      <select class="sel-tag" onchange="estado.antecedentes.gesta=this.value;updateLaudo()" onclick="event.stopPropagation()">
+        <option value="0" ${e.gesta==='0'?'selected':''}>G0</option>
+        <option value="1" ${e.gesta==='1'?'selected':''}>G1-2</option>
+        <option value="3" ${e.gesta==='3'?'selected':''}>G3</option>
+        <option value="4" ${e.gesta==='4'?'selected':''}>G4+</option>
+      </select>
+    </label></div>
+    <div class="radio-opt ${isSit('menopausa')}" onclick="setV('antecedentes','status','menopausa')"><input type="radio" name="r_ant"><label class="radio-label"><span class="radio-mark"></span>Paciente menopausada</label></div>
+  </div>
+  <div class="block"><div class="block-title">DUM</div>
+    <div class="radio-opt ${isDUM('nc')}" onclick="setV('antecedentes','dum','nc')"><input type="radio" name="r_dum"><label class="radio-label"><span class="radio-mark"></span>não citar</label></div>
+    <div class="radio-opt ${isDUM('precisa')}" onclick="setV('antecedentes','dum','precisa')"><input type="radio" name="r_dum"><label class="radio-label"><span class="radio-mark"></span>data precisa
+      <input type="date" class="sel-tag" style="margin-left:6px;" value="${e.dumData||new Date(Date.now()-15*86400000).toISOString().slice(0,10)}" onclick="event.stopPropagation()" onchange="estado.antecedentes.dumData=this.value;updateLaudo()">
+    </label></div>
+    <div class="radio-opt ${isDUM('estimado')}" onclick="setV('antecedentes','dum','estimado')"><input type="radio" name="r_dum"><label class="radio-label"><span class="radio-mark"></span>há aproximadamente
+      <select class="sel-tag" onchange="estado.antecedentes.dumValor=this.value;updateLaudo()" onclick="event.stopPropagation()" style="width:54px">
+        ${Array.from({length:30},(_,i)=>`<option value="${i+1}" ${e.dumValor==i+1?'selected':''}>${i+1}</option>`).join('')}
+      </select>
+      <select class="sel-tag" onchange="estado.antecedentes.dumUnidade=this.value;updateLaudo()" onclick="event.stopPropagation()">
+        <option value="dias" ${e.dumUnidade==='dias'?'selected':''}>dias</option>
+        <option value="semanas" ${e.dumUnidade==='semanas'?'selected':''}>semanas</option>
+        <option value="meses" ${e.dumUnidade==='meses'?'selected':''}>meses</option>
+      </select>
+    </label></div>
+  </div>`;
+}
+
+// ── BEXIGA ──
+function renderBexiga(){
+  const e=estado.bexiga;
+  const isSit=(v)=>e.sit===v?'selected':'';
+  const isJat=(v)=>e.jatos===v?'selected':'';
+  return `
+  <div class="block"><div class="block-title">Situação</div>
+    <div class="radio-opt ${isSit('habitual')}" onclick="setV('bexiga','sit','habitual')"><input type="radio" name="r_bex"><label class="radio-label"><span class="radio-mark"></span>distensão adequada (habitual)</label></div>
+    <div class="radio-opt ${isSit('parcial')}" onclick="setV('bexiga','sit','parcial')"><input type="radio" name="r_bex"><label class="radio-label"><span class="radio-mark"></span>distensão parcial</label></div>
+    <div class="radio-opt ${isSit('espessada')}" onclick="setV('bexiga','sit','espessada')"><input type="radio" name="r_bex"><label class="radio-label"><span class="radio-mark"></span>paredes espessadas</label></div>
+    <div class="radio-opt ${isSit('vazia')}" onclick="setV('bexiga','sit','vazia')"><input type="radio" name="r_bex"><label class="radio-label"><span class="radio-mark"></span>bexiga vazia</label></div>
+    <div class="radio-opt ${isSit('nc')}" onclick="setV('bexiga','sit','nc')"><input type="radio" name="r_bex"><label class="radio-label"><span class="radio-mark"></span>não citar</label></div>
+  </div>
+  <div class="block"><div class="block-title">Conteúdo / Achados</div>
+    ${chkRow('bex-debris','debris em suspensão',e.debris,"toggle('bexiga','debris')")}
+    ${chkRow('bex-coagulo','coágulo móvel',e.coagulo,"toggle('bexiga','coagulo')")}
+    ${chkRow('bex-calculo','cálculo vesical',e.calculo,"toggle('bexiga','calculo')")}
+    ${chkRow('bex-lesao','lesão focal parietal',e.lesao,"toggle('bexiga','lesao')")}
+    ${chkRow('bex-sonda','balonete de sonda vesical',e.sonda,"toggle('bexiga','sonda')")}
+  </div>
+  <div class="block"><div class="block-title">Jatos Ureterais</div>
+    <div class="radio-opt ${isJat('nc')}" onclick="setV('bexiga','jatos','nc')"><input type="radio" name="r_jat"><label class="radio-label"><span class="radio-mark"></span>não citar</label></div>
+    <div class="radio-opt ${isJat('presentes')}" onclick="setV('bexiga','jatos','presentes')"><input type="radio" name="r_jat"><label class="radio-label"><span class="radio-mark"></span>presentes e simétricos</label></div>
+    <div class="radio-opt ${isJat('reduzidos')}" onclick="setV('bexiga','jatos','reduzidos')"><input type="radio" name="r_jat"><label class="radio-label"><span class="radio-mark"></span>assimétricos / reduzidos</label></div>
+    <div class="radio-opt ${isJat('ausentes')}" onclick="setV('bexiga','jatos','ausentes')"><input type="radio" name="r_jat"><label class="radio-label"><span class="radio-mark"></span>não caracterizados</label></div>
+  </div>`;
+}
+
+// ── ÚTERO ──
+function renderUtero(){
+  const e=estado.utero;
+  const isSit=(v)=>e.sit===v?'selected':'';
+  const isMio=(v)=>e.miometrio===v?'selected':'';
+  const isColo=(v)=>e.colo===v?'selected':'';
+  return `
+  <div class="block"><div class="block-title">Situação</div>
+    <div class="radio-opt ${isSit('habitual')}" onclick="setV('utero','sit','habitual')"><input type="radio" name="r_ute"><label class="radio-label"><span class="radio-mark"></span>habitual</label></div>
+    <div class="radio-opt ${isSit('parcial')}" onclick="setV('utero','sit','parcial')"><input type="radio" name="r_ute"><label class="radio-label"><span class="radio-mark"></span>histerectomia parcial</label></div>
+    <div class="radio-opt ${isSit('total')}" onclick="setV('utero','sit','total')"><input type="radio" name="r_ute"><label class="radio-label"><span class="radio-mark"></span>histerectomia total</label></div>
+  </div>
+  ${e.sit!=='parcial'&&e.sit!=='total'?`
+  <div class="block"><div class="block-title">Morfologia</div>
+    <div class="inline-field"><label>formato</label>
+      <select class="sel-tag" style="margin-left:0" onchange="estado.utero.formato=this.value;updateLaudo()">
+        <option value="" ${!e.formato?'selected':''}>não citar</option>
+        <option value="piriforme" ${e.formato==='piriforme'?'selected':''}>piriforme</option>
+        <option value="globoso" ${e.formato==='globoso'?'selected':''}>globoso</option>
+        <option value="alongado" ${e.formato==='alongado'?'selected':''}>alongado</option>
+      </select></div>
+    <div class="inline-field"><label>flexão</label>
+      <select class="sel-tag" style="margin-left:0" onchange="estado.utero.flexao=this.value;updateLaudo()">
+        <option value="ante" ${e.flexao==='ante'?'selected':''}>anteversoflexão</option>
+        <option value="medio" ${e.flexao==='medio'?'selected':''}>médioversoflexão</option>
+        <option value="retro" ${e.flexao==='retro'?'selected':''}>retroversoflexão</option>
+      </select></div>
+    <div class="inline-field"><label>desvio</label>
+      <select class="sel-tag" style="margin-left:0" onchange="estado.utero.desvio=this.value;updateLaudo()">
+        <option value="centrado" ${e.desvio==='centrado'?'selected':''}>centrado</option>
+        <option value="à direita" ${e.desvio==='à direita'?'selected':''}>à direita</option>
+        <option value="à esquerda" ${e.desvio==='à esquerda'?'selected':''}>à esquerda</option>
+      </select></div>
+    <div class="inline-field"><label>contornos</label>
+      <select class="sel-tag" style="margin-left:0" onchange="estado.utero.contornos=this.value;updateLaudo()">
+        <option value="regulares" ${e.contornos==='regulares'?'selected':''}>regulares</option>
+        <option value="lobulados" ${e.contornos==='lobulados'?'selected':''}>lobulados</option>
+        <option value="irregulares" ${e.contornos==='irregulares'?'selected':''}>irregulares</option>
+      </select></div>
+  </div>
+  <div class="block"><div class="block-title">Dimensões</div>
+    ${triDim('ute','medindo',e.d1,e.d2,e.d3)}
+    <div style="padding:5px 14px 8px;font-size:11px;color:var(--text-3);" id="vol-utero-info"></div>
+  </div>
+  <div class="block"><div class="block-title">Miométrio</div>
+    <div class="radio-opt ${isMio('homogeneo')}" onclick="setV('utero','miometrio','homogeneo')"><input type="radio" name="r_mio"><label class="radio-label"><span class="radio-mark"></span>ecotextura homogênea</label></div>
+    <div class="radio-opt ${isMio('heterogeneo')}" onclick="setV('utero','miometrio','heterogeneo')"><input type="radio" name="r_mio"><label class="radio-label"><span class="radio-mark"></span>ecotextura heterogênea</label></div>
+  </div>
+  <div class="block"><div class="block-title">Colo Uterino</div>
+    <div class="radio-opt ${isColo('habitual')}" onclick="setV('utero','colo','habitual')"><input type="radio" name="r_col"><label class="radio-label"><span class="radio-mark"></span>aspecto habitual</label></div>
+    <div class="radio-opt ${isColo('colpite')}" onclick="setV('utero','colo','colpite')"><input type="radio" name="r_col"><label class="radio-label"><span class="radio-mark"></span>sinais de colpite</label></div>
+    ${chkRow('ute-colo-cisto','cisto nabothiano presente',e.coloCisto,"toggle('utero','coloCisto')")}
+  </div>`:''}`;
+}
+
+// ── ENDOMÉTRIO ──
+function renderEndometrio(){
+  const e=estado.endometrio;
+  const isSit=(v)=>e.sit===v?'selected':'';
+  const isCar=(v)=>e.car===v?'selected':'';
+  const isDIU=(v)=>e.diu===v?'selected':'';
+  return `
+  <div class="block"><div class="block-title">Situação</div>
+    <div class="radio-opt ${isSit('habitual')}" onclick="setV('endometrio','sit','habitual')"><input type="radio" name="r_end"><label class="radio-label"><span class="radio-mark"></span>regular e homogêneo (habitual)</label></div>
+    <div class="radio-opt ${isSit('laminar')}" onclick="setV('endometrio','sit','laminar')"><input type="radio" name="r_end"><label class="radio-label"><span class="radio-mark"></span>trilaminar (proliferativo)</label></div>
+    <div class="radio-opt ${isSit('secretor')}" onclick="setV('endometrio','sit','secretor')"><input type="radio" name="r_end"><label class="radio-label"><span class="radio-mark"></span>secretor (ecogênico)</label></div>
+    <div class="radio-opt ${isSit('heterogeneo')}" onclick="setV('endometrio','sit','heterogeneo')"><input type="radio" name="r_end"><label class="radio-label"><span class="radio-mark"></span>heterogêneo</label></div>
+    <div class="radio-opt ${isSit('espessado')}" onclick="setV('endometrio','sit','espessado')"><input type="radio" name="r_end"><label class="radio-label"><span class="radio-mark"></span>espessado</label></div>
+    <div class="radio-opt ${isSit('atrofico')}" onclick="setV('endometrio','sit','atrofico')"><input type="radio" name="r_end"><label class="radio-label"><span class="radio-mark"></span>atrófico / laminar fino</label></div>
+    <div class="radio-opt ${isSit('nc')}" onclick="setV('endometrio','sit','nc')"><input type="radio" name="r_end"><label class="radio-label"><span class="radio-mark"></span>não caracterizado</label></div>
+  </div>
+  ${e.sit!=='nc'?`
+  <div class="block"><div class="block-title">Caracterização</div>
+    <div class="radio-opt ${isCar('habitual')}" onclick="setV('endometrio','car','habitual')"><input type="radio" name="r_car"><label class="radio-label"><span class="radio-mark"></span>integralmente caracterizado</label></div>
+    <div class="radio-opt ${isCar('parcial')}" onclick="setV('endometrio','car','parcial')"><input type="radio" name="r_car"><label class="radio-label"><span class="radio-mark"></span>parcialmente caracterizado</label></div>
+  </div>
+  <div class="block"><div class="block-title">Espessura</div><div class="dim-rows">
+    ${dimInput('end-esp','espessura',e.espessura,'mm',"estado.endometrio.espessura=this.value;updateLaudo()")}
+  </div></div>
+  ${chkRow('end-liquido','líquido intracavitário (mucometra/hemometra)',e.liquido,"toggle('endometrio','liquido')")}
+  ${chkRow('end-polipo','pólipo endometrial',e.polipo,"toggle('endometrio','polipo')")}
+  `:''}
+  <div class="block" style="display:none"><div class="block-title">DIU</div>
+    <div class="radio-opt ${isDIU('nao')}" onclick="setV('endometrio','diu','nao')"><input type="radio" name="r_diu"><label class="radio-label"><span class="radio-mark"></span>sem DIU</label></div>
+    <div class="radio-opt ${isDIU('normoposicionado')}" onclick="setV('endometrio','diu','normoposicionado')"><input type="radio" name="r_diu"><label class="radio-label"><span class="radio-mark"></span>DIU tópico / normoposicionado</label></div>
+    <div class="radio-opt ${isDIU('baixo')}" onclick="setV('endometrio','diu','baixo')"><input type="radio" name="r_diu"><label class="radio-label"><span class="radio-mark"></span>DIU em posição baixa</label></div>
+    <div class="radio-opt ${isDIU('deslocado')}" onclick="setV('endometrio','diu','deslocado')"><input type="radio" name="r_diu"><label class="radio-label"><span class="radio-mark"></span>DIU deslocado / intramural</label></div>
+  </div>`;
+}
+
+// ── OVÁRIOS ──
+function renderOvario(lado){
+  const key='ovario'+lado;
+  const e=estado[key];
+  const lbl=lado==='D'?'Direito':'Esquerdo';
+  const lblMin=lado==='D'?'direito':'esquerdo';
+  const isSit=(v)=>e.sit===v?'selected':'';
+  return `
+  <div class="block"><div class="block-title">Situação</div>
+    <div class="radio-opt ${isSit('habitual')}" onclick="setV('${key}','sit','habitual')"><input type="radio" name="r_ova${lado}"><label class="radio-label"><span class="radio-mark"></span>tópico, dimensões habituais</label></div>
+    <div class="radio-opt ${isSit('aumentado')}" onclick="setV('${key}','sit','aumentado')"><input type="radio" name="r_ova${lado}"><label class="radio-label"><span class="radio-mark"></span>dimensões aumentadas</label></div>
+    <div class="radio-opt ${isSit('multifolicular')}" onclick="setV('${key}','sit','multifolicular')"><input type="radio" name="r_ova${lado}"><label class="radio-label"><span class="radio-mark"></span>padrão multifolicular com cistos de até
+      <input class="dim-input" type="text" id="ova${lado}MulAte" value="${e.mulAte}" placeholder="—" style="width:44px;margin-left:4px" onclick="event.stopPropagation()" oninput="estado['${key}'].mulAte=this.value;updateLaudo()"> cm
+    </label></div>
+    <div class="radio-opt ${isSit('policistico')}" onclick="setV('${key}','sit','policistico')"><input type="radio" name="r_ova${lado}"><label class="radio-label"><span class="radio-mark"></span>padrão policístico</label></div>
+    <div class="radio-opt ${isSit('nc')}" onclick="setV('${key}','sit','nc')"><input type="radio" name="r_ova${lado}"><label class="radio-label"><span class="radio-mark"></span>não caracterizado
+      <select class="sel-tag" onclick="event.stopPropagation()" onchange="estado['${key}'].ncMotivo=this.value;updateLaudo()">
+        <option value="nc" ${e.ncMotivo==='nc'?'selected':''}>sem citar motivo</option>
+        <option value="atrofia" ${e.ncMotivo==='atrofia'?'selected':''}>provável involução fisiológica</option>
+        <option value="interposicao" ${e.ncMotivo==='interposicao'?'selected':''}>interposição gasosa</option>
+        <option value="ooforectomia" ${e.ncMotivo==='ooforectomia'?'selected':''}>ooforectomia</option>
+      </select>
+    </label></div>
+  </div>
+  ${e.sit!=='nc'?`
+  <div class="block"><div class="block-title">Dimensões</div>
+    ${triDim('ova'+lado,`ovário ${lblMin}`,e.d1,e.d2,e.d3)}
+    <div style="padding:5px 14px 8px;font-size:11px;color:var(--text-3);">
+      ${(()=>{const v=vol(e.d1,e.d2,e.d3); return v?`Volume: ${v} cm³ (ref.: até ${estado.antecedentes.status==='menopausa'?'5,0':'10,0'} cm³)`:'';})()}
+    </div>
+  </div>
+  <div class="block"><div class="block-title">Localização</div>
+    <div class="inline-field">
+      <select class="sel-tag" style="margin-left:0" onchange="estado['${key}'].loc=this.value;updateLaudo()">
+        <option value="nc" ${e.loc==='nc'?'selected':''}>não citar</option>
+        <option value="topico" ${e.loc==='topico'?'selected':''}>tópico</option>
+        <option value="parauterino" ${e.loc==='parauterino'?'selected':''}>parauterino</option>
+        <option value="justauterino" ${e.loc==='justauterino'?'selected':''}>justauterino</option>
+        <option value="retrouterino" ${e.loc==='retrouterino'?'selected':''}>retrouterino</option>
+      </select>
+    </div>
+  </div>
+  <div class="block"><div class="block-title">Achados Ovarianos</div>
+    ${chkRow(`ova${lado}-fun`,`folículo dominante`,e.folFun,`toggle('${key}','folFun')`)}
+    ${e.folFun?triDim(`ova${lado}Fun`,'medindo',e.funD1,e.funD2,e.funD3):''}
+    ${chkRow(`ova${lado}-lut`,`corpo lúteo`,e.cLuteo,`toggle('${key}','cLuteo')`)}
+    ${e.cLuteo?triDim(`ova${lado}Lut`,'medindo',e.lutD1,e.lutD2,e.lutD3):''}
+    ${chkRow(`ova${lado}-sim`,`cisto simples`,e.cSimples,`toggle('${key}','cSimples')`)}
+    ${e.cSimples?triDim(`ova${lado}Sim`,'medindo',e.simD1,e.simD2,e.simD3):''}
+    ${chkRow(`ova${lado}-hem`,`cisto hemorrágico`,e.cHem,`toggle('${key}','cHem')`)}
+    ${e.cHem?triDim(`ova${lado}Hem`,'medindo',e.hemD1,e.hemD2,e.hemD3):''}
+    ${chkRow(`ova${lado}-end`,`endometrioma`,e.endometrioma,`toggle('${key}','endometrioma')`)}
+    ${e.endometrioma?triDim(`ova${lado}End`,'medindo',e.endD1,e.endD2,e.endD3):''}
+    ${chkRow(`ova${lado}-der`,`cisto dermoide`,e.cDermoide,`toggle('${key}','cDermoide')`)}
+    ${e.cDermoide?triDim(`ova${lado}Der`,'medindo',e.derD1,e.derD2,e.derD3):''}
+  </div>`:''}`;
+}
+
+// ── LÍQUIDO LIVRE ──
+function renderLiquido(){
+  const e=estado.liquido;
+  const isSit=(v)=>e.sit===v?'selected':'';
+  return `
+  <div class="block"><div class="block-title">Situação</div>
+    <div class="radio-opt ${isSit('ausente')}" onclick="setV('liquido','sit','ausente')"><input type="radio" name="r_liq"><label class="radio-label"><span class="radio-mark"></span>ausente</label></div>
+    <div class="radio-opt ${isSit('presente')}" onclick="setV('liquido','sit','presente')"><input type="radio" name="r_liq"><label class="radio-label"><span class="radio-mark"></span>presente</label></div>
+  </div>
+  ${e.sit==='presente'?`
+  <div class="block"><div class="block-title">Quantidade</div>
+    <div class="radio-opt ${e.qtd==='discreta'?'selected':''}" onclick="setV('liquido','qtd','discreta')"><input type="radio" name="r_liqQtd"><label class="radio-label"><span class="radio-mark"></span>discreta quantidade</label></div>
+    <div class="radio-opt ${e.qtd==='moderada'?'selected':''}" onclick="setV('liquido','qtd','moderada')"><input type="radio" name="r_liqQtd"><label class="radio-label"><span class="radio-mark"></span>moderada quantidade</label></div>
+    <div class="radio-opt ${e.qtd==='acentuada'?'selected':''}" onclick="setV('liquido','qtd','acentuada')"><input type="radio" name="r_liqQtd"><label class="radio-label"><span class="radio-mark"></span>acentuada quantidade</label></div>
+  </div>
+  <div class="block"><div class="block-title">Aspecto</div>
+    <div class="radio-opt ${e.aspecto==='anecoico'?'selected':''}" onclick="setV('liquido','aspecto','anecoico')"><input type="radio" name="r_liqAsp"><label class="radio-label"><span class="radio-mark"></span>anecoico (simples)</label></div>
+    <div class="radio-opt ${e.aspecto==='ecos'?'selected':''}" onclick="setV('liquido','aspecto','ecos')"><input type="radio" name="r_liqAsp"><label class="radio-label"><span class="radio-mark"></span>com ecos em suspensão</label></div>
+    <div class="radio-opt ${e.aspecto==='hetero'?'selected':''}" onclick="setV('liquido','aspecto','hetero')"><input type="radio" name="r_liqAsp"><label class="radio-label"><span class="radio-mark"></span>heterogêneo (hematossalpinge?)</label></div>
+  </div>
+  <div class="block"><div class="block-title">Localização</div>
+    <div class="radio-opt ${e.local==='pélvica'?'selected':''}" onclick="setV('liquido','local','pélvica')"><input type="radio" name="r_liqLoc"><label class="radio-label"><span class="radio-mark"></span>cavidade pélvica</label></div>
+    <div class="radio-opt ${e.local==='douglas'?'selected':''}" onclick="setV('liquido','local','douglas')"><input type="radio" name="r_liqLoc"><label class="radio-label"><span class="radio-mark"></span>fundo de saco de Douglas</label></div>
+    <div class="radio-opt ${e.local==='periuterino'?'selected':''}" onclick="setV('liquido','local','periuterino')"><input type="radio" name="r_liqLoc"><label class="radio-label"><span class="radio-mark"></span>periterouxos / periovarianos</label></div>
+    <div class="radio-opt ${e.local==='abdominal'?'selected':''}" onclick="setV('liquido','local','abdominal')"><input type="radio" name="r_liqLoc"><label class="radio-label"><span class="radio-mark"></span>pélvica e abdominal</label></div>
+  </div>`:''}`;
+}
+
+// ── ACHADOS ADICIONAIS ──
+function renderAchados(){
+  const e=estado.achados;
+  return `
+  <div class="block"><div class="block-title">Texto Livre</div>
+    <div style="padding:10px 14px;">
+      <textarea id="achados-texto" style="width:100%;height:140px;border:1px solid var(--border-strong);border-radius:6px;padding:8px 10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);background:var(--white);resize:vertical;" placeholder="Descreva achados adicionais aqui..." oninput="estado.achados.texto=this.value;updateLaudo()">${e.texto}</textarea>
+    </div>
+  </div>`;
+}
+
+// ── SEÇÕES MIGRADAS (Técnica sem aparelho, Indicação, Miométrio, Região Anexial, Recomendações) ──
+const EXTRA={};
+const LIM=[['lim_meteorismo','meteorismo intestinal'],['lim_biotipo','biotipo / obesidade'],['lim_repInad','repleção vesical inadequada'],['lim_esvaz','esvaziamento vesical incompleto'],['lim_posic','restrições de posicionamento / cooperação'],['lim_janela','janela acústica reduzida'],['lim_dor','dor durante a compressão / exame transvaginal']];
+const IND=[['rotina','avaliação de rotina'],['dor','dor pélvica'],['sangr','sangramento uterino anormal'],['irreg','irregularidade menstrual'],['infert','investigação de infertilidade'],['massa','massa pélvica / anexial'],['cisto','acompanhamento de cisto ovariano'],['mioma','miomatose uterina'],['endo','suspeita / acompanhamento de endometriose'],['diu','localização / controle de DIU'],['posop','controle pós-operatório']];
+const TUB=[['hidro','Hidrossalpinge típica'],['hemato','Hematossalpinge'],['pio','Piossalpinge'],['tov','Abscesso tubo-ovariano']];
+const REC=[['corr','correlação clínica'],['tv','complementação por via transvaginal'],['rm','ressonância magnética para complementação'],['seriado','acompanhamento ultrassonográfico seriado'],['histero','histeroscopia diagnóstica']];
+const SEL='border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;background:var(--white);color:var(--text);font-family:inherit;font-size:12px;';
+function lista(a){return a.length>1?a.slice(0,-1).join(', ')+' e '+a[a.length-1]:(a[0]||'');}
+function resetExtras(){
+  const t={vesical:'adequada',sonda:'convexa'};LIM.forEach(l=>t[l[0]]=false);estado.tecnica=t;
+  const i={nc:false,outra:''};IND.forEach(l=>i[l[0]]=false);estado.indicacao=i;
+  estado.miometrio={ist:false,istCont:'líquido anecoico',istA:'',istB:'',istC:'',istEMR:'',istEMA:'',calc:false};
+  const a={var:false,varLado:'bilaterais',varMult:false,varDiam:'',varHemo:'nc',varDist:'nc',varPred:'nc',ascite:false};
+  TUB.forEach(t=>['D','E'].forEach(l=>{a[t[0]+l]=false;for(let n=1;n<4;n++)a[t[0]+l+n]='';}));estado.anexos=a;
+  const r={incluir:true,extra:''};REC.forEach(l=>r[l[0]]=false);estado.recomend=r;
+}
+resetExtras();
+function blk(t,h){return `<div class="block"><div class="block-title">${t}</div>${h}</div>`;}
+function rO(sec,key,val,label){return `<div class="radio-opt ${estado[sec][key]===val?'selected':''}" onclick="setV('${sec}','${key}','${val}')"><input type="radio"><label class="radio-label"><span class="radio-mark"></span>${label}</label></div>`;}
+function cK(sec,key,label,ind){return chkRow(sec+'_'+key,label,estado[sec][key],`toggle('${sec}','${key}')`,ind);}
+function row(h){return `<div style="padding:9px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;font-size:12px;flex-wrap:wrap;color:var(--text-2);">${h}</div>`;}
+function tIn(sec,key,w){return `<input class="dim-input" type="text" value="${estado[sec][key]||''}" placeholder="—" style="width:${w||48}px" oninput="estado.${sec}.${key}=this.value;updateLaudo()">`;}
+function sel(sec,key,opts){return `<select style="${SEL}" onchange="estado.${sec}.${key}=this.value;updateLaudo()">`+opts.map(o=>`<option value="${o[0]}" ${estado[sec][key]===o[0]?'selected':''}>${o[1]}</option>`).join('')+'</select>';}
+function dims3(sec,k,lbl,u){return row(`<span style="min-width:90px">${lbl}</span>${tIn(sec,k+'1')}<span>×</span>${tIn(sec,k+'2')}<span>×</span>${tIn(sec,k+'3')}<span>${u||'cm'}</span>`);}
+function dimTxt(e,k,u){const v=[1,2,3].map(n=>e[k+n]).filter(Boolean);return v.length?v.join(' x ')+' '+(u||'cm'):'';}
+const NC=[['nc','não citar']];
+
+EXTRA.tecnica=()=>{const e=estado.tecnica;
+  return blk('Sonda',[['nc','não citar'],['convexa','sonda convexa via pélvica'],['ambas','ambas as vias, pélvica e transvaginal']].map(o=>rO('tecnica','sonda',o[0],o[1])).join(''))
+   +blk('Repleção vesical',[['adequada','adequada'],['parcial','parcial'],['excessiva','excessiva (esvaziamento parcial realizado)'],['ausente','ausente']].map(o=>rO('tecnica','vesical',o[0],o[1])).join(''))
+   +blk('Limitações mais comuns',LIM.map(l=>cK('tecnica',l[0],l[1])).join(''));};
+EXTRA.indicacao=()=>{const e=estado.indicacao;
+  return blk('Indicações mais comuns',cK('indicacao','nc','não citar')+IND.map(l=>cK('indicacao',l[0],l[1])).join('')
+   +row(`<span>outra indicação:</span>${tIn('indicacao','outra',260)}`));};
+EXTRA.miometrio=()=>{const e=estado.miometrio;
+  return blk('Istmocele / nicho de cicatriz',cK('miometrio','ist','presente')+(e.ist?
+    row(`<span>conteúdo intracavitário</span>${sel('miometrio','istCont',[['líquido anecoico','líquido anecoico'],['conteúdo espesso','com conteúdo espesso'],['conteúdo hemático','com conteúdo hemático']])}`)
+    +dims3('miometrio','ist','medidas','mm')
+    +row(`<span>espessura miometrial residual (EMR)</span>${tIn('miometrio','istEMR')}<span>mm</span>`)
+    +row(`<span>espessura miometrial adjacente (EMA)</span>${tIn('miometrio','istEMA')}<span>mm</span>`):''))
+   +blk('Calcificações das artérias arqueadas',cK('miometrio','calc','presentes'));};
+EXTRA.anexos=()=>{const e=estado.anexos;
+  let h=blk('Varizes pélvicas',cK('anexos','var','presentes')+(e.var?
+    row(`<span>lado</span>${sel('anexos','varLado',[['à direita','à direita'],['à esquerda','à esquerda'],['bilaterais','bilaterais']])}`)
+    +cK('anexos','varMult','com múltiplas veias dilatadas',true)
+    +row(`<span>diâmetro venoso máximo de</span>${tIn('anexos','varDiam')}<span>mm (VR &lt; 5,0 mm)</span>`)
+    +row(`<span>hemodinâmica</span>${sel('anexos','varHemo',NC.concat([['refluxo venoso em repouso','refluxo venoso em repouso'],['refluxo à Valsalva','refluxo à Valsalva'],['refluxo em repouso + Valsalva','refluxo em repouso + Valsalva']]))}`)
+    +row(`<span>distribuição</span>${sel('anexos','varDist',NC.concat([['plexo venoso periuterino','plexo venoso periuterino'],['plexo venoso paraovariano','plexo venoso paraovariano'],['plexos venosos periuterino e paraovariano','plexos venosos periuterino e paraovariano']]))}`)
+    +row(`<span>predominância</span>${sel('anexos','varPred',NC.concat([['predominando à direita','predominando à direita'],['predominando à esquerda','predominando à esquerda']]))}`):''));
+  h+=blk('Ascite ou nódulos peritoneais',cK('anexos','ascite','presentes (O-RADS: eleva lesão 3 ou 4 para 5)'));
+  TUB.forEach(t=>{h+=blk(t[1],['D','E'].map(l=>cK('anexos',t[0]+l,'presente à '+(l==='D'?'direita':'esquerda'))+(e[t[0]+l]?dims3('anexos',t[0]+l,'medindo'):'')).join(''));});
+  return h;};
+EXTRA.recomend=()=>{const e=estado.recomend;
+  return blk('Bloco no laudo',cK('recomend','incluir','incluir bloco de RECOMENDAÇÕES no laudo final'))
+   +blk('Complementares',REC.map(l=>cK('recomend',l[0],l[1])).join(''))
+   +blk('Recomendações adicionais',`<div style="padding:10px 14px;"><textarea style="width:100%;height:90px;${SEL}resize:vertical;" oninput="estado.recomend.extra=this.value;updateLaudo()">${e.extra}</textarea></div>`);};
+
+(function(){const nav=[['tecnica','Técnica'],['indicacao','Indicação'],['antecedentes','Ant. Ginecológicos'],['bexiga','Bexiga'],['utero','Útero'],['miometrio','Miométrio'],['endometrio','Endométrio'],['ovarioD','Ovário Direito'],['ovarioE','Ovário Esquerdo'],['liquido','Líquido Livre'],['anexos','Região Anexial'],['achados','Achados Adicionais'],['recomend','Recomendações']];
+  document.querySelector('.nav-group').innerHTML=nav.map(n=>`<div class="nav-item" id="nav-${n[0]}" onclick="showSection('${n[0]}')"><span class="nav-dot"></span>${n[1]}</div>`).join('');})();
+
+
+// ── COMPLEMENTOS: miométrio, endométrio, ovários ──
+const ADE_D=[['ilhas','ilhas hiperecogênicas'],['cm','cistos miometriais'],['cs','cistos subendometriais'],['linhas','linhas e brotos ecogênicos']];
+const ADE_I=[['assim','assimetria de paredes'],['leque','artefato acústico posterior em leque'],['zona','irregularidade e descontinuidade da zona juncional'],['vasc','vascularização translesional']];
+const EXT={menos25:'menos de 25% do volume miometrial (extensão leve)','25a50':'25% a 50% do volume miometrial (extensão moderada)',mais50:'mais de 50% do volume miometrial (extensão grave)'};
+const FIG=[['nc','não citar'],['FIGO 0','FIGO 0: intracavitário pediculado'],['FIGO 1','FIGO 1: submucoso < 50% intramural'],['FIGO 2','FIGO 2: submucoso ≥ 50% intramural'],['FIGO 3','FIGO 3: intramural, tangencia o endométrio'],['FIGO 4','FIGO 4: intramural'],['FIGO 5','FIGO 5: subseroso ≥ 50% intramural'],['FIGO 6','FIGO 6: subseroso < 50% intramural'],['FIGO 7','FIGO 7: subseroso pediculado'],['FIGO 8','FIGO 8: cervical/parasita'],['FIGO 2-5','FIGO 2-5: híbrido submucoso/subseroso']];
+const FLU=[['nc','não citar'],['circunferencial','circunferencial'],['intralesional','intralesional'],['misto','misto']];
+const TORS=['deslocando o útero anteriormente','localizado em posição medial na pelve','associado a líquido livre na cavidade pélvica','com espessamento da tuba uterina adjacente','com estrutura tubular torcida adjacente (sinal do redemoinho)','sem fluxo vascular detectável ao estudo Doppler','com fluxo arterial preservado e ausência de fluxo venoso ao Doppler','associado a lesão cística/massa ovariana predisponente'];
+const _rx=resetExtras;
+resetExtras=function(){_rx();
+  const m=estado.miometrio;Object.assign(m,{ade:false,adeForma:'difusa',adeLoc:'parede anterior',adeCam:'subendometrial',adeExt:'nc',fig1:'nc',flu1:'nc',fig2:'nc',flu2:'nc'});
+  ADE_D.concat(ADE_I).forEach(x=>m['c_'+x[0]]=false);
+  estado.end2={ecog:'nc',cist:'nc',linha:'nc',cont:'nc',intf:'nc',dop:'nc',ader:false,td:false,liq:'ausente',liqD:''};
+  ['D','E'].forEach(l=>{const o={pad:'nc',padDim:'',tors:false,mob:'nc',dor:false,alb:false,para:false,incl:false};
+    for(let n=1;n<4;n++){o['para'+n]='';o['incl'+n]='';}TORS.forEach((t,i)=>o['t'+i]=false);estado['ovx'+l]=o;});
+};
+resetExtras();
+const _em=EXTRA.miometrio;
+EXTRA.miometrio=()=>{const e=estado.miometrio;
+  const ade=blk('Adenomiose (detalhada)',cK('miometrio','ade','presente')+(e.ade?
+    row(`<span>forma</span>${sel('miometrio','adeForma',[['difusa','difusa'],['focal','focal']])}`)
+    +(e.adeForma==='focal'?row(`<span>localização</span>${sel('miometrio','adeLoc',['parede anterior','parede posterior','fundo uterino','parede lateral direita','parede lateral esquerda'].map(x=>[x,x]))}`)
+      +row(`<span>camada acometida</span>${sel('miometrio','adeCam',['subendometrial','intramiometrial','subserosa','acometimento transmural'].map(x=>[x,x]))}`):'')
+    +row(`<span>extensão (MUSA)</span>${sel('miometrio','adeExt',[['nc','não citar'],['menos25','leve (menos de 25%)'],['25a50','moderada (25% a 50%)'],['mais50','grave (mais de 50%)']])}`)
+    +'<div class="block-title" style="font-size:11px">critérios diretos</div>'+ADE_D.map(x=>cK('miometrio','c_'+x[0],x[1])).join('')
+    +'<div class="block-title" style="font-size:11px">critérios indiretos</div>'+ADE_I.map(x=>cK('miometrio','c_'+x[0],x[1])).join(''):''));
+  const fg=blk('Classificação dos miomas (nódulos 1 e 2 do Útero)',[1,2].map(n=>row(`<span>nódulo ${n}</span>${sel('miometrio','fig'+n,FIG)}<span>fluxo</span>${sel('miometrio','flu'+n,FLU)}`)).join(''));
+  return _em()+ade+miomasUI();};
+EXTRA.endExtra=()=>{const e=estado.end2;
+  const S=(k,o)=>row(`<span style="min-width:120px">${k[1]}</span>${sel('end2',k[0],[['nc','não citar']].concat(o.map(x=>[x,x])))}`);
+  return blk('Características (IETA)',S(['ecog','ecogenicidade'],['uniforme, isoecogênica','uniforme, hiperecogênica','uniforme, hipoecogênica','uniforme, três camadas','não uniforme, homogênea','não uniforme, heterogênea'])
+    +S(['cist','áreas císticas'],['ausentes','presentes, de contornos regulares','presentes, de contornos irregulares'])
+    +S(['linha','linha média'],['linear','não linear (bright edge sign)','irregular','não definida'])
+    +S(['cont','contorno'],['regular','irregular'])+S(['intf','interface'],['regular','irregular','interrompida','não definida'])
+    +S(['dop','escore Doppler'],['1 (sem fluxo)','2 (fluxo mínimo)','3 (fluxo moderado)','4 (fluxo abundante)']))
+   +blk('Lâmina líquida endometrial',[['ausente','ausente'],['fina lâmina líquida','fina lâmina líquida'],['hematometra','hematometra'],['mucometra','mucometra'],['piometra','piometra']].map(o=>rO('end2','liq',o[0],o[1])).join('')
+    +(['hematometra','mucometra','piometra'].includes(e.liq)?row(`<span>maior diâmetro ântero-posterior</span>${tIn('end2','liqD')}<span>mm</span>`):''))
+   +blk('Outros',cK('end2','ader','processo aderencial / sinequial')+cK('end2','td','cavidade endometrial com morfologia habitual à avaliação tridimensional'));};
+function endExtra(){return EXTRA.endExtra();}
+function endExtraTxt(hd){const e=estado.end2;let h='';
+  const P=[['ecog','ecogenicidade'],['cist','áreas císticas'],['linha','linha média'],['cont','contorno'],['intf','interface endométrio-miométrio']].filter(x=>e[x[0]]!=='nc').map(x=>`${x[1]} ${e[x[0]]}`);
+  if(e.dop!=='nc')P.push('escore Doppler '+e.dop.replace(/ \(.*/,''));
+  if(P.length)h+=`<div class="doc-p">Características IETA: ${lista(P)}.</div>`;
+  if(e.liq==='fina lâmina líquida')h+='<div class="doc-p">Fina lâmina líquida endometrial.</div>';
+  else if(e.liq!=='ausente'){h+=`<div class="doc-p">${e.liq.charAt(0).toUpperCase()+e.liq.slice(1)}${e.liqD?`, com maior diâmetro ântero-posterior de ${e.liqD} mm`:''}.</div>`;hd.push(e.liq.charAt(0).toUpperCase()+e.liq.slice(1)+'.');}
+  if(e.ader){h+='<div class="doc-p">Sinais de processo aderencial / sinequial.</div>';hd.push('Processo aderencial / sinequial.');}
+  if(e.td)h+='<div class="doc-p">Cavidade endometrial com morfologia habitual à avaliação tridimensional.</div>';
+  return h;}
+function ovExtra(l){const k='ovx'+l,e=estado[k];
+  return blk('Padrão ovariano',[['nc','não citar'],['multi','padrão multifolicular'],['hipo','padrão hipotrófico'],['antral','não caracterizar folículos antrais']].map(o=>rO(k,'pad',o[0],o[1])).join('')+(e.pad==='multi'?row(`<span>cistos de até</span>${tIn(k,'padDim')}<span>cm</span>`):''))
+   +blk('Torção anexial',cK(k,'tors','torção anexial')+(e.tors?TORS.map((t,i)=>cK(k,'t'+i,t,true)).join(''):''))
+   +blk('Mobilidade ovariana',[['nc','não citar'],['preservada','mobilidade preservada'],['reduzida','mobilidade reduzida'],['fixo','ovário fixo']].map(o=>rO(k,'mob',o[0],o[1])).join('')+cK(k,'dor','com dor à compressão'))
+   +blk('Outras lesões típicas',cK(k,'alb','corpo albicans')+cK(k,'para','cisto paraovariano típico')+(e.para?dims3(k,'para','medindo'):'')+cK(k,'incl','cisto de inclusão peritoneal')+(e.incl?dims3(k,'incl','medindo'):''));}
+function ovExtraTxt(l,hd){const e=estado['ovx'+l],n=l==='D'?'direito':'esquerdo';let h='';const d=(k)=>dimTxt(e,k);
+  if(e.pad==='multi')h+=`<div class="doc-p">Ovário ${n} com padrão multifolicular${e.padDim?`, com cistos de até ${e.padDim} cm`:''}.</div>`,hd.push(`Ovário ${n} com padrão multifolicular.`);
+  if(e.pad==='hipo')h+=`<div class="doc-p">Ovário ${n} com padrão hipotrófico.</div>`,hd.push(`Ovário ${n} hipotrófico.`);
+  if(e.pad==='antral')h+=`<div class="doc-p">Folículos antrais não caracterizados no ovário ${n}.</div>`;
+  if(e.tors){const t=TORS.filter((x,i)=>e['t'+i]);h+=`<div class="doc-p">Sinais de torção anexial no ovário ${n}${t.length?', '+lista(t):''}.</div>`;hd.push(`Sinais de torção anexial no ovário ${n}.`);}
+  if(e.mob!=='nc'||e.dor){const m={nc:'',preservada:'Mobilidade ovariana preservada',reduzida:'Mobilidade ovariana reduzida',fixo:'Ovário '+n+' fixo'}[e.mob];
+    h+=`<div class="doc-p">${m?m+(e.dor?', com dor à compressão':''):'Dor à compressão do ovário '+n}.</div>`;}
+  if(e.alb)h+=`<div class="doc-p">Corpo albicans no ovário ${n}.</div>`;
+  if(e.para)h+=`<div class="doc-p">Cisto paraovariano típico ${n==='direito'?'à direita':'à esquerda'}${d('para')?', medindo '+d('para'):''}.</div>`,hd.push(`Cisto paraovariano ${n==='direito'?'à direita':'à esquerda'}.`);
+  if(e.incl)h+=`<div class="doc-p">Cisto de inclusão peritoneal ${n==='direito'?'à direita':'à esquerda'}${d('incl')?', medindo '+d('incl'):''}.</div>`,hd.push(`Cisto de inclusão peritoneal ${n==='direito'?'à direita':'à esquerda'}.`);
+  return h;}
+
+// ── COMPLETO: DIU, padrão/endometrite/produtos retidos, lesões ovarianas ──
+const O=a=>a.map(x=>Array.isArray(x)?x:[x,x]);
+const EN9=['focos gasosos de permeio','debris ecogênicos móveis','nível líquido-debris','espessamento difuso','irregularidade da superfície endometrial','heterogeneidade acentuada','perda da diferenciação endometrial','limites endometriais imprecisos','aumento da vascularização endometrial ao Doppler'];
+const _rx2=resetExtras;
+resetExtras=function(){_rx2();
+  Object.assign(estado.end2,{diu:'nc',dHist:false,dHistV:'',hastes:'abertas',rot:false,plano:'ântero-posterior',pen:false,penLado:'direita',penProf:'',baixoDist:'',desvTipo:'girado',dTraj:'intramural',dElem:'haste transversal',dParede:'corporal anterior',pad:'nc',micro:false,infil:false,endo:false,prc:false,prcCont:'heterogêneo',prcDop:'nc',prcMassa:false,prcMassaD:'',prcIntf:'nc',prcMio:false,prcTipo:'auto'});
+  EN9.forEach((x,i)=>estado.end2['en'+i]=false);
+  ['D','E'].forEach(l=>Object.assign(estado['ovx'+l],{hemPad:'nc',lutHem:false,dRok:false,dLin:false,dPon:false,dNiv:false,outras:''}));
+};
+resetExtras();
+const _ee=EXTRA.endExtra;
+EXTRA.endExtra=()=>{const e=estado.end2;
+  const S=(k,l,o)=>row(`<span style="min-width:110px">${l}</span>${sel('end2',k,O(o))}`);
+  const HS=['abertas','parcialmente abertas','fechadas'];
+  const PEN=cK('end2','pen','penetração miometrial de haste',true)+(e.pen?row(`${sel('end2','penLado',O(['direita','esquerda','bilateral']))}<span>profundidade</span>${tIn('end2','penProf')}<span>mm</span>`):'');
+  const PL=S('plano','hastes no plano',['ântero-posterior','oblíquo']);
+  let d=[['nc','não citar'],['normo','normoposicionado'],['baixo','em inserção baixa'],['desvio','com desvio de posição (em cavidade)'],['desloc','deslocado']].map(o=>rO('end2','diu',o[0],o[1])).join('');
+  if(e.diu==='normo') d+=S('hastes','hastes',HS)+cK('end2','rot','com alteração de rotação',true)+(e.rot?PL:'')+PEN;
+  if(e.diu==='baixo') d+=row(`<span>distando</span>${tIn('end2','baixoDist')}<span>cm do orifício externo do colo</span>`)+S('hastes','hastes',HS)+PEN;
+  if(e.diu==='desvio') d+=S('desvTipo','desvio',[['girado','girado / rotacionado'],['transversal','transversal'],['obliquo','oblíquo']])+(e.desvTipo==='girado'?PL:'')+S('hastes','hastes',['abertas','parcialmente abertas','assimétricas','fechadas'])+PEN;
+  if(e.diu==='desloc') d+=S('dTraj','trajeto',[['intramural','intramural'],['serosa','através da serosa'],['intraperitoneal','intraperitoneal']])+(e.dTraj!=='intraperitoneal'?S('dElem','elemento',['haste transversal','haste central','dispositivo completo'])+S('dParede','na parede',['corporal anterior','corporal posterior','fúndica','lateral direita','lateral esquerda']):'');
+  d+=cK('end2','dHist','avaliação pré-DIU: histerometria virtual')+(e.dHist?row(`<span>trajeto uterocervical</span>${tIn('end2','dHistV')}<span>cm</span>`):'');
+  let h=_ee()+blk('Padrão ecográfico',S('pad','padrão',[['nc','não citar'],'laminar','trilaminar (periovulatório)','secretor','atrófico (pós-menopausa)','heterogêneo','espessado homogêneo','espessado heterogêneo','espessado cístico (tamoxifeno)','suspeito para processo infiltrativo'])+cK('end2','micro','com microcistos subendometriais')+cK('end2','infil','aspecto infiltrativo'))
+   +blk('DIU (completo)',d)
+   +blk('Endometrite puerperal',cK('end2','endo','endometrite puerperal')+(e.endo?EN9.map((x,i)=>cK('end2','en'+i,x,true)).join(''):''))
+   +blk('Produtos retidos da concepção',cK('end2','prc','produtos retidos')+(e.prc?S('prcCont','conteúdo',[['heterogêneo','heterogêneo'],['ecogênico','predominantemente ecogênico']])+S('prcDop','Doppler do conteúdo',[['nc','não citar'],'ausente','presente','proeminente'])
+     +cK('end2','prcMassa','massa focal hiperecogênica intracavitária',true)+(e.prcMassa?row(`<span>maior diâmetro</span>${tIn('end2','prcMassaD')}<span>mm</span>`):'')
+     +S('prcIntf','interface endométrio-miométrio',[['nc','não citar'],['preservada','preservada'],['mal definida','mal definida']])+cK('end2','prcMio','miométrio subjacente intensamente vascularizado',true)
+     +S('prcTipo','Gutenberg',[['auto','automático'],['0','tipo 0'],['1','tipo 1'],['2','tipo 2'],['3','tipo 3'],['nc','não classificar']]):''));
+  return h;};
+const _et=endExtraTxt;
+endExtraTxt=function(hd){let h=_et(hd);const e=estado.end2;
+  const pen=()=>e.pen?`, com penetração miometrial de haste ${e.penLado}${e.penProf?' com profundidade de '+e.penProf+' mm':''}`:'';
+  const rot=e.rot?`, com alteração de rotação, com hastes posicionadas no plano ${e.plano}`:'';
+  const P=e.pen?' e penetração miometrial de haste':'';let t='',c='';
+  if(e.diu==='normo'){t=`Cavidade uterina ocupada por DIU, com seu extremo inferior da haste central acima do orifício cervical interno, com suas hastes transversais ${e.hastes}${rot}${pen()}.`;
+    c=e.rot&&e.pen?'DIU com alteração de rotação de hastes e penetração miometrial (malposicionado).':e.rot?'DIU tópico com alteração de rotação de hastes.':e.pen?'DIU com penetração miometrial (malposicionado).':'DIU normoposicionado.';}
+  if(e.diu==='baixo'){t=`Cavidade uterina parcialmente ocupada por DIU, com seu extremo inferior da haste central abaixo do orifício cervical interno${e.baixoDist?', distando '+e.baixoDist+' cm do orifício externo do colo':''}, com suas hastes transversais ${e.hastes}${pen()}.`;
+    c=e.pen?'DIU em posição baixa com penetração miometrial de haste.':'DIU em posição baixa na cavidade uterina.';}
+  if(e.diu==='desvio'){const g=e.desvTipo==='girado',tr=e.desvTipo==='transversal';
+    t=g?`Dispositivo intrauterino (DIU) em cavidade uterina, acima do orifício cervical interno, com alteração de rotação, com suas hastes transversais posicionadas no plano ${e.plano}, ${e.hastes}${pen()}.`
+      :`Dispositivo intrauterino (DIU) em posicionamento ${tr?'transversal':'oblíquo'} na cavidade uterina, acima do orifício cervical interno, com suas hastes ${e.hastes}${pen()}.`;
+    c=g?`DIU com desvio de posição, com alteração de rotação${P}.`:`DIU em posição ${tr?'transversal':'oblíqua'} na cavidade uterina${e.pen?' com penetração miometrial de haste':''}.`;}
+  if(e.diu==='desloc'){const el=e.dElem;
+    if(e.dTraj==='intraperitoneal'){t='Dispositivo intrauterino (DIU) não identificado no interior da cavidade uterina, com localização intraperitoneal.';c='DIU com localização intraperitoneal.';}
+    else if(e.dTraj==='intramural'){t=`Dispositivo intrauterino (DIU) com trajeto intramural ${el==='dispositivo completo'?'':'da '+el+' '}em parede ${e.dParede}.`;c='DIU com trajeto intramural.';}
+    else{t=`Dispositivo intrauterino (DIU) com ${el==='dispositivo completo'?'o dispositivo completo':'a '+el} atravessando a serosa uterina em parede ${e.dParede}.`;c='DIU com trajeto através da serosa uterina.';}}
+  if(t){h+=`<div class="doc-p">${t}</div>`;hd.push(c);}
+  if(e.dHist&&e.dHistV)h+=`<div class="doc-p">Histerometria virtual: trajeto uterocervical medindo ${e.dHistV} cm em conjunto com o canal cervical.</div>`;
+  if(e.pad!=='nc')h+=`<div class="doc-p">Endométrio com padrão ecográfico ${e.pad}${e.micro?', com microcistos subendometriais':''}${e.infil?', com aspecto infiltrativo':''}.</div>`;
+  else if(e.micro||e.infil)h+=`<div class="doc-p">Endométrio ${lista([e.micro?'com microcistos subendometriais':'',e.infil?'com aspecto infiltrativo':''].filter(Boolean))}.</div>`;
+  if(e.endo){const f=EN9.filter((x,i)=>e['en'+i]);h+=`<div class="doc-p">Endométrio com aspecto compatível com endometrite puerperal${f.length?', com '+lista(f):''}.</div>`;hd.push('Endometrite puerperal.');}
+  if(e.prc){const esp=estado.endometrio.espessura;
+    let x=`A cavidade uterina encontra-se parcialmente preenchida por ${e.prcCont==='ecogênico'?'conteúdo predominantemente ecogênico':'conteúdo heterogêneo'}${esp?', com espessura de '+esp+' mm':''}. Ausência de saco gestacional identificável ou polo embrionário.`;
+    if(e.prcMassa)x+=` Identifica-se massa focal hiperecogênica intracavitária${e.prcMassaD?', medindo '+e.prcMassaD+' mm':''}.`;
+    if(e.prcIntf==='preservada')x+=' A interface endométrio-miométrio encontra-se preservada.';
+    if(e.prcIntf==='mal definida')x+=' A interface endométrio-miométrio encontra-se mal definida.';
+    x+={ausente:' Ao mapeamento Doppler colorido, não se identifica fluxo vascular no interior do conteúdo intrauterino.',presente:' Ao mapeamento Doppler colorido, identifica-se fluxo vascular no interior do conteúdo intrauterino, compatível com vilosidades coriônicas com vascularização ativa.',proeminente:' Ao mapeamento Doppler colorido, observa-se fluxo vascular proeminente no interior do conteúdo intrauterino.'}[e.prcDop]||'';
+    const fl=e.prcDop==='presente'||e.prcDop==='proeminente';if(e.prcMio&&fl)x+=' O miométrio subjacente apresenta vascularização acentuada ao mapeamento Doppler colorido.';
+    let tp=e.prcTipo==='auto'?(e.prcDop==='nc'?null:e.prcDop==='ausente'?((e.prcMassa||e.prcCont==='ecogênico')?0:1):(e.prcMio&&fl?3:e.prcDop==='proeminente'?2:1)):e.prcTipo==='nc'?null:+e.prcTipo;
+    h+=`<div class="doc-p">${x}</div>`;hd.push('Produtos retidos da concepção'+(tp!==null?` (tipo ${tp} de Gutenberg)`:'')+'.');}
+  return h;};
+const _ox=ovExtra;
+ovExtra=function(l){const k='ovx'+l,e=estado[k],o=estado['ovario'+l];
+  return _ox(l)+blk('Lesões típicas (complemento)',
+    (o.cHem?row(`<span>cisto hemorrágico: padrão interno</span>${sel(k,'hemPad',[['nc','não citar'],['reticular','reticular'],['coágulo retraído','coágulo retraído']])}`):'')
+    +(o.cLuteo?cK(k,'lutHem','corpo lúteo: conteúdo hemorrágico de permeio'):'')
+    +(o.cDermoide?cK(k,'dRok','dermoide: nódulo mural hiperecogênico (nódulo de Rokitansky)')+cK(k,'dLin','dermoide: linhas hiperecogênicas')+cK(k,'dPon','dermoide: pontos hiperecogênicos')+cK(k,'dNiv','dermoide: nível gordura-líquido'):'')
+    +(o.cHem||o.cLuteo||o.cDermoide?'':'<div style="padding:10px 14px;font-size:12px;color:var(--text-3)">Marque corpo lúteo, cisto hemorrágico ou dermoide em "Achados Ovarianos" para ver as opções.</div>'))
+   +blk('Outras lesões',`<div style="padding:10px 14px;"><textarea style="width:100%;height:70px;${SEL}resize:vertical;" oninput="estado.${k}.outras=this.value;updateLaudo()">${e.outras}</textarea></div>`);};
+const _oxt=ovExtraTxt;
+ovExtraTxt=function(l,hd){let h=_oxt(l,hd);const e=estado['ovx'+l],o=estado['ovario'+l],n=l==='D'?'direito':'esquerdo';
+  if(o.cHem&&e.hemPad!=='nc')h+=`<div class="doc-p">Cisto hemorrágico do ovário ${n} com padrão interno ${e.hemPad}.</div>`;
+  if(o.cLuteo&&e.lutHem)h+=`<div class="doc-p">Corpo lúteo do ovário ${n} com conteúdo hemorrágico de permeio.</div>`;
+  if(o.cDermoide){const f=[e.dRok&&'nódulo mural hiperecogênico (nódulo de Rokitansky)',e.dLin&&'linhas hiperecogênicas',e.dPon&&'pontos hiperecogênicos',e.dNiv&&'nível gordura-líquido'].filter(Boolean);if(f.length)h+=`<div class="doc-p">Cisto dermoide do ovário ${n} apresentando ${lista(f)}.</div>`;}
+  if(e.outras.trim())h+=`<div class="doc-p">${e.outras.trim()}</div>`;
+  return h;};
+
+// ── MIOMÉTRIO logo após o útero + miomas completos ──
+const MLOC=['fúndica','corporal','fúndica anterior','fúndica posterior','fúndica à direita','fúndica à esquerda','corporal anterior','corporal posterior','corporal à direita','corporal à esquerda','cavidade endometrial','canal endocervical'];
+const MCLA=[['subseroso','subseroso'],['intramural','intramural'],['submucoso','submucoso'],['subseroso pediculado','subseroso pediculado'],['intracavitário pediculado (FIGO 0)','FIGO 0: intracavitário pediculado'],['submucoso < 50% intramural (FIGO 1)','FIGO 1: submucoso < 50% intramural'],['submucoso >= 50% intramural (FIGO 2)','FIGO 2: submucoso >= 50% intramural'],['intramural tangenciando o endométrio (FIGO 3)','FIGO 3: intramural, tangencia o endométrio'],['intramural (FIGO 4)','FIGO 4: intramural'],['subseroso >= 50% intramural (FIGO 5)','FIGO 5: subseroso >= 50% intramural'],['subseroso < 50% intramural (FIGO 6)','FIGO 6: subseroso < 50% intramural'],['subseroso pediculado (FIGO 7)','FIGO 7: subseroso pediculado'],['cervical/parasita (FIGO 8)','FIGO 8: cervical/parasita'],['híbrido submucoso/subseroso (FIGO 2-5)','FIGO 2-5: híbrido submucoso/subseroso']];
+function mioNovo(){return {on:false,tipo:'unico',d1:'',d2:'',d3:'',eco:'hipoecogênico',loc:'fúndica',cla:'subseroso',flu:'não citar',dEndo:'',dSer:''};}
+const _rx3=resetExtras;
+resetExtras=function(){_rx3();estado.miomas=[mioNovo()];};
+resetExtras();
+function mioRegra(c){c=c.toLowerCase();
+  const F=[['figo 2-5',1,1],['figo 0',0,1],['figo 1',0,1],['figo 2',0,1],['figo 3',0,1],['figo 4',1,1],['figo 5',1,0],['figo 6',1,0],['figo 7',1,0],['figo 8',1,1]];
+  const T=[['submucoso',0,1],['subseroso pediculado',1,0],['subseroso',1,0],['intramural',1,1]];
+  const r=(c.includes('figo')?F:T).find(x=>c.includes(x[0]));return r?[!!r[1],!!r[2]]:[false,false];}
+function addMioma(){estado.miomas.push(mioNovo());renderPanel(secaoAtual);updateLaudo();}
+function remMioma(){if(estado.miomas.length>1){estado.miomas.pop();renderPanel(secaoAtual);updateLaudo();}}
+function togMio(i){estado.miomas[i].on=!estado.miomas[i].on;renderPanel(secaoAtual);updateLaudo();}
+function setMio(i,k,v,rr){estado.miomas[i][k]=v;if(rr)renderPanel(secaoAtual);updateLaudo();}
+function miomasUI(){
+  const cards=estado.miomas.map((m,i)=>{
+    const S=(k,l,o,rr)=>row(`<span style="min-width:100px">${l}</span><select style="${SEL}" onchange="setMio(${i},'${k}',this.value,${rr?1:0})">${o.map(x=>`<option value="${x[0]}" ${m[k]===x[0]?'selected':''}>${x[1]}</option>`).join('')}</select>`);
+    const T=(k)=>`<input class="dim-input" type="text" value="${m[k]}" placeholder="—" style="width:48px" oninput="setMio(${i},'${k}',this.value)">`;
+    const [rE,rS]=mioRegra(m.cla);const v=vol(m.d1,m.d2,m.d3);
+    return blk('Mioma '+(i+1),chkRow('mio'+i,'incluir no laudo',m.on,`togMio(${i})`)+(m.on?
+      S('tipo','tipo',[['unico','mioma único'],['multiplos','múltiplos miomas']])
+      +row(`<span style="min-width:100px">medidas</span>${T('d1')}<span>×</span>${T('d2')}<span>×</span>${T('d3')}<span>cm${v?' (volume: '+v+' cm³)':''}</span>`)
+      +S('eco','ecogenicidade',[['hipoecogênico','hipoecogênico'],['isoecogênico','isoecogênico'],['hiperecogênico','hiperecogênico']])
+      +S('loc','localização',MLOC.map(x=>[x,x]))+S('cla','classificação',MCLA,true)
+      +S('flu','fluxo',[['não citar','não citar'],['circunferencial','circunferencial'],['intralesional','intralesional'],['misto','misto']])
+      +(rE?row(`<span style="min-width:100px">dist. endométrio</span>${T('dEndo')}<span>cm</span>`):'')
+      +(rS?row(`<span style="min-width:100px">dist. serosa</span>${T('dSer')}<span>cm</span>`):''):''));}).join('');
+  return blk('Miomas',`<div style="padding:10px 14px;display:flex;gap:8px;"><button class="btn btn-primary" onclick="addMioma()">+ Adicionar mioma</button><button class="btn btn-danger" onclick="remMioma()" ${estado.miomas.length<2?'disabled':''}>− Remover mioma</button></div>`)+cards;}
+function mioTxt(m,lista1){
+  const loc=m.loc==='cavidade endometrial'?'na cavidade endometrial':m.loc==='canal endocervical'?'no canal endocervical':'na região '+m.loc;
+  const [rE,rS]=mioRegra(m.cla);const dp=[];if(rE&&m.dEndo)dp.push(m.dEndo+' cm do endométrio');if(rS&&m.dSer)dp.push(m.dSer+' cm da serosa');
+  const v=vol(m.d1,m.d2,m.d3),med=(m.d1?medStr(m.d1,m.d2,m.d3):'_ cm')+(v?` (volume: ${v} cm³)`:'');
+  return `${m.eco}, ${loc}, de aspecto ${m.cla}${dp.length?', distando '+dp.join(' e '):''}, medindo ${med}${m.flu!=='não citar'?`, com fluxo vascular ${m.flu} ao estudo Doppler`:''}`;}
+function miomasAtivos(){return estado.miomas.filter(m=>m.on);}
+function miometrioAlterado(){const m=estado.miometrio;return !!(m.ade||miomasAtivos().length||m.ist);}
+function miometrioTxt(hd){const m=estado.miometrio,ms=miomasAtivos();let out='',ger=[];
+  if(m.ade){const di=ADE_D.filter(x=>m['c_'+x[0]]).map(x=>x[1]),ii=ADE_I.filter(x=>m['c_'+x[0]]).map(x=>x[1]);
+    let c=di.length?`, associada à presença de ${lista(di)}`:'';if(ii.length)c+=`${di.length?', além de':', associada a'} ${lista(ii)}`;
+    const ex=m.adeExt!=='nc'?`, acometendo ${EXT[m.adeExt]}`:'';
+    const b=m.adeForma==='focal'?`apresentando área focal pseudonodular de contornos imprecisos, localizada na ${m.adeLoc} do útero, em topografia ${m.adeCam}`:'apresentando alterações estruturais difusas';
+    ger.push(b+c+ex);hd.push(`Sinais de adenomiose ${m.adeForma}.`);}
+  const so=ms.length&&!m.ade&&!m.ist,NT=so?'exceto por ':'notando-se ';
+  if(ms.length){const bl=[];let mul=null;ms.forEach(x=>{if(x.tipo==='multiplos'){(mul=mul||{t:'m',it:[]}).it.push(x);}else bl.push({t:'u',it:[x]});});if(mul)bl.push(mul);
+    const maior=a=>a.slice().sort((p,q)=>(parseFloat(vol(q.d1,q.d2,q.d3)?.replace(/\./g,'').replace(',','.'))||0)-(parseFloat(vol(p.d1,p.d2,p.d3)?.replace(/\./g,'').replace(',','.'))||0))[0];
+    if(bl.length===1){const b=bl[0],x=b.t==='m'?maior(b.it):b.it[0];
+      ger.push(b.t==='m'?`${NT}múltiplos nódulos miometriais, sendo o maior deles ${mioTxt(x)}`:`${NT}nódulo miometrial ${mioTxt(x)}`);
+      hd.push(b.t==='m'?'Nódulos miometriais mais comumente relacionados a leiomiomas.':'Nódulo miometrial mais comumente relacionado a leiomioma.');}
+    else{const li=bl.map((b,k)=>{const t=b.t==='m'?'múltiplos outros nódulos semelhantes entre si, sendo o maior deles '+mioTxt(maior(b.it)):mioTxt(b.it[0]);
+        return `<br>- <b>N${k+1}</b>: ${t.charAt(0).toUpperCase()+t.slice(1)}${k<bl.length-1?';':''}`;}).join('');
+      ger.push(NT+'nódulos miometriais assim descritos:'+li);hd.push('Nódulos miometriais mais comumente relacionados a leiomiomas.');}}
+  if(ger.length)out+=' Miométrio com ecotextura '+(so?'homogênea':'heterogênea')+', '+ger.join(', ')+'.';
+  else if(m.ist)out+=' Miométrio com ecotextura heterogênea.';
+  if(m.ist){const med=dimTxt(m,'ist','mm');
+    out+=`<br><br>Identifica-se descontinuidade miometrial em parede anterior, na topografia de histerorrafia prévia, preenchida por ${m.istCont}, que se comunica com a cavidade endometrial${med?', medindo '+med:''}${m.istEMR?', com espessura miometrial residual de '+m.istEMR+' mm':''}${m.istEMA?', e espessura miometrial adjacente de '+m.istEMA+' mm':''}.`;
+    hd.push('Istmocele (defeito de cicatriz uterina).');}
+  if(m.calc){out+='<br><br>Notam-se focos hiperecogênicos com sombra acústica posterior, distribuídos perifericamente no miométrio ao longo do trajeto das artérias arqueadas, achado que pode corresponder a calcificações vasculares (arteriosclerose arqueada), de caráter benigno.';
+    hd.push('Calcificações das artérias arqueadas do miométrio.');}
+  return out;}
+
+// ── O-RADS nos ovários ──
+const OR_REC={2:'achado benigno; em geral dispensa seguimento',3:'recomenda-se controle ultrassonográfico ou complementação por ressonância magnética; considerar avaliação por ultrassonografista com expertise em massas anexiais',4:'recomenda-se ressonância magnética e/ou avaliação especializada em ginecologia; considerar encaminhamento à ginecologia oncológica',5:'recomenda-se avaliação em ginecologia oncológica; a ressonância magnética pode auxiliar no planejamento terapêutico'};
+const ORESC={1:'sem fluxo',2:'fluxo mínimo',3:'fluxo moderado',4:'fluxo abundante'};
+function lesNova(){return {tipo:'cística',comp:'unilocular',par:'lisas',cs:'nao',proj:'nenhuma',esc:'1',ate:'nao',d1:'',d2:'',d3:''};}
+const _rx4=resetExtras;
+resetExtras=function(){_rx4();['D','E'].forEach(l=>estado['ovx'+l].les=[]);};
+resetExtras();
+function oradsCalc(o){const n=k=>parseFloat(String(o[k]).replace(',','.'))||0,m=Math.max(n('d1'),n('d2'),n('d3')),e=+o.esc,c=o.tipo==='cística',sl=!c;let r=2;
+  if(c&&o.comp==='unilocular'&&o.par==='lisas'&&m>=10)r=3;
+  if(c&&o.comp==='bilocular'&&o.par==='lisas'&&m>=10)r=3;
+  if(c&&o.comp==='unilocular'&&o.par==='irregulares')r=3;
+  if(c&&o.comp==='multilocular'&&o.par==='lisas'&&m<10&&e<4)r=3;
+  if(sl&&o.ate==='sim'&&o.par==='lisas'&&e<=3)r=3;
+  if(c&&o.comp==='bilocular'&&o.cs==='nao'&&o.par==='irregulares')r=4;
+  if(c&&o.comp==='multilocular'&&o.cs==='nao'){if(o.par==='lisas'&&m>=10&&e<4)r=4;if(o.par==='lisas'&&e===4)r=4;if(o.par==='irregulares')r=4;}
+  if(c&&o.comp==='unilocular'&&o.cs==='sim'&&o.proj==='1a3')r=4;
+  if(c&&(o.comp==='bilocular'||o.comp==='multilocular')&&o.cs==='sim'&&e<=2)r=4;
+  if(sl&&o.ate==='nao'&&o.par==='lisas')r=4;
+  if(c&&o.comp==='unilocular'&&o.proj==='4m')r=5;
+  if(c&&(o.comp==='bilocular'||o.comp==='multilocular')&&o.cs==='sim'&&e>=3)r=5;
+  if(sl&&o.ate==='sim'&&o.par==='lisas'&&e===4)r=5;
+  if(sl&&o.par==='irregulares')r=5;
+  return r;}
+function oradsTipicas(l){const o=estado['ovario'+l];
+  const ls=[['folFun','fun',1],['cLuteo','lut',1],['cSimples','sim',1],['cHem','hem',0],['endometrioma','end',0],['cDermoide','der',0]].filter(x=>o[x[0]]);
+  if(!ls.length)return null;const menop=estado.antecedentes.status==='menopausa';let cat=0;
+  ls.forEach(x=>{const d=Math.max(...[1,2,3].map(n=>parseFloat(String(o[x[1]+'D'+n]).replace(',','.'))||0));cat=Math.max(cat,d>=10?3:(x[2]&&d<=3&&!menop)?1:2);});
+  return (estado.anexos.ascite&&(cat===3||cat===4))?5:cat;}
+const ORC={1:'#047857',2:'#047857',3:'#b8860b',4:'#d9730d',5:'#c93a3a'};
+function addLesOv(l){estado['ovx'+l].les.push(lesNova());renderPanel(secaoAtual);updateLaudo();}
+function remLesOv(l){estado['ovx'+l].les.pop();renderPanel(secaoAtual);updateLaudo();}
+function setLes(l,i,k,v,rr){estado['ovx'+l].les[i][k]=v;if(rr)renderPanel(secaoAtual);updateLaudo();}
+const _ox2=ovExtra;
+ovExtra=function(l){const e=estado['ovx'+l],tip=oradsTipicas(l);
+  const cards=e.les.map((o,i)=>{const S=(k,lb,op,rr)=>row(`<span style="min-width:110px">${lb}</span><select style="${SEL}" onchange="setLes('${l}',${i},'${k}',this.value,${rr?1:0})">${op.map(x=>`<option value="${x[0]}" ${o[k]===x[0]?'selected':''}>${x[1]}</option>`).join('')}</select>`);
+    const T=k=>`<input class="dim-input" type="text" value="${o[k]}" placeholder="—" style="width:48px" oninput="setLes('${l}',${i},'${k}',this.value,1)">`;
+    const c=o.tipo==='cística',r=oradsCalc(o);
+    return blk('Lesão '+(i+1)+` — <span style="color:${ORC[r]};text-transform:none">ACR O-RADS ${r}</span>`,
+      S('tipo','tipo de lesão',[['cística','cística'],['sólida','sólida']],true)
+      +(c?S('comp','composição',[['unilocular','unilocular'],['bilocular','bilocular'],['multilocular','multilocular']])+S('cs','componentes sólidos',[['nao','não'],['sim','sim']],true)
+        +(o.cs==='sim'?S('proj','projeções papilares',[['nenhuma','nenhuma'],['1a3','menos que 4'],['4m','4 ou mais']]):''):S('ate','atenuação acústica',[['nao','não'],['sim','sim']]))
+      +S('par','paredes',[['lisas','lisas'],['irregulares','irregulares']])+S('esc','escore de cor',[['1','1 — sem fluxo'],['2','2 — fluxo mínimo'],['3','3 — fluxo moderado'],['4','4 — fluxo abundante']])
+      +row(`<span style="min-width:110px">dimensões</span>${T('d1')}<span>×</span>${T('d2')}<span>×</span>${T('d3')}<span>cm</span>`));}).join('');
+  return _ox2(l)+blk('Classificação O-RADS',(tip?`<div style="padding:10px 14px;font-size:13px;">Lesões típicas marcadas: <b style="color:${ORC[tip]}">ACR O-RADS ${tip}</b> (automático, pelo maior diâmetro)</div>`:'<div style="padding:10px 14px;font-size:12px;color:var(--text-3)">Marque lesões típicas em "Achados Ovarianos" para a classificação automática, ou adicione uma lesão abaixo.</div>')
+    +`<div style="padding:10px 14px;display:flex;gap:8px;"><button class="btn btn-primary" onclick="addLesOv('${l}')">+ Adicionar lesão</button><button class="btn btn-danger" onclick="remLesOv('${l}')" ${e.les.length?'':'disabled'}>− Remover lesão</button></div>`)+cards;};
+const _oxt2=ovExtraTxt;
+ovExtraTxt=function(l,hd){let h=_oxt2(l,hd);const e=estado['ovx'+l],n=l==='D'?'direito':'esquerdo';
+  const tip=oradsTipicas(l);
+  if(tip){h+=`<div class="doc-p">Lesão típica no ovário ${n}, classificada como ACR O-RADS ${tip}.</div>`;if(tip>=3){hd.push(`Lesão ovariana ${n} ACR O-RADS ${tip}.`);ORADS_REC.push(tip);}}
+  e.les.forEach(o=>{const c=o.tipo==='cística',r=oradsCalc(o),d=dimTxt(o,'',' cm').replace(/^ /,'');const dm=[1,2,3].map(k=>o['d'+k]).filter(Boolean);
+    h+=`<div class="doc-p">Lesão ${o.tipo} no ovário ${n}${c?', '+o.comp:''}, de paredes ${o.par}${c&&o.cs==='sim'?', com componentes sólidos'+(o.proj==='1a3'?' e menos de 4 projeções papilares':o.proj==='4m'?' e 4 ou mais projeções papilares':''):''}, com escore de cor ${o.esc} (${ORESC[o.esc]})${!c&&o.ate==='sim'?', com atenuação acústica':''}, medindo ${dm.length?dm.join(' x ')+' cm':'_ cm'}, classificada como ACR O-RADS ${r}.</div>`;
+    hd.push(`Lesão ${o.tipo} no ovário ${n}, ACR O-RADS ${r}.`);if(r>=3)ORADS_REC.push(r);});
+  return h;};
+let ORADS_REC=[];
+
+// ── Malformações müllerianas (útero) + espessura dupla do endométrio + O-RADS hidrossalpinge ──
+const MALF=[['ausentes','ausentes'],['arqueado','útero arqueado'],['sepP','útero septado parcial'],['sepC','útero septado completo'],['bicorno','útero bicorno'],['didelfo','útero didelfo'],['unicorno','útero unicorno'],['tshape','útero em T']];
+const FLX=['anteversoflexão','anteversão, sem flexão do corpo uterino','médioversoflexão','retroversoflexão','retroversão, sem flexão do corpo uterino','anteversão com retroflexão do corpo uterino (em S)'];
+const MT={arqueado:['Útero arqueado, com indentação côncava discreta da cavidade endometrial na região fúndica, inferior a 1 cm, com ângulo de abertura superior a 90°, mantendo contorno externo uterino convexo.','Útero arqueado (variação da normalidade).'],
+ bicorno:['Útero com indentação serosa fúndica superior a 1 cm, determinando divisão da cavidade uterina em dois cornos bem definidos, com contorno externo uterino alterado.','Útero bicorno.'],
+ unicorno:['Útero com desenvolvimento assimétrico, apresentando cavidade endometrial única e lateralizada, correspondente a um único corno uterino.','Útero unicorno.']};
+const _rx5=resetExtras;
+resetExtras=function(){_rx5();
+  estado.malf={tipo:'ausentes',sepComp:'',sepEsp:'',angC:'',indP:'',indA:'',parL:'',fundo:''};
+  ['D','E'].forEach(l=>estado['malf'+l]={formato:'',flexao:'anteversoflexão',contornos:'regulares',d1:'',d2:'',d3:''});
+  Object.assign(estado.end2,{espDir:'',espEsq:''});};
+resetExtras();
+function endDuploAtivo(){return ['bicorno','didelfo'].includes(estado.malf.tipo);}
+EXTRA.malf=()=>{const e=estado.malf,t=e.tipo;
+  let h=blk('Malformações müllerianas',MALF.map(o=>rO('malf','tipo',o[0],o[1])).join('')
+   +(t==='sepP'?row(`<span>comprimento do septo</span>${tIn('malf','sepComp')}<span>cm</span><span>espessura</span>${tIn('malf','sepEsp')}<span>cm</span>`):'')
+   +(t==='sepC'?row(`<span>espessura do septo</span>${tIn('malf','sepEsp')}<span>cm</span>`):'')
+   +(t==='tshape'?row(`<span>ângulo cornual</span>${tIn('malf','angC')}<span>° (VR &gt; 40°)</span>`)+row(`<span>indentação lateral: profundidade</span>${tIn('malf','indP')}<span>mm (VR &lt; 7,0)</span><span>ângulo</span>${tIn('malf','indA')}<span>° (VR &gt; 130°)</span>`)+row(`<span>parede lateral</span>${tIn('malf','parL')}<span>mm (VR &gt; 10)</span><span>fundo</span>${tIn('malf','fundo')}<span>mm (VR &lt; 10)</span>`):''));
+  if(t==='didelfo')['D','E'].forEach(l=>{const k='malf'+l;h+=blk('Hemiútero à '+(l==='D'?'direita':'esquerda'),
+    row(`<span>formato</span>${sel(k,'formato',[['','não citar'],['piriforme','piriforme'],['globoso','globoso'],['alongado','alongado']])}<span>flexão</span>${sel(k,'flexao',O(FLX))}`)
+    +row(`<span>contornos</span>${sel(k,'contornos',O(['regulares','lobulados','irregulares']))}`)+dims3(k,'d','medindo'));});
+  return h;};
+(function(){const r=renderPanel;renderPanel=function(sec){r(sec);};})();
+function hemiTxt(l){const e=estado['malf'+l],lado=l==='D'?'direita':'esquerda',m=e.d1&&e.d2&&e.d3;
+  return `hemiútero à ${lado}${e.formato?' '+e.formato:''}, em ${e.flexao}, com contornos ${e.contornos}, ${m?`dimensões habituais, medindo cerca de ${medStr(e.d1,e.d2,e.d3)}, com volume estimado de ${vol(e.d1,e.d2,e.d3)} cm³`:'dimensões habituais'}`;}
+function uteroMalfTxt(base,hd){const e=estado.malf,t=e.tipo,u=estado.utero.sit;
+  if(t==='ausentes'||!(u==='habitual'||u==='aumentado'))return base;
+  const k=base.indexOf(' Miométrio '),head=k>=0?base.slice(0,k):base,tail=k>=0?base.slice(k):'',X=v=>v||'_';
+  const ap=d=>head.replace(/\.$/,', '+d+'.');
+  if(t==='didelfo'){hd.push('Útero didelfo.');return `Útero apresentando duplicação completa dos cornos uterinos e do colo uterino, amplamente separados, sem comunicação entre as cavidades endometriais, ${hemiTxt('D')} e ${hemiTxt('E')}.`+(miometrioAlterado()?'':' Miométrio homogêneo.');}
+  if(t==='arqueado'||t==='bicorno'){hd.push(MT[t][1]);
+    const d={arqueado:'apresentando discreta indentação côncava da cavidade endometrial na região fúndica, inferior a 1 cm, com ângulo de abertura superior a 90°, mantendo contorno externo uterino convexo',bicorno:'apresentando indentação serosa fúndica superior a 1 cm, determinando divisão da cavidade uterina em dois cornos bem definidos e contorno externo uterino alterado'}[t];return ap(d)+tail;}
+  if(t==='sepP'){hd.push('Útero septado parcial.');return ap(`apresentando septo fibromuscular projetando-se da região fúndica em direção à cavidade endometrial, superior a 1 cm, sem atingir o canal cervical, com ângulo septal inferior a 90° e contorno externo uterino convexo, medindo ${X(e.sepComp)} cm da linha interóstios tubários até o ápice do septo e espessura de ${X(e.sepEsp)} cm`)+tail;}
+  if(t==='sepC'){hd.push('Útero septado completo.');return ap(`apresentando septo fibromuscular estendendo-se da região fúndica até o canal cervical, dividindo completamente a cavidade endometrial, com ângulo septal inferior a 90°, contorno externo uterino convexo e espessura de ${X(e.sepEsp)} cm`)+tail;}
+  if(t==='unicorno'){hd.push(MT.unicorno[1]);return head+' '+MT.unicorno[0]+tail;}
+  if(t==='tshape'){const P=[e.angC&&`ângulo da região cornual de ${e.angC}°`,e.indP&&`profundidade da indentação lateral de ${e.indP} mm`,e.indA&&`ângulo da indentação lateral de ${e.indA}°`,e.parL&&`comprimento da parede lateral de ${e.parL} mm`,e.fundo&&`comprimento do fundo de ${e.fundo} mm`].filter(Boolean);
+    hd.push('Útero em T-Shape.');return head+' Útero com cavidade endometrial estreitada no sentido transversal, apresentando espessamento das paredes laterais e configuração tubular, com redução do diâmetro intercornual e contorno externo uterino preservado'+(P.length?', com '+lista(P):'')+'.'+tail;}
+  return base;}
+const _ee2=EXTRA.endExtra;
+EXTRA.endExtra=()=>_ee2()+(endDuploAtivo()?blk('Espessura dupla do endométrio',row(`<span>endométrio direito</span>${tIn('end2','espDir')}<span>mm</span><span>endométrio esquerdo</span>${tIn('end2','espEsq')}<span>mm</span>`)):'');
+function endDuplo(f){const e=estado.end2;if(!endDuploAtivo()||(!e.espDir&&!e.espEsq))return f;
+  const t=e.espDir&&e.espEsq?`espessuras de ${e.espDir} mm e ${e.espEsq} mm, respectivamente`:`espessura de ${e.espDir||e.espEsq} mm`;
+  return f.replace(/espessura de \S+ mm/,t);}
+
+// ── Antecedentes, Bexiga, Líquido Livre e Achados Adicionais (complementos do txt) ──
+const num=v=>parseFloat(String(v||'').replace(',','.'))||0;
+const f1=x=>x.toFixed(1).replace('.',',');
+const _rx7=resetExtras;
+resetExtras=function(){_rx7();
+  estado.antX={sua:false,obs:false,g:'',p:'',c:'',a:'',horm:false,hormT:'',cir:false,cirT:'',endo:false,tam:false};
+  estado.bexX={bexigoma:false,vpre:false,par:false,esv:'nc',jat:'nc',jatL:'direito',calcU:false,calcUv:'',cist:false,cistV:'',enf:false,calc:false,calcV:'',calcTipo:'móvel',calcLado:'direita',mult:false,coag:false,coagFl:false,esforco:false,ureter:false,ureL:'direita',ureV:'',mass:false,massT:'polipoide',massTop:'trígono',massVasc:false,massCalc:false,endoV:false,endoMuc:false,sonda:false,sondaVaz:false,div:[]};
+  estado.liqX={pequena:false,espesso:false,sept:false,complexo:false,anD:false,anE:false};
+  estado.achX={hid:false,hidL:'direito',nef:false,nefL:'direito',nefT:'cálculo único',dur:false,durL:'direito',alca:false,alcaS:'cólon sigmoide',alcaT:'espessamento parietal',apen:false,lin:false,linL:'direita',hern:false,hernT:'inguinal à direita',hernC:'adiposo',hernR:'nc'};};
+resetExtras();
+const LD=[['direito','direito'],['esquerdo','esquerdo']];
+const LF=[['direita','direita'],['esquerda','esquerda']];
+EXTRA.antX=()=>{const e=estado.antX;
+  return blk('Status adicional',cK('antX','sua','sangramento uterino anormal'))
+   +blk('Antecedentes obstétricos',cK('antX','obs','incluir no laudo')+row(`<span>gestações</span>${tIn('antX','g')}<span>partos</span>${tIn('antX','p')}<span>cesáreas</span>${tIn('antX','c')}<span>abortos</span>${tIn('antX','a')}`))
+   +blk('Dados clínicos adicionais',cK('antX','horm','em uso de medicação hormonal')+(e.horm?row(`<span>qual:</span>${tIn('antX','hormT',200)}`):'')
+     +cK('antX','cir','cirurgia pélvica prévia')+(e.cir?row(`<span>qual:</span>${tIn('antX','cirT',200)}`):'')
+     +cK('antX','endo','diagnóstico prévio de endometriose')+cK('antX','tam','em uso de tamoxifeno'));};
+function blocoClinico(){const e=estado.antX,x=[];
+  if(e.sua)x.push('sangramento uterino anormal');
+  if(e.obs&&(e.g||e.p||e.c||e.a))x.push(`G${e.g||0}P${e.p||0}C${e.c||0}A${e.a||0}`);
+  if(e.horm)x.push('em uso de medicação hormonal'+(e.hormT?' ('+e.hormT+')':''));
+  if(e.cir)x.push('cirurgia pélvica prévia'+(e.cirT?' ('+e.cirT+')':''));
+  if(e.endo)x.push('diagnóstico prévio de endometriose');if(e.tam)x.push('em uso de tamoxifeno');
+  return x.length?`<div class="doc-secao"><span class="doc-label">DADOS CLÍNICOS:</span><div class="doc-p">${x.join('; ')}.</div></div>`:'';}
+EXTRA.bexX=()=>{const e=estado.bexX;
+  const dv=(k,lb,u)=>dims3('bexX',k,lb,u);
+  let h=blk('Situação adicional',cK('bexX','bexigoma','bexigoma / retenção urinária'));
+  h+=blk('Avaliação funcional',cK('bexX','vpre','volume pré-miccional')+(e.vpre?dv('vp','medidas'):'')+cK('bexX','par','espessura da parede vesical')+(e.par?dv('pa','medidas 1, 2 e 3','mm'):''));
+  h+=blk('Esvaziamento vesical',[['nc','não citar'],['desp','volume desprezível'],['res','resíduo pós-miccional'],['dup','dupla micção'],['sond','paciente sondado / sem avaliação de resíduo']].map(o=>rO('bexX','esv',o[0],o[1])).join('')
+    +(e.esv==='res'?dv('r','medidas'):'')+(e.esv==='dup'?dv('s','1ª micção')+dv('t','2ª micção'):''));
+  h+=blk('Jatos ureterais (complemento)',[['nc','não citar'],['red','presentes, reduzidos'],['aus','ausência unilateral completa'],['bil','ausência bilateral']].map(o=>rO('bexX','jat',o[0],o[1])).join('')
+    +(e.jat==='red'||e.jat==='aus'?row(`<span>lado</span>${sel('bexX','jatL',e.jat==='red'?LF:LD)}`):'')+cK('bexX','calcU','cálculo associado no trajeto ureteral ipsilateral')+(e.calcU?row(`<span>medindo</span>${tIn('bexX','calcUv')}<span>mm</span>`):''));
+  h+=blk('Achados',cK('bexX','cist','cistite / espessamento parietal')+(e.cist?row(`<span>medindo</span>${tIn('bexX','cistV')}<span>mm</span>`)+cK('bexX','enf','cistite enfisematosa',true):'')
+    +cK('bexX','calc','cálculo vesical')+(e.calc?row(`<span>medindo</span>${tIn('bexX','calcV')}<span>cm</span>${sel('bexX','calcTipo',[['móvel','móvel às mudanças de decúbito'],['impactado','impactado na JUV']])}${e.calcTipo==='impactado'?sel('bexX','calcLado',LF):''}`):'')
+    +cK('bexX','mult','múltiplos cálculos menores')
+    +cK('bexX','coag','coágulo / hematoma')+(e.coag?dv('cg','medindo')+cK('bexX','coagFl','sem fluxo ao Doppler',true):'')
+    +cK('bexX','esforco','bexiga de esforço / neurogênica')
+    +cK('bexX','ureter','ureterocele')+(e.ureter?row(`${sel('bexX','ureL',LF)}<span>medindo</span>${tIn('bexX','ureV')}<span>cm</span>`):'')
+    +cK('bexX','mass','massa vesical')+(e.mass?row(`${sel('bexX','massT',O(['polipoide','vegetante','espessamento focal']))}<span>topografia</span>${sel('bexX','massTop',O(['trígono','base','parede lateral','domo','parede posterior','parede anterior']))}`)+dv('ms','medindo')+cK('bexX','massVasc','vascularizada ao Doppler',true)+cK('bexX','massCalc','calcificação de permeio',true):'')
+    +cK('bexX','endoV','endometriose vesical')+(e.endoV?dv('ev','medindo')+cK('bexX','endoMuc','mucosa preservada',true):'')
+    +cK('bexX','sonda','sonda vesical de demora')+(e.sonda?cK('bexX','sondaVaz','bexiga vazia ao redor do balão',true):''));
+  h+=blk('Divertículos vesicais',`<div style="padding:10px 14px;display:flex;gap:8px;"><button class="btn btn-primary" onclick="estado.bexX.div.push({});renderPanel(secaoAtual);updateLaudo()">+ Adicionar divertículo</button><button class="btn btn-danger" onclick="estado.bexX.div.pop();renderPanel(secaoAtual);updateLaudo()" ${e.div.length?'':'disabled'}>− Remover divertículo</button></div>`
+    +e.div.map((d,i)=>row(`<span style="min-width:90px">divertículo ${i+1}</span>`+['d1','d2','d3'].map(k=>`<input class="dim-input" type="text" value="${d[k]||''}" placeholder="—" style="width:44px" oninput="estado.bexX.div[${i}].${k}=this.value;updateLaudo()">`).join('<span>×</span>')+`<span>cm  colo</span><input class="dim-input" type="text" value="${d.colo||''}" placeholder="—" style="width:44px" oninput="estado.bexX.div[${i}].colo=this.value;updateLaudo()"><span>mm</span>`)).join(''));
+  return h;};
+function bexExtraTxt(hd){const e=estado.bexX,o=[],P=(t,c)=>{o.push(t);if(c)hd.push(c);};
+  const mm=(k,u)=>dimTxt(e,k,u||'cm'),mL=k=>{const v=vol(e[k+'1'],e[k+'2'],e[k+'3']);return v?v+' mL':'';};
+  if(e.bexigoma)P('Bexiga de grande volume, compatível com bexigoma / retenção urinária.','Bexigoma / retenção urinária.');
+  if(e.vpre&&e.vp1)P(`Volume pré-miccional estimado em ${mL('vp')} (${mm('vp')}).`);
+  if(e.par){const v=['pa1','pa2','pa3'].map(k=>num(e[k])).filter(Boolean);if(v.length)P(`Parede vesical com espessura média de ${f1(v.reduce((a,b)=>a+b,0)/v.length)} mm (medidas de ${v.map(f1).join(', ')} mm).`);}
+  if(e.esv==='desp')P('Resíduo pós-miccional de volume desprezível.');
+  if(e.esv==='res'&&e.r1)P(`Resíduo pós-miccional estimado em ${mL('r')} (${mm('r')}).`);
+  if(e.esv==='dup'){if(e.s1)P(`Bexiga com resíduo urinário de ${mL('s')} após a primeira micção.`);if(e.t1)P(`O resíduo urinário após a segunda micção foi ${mL('t')}.`);}
+  if(e.esv==='sond')P('Paciente sondado, sem avaliação de resíduo pós-miccional.');
+  if(e.jat==='red')P(`Jatos ureterais presentes, reduzidos à ${e.jatL}.`,`Jato ureteral reduzido à ${e.jatL}.`);
+  if(e.jat==='aus')P(`Ausência completa de jato ureteral ${e.jatL}.`,`Ausência de jato ureteral ${e.jatL}.`);
+  if(e.jat==='bil')P('Ausência de jatos ureterais bilateralmente.','Ausência de jatos ureterais bilateral.');
+  if(e.calcU)P(`Cálculo associado no trajeto ureteral ipsilateral${e.calcUv?', medindo '+e.calcUv+' mm':''}.`,'Cálculo no trajeto ureteral.');
+  if(e.cist){P(`Espessamento parietal da bexiga${e.cistV?', medindo '+e.cistV+' mm':''}, podendo corresponder a cistite.`,'Espessamento parietal vesical / cistite.');if(e.enf)P('Focos gasosos na parede vesical, compatíveis com cistite enfisematosa.','Cistite enfisematosa.');}
+  if(e.calc)P(`Cálculo vesical${e.calcV?' medindo '+e.calcV+' cm':''}, ${e.calcTipo==='impactado'?'impactado na JUV à '+e.calcLado:'móvel às mudanças de decúbito'}.`,'Cálculo vesical.');
+  if(e.mult)P('Múltiplos cálculos vesicais menores.','Cálculos vesicais.');
+  if(e.coag)P(`Coágulo / hematoma intravesical${mm('cg')?' medindo '+mm('cg'):''}${e.coagFl?', sem fluxo ao Doppler':''}.`,'Coágulo / hematoma intravesical.');
+  if(e.esforco)P('Aspecto de bexiga de esforço / neurogênica.','Bexiga de esforço / neurogênica.');
+  if(e.ureter)P(`Ureterocele à ${e.ureL}${e.ureV?', medindo '+e.ureV+' cm':''}.`,`Ureterocele à ${e.ureL}.`);
+  if(e.mass)P(`Massa vesical ${e.massT}${mm('ms')?', medindo '+mm('ms'):''}, localizada em ${e.massTop}${e.massVasc?', vascularizada ao Doppler':''}${e.massCalc?', com calcificação de permeio':''}.`,'Massa vesical.');
+  if(e.endoV)P(`Lesão compatível com endometriose vesical${mm('ev')?', medindo '+mm('ev'):''}${e.endoMuc?', com mucosa preservada':''}.`,'Endometriose vesical.');
+  if(e.sonda)P(`Sonda vesical de demora${e.sondaVaz?', com bexiga vazia ao redor do balão':''}.`);
+  e.div.forEach(d=>{const m=[d.d1,d.d2,d.d3].filter(Boolean).join(' x ');P(`Divertículo vesical${m?' medindo '+m+' cm':''}${d.colo?', com colo de '+d.colo+' mm':''}.`,'Divertículo vesical.');});
+  return o.length?' '+o.join(' '):'';}
+EXTRA.liqX=()=>blk('Quantidade adicional',cK('liqX','pequena','pequena quantidade'))
+  +blk('Aspecto adicional',cK('liqX','espesso','espesso')+cK('liqX','sept','com septações')+cK('liqX','complexo','complexo'))
+  +blk('Localização adicional',cK('liqX','anD','região anexial direita')+cK('liqX','anE','região anexial esquerda'));
+function liqFraseX(f){const l=estado.liquido,x=estado.liqX;if(l.sit!=='presente'||!(x.pequena||x.espesso||x.sept||x.complexo||x.anD||x.anE))return f;
+  const asp={anecoico:'anecoico',ecos:'com debris/ecos internos',hetero:'heterogêneo'}[l.aspecto]||l.aspecto,loc={pélvica:'na cavidade pélvica',douglas:'no fundo de saco posterior',periuterino:'na região parauterina',abdominal:'nas cavidades pélvica e abdominal'}[l.local]||l.local;
+  const A=[asp];if(x.espesso)A.push('espesso');if(x.sept)A.push('com septações');if(x.complexo)A.push('complexo');
+  const L=[loc];if(x.anD)L.push('na região anexial direita');if(x.anE)L.push('na região anexial esquerda');
+  return `Presença de líquido livre em quantidade ${x.pequena?'pequena':l.qtd}, de aspecto ${lista(A)}, ${lista(L)}.`;}
+EXTRA.achX=()=>{const e=estado.achX;const L=(k,o)=>sel('achX',k,o||LD);
+  const R=(c,lb,sub)=>cK('achX',c,lb)+(e[c]&&sub?row(sub):'');
+  return blk('Mais comuns',
+    R('hid','hidronefrose',`<span>rim</span>${L('hidL')}<span>pelve renal AP de</span>${tIn('achX','hidV')}<span>cm</span>`)
+   +R('nef','nefrolitíase',`${L('nefL',[['direito','direito'],['esquerdo','esquerdo'],['bilateral','bilateral']])}${sel('achX','nefT',O(['cálculo único','múltiplos cálculos']))}<span>maior</span>${tIn('achX','nefV')}<span>cm</span>`)
+   +R('dur','dilatação do ureter distal',`${L('durL')}<span>calibre de</span>${tIn('achX','durV')}<span>cm</span>`)
+   +R('alca','alça espessada',`${sel('achX','alcaS',O(['cólon sigmoide','transição retossigmoide','íleo terminal','ceco']))}${sel('achX','alcaT',O(['espessamento parietal','diverticulite aguda']))}<span>espessura</span>${tIn('achX','alcaV')}<span>cm</span>`)
+   +R('apen','apendicite',`<span>diâmetro do apêndice</span>${tIn('achX','apenV')}<span>cm</span>`)
+   +R('lin','linfonodomegalia ilíaca',`${L('linL',LF)}<span>medindo</span>${tIn('achX','ln1')}<span>×</span>${tIn('achX','ln2')}<span>cm</span>`)
+   +R('hern','hérnia',`${sel('achX','hernT',O(['inguinal à direita','inguinal à esquerda']))}<span>conteúdo</span>${sel('achX','hernC',O(['adiposo','intestinal']))}<span>colo</span>${tIn('achX','hernV')}<span>cm</span>${sel('achX','hernR',[['nc','redutível? não citar'],['redutível','redutível'],['não redutível','não redutível']])}`))
+   +blk('Calculadora de nódulo',dims3('achX','nd','medindo')+`<div style="padding:10px 14px;display:flex;gap:10px;align-items:center;font-size:12px;"><span>volume: <b id="nd-vol">${vol(e.nd1,e.nd2,e.nd3)||'0,0'}</b> cm³</span><button class="btn btn-primary" onclick="inserirNodulo()">Inserir na descrição</button></div>`);};
+function inserirNodulo(){const e=estado.achX;if(!e.nd1)return;const t=`Nódulo medindo ${medStr(e.nd1,e.nd2,e.nd3)} (volume: ${vol(e.nd1,e.nd2,e.nd3)} cm³).`;
+  estado.achados.texto=(estado.achados.texto?estado.achados.texto+' ':'')+t;const ta=document.getElementById('achados-texto');if(ta)ta.value=estado.achados.texto;updateLaudo();}
+function achXTxt(){const e=estado.achX,o=[],S={direito:'à direita',esquerdo:'à esquerda',bilateral:'bilateral'};
+  if(e.hid)o.push(`Hidronefrose no rim ${e.hidL}${e.hidV?', com pelve renal de '+e.hidV+' cm no diâmetro anteroposterior':''}.`);
+  if(e.nef)o.push(`Nefrolitíase ${S[e.nefL]}, ${e.nefT}${e.nefV?', o maior medindo '+e.nefV+' cm':''}.`);
+  if(e.dur)o.push(`Dilatação do ureter distal ${e.durL}${e.durV?', com calibre de '+e.durV+' cm':''}.`);
+  if(e.alca)o.push(`Alça intestinal espessada em ${e.alcaS}, com aspecto de ${e.alcaT}${e.alcaV?', com espessura de '+e.alcaV+' cm':''}.`);
+  if(e.apen)o.push(`Apêndice cecal com aspecto sugestivo de apendicite${e.apenV?', com diâmetro de '+e.apenV+' cm':''}.`);
+  if(e.lin){const m=[e.ln1,e.ln2].filter(Boolean).join(' x ');o.push(`Linfonodomegalia ilíaca ${e.linL}${m?', medindo '+m+' cm':''}.`);}
+  if(e.hern)o.push(`Hérnia ${e.hernT}, com conteúdo ${e.hernC}${e.hernV?', colo de '+e.hernV+' cm':''}${e.hernR!=='nc'?', '+e.hernR:''}.`);
+  return o.join(' ');}
+
+function blocoTecnica(){ORADS_REC=[];const t=estado.tecnica;
+  const v={adequada:'adequada',parcial:'parcial',excessiva:'excessiva (esvaziamento parcial realizado)',ausente:'ausente'}[t.vesical];
+  const l=LIM.filter(x=>t[x[0]]).map(x=>x[1]);
+  const so={nc:'',convexa:' com transdutor convexo por via pélvica',endo:' com transdutor endocavitário por via transvaginal',ambas:' com transdutor convexo por via pélvica e transdutor endocavitário por via transvaginal'}[t.sonda];
+  let s=`Exame realizado${so}${so?',':''} com repleção vesical ${v}.`;
+  if(l.length) s+=` Limitações técnicas: ${lista(l)}.`;
+  let h=`<div class="doc-secao"><span class="doc-label">TÉCNICA:</span><div class="doc-p">${s}</div></div>`;
+  const i=estado.indicacao;
+  if(!i.nc){const x=IND.filter(a=>i[a[0]]).map(a=>a[1]);if(i.outra.trim())x.push(i.outra.trim());
+    if(x.length) h+=`<div class="doc-secao"><span class="doc-label">INDICAÇÃO:</span><div class="doc-p">${lista(x)}.</div></div>`;}
+  h+=blocoClinico();
+  return h;}
+
+function extrasAnalise(hd){const m=estado.miometrio,a=estado.anexos;let h='';
+  if(a.var){let s=`Varizes pélvicas ${a.varLado}`;
+    if(a.varMult) s+=', com múltiplas veias dilatadas';
+    if(a.varDiam) s+=`, com diâmetro venoso máximo de ${a.varDiam} mm`;
+    if(a.varHemo!=='nc') s+=`, com ${a.varHemo}`;
+    if(a.varDist!=='nc') s+=`, acometendo ${a.varDist}`;
+    if(a.varPred!=='nc') s+=`, ${a.varPred}`;
+    h+=`<div class="doc-p">${s}.</div>`;hd.push(`Varizes pélvicas ${a.varLado}.`);}
+  if(a.ascite){h+='<div class="doc-p">Presença de ascite ou nódulos peritoneais.</div>';hd.push('Ascite ou nódulos peritoneais.');}
+  TUB.forEach(t=>['D','E'].forEach(l=>{if(!a[t[0]+l]) return;
+    const lado=l==='D'?'à direita':'à esquerda',med=dimTxt(a,t[0]+l);
+    h+=`<div class="doc-p">${t[1]} ${lado}${med?', medindo '+med:''}${t[0]==='hidro'?', classificada como ACR O-RADS 2':''}.</div>`;hd.push(`${t[1]} ${lado}${t[0]==='hidro'?' (ACR O-RADS 2)':''}.`);}));
+  return h;}
+
+function blocoRecomend(){const r=estado.recomend;if(!r.incluir) return '';
+  const x=REC.filter(a=>r[a[0]]).map(a=>a[1].charAt(0).toUpperCase()+a[1].slice(1));if(ORADS_REC.length)x.push('O-RADS '+Math.max(...ORADS_REC)+': '+OR_REC[Math.max(...ORADS_REC)]+'.');if(r.extra.trim()) x.push(r.extra.trim());
+  return x.length?`<div class="doc-secao"><span class="doc-label">RECOMENDAÇÕES:</span><div class="doc-p">${x.join('<br>')}</div></div>`:'';}
+
+// ── GERAÇÃO DO LAUDO ──
+function updateLaudo(){
+  // Sincronizar valores de inputs dinâmicos
+  syncInputs();
+
+  const hd=[];
+  let laudoHtml='';
+
+  // Título
+  laudoHtml+=`<div class="doc-titulo">ULTRASSONOGRAFIA PÉLVICA ABDOMINAL</div>`;
+
+  // Técnica
+  laudoHtml+=blocoTecnica();
+
+  // Antecedentes (inline, sem bloco separado)
+  const ant=estado.antecedentes;
+  let fraseAnt='';
+  if(ant.dum==='precisa'&&ant.dumData){
+    const d=new Date(ant.dumData+'T12:00:00');
+    const hoje=new Date();
+    const diff=Math.round((hoje-d)/(1000*60*60*24));
+    if(diff>=0&&diff<=35) fraseAnt=`${diff}º dia do ciclo menstrual.`;
+    else if(diff>35&&diff<365) fraseAnt=`${diff} dias de amenorreia.`;
+    else if(diff>=365) fraseAnt='Paciente menopausada.';
+  } else if(ant.dum==='estimado'){
+    fraseAnt=`Amenorreia de aproximadamente ${ant.dumValor} ${ant.dumUnidade}.`;
+  }
+
+  // ANÁLISE
+  laudoHtml+=`<div class="doc-secao"><span class="doc-label">ANÁLISE:</span>`;
+
+  // Bexiga
+  const bex=estado.bexiga;
+  let fraseBex='';
+  if(bex.sit!=='nc'){
+    const achados=[];
+    if(bex.debris) { achados.push('ecos em suspensão'); hd.push('Bexiga contendo debris em seu interior.'); }
+    if(bex.coagulo) { achados.push('coágulo móvel'); hd.push('Coágulo vesical.'); }
+    if(bex.calculo) { achados.push('cálculo'); hd.push('Litíase vesical.'); }
+    if(bex.lesao) { achados.push('lesão exofítica parietal'); hd.push('Lesão vesical. Sugere-se complementação com cistoscopia.'); }
+
+    let conteudo = achados.length===0
+      ? 'e conteúdo homogêneo.'
+      : 'e conteúdo heterogêneo à custa de '+achados.join(', ')+'.';
+
+    if(bex.sit==='habitual') fraseBex=`Bexiga com distensão adequada, apresentando contornos regulares, parede com espessura normal ${conteudo}`;
+    else if(bex.sit==='parcial') fraseBex=`Bexiga com distensão parcial, apresentando contornos regulares, paredes com espessura normal ${conteudo}`;
+    else if(bex.sit==='espessada') { fraseBex=`Bexiga com distensão adequada, apresentando contornos regulares, paredes com espessura aumentada ${conteudo}`; hd.push('Espessamento parietal vesical difuso.'); }
+    else if(bex.sit==='vazia') { fraseBex='Bexiga com repleção insuficiente.'; hd.push('Bexiga com repleção insuficiente.'); }
+
+    if(bex.sonda) { fraseBex+=' Presença de balonete de sonda vesical.'; hd.push('Bexiga cateterizada.'); }
+
+    if(bex.jatos==='presentes') fraseBex+='<br>Jatos ureterais presentes e simétricos.';
+    else if(bex.jatos==='reduzidos') { fraseBex+='<br>Jatos ureterais assimétricos.'; hd.push('Jatos ureterais assimétricos.'); }
+    else if(bex.jatos==='ausentes') { fraseBex+='<br>Jatos ureterais não caracterizados.'; hd.push('Jatos ureterais não caracterizados.'); }
+
+    laudoHtml+=`<div class="doc-p">${fraseBex}${bexExtraTxt(hd)}</div>`;
+  }
+
+  // Útero
+  const ute=estado.utero;
+  let fraseUte='', opUte='';
+  const refUte=ant.status==='menopausa'?70:(ant.gesta==='0'?90:ant.gesta==='1'?140:ant.gesta==='3'?160:180);
+  const refUteStr=refUte.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1});
+  const volUte=vol(ute.d1,ute.d2,ute.d3);
+  const volUteStr=volUte||'_';
+  const flexaoMap={ante:'anteversoflexão',medio:'médioversoflexão',retro:'retroversoflexão'};
+  const flex=flexaoMap[ute.flexao]||ute.flexao;
+
+  if(ute.sit==='habitual'||ute.sit==='aumentado'){
+    const fm=ute.formato?` ${ute.formato},`:'';
+    const dsv={'centrado':'centrado','à direita':'desviado à direita','à esquerda':'desviado à esquerda'}[ute.desvio]||'centrado';
+    const dm=ute.d1?`medindo cerca de ${medStr(ute.d1,ute.d2,ute.d3)}${volUte?`, com volume estimado de ${volUteStr} cm³`:''}`:'dimensões habituais';
+    fraseUte=`Útero${fm} em ${flex}, ${dsv}, com contornos ${ute.contornos}, ${dm}. ${miometrioAlterado()?'':`Miométrio ${ute.miometrio==='homogeneo'?'homogêneo':'heterogêneo'}.`}`;
+  } else if(ute.sit==='parcial'){
+    fraseUte='Sinais de histerectomia parcial, com colo uterino remanescente de aspecto habitual.';
+    hd.push('Status pós-histerectomia parcial.');
+  } else if(ute.sit==='total'){
+    fraseUte='Sinais de histerectomia total. Não se visualiza o corpo uterino.';
+    hd.push('Status pós-histerectomia total.');
+  }
+
+  // Adenomiose e miomas
+  if(ute.sit!=='parcial'&&ute.sit!=='total'){
+    fraseUte=uteroMalfTxt(fraseUte,hd);
+    fraseUte+=miometrioTxt(hd);
+
+    // Colo
+    if(ute.colo==='habitual'){
+      fraseUte+='<br>Colo uterino e canal endocervical de aspecto habitual.';
+    } else if(ute.colo==='colpite'){
+      fraseUte+='<br>Colo uterino com sinais de colpite.';
+      hd.push('Sinais de colpite.');
+    }
+    if(ute.coloCisto){ fraseUte+=' Presença de cisto nabothiano.'; hd.push('Cisto nabothiano.'); }
+  }
+
+  laudoHtml+=`<div class="doc-p">${fraseUte}</div>`;
+
+  // Endométrio (só se útero não for total/parcial)
+  if(ute.sit!=='parcial'&&ute.sit!=='total'){
+    const end=estado.endometrio;
+    let fraseEnd='';
+    const esp=end.espessura||'_';
+    const car=end.car==='parcial'?'parcialmente caracterizado, ':'';
+
+    if(end.diu==='normoposicionado'){
+      fraseEnd='Cavidade uterina ocupada por DIU, com seu extremo inferior da haste central acima do orifício cervical interno, com suas hastes transversais simétricas e abertas no sentido látero-lateral, sem alterações de rotação.';
+      hd.push('DIU tópico.');
+    } else if(end.diu==='baixo'){
+      fraseEnd='Cavidade uterina parcialmente ocupada por DIU, com seu extremo inferior da haste central abaixo do orifício cervical interno, com suas hastes transversais parcialmente abertas.';
+      hd.push('DIU em posição baixa na cavidade uterina.');
+    } else if(end.diu==='deslocado'){
+      fraseEnd='Dispositivo intra-uterino (DIU) com trajeto intramural, deslocado de sua posição habitual.';
+      hd.push('DIU deslocado / intramural.');
+    } else if(end.sit==='nc'){
+      fraseEnd='Endométrio não caracterizado.';
+    } else if(end.sit==='habitual'){
+      fraseEnd=`Endométrio ${car}regular e homogêneo, com espessura de ${esp} mm.`;
+    } else if(end.sit==='laminar'){
+      fraseEnd=`Endométrio ${car}regular, de aspecto trilaminar, com espessura de ${esp} mm.`;
+    } else if(end.sit==='secretor'){
+      fraseEnd=`Endométrio ${car}regular, de aspecto secretor, com espessura de ${esp} mm.`;
+    } else if(end.sit==='heterogeneo'){
+      fraseEnd=`Endométrio ${car}com espessura de ${esp} mm, de aspecto heterogêneo.`;
+      hd.push('Endométrio de aspecto heterogêneo.');
+    } else if(end.sit==='espessado'){
+      fraseEnd=`Endométrio ${car}espessado e homogêneo, com espessura de ${esp} mm.`;
+      hd.push('Espessamento endometrial. Sugere-se correlação clínica.');
+    } else if(end.sit==='atrofico'){
+      fraseEnd=`Endométrio ${car}atrófico, de aspecto laminar fino, com espessura de ${esp} mm.`;
+    }
+
+    if(end.liquido&&end.diu==='nao'){ fraseEnd+=' Presença de discreta quantidade de líquido anecoico intracavitário.'; hd.push('Líquido intracavitário (mucometra/hemometra?).'); }
+    if(end.polipo&&end.diu==='nao'){ fraseEnd+=' Presença de imagem polipoide hiperecoica endometrial.'; hd.push('Lesão polipoide endometrial.'); }
+
+    laudoHtml+=`<div class="doc-p">${endDuplo(fraseEnd)}</div>`;
+    laudoHtml+=endExtraTxt(hd);
+  }
+
+  // Ovários
+  function fraseOvario(lado){
+    const key='ovario'+lado;
+    const e=estado[key];
+    const lbl=lado==='D'?'Direito':'Esquerdo';
+    const lblMin=lado==='D'?'direito':'esquerdo';
+    const refOv=ant.status==='menopausa'?5:10;
+    const refOvStr=`${refOv.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})}`;
+    const v=vol(e.d1,e.d2,e.d3);
+    const vStr=v||'_';
+
+    let s='';
+    if(e.sit==='nc'){
+      if(e.ncMotivo==='ooforectomia'){ s=`Sinais de ooforectomia à ${lblMin}.`; hd.push(`Sinais de ooforectomia à ${lblMin}.`); }
+      else if(e.ncMotivo==='atrofia'){ s=`Ovário ${lblMin} não caracterizado ao método, compatível com provável involução fisiológica.`; }
+      else if(e.ncMotivo==='interposicao'){ s=`Ovário ${lblMin} não caracterizado ao método por interposição gasosa.`; }
+      else { s=`Ovário ${lblMin} não caracterizado ao método.`; }
+    } else if(e.sit==='habitual'){
+      s=`Ovário ${lblMin} tópico, de contornos regulares, medindo cerca de ${medStr(e.d1,e.d2,e.d3)} com volume de ${vStr} cm³ (normal até ${refOvStr} cm³). O parênquima tem ecotextura habitual.`;
+    } else if(e.sit==='aumentado'){
+      s=`Ovário ${lblMin} tópico, de contornos regulares, com dimensões aumentadas, medindo cerca de ${medStr(e.d1,e.d2,e.d3)} com volume de ${vStr} cm³.`;
+      hd.push(`Ovário ${lblMin} de dimensões aumentadas.`);
+    } else if(e.sit==='multifolicular'){
+      s=`Ovário ${lblMin} tópico, de dimensões ${e.d1?`medindo ${medStr(e.d1,e.d2,e.d3)} com volume de ${vStr} cm³`:'habituais'}, apresentando padrão multifolicular com cistos de até ${e.mulAte||'_'} cm.`;
+    } else if(e.sit==='policistico'){
+      s=`Ovário ${lblMin} com aspecto policístico, medindo ${medStr(e.d1,e.d2,e.d3)} com volume de ${vStr} cm³.`;
+      hd.push(`Ovário ${lblMin} com aspecto policístico.`);
+    }
+
+    // Achados
+    const achs=[];
+    if(e.folFun){ achs.push(`folículo dominante medindo ${medStr(e.funD1,e.funD2,e.funD3)}`); hd.push(`Folículo no ovário ${lblMin}.`); }
+    if(e.cLuteo){ achs.push(`corpo lúteo medindo ${medStr(e.lutD1,e.lutD2,e.lutD3)}`); hd.push(`Corpo lúteo no ovário ${lblMin}.`); }
+    if(e.cSimples){ achs.push(`cisto de aspecto simples, anecoico, de paredes finas, medindo ${medStr(e.simD1,e.simD2,e.simD3)}`); hd.push(`Cisto de aspecto simples no ovário ${lblMin}.`); }
+    if(e.cHem){ achs.push(`cisto hemorrágico medindo ${medStr(e.hemD1,e.hemD2,e.hemD3)}`); hd.push(`Cisto hemorrágico no ovário ${lblMin}.`); }
+    if(e.endometrioma){ achs.push(`endometrioma de conteúdo espesso e homogêneo, medindo ${medStr(e.endD1,e.endD2,e.endD3)}`); hd.push(`Endometrioma no ovário ${lblMin}.`); }
+    if(e.cDermoide){ achs.push(`cisto dermoide medindo ${medStr(e.derD1,e.derD2,e.derD3)}`); hd.push(`Cisto dermoide no ovário ${lblMin}.`); }
+
+    if(achs.length===1) s+=` Presença de ${achs[0]}.`;
+    else if(achs.length>1) s+=` Presença de: ${achs.join('; ')}.`;
+
+    return s;
+  }
+
+  laudoHtml+=`<div class="doc-p">${fraseOvario('D')}</div>`+ovExtraTxt('D',hd);
+  laudoHtml+=`<div class="doc-p">${fraseOvario('E')}</div>`+ovExtraTxt('E',hd);
+
+  // Líquido livre
+  const liq=estado.liquido;
+  let fraseLiq='';
+  if(liq.sit==='ausente'){
+    fraseLiq='Ausência de líquido livre na cavidade pélvica.';
+  } else {
+    const aspMap={anecoico:'anecoico',ecos:'com ecos em suspensão',hetero:'heterogêneo'};
+    const locMap={pélvica:'na cavidade pélvica',douglas:'no fundo de saco de Douglas',periuterino:'em região periuterina / periovarianas',abdominal:'nas cavidades pélvica e abdominal'};
+    fraseLiq=`Presença de ${liq.qtd} quantidade de líquido ${aspMap[liq.aspecto]||liq.aspecto} ${locMap[liq.local]||liq.local}.`;
+    hd.push(`Líquido livre ${locMap[liq.local]||liq.local}.`);
+  }
+  laudoHtml+=`<div class="doc-p">${liqFraseX(fraseLiq)}</div>`;
+  laudoHtml+=extrasAnalise(hd);
+
+  laudoHtml+='</div>';
+
+  // Opinião
+  let opiniao='';
+  if(hd.length===0){
+    opiniao='Estudo ecográfico sem evidentes anormalidades apreciáveis ao método.';
+  } else {
+    opiniao=hd.join('<br>')+'\n<br>Demais estruturas sem evidentes anormalidades apreciáveis ao método.';
+  }
+
+  laudoHtml+=`<div class="doc-secao"><span class="doc-label">IMPRESSÃO DIAGNÓSTICA:</span><div class="doc-p">${opiniao.replace(/\n/g,'')}</div></div>`;
+
+  // Achados adicionais
+  const _ax=achXTxt();
+  if(estado.achados.texto||_ax){
+    laudoHtml+=`<div class="doc-secao"><span class="doc-label">ACHADOS ADICIONAIS:</span><div class="doc-p">${_ax}${_ax&&estado.achados.texto?' ':''}${estado.achados.texto}</div></div>`;
+  }
+
+  laudoHtml+=blocoRecomend();
+  document.getElementById('laudo-doc').innerHTML=laudoHtml;
+}
+
+// Sincronizar inputs dinâmicos que surgem com chkRow/triDim
+function syncInputs(){
+  function getVal(id){ const el=document.getElementById(id); return el?el.value:''; }
+
+  // Útero dims
+  const ud1=getVal('uteD1'),ud2=getVal('uteD2'),ud3=getVal('uteD3');
+  if(ud1!==undefined){ estado.utero.d1=ud1; estado.utero.d2=ud2; estado.utero.d3=ud3; }
+
+  // Miomas
+  if(estado.utero.nod1){
+    estado.utero.nod1d1=getVal('uteN1D1'); estado.utero.nod1d2=getVal('uteN1D2'); estado.utero.nod1d3=getVal('uteN1D3');
+  }
+  if(estado.utero.nod2){
+    estado.utero.nod2d1=getVal('uteN2D1'); estado.utero.nod2d2=getVal('uteN2D2'); estado.utero.nod2d3=getVal('uteN2D3');
+  }
+  if(estado.utero.nodMul){
+    estado.utero.nodMulD1=getVal('uteNMD1'); estado.utero.nodMulD2=getVal('uteNMD2'); estado.utero.nodMulD3=getVal('uteNMD3');
+  }
+
+  // Ovário D
+  estado.ovarioD.d1=getVal('ovaDdD1')||getVal('ovaDdim1')||''; // fallback
+  function syncOva(l){
+    const key='ovario'+l;
+    const e=estado[key];
+    const pf='ova'+l;
+    const fd=getVal(pf+'D1'); if(fd!==undefined){ e.d1=fd||''; e.d2=getVal(pf+'D2')||''; e.d3=getVal(pf+'D3')||''; }
+    if(e.folFun){ e.funD1=getVal(pf+'FunD1'); e.funD2=getVal(pf+'FunD2'); e.funD3=getVal(pf+'FunD3'); }
+    if(e.cLuteo){ e.lutD1=getVal(pf+'LutD1'); e.lutD2=getVal(pf+'LutD2'); e.lutD3=getVal(pf+'LutD3'); }
+    if(e.cSimples){ e.simD1=getVal(pf+'SimD1'); e.simD2=getVal(pf+'SimD2'); e.simD3=getVal(pf+'SimD3'); }
+    if(e.cHem){ e.hemD1=getVal(pf+'HemD1'); e.hemD2=getVal(pf+'HemD2'); e.hemD3=getVal(pf+'HemD3'); }
+    if(e.endometrioma){ e.endD1=getVal(pf+'EndD1'); e.endD2=getVal(pf+'EndD2'); e.endD3=getVal(pf+'EndD3'); }
+    if(e.cDermoide){ e.derD1=getVal(pf+'DerD1'); e.derD2=getVal(pf+'DerD2'); e.derD3=getVal(pf+'DerD3'); }
+  }
+  syncOva('D'); syncOva('E');
+
+  // Endométrio
+  const endEl=document.getElementById('end-esp');
+  if(endEl) estado.endometrio.espessura=endEl.value;
+}
+
+function toggleDark(){
+  const isDark=document.body.classList.toggle('dark');
+  const btn=document.getElementById('btn-dark-toggle');
+  if(isDark){
+    btn.innerHTML='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 8.5A5.5 5.5 0 0 1 6 3c0-.18.01-.36.03-.53A6 6 0 1 0 13.97 9.5c-.15.01-.31.01-.47 0z"/></svg>Modo claro';
+  } else {
+    btn.innerHTML='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro';
+  }
+  localStorage.setItem('darkMode',isDark?'1':'0');
+}
+(function(){ if(localStorage.getItem('darkMode')==='1') toggleDark(); })();
+
+function copiar() {
+  var el = document.getElementById('laudo-doc');
+  if (!el) return;
+  _copyLaudoRichText(el, function(ok) {
+    if (ok) {
+      showToast('Laudo copiado para a área de transferência!');
+    } else {
+      showToast('Falha ao copiar. Use Ctrl+A e Ctrl+C no texto do laudo.');
+    }
+  });
+}
+
+// Intercepta copy manual no dark mode para remover fundo escuro
+document.getElementById('laudo-doc').addEventListener('copy', function(e) {
+  if (!document.body.classList.contains('dark')) return;
+  document.body.classList.remove('dark');
+  document.body.offsetHeight;
+  setTimeout(function() {
+    document.body.classList.add('dark');
+  }, 0);
+});
+
+function showToast(msg) {
+  let t = document.getElementById('toast-notification');
+  t.innerText = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+function imprimir(){
+  const h=document.getElementById('laudo-doc').innerHTML;
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Helvetica,Arial,sans-serif;font-size:10pt;padding:32px;color:#111;line-height:1.65;}.doc-titulo{text-align:center;font-weight:700;text-transform:uppercase;margin-bottom:16px;}.doc-label{font-weight:700;}.doc-p{margin-bottom:8px;}.doc-secao{margin-bottom:14px;}*{color:#111 !important;}.laudo-doc:focus { outline: none; }
+</style></head><body>${h}
+<div id="toast-notification" class="toast-notification">Laudo copiado!</div>
+</body></html>`);
+  w.document.close();
+  w.print();
+}
+function reiniciar(){
+  estado.antecedentes={status:'fertil',gesta:'0',dum:'nc',dumData:'',dumValor:'10',dumUnidade:'dias'};
+  estado.bexiga={sit:'habitual',debris:false,coagulo:false,calculo:false,lesao:false,sonda:false,jatos:'nc'};
+  estado.utero={sit:'habitual',formato:'',desvio:'centrado',flexao:'ante',contornos:'regulares',d1:'',d2:'',d3:'',miometrio:'homogeneo',adenomiose:false,nod1:false,nod1d1:'',nod1d2:'',nod1d3:'',nod1eco:'hipoecogenico',nod1loc:'intramural',nod2:false,nod2d1:'',nod2d2:'',nod2d3:'',nod2eco:'hipoecogenico',nod2loc:'intramural',nodMul:false,nodMulD1:'',nodMulD2:'',nodMulD3:'',nodMulEco:'hipoecogenico',nodMulLoc:'intramural',colo:'habitual',coloCisto:false,coloColpite:false};
+  estado.endometrio={sit:'habitual',espessura:'',car:'habitual',diu:'nao',polipo:false,polipoDim:'',liquido:false};
+  estado.ovarioD={sit:'habitual',d1:'',d2:'',d3:'',loc:'nc',folFun:false,funD1:'',funD2:'',funD3:'',cLuteo:false,lutD1:'',lutD2:'',lutD3:'',cSimples:false,simD1:'',simD2:'',simD3:'',cHem:false,hemD1:'',hemD2:'',hemD3:'',endometrioma:false,endD1:'',endD2:'',endD3:'',cDermoide:false,derD1:'',derD2:'',derD3:'',ncMotivo:'nc',ncLivre:true,mulAte:''};
+  estado.ovarioE={sit:'habitual',d1:'',d2:'',d3:'',loc:'nc',folFun:false,funD1:'',funD2:'',funD3:'',cLuteo:false,lutD1:'',lutD2:'',lutD3:'',cSimples:false,simD1:'',simD2:'',simD3:'',cHem:false,hemD1:'',hemD2:'',hemD3:'',endometrioma:false,endD1:'',endD2:'',endD3:'',cDermoide:false,derD1:'',derD2:'',derD3:'',ncMotivo:'nc',ncLivre:true,mulAte:''};
+  estado.liquido={sit:'ausente',qtd:'discreta',aspecto:'anecoico',local:'pélvica'};
+  estado.achados={texto:''};resetExtras();
+  showSection('antecedentes');
+}
+
+showSection('tecnica');
+</script>
+
+<div id="toast-notification" class="toast-notification">Laudo copiado!</div>
+<script src="../js/copy-pacs.js"></script>
+</body>
+</html>

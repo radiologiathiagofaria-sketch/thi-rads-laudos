@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THI-RADS — US Próstata Abdominal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===== Paleta alinhada ao app obstétrico (slate escuro + ciano) ===== */
+:root{
+  --blue:#0e6a83;--blue-dark:#0c566b;--blue-light:#d3e6ec;--blue-mid:#c0dce5;
+  --surface:#e1e6ee;--border:#c9d1de;--border-strong:#9eacc2;
+  --text:#1b2538;--text-2:#34425b;--text-3:#5c6a83;
+  --white:#f3f5f9;--green:#047857;--red:#c93a3a;--radius:10px;--radius-lg:14px;
+  --hover:#dfeaf0;--sel-bg:#cbe3ec;--focus-ring:rgba(14,106,131,.22);
+}
+body.dark{
+  --blue:#2fa9c2;--blue-dark:#2490a8;--blue-light:#12293d;--blue-mid:#12293d;
+  --surface:#090e19;--border:#1a263b;--border-strong:#33445f;
+  --text:#c9d2e0;--text-2:#a3afc4;--text-3:#7a879f;
+  --white:#0e1626;--green:#2fbf8c;--red:#e07a7a;
+  --hover:#13203a;--sel-bg:#12324a;--focus-ring:rgba(47,169,194,.28);
+}
+body.dark .laudo-doc{color:#e2e6f0;}
+body.dark .laudo-panel{background:var(--white);border-left-color:var(--border);}
+body.dark .laudo-body{background:var(--white);}
+body.dark .laudo-header{background:var(--white);border-bottom-color:var(--border);}
+@media print{
+  body.dark .laudo-doc,
+  body.dark .laudo-doc *{color:#111 !important;}
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',system-ui,sans-serif;font-size:14px;background:var(--surface);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+/* ----- Barra superior ----- */
+.toolbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 22px;display:flex;align-items:center;gap:10px;height:58px;flex-shrink:0;}
+.logo{display:flex;align-items:baseline;gap:8px;margin-right:14px;}
+.logo-name{font-size:20px;font-weight:600;color:var(--blue);letter-spacing:-.3px;}
+.logo-sub{font-size:13px;color:var(--text-3);font-weight:400;}
+.tb-sep{width:1px;height:24px;background:var(--border);margin:0 4px;}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid var(--border-strong);font-weight:500;transition:all .13s;background:var(--white);color:var(--text);}
+.btn:hover{background:var(--hover);border-color:var(--blue);color:var(--blue);}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600;}
+body.dark .btn-primary{color:#06202b;}
+.btn-primary:hover{background:var(--blue-dark);border-color:var(--blue-dark);color:#fff;}
+body.dark .btn-primary:hover{color:#06202b;}
+.btn-danger{background:#f6e6e8;color:var(--red);border-color:#e3a9ad;}
+body.dark .btn-danger{background:#2d1a1f;border-color:#7a3038;}
+.btn-danger:hover{background:#fee2e2;border-color:#f87171;color:var(--red);}
+body.dark .btn-danger:hover{background:#3a2026;}
+.btn svg{width:16px;height:16px;flex-shrink:0;}
+.btn-dark{margin-left:auto;}
+.btn:focus-visible,.nav-item:focus-visible{outline:2px solid var(--blue);outline-offset:2px;}
+
+.body{display:flex;flex:1;overflow:hidden;}
+
+/* ----- Coluna esquerda: navegação ----- */
+.sidebar{width:208px;background:var(--white);border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;}
+.sidebar-hd{padding:16px 16px 14px;border-bottom:1px solid var(--border);}
+.sidebar-tipo{font-size:12px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px;}
+.sidebar-titulo{font-size:19px;font-weight:600;color:var(--text);}
+.nav-group{padding:8px 0;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:15px;color:var(--text-2);cursor:pointer;transition:all .12s;border-left:3px solid transparent;line-height:1.25;}
+.nav-item:hover{background:var(--hover);color:var(--text);}
+.nav-item.active{background:var(--sel-bg);color:var(--blue);border-left-color:var(--blue);font-weight:600;}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.45;flex-shrink:0;}
+.nav-item.active .nav-dot{opacity:1;}
+
+/* ----- Coluna central: formulário ----- */
+.panel{width:560px;flex-shrink:0;overflow-y:auto;padding:18px 18px 26px;background:var(--surface);}
+.panel .doc-p{font-size:14px !important;}
+.sec-title{font-size:19px;font-weight:600;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:9px;}
+.sec-title::before{content:'';display:block;width:4px;height:22px;background:var(--blue);border-radius:2px;}
+.block{margin-bottom:14px;background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden;}
+.block-title{font-size:13px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.6px;padding:11px 16px 10px;border-bottom:1px solid var(--border);background:var(--white);}
+body.dark .block-title{border-bottom-color:var(--border);}
+
+.radio-opt{display:flex;align-items:flex-start;gap:0;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;position:relative;}
+.radio-opt:last-child{border-bottom:none;}
+.radio-opt:hover{background:var(--hover);}
+.radio-opt.selected{background:var(--sel-bg);}
+.radio-opt input[type=radio]{position:absolute;opacity:0;pointer-events:none;}
+.radio-label{display:flex;align-items:center;gap:12px;width:100%;padding:12px 16px;font-size:15px;color:var(--text);line-height:1.4;cursor:pointer;}
+.radio-opt.selected .radio-label{color:var(--blue);font-weight:600;}
+.radio-mark{width:20px;height:20px;border-radius:50%;border:2px solid var(--border-strong);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.radio-opt:hover .radio-mark{border-color:var(--blue);}
+.radio-opt.selected .radio-mark{border-color:var(--blue);background:var(--blue);}
+.radio-mark::after{content:'';width:8px;height:8px;border-radius:50%;background:#fff;opacity:0;transition:opacity .15s;}
+body.dark .radio-mark::after{background:#06202b;}
+.radio-opt.selected .radio-mark::after{opacity:1;}
+
+.check-row{display:flex;align-items:center;gap:0;border-bottom:1px solid var(--border);cursor:pointer;background:var(--surface);}
+.check-row:last-child{border-bottom:none;}
+.check-row:hover{background:var(--hover);}
+.check-row.selected{background:var(--sel-bg);}
+.check-row input[type=checkbox]{position:absolute;opacity:0;pointer-events:none;}
+.check-label{display:flex;align-items:center;gap:12px;width:100%;padding:11px 16px 11px 34px;font-size:14.5px;color:var(--text);cursor:pointer;}
+.check-row.selected .check-label{color:var(--blue);font-weight:600;}
+.check-box{width:19px;height:19px;border-radius:5px;border:2px solid var(--border-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.check-row:hover .check-box{border-color:var(--blue);}
+.check-row.selected .check-box{border-color:var(--blue);background:var(--blue);}
+.check-box svg{display:none;width:12px;height:12px;}
+.check-row.selected .check-box svg{display:block;}
+body.dark .check-box svg{stroke:#06202b;}
+.sel-tag{font-size:13px;border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);margin-left:6px;cursor:pointer;}
+
+.dim-rows{padding:12px 16px;display:flex;flex-direction:column;gap:9px;}
+.dim-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.dim-lbl{flex:1;font-size:14.5px;color:var(--text);}
+.dim-input{width:76px;padding:8px 10px;border:1px solid var(--border-strong);border-radius:8px;font-size:14.5px;font-family:'DM Sans',sans-serif;text-align:center;color:var(--text);background:var(--white);transition:border .12s;}
+.dim-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--focus-ring);}
+.dim-unit{font-size:14px;color:var(--text-3);}
+.nodulo-wrap{padding:12px 16px;display:flex;flex-direction:column;gap:10px;}
+
+.btn-add-lesao{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:600;transition:all .12s;border:1.5px dashed var(--blue);background:transparent;color:var(--blue);width:100%;justify-content:center;}
+.btn-add-lesao:hover{background:var(--sel-bg);}
+.lesao-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 14px;margin-bottom:10px;}
+.lesao-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;}
+.lesao-hd-title{font-size:13px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.5px;}
+.btn-rem{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:6px;font-size:12.5px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;border:1px solid #e3a9ad;background:#f6e6e8;color:var(--red);transition:all .12s;}
+body.dark .btn-rem{background:#2d1a1f;border-color:#7a3038;}
+.btn-rem:hover{background:#fee2e2;}
+body.dark .btn-rem:hover{background:#3a2026;}
+
+.ff-grid{display:flex;gap:11px;flex-wrap:wrap;margin-bottom:8px;}
+.ff{display:flex;flex-direction:column;gap:4px;}
+.ff label{font-size:12px;color:var(--text-2);font-weight:600;text-transform:uppercase;letter-spacing:.3px;}
+.ff select,.ff input[type=text],.ff input[type=number]{font-size:14px;padding:7px 9px;border:1px solid var(--border-strong);border-radius:7px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);}
+.ff select:focus,.ff input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--focus-ring);}
+.ff input[type=text],.ff input[type=number]{width:68px;text-align:center;}
+.inline-select{font-size:14px;padding:6px 9px;border:1px solid var(--border-strong);border-radius:7px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);margin-left:5px;}
+.inline-select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--focus-ring);}
+.inline-num{width:60px;font-size:14px;padding:6px 8px;border:1px solid var(--border-strong);border-radius:7px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);text-align:center;margin:0 2px;}
+.inline-num:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--focus-ring);}
+body.dark .sub-opts{background:var(--hover);border-bottom-color:var(--border);}
+.sub-opt-label{color:var(--text-2);}
+body.dark .sub-opt-label{background:var(--white);color:var(--text);}
+.panel select option{background:var(--white);color:var(--text);}
+
+/* ----- Coluna direita: LAUDO (fonte e estrutura preservadas) ----- */
+.laudo-panel{flex:1;min-width:0;background:var(--white);display:flex;flex-direction:column;border-left:1px solid var(--border);}
+.laudo-header{padding:9px 20px 8px;border-bottom:1px solid var(--border);background:var(--white);display:flex;align-items:center;}
+.laudo-header-title{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.6px;}
+.laudo-body{flex:1;overflow-y:auto;padding:22px 28px;}
+.laudo-doc{font-family:Helvetica,Arial,sans-serif;font-size:10pt;line-height:1.65;color:#111;max-width:720px;}
+.doc-titulo{text-align:center;font-weight:700;font-size:10pt;margin-bottom:16px;text-transform:uppercase;letter-spacing:.3px;}
+.doc-label{font-weight:700;font-size:10pt;}
+.doc-p{margin-bottom:8px;font-size:10pt;}
+.doc-secao{margin-bottom:14px;}
+.laudo-doc:focus { outline: none; }
+
+.toast-notification{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(12px);background:var(--text);color:var(--white);font-size:12.5px;font-weight:500;padding:10px 18px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.18);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;z-index:999;}
+.toast-notification.show{opacity:1;transform:translateX(-50%) translateY(0);}
+body.dark .toast-notification{background:#3a4155;color:#e2e6f0;}
+
+/* --- CUSTOM COMPONENTS RESTORED --- */
+body.dark .btn-dark {background:#2a2f3d;border-color:#3a4155;color:#e2e6f0;}
+body.dark .btn-dark:hover {background:#343a4d;color:#fff;}
+body.dark .dim-input,body.dark .ff select,body.dark .ff input[type=text],body.dark select.sel-tag,body.dark input.dim-input {background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .toolbar {background:var(--white);border-bottom-color:var(--border);}
+body.dark .sidebar {background:var(--white);border-right-color:var(--border);}
+body.dark .sidebar-hd {border-bottom-color:var(--border);}
+body.dark .radio-opt:hover {background:#1e2d4a;}
+body.dark .radio-opt.selected {background:#1e2d4a;}
+body.dark .check-row {background:#1a1f2e;}
+body.dark .check-row:hover {background:#1e2d4a;}
+body.dark .check-row.selected {background:#1e2d4a;}
+body.dark select {background:var(--white);color:var(--text);border-color:var(--border-strong);}
+.sub-opt-label:has(input:checked) {background:var(--blue);color:#fff;border-color:var(--blue);}
+.sub-opt-label input {position:absolute;opacity:0;pointer-events:none;}
+.dim-inline {display:flex;align-items:center;gap:6px;padding:9px 14px;font-size:12px;color:var(--text-2);flex-wrap:wrap;}
+.dim-inline .dim-input {width:54px;}
+.dim-inline .dim-unit {color:var(--text-3);}
+.inline-field {padding:9px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--border);font-size:12px;color:var(--text-2);}
+.inline-field:last-child {border-bottom:none;}
+.inline-field label {color:var(--text-2);}
+
+
+/* --- FIX TEXTAREA --- */
+textarea { background: var(--white); color: var(--text); }
+body.dark textarea { background: var(--white); color: var(--text); border-color: var(--border-strong); }
+
+/* --- PRÓSTATA: componentes extras (mesmas variáveis do tema, claro e escuro) --- */
+.sub-box{padding:8px 14px 10px;background:var(--hover);border-bottom:1px solid var(--border);}
+.sub-box .check-row{background:transparent;border-bottom:none;}
+.sub-box .check-label{padding-left:6px;}
+.block > .dim-inline{border-bottom:1px solid var(--border);}
+.block > .dim-inline:last-child{border-bottom:none;}
+.sub-box .dim-inline{padding:6px 0;}
+.hint{padding:6px 16px 10px;font-size:12px;line-height:1.5;color:var(--text-3);}
+.hint b{color:var(--text-2);}
+.ta{width:100%;border:1px solid var(--border-strong);border-radius:7px;padding:8px 10px;font-family:'DM Sans',sans-serif;font-size:13.5px;color:var(--text);background:var(--white);resize:vertical;}
+.ta:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--focus-ring);}
+.rec-sug{margin:0;padding:10px 16px;font-size:13px;line-height:1.5;color:var(--text-2);background:var(--blue-light);border-top:1px solid var(--border);}
+.rec-sug span{font-size:12px;color:var(--text-3);}
+.radio-opt:focus-visible,.check-row:focus-visible{outline:2px solid var(--blue);outline-offset:-2px;}
+.radio-label > span:last-child,.check-label > span:last-child{min-width:0;}
+@media (max-width:1100px){.panel{width:440px;}}
+/* Pré-visualização com a formatação do modelo em Word: Helvetica 11 pt, justificado, espaçamento simples */
+.laudo-doc{font-family:Helvetica,Arial,sans-serif;font-size:11pt;line-height:1.2;max-width:5.9in;}
+.laudo-doc p{margin:0;}
+</style>
+
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="logo" style="cursor:pointer" onclick="window.location.href='../laudo-thirads.html'"><span class="logo-name">THI-RADS</span><span class="logo-sub">laudo estruturado</span></div>
+  <button class="btn" onclick="window.location.href='../laudo-thirads.html'"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 2L4 8l6 6"/></svg>Voltar</button>
+  <div class="tb-sep"></div>
+  <button class="btn" onclick="copiar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>Copiar laudo</button>
+  <button class="btn btn-primary" onclick="imprimir()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6V2h8v4M4 12H2V7h12v5h-2M4 9h8M4 12v2h8v-2"/></svg>Imprimir</button>
+  <button class="btn btn-dark" id="btn-dark-toggle" onclick="toggleDark()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro</button>
+  <button class="btn btn-danger" onclick="reiniciar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8a6 6 0 1 0 1.5-3.9M2 4v4h4"/></svg>Reiniciar</button>
+</div>
+
+<div class="body">
+  <div class="sidebar">
+    <div class="sidebar-hd"><div class="sidebar-tipo">Ultrassonografia</div><div class="sidebar-titulo">Próstata Abdominal</div></div>
+    <div class="nav-group">
+      <div class="nav-item" id="nav-tecnica" onclick="showSection('tecnica')"><span class="nav-dot"></span>Técnica</div>
+      <div class="nav-item" id="nav-indicacao" onclick="showSection('indicacao')"><span class="nav-dot"></span>Indicação</div>
+      <div class="nav-item" id="nav-bexiga" onclick="showSection('bexiga')"><span class="nav-dot"></span>Bexiga</div>
+      <div class="nav-item" id="nav-prostata" onclick="showSection('prostata')"><span class="nav-dot"></span>Próstata</div>
+      <div class="nav-item" id="nav-vs" onclick="showSection('vs')"><span class="nav-dot"></span>Vesículas Seminais</div>
+      <div class="nav-item" id="nav-comparativo" onclick="showSection('comparativo')"><span class="nav-dot"></span>Exames Comparativos</div>
+      <div class="nav-item" id="nav-achados" onclick="showSection('achados')"><span class="nav-dot"></span>Achados Adicionais</div>
+      <div class="nav-item" id="nav-recomendacoes" onclick="showSection('recomendacoes')"><span class="nav-dot"></span>Recomendações</div>
+    </div>
+  </div>
+
+  <div class="panel" id="main-panel"></div>
+
+  <div class="laudo-panel">
+    <div class="laudo-header"><span class="laudo-header-title">Pré-visualização</span></div>
+    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc" contenteditable="true"></div></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+//  US PRÓSTATA ABDOMINAL — laudo estruturado
+//  O laudo padrão (prostata.txt) é a referência: com tudo no padrão,
+//  a pré-visualização sai idêntica a ele. Os campos estruturados só
+//  trocam/acrescentam frases a partir dele.
+// ═══════════════════════════════════════════════════════════════════
+
+const NOTA_METODO = 'Nota: a avaliação da próstata por ultrassonografia apresenta limitações inerentes ao método, não permitindo excluir completamente lesões focais prostáticas, sobretudo as de pequenas dimensões.';
+
+const novoEstado = () => ({
+  tecnica: { sonda:'convexa', aparelho:'nc', marca:'', modelo:'', reple:'adequada', met:false, bio:false, pos:false },
+  ind: { nc:true, rotina:false, hpb:false, itu:false, psa:false, luts:false, neo:false, pos:false, calc:false, outro:false, outroTxt:'' },
+  bexiga: {
+    sit:'normo', debris:false, coagulo:false, calculo:false, calcMed:'', sonda:false,
+    parede:'normal', dwt:'', cistite:false,
+    div:false, div1:'', div2:'', div3:'', divColo:'',
+    massa:false, massa1:'', massa2:'', massa3:'', massaTopo:'trígono', massaDop:false,
+    preCitar:true, pre1:'', pre2:'', pre3:'', preMan:'',
+    res:'auto', res1:'', res2:'', res3:'', resMan:'',
+    jatos:'nc', jatosLado:'direita'
+  },
+  prostata: {
+    sit:'habitual', autoHPB:false, hpbTipo:'tipo1', hpbCalc:false, hpbCisto:false, hpbComp:false,
+    d1:'', d2:'', d3:'', manterNormal:false, citarAumento:true, citarVol:false, calc:false, rtu:false,
+    ipp:'ausente', ippMed:'', ippGrau:true, ippValvula:false, ippTrigono:false,
+    cisto:'aus', cisto1:'', cisto2:'', cisto3:'', cistoTopo:'linha_media', cistoDebris:false, cistoCranial:false, cistoUretra:false,
+    prost:'aus', prostEdema:false, prostEdemaTipo:'focal', prostDop:false, prostAbs:false, abs1:'', abs2:'', abs3:'',
+    nod:'aus', nod1:'', nod2:'', nodLoc:'posterior', nodLado:'direita', nodCaps:false, nodDop:false
+  },
+  vs: { sit:'habitual', lado:'direita', alt:false, altTipo:'vesiculite', altLado:'bilateral', altDop:'aumento', altProst:false, altCalc:false, altCalcLado:'direita', altCalcMed:'' },
+  cmp: { modo:'nc', metodo:'us', data:'', outro:false, achado:'sem', achDesc:'', comp:'estavel', detalhe:'', varAnt:'', varAtual:'', varUn:'mm', concl:false },
+  ach: {
+    hn:false, hnLado:'direita', hnAP:'', cr:false, crLado:'direita', crMed:'', ure:false, ureLado:'direita', ureCal:'',
+    her:false, herLado:'direita', herCont:'intestinal', herColo:'', herRed:true, lin:false, linLado:'direita', linMed:'',
+    liq:false, liqLocal:'pelve', liqQtd:'pequena', texto:'', nota:true
+  },
+  rec: { incluir:false, clin:false, acomp:false, tc:false, rm:false, rmmp:false, psa:false, cisto:false, tocadas:{}, custom:'' }
+});
+
+let estado = novoEstado();
+let secaoAtual = 'bexiga';
+
+const REC_ITENS = [
+  ['clin',  'correlação clínica',                                'Correlação clínica.'],
+  ['acomp', 'acompanhamento ultrassonográfico seriado',          'Acompanhamento ultrassonográfico seriado.'],
+  ['tc',    'tomografia computadorizada',                        'Tomografia computadorizada.'],
+  ['rm',    'ressonância magnética para complementação',         'Ressonância magnética para complementação.'],
+  ['rmmp',  'ressonância magnética multiparamétrica de próstata','Ressonância magnética multiparamétrica da próstata.'],
+  ['psa',   'correlação com PSA / avaliação urológica',          'Correlação com PSA sérico e avaliação urológica.'],
+  ['cisto', 'avaliação urológica / cistoscopia',                 'Avaliação urológica complementar, incluindo cistoscopia.']
+];
+
+// ── HELPERS ──
+const esc = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const escBr = s => esc(s).replace(/\r?\n/g,'<br>');
+const cap = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+const semPonto = s => String(s || '').trim().replace(/[.\s]+$/,'');
+const getP = path => path.split('.').reduce((o,k) => (o == null ? o : o[k]), estado);
+function setP(path, val){
+  const ks = path.split('.'), last = ks.pop();
+  ks.reduce((o,k) => o[k], estado)[last] = val;
+}
+function n(v){ const x = parseFloat(String(v == null ? '' : v).replace(',','.')); return isNaN(x) ? null : x; }
+function fN(x, dec = 1){ return x === null ? '_' : x.toLocaleString('pt-BR',{minimumFractionDigits:0, maximumFractionDigits:dec}); }
+function fF(x, dec = 1){ return x === null ? '_' : x.toLocaleString('pt-BR',{minimumFractionDigits:dec, maximumFractionDigits:dec}); }
+function juntar(arr){ return arr.length <= 1 ? arr.join('') : arr.slice(0,-1).join(', ') + ' e ' + arr[arr.length-1]; }
+
+// medidas "a x b x c" (ph=true mostra "_" nos campos vazios, como o laudo padrão)
+function dims(prefix, qtd, ph){
+  const vs = [];
+  for (let i = 1; i <= qtd; i++) vs.push(n(getP(prefix + i)));
+  if (ph) return vs.map(v => fN(v)).join(' x ');
+  return vs.filter(v => v !== null).map(v => fN(v)).join(' x ');
+}
+// volume pelo elipsoide (0,52): medidas em mm → cm³
+function volMm(prefix){
+  const a = n(getP(prefix+'1')), b = n(getP(prefix+'2')), c = n(getP(prefix+'3'));
+  return (a !== null && b !== null && c !== null) ? a*b*c*0.52/1000 : null;
+}
+function volProst(){ return volMm('prostata.d'); }
+// bexiga: medidas em cm → mL (valor manual tem prioridade)
+function volBex(pre){
+  const b = estado.bexiga, man = n(b[pre+'Man']);
+  if (man !== null) return man;
+  const x = n(b[pre+'1']), y = n(b[pre+'2']), z = n(b[pre+'3']);
+  return (x !== null && y !== null && z !== null) ? x*y*z*0.52 : null;
+}
+function classeRes(v){
+  if (v === null || v < 30) return 'desprezível';
+  if (v <= 80) return 'pequeno';
+  if (v <= 150) return 'moderado';
+  if (v <= 300) return 'acentuado';
+  return 'muito acentuado';
+}
+function grauIPP(){
+  const m = n(estado.prostata.ippMed);
+  if (m === null || m <= 5) return 1;
+  if (m <= 10) return 2;
+  return 3;
+}
+
+function chkIcon(){ return `<svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.8"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg>`; }
+
+// ── COMPONENTES DO PAINEL (tudo ligado ao estado por data-attributes) ──
+function R(path, val, label, extra = ''){
+  const on = getP(path) === val;
+  return `<div class="radio-opt ${on?'selected':''}" data-set="${path}" data-val="${val}" role="radio" aria-checked="${on}" tabindex="0"><label class="radio-label"><span class="radio-mark"></span><span>${label}${extra}</span></label></div>`;
+}
+function C(path, label, extra = '', indent = false){
+  const on = !!getP(path);
+  return `<div class="check-row ${on?'selected':''}" data-tog="${path}" role="checkbox" aria-checked="${on}" tabindex="0"><label class="check-label" ${indent?'style="padding-left:50px"':''}><span class="check-box">${chkIcon()}</span><span>${label}${extra}</span></label></div>`;
+}
+function NI(path, w = 54, also = ''){
+  return `<input class="dim-input" type="text" inputmode="decimal" data-num data-in="${path}" value="${esc(getP(path))}" placeholder="—" style="width:${w}px;margin:0 4px" ${also?`data-also="${also}"`:''}>`;
+}
+function TI(path, w = 110, also = '', ph = ''){
+  return `<input class="dim-input" type="text" data-in="${path}" value="${esc(getP(path))}" placeholder="${ph||'—'}" style="width:${w}px;margin:0 4px;text-align:left" ${also?`data-also="${also}"`:''}>`;
+}
+function TA(path, h = 90, ph = ''){
+  return `<textarea class="ta" data-in="${path}" placeholder="${ph}" style="height:${h}px">${esc(getP(path))}</textarea>`;
+}
+function S(path, opts, also = ''){
+  const cur = getP(path);
+  return `<select class="sel-tag" data-in="${path}" ${also?`data-also="${also}"`:''}>${opts.map(([v,l]) => `<option value="${v}" ${cur===v?'selected':''}>${l}</option>`).join('')}</select>`;
+}
+function T3(prefix, label, unit, qtd = 3, also = ''){
+  let h = `<div class="dim-inline"><span style="min-width:74px;">${label}</span>`;
+  for (let i = 1; i <= qtd; i++){
+    h += NI(prefix + i, 54, also);
+    if (i < qtd) h += `<span class="dim-unit">×</span>`;
+  }
+  return h + `<span class="dim-unit">${unit}</span></div>`;
+}
+const B = (titulo, corpo) => `<div class="block"><div class="block-title">${titulo}</div>${corpo}</div>`;
+const SUB = h => `<div class="sub-box">${h}</div>`;
+const LAT = [['direita','direita'],['esquerda','esquerda']];
+
+// ── NAVEGAÇÃO ──
+function showSection(sec){
+  secaoAtual = sec;
+  document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+  document.getElementById('nav-' + sec).classList.add('active');
+  renderPanel(sec);
+  updateLaudo();
+  document.getElementById('main-panel').scrollTop = 0;
+}
+function renderPanel(sec){
+  const titles = { tecnica:'Técnica', indicacao:'Indicação', bexiga:'Bexiga', prostata:'Próstata', vs:'Vesículas Seminais', comparativo:'Exames Comparativos', achados:'Achados Adicionais', recomendacoes:'Recomendações' };
+  const fn = { tecnica:renderTecnica, indicacao:renderIndicacao, bexiga:renderBexiga, prostata:renderProstata, vs:renderVS, comparativo:renderComparativo, achados:renderAchados, recomendacoes:renderRecomendacoes };
+  document.getElementById('main-panel').innerHTML = `<div class="sec-title">${titles[sec]}</div>` + fn[sec]();
+  updateInfos();
+}
+function rerender(keep){
+  const panel = document.getElementById('main-panel');
+  const a = document.activeElement;
+  let id = null, s = null, e = null;
+  if (keep && a && a.dataset && a.dataset.in){ id = a.dataset.in; try { s = a.selectionStart; e = a.selectionEnd; } catch(_){} }
+  const sc = panel.scrollTop;
+  renderPanel(secaoAtual);
+  panel.scrollTop = sc;
+  if (id){
+    const el = panel.querySelector(`[data-in="${id}"]`);
+    if (el){ el.focus(); try { if (s !== null && el.setSelectionRange) el.setSelectionRange(s, e); } catch(_){} }
+  }
+}
+
+// ── TÉCNICA ──
+function renderTecnica(){
+  return `
+  ${B('Sonda', R('tecnica.sonda','convexa','transdutor convexo por via transabdominal') + R('tecnica.sonda','nc','não citar'))}
+  ${B('Aparelho', R('tecnica.aparelho','nc','não citar') +
+      R('tecnica.aparelho','citar','citar aparelho dinâmico', ` — marca ${TI('tecnica.marca',96,'tecnica.aparelho=citar')} modelo ${TI('tecnica.modelo',96,'tecnica.aparelho=citar')}`))}
+  ${B('Repleção vesical', R('tecnica.reple','adequada','adequada') + R('tecnica.reple','parcial','parcial') +
+      R('tecnica.reple','excessiva','excessiva (esvaziamento parcial realizado)') + R('tecnica.reple','ausente','ausente'))}
+  ${B('Limitações mais comuns', C('tecnica.met','meteorismo intestinal') + C('tecnica.bio','biotipo (obesidade)') + C('tecnica.pos','limitações de posicionamento'))}`;
+}
+
+// ── INDICAÇÃO ──
+function renderIndicacao(){
+  return B('Indicações mais comuns',
+    C('ind.nc','não citar') + C('ind.rotina','rotina') + C('ind.hpb','hiperplasia prostática benigna') +
+    C('ind.itu','infecções urinárias de repetição') + C('ind.psa','PSA elevado') +
+    C('ind.luts','sintomas do trato urinário inferior (LUTS)') + C('ind.neo','suspeita de neoplasia prostática') +
+    C('ind.pos','avaliação pós-tratamento (quimioterapia / radioterapia)') + C('ind.calc','cálculos prostáticos') +
+    C('ind.outro','outra indicação:', ` ${TI('ind.outroTxt',220,'ind.outro=true')}`));
+}
+
+// ── BEXIGA ──
+function renderBexiga(){
+  const b = estado.bexiga;
+  return `
+  ${B('Repleção',
+      R('bexiga.sit','normo','normodistendida (habitual)') + R('bexiga.sit','parcial','parcialmente repleta') +
+      R('bexiga.sit','vazia','vazia') + R('bexiga.sit','bexigoma','bexigoma / retenção urinária') + R('bexiga.sit','nc','não citar a bexiga'))}
+  ${b.sit === 'nc' ? '' : `
+  ${B('Parede vesical',
+      R('bexiga.parede','normal','regular e de espessura normal') +
+      R('bexiga.parede','esforco','espessada e trabeculada (bexiga de esforço)') +
+      R('bexiga.parede','espessada','espessamento parietal difuso') +
+      (b.parede === 'espessada' ? C('bexiga.cistite','compatível com cistite','',true) : '') +
+      `<div class="inline-field"><label>espessura da parede (opcional)</label>${NI('bexiga.dwt',54)}<span class="dim-unit">mm</span></div>
+       <div class="hint" id="info-dwt"></div>`)}
+  ${B('Conteúdo / achados',
+      C('bexiga.debris','debris em suspensão') + C('bexiga.coagulo','coágulo') +
+      C('bexiga.calculo','cálculo vesical') +
+      (b.calculo ? SUB(`<div class="inline-field" style="border:0;padding:0">medindo ${NI('bexiga.calcMed',54)} cm</div>`) : '') +
+      C('bexiga.sonda','sonda vesical de demora (balão de fixação)') +
+      C('bexiga.div','divertículo vesical') +
+      (b.div ? SUB(T3('bexiga.div','medindo','cm') + `<div class="inline-field" style="border:0;padding:6px 0 0">colo medindo ${NI('bexiga.divColo',54)} cm</div>`) : '') +
+      C('bexiga.massa','massa / lesão focal parietal vesical') +
+      (b.massa ? SUB(T3('bexiga.massa','medindo','cm') +
+        `<div class="inline-field" style="border:0;padding:6px 0 0">topografia ${S('bexiga.massaTopo',[['trígono','trígono'],['base','base'],['parede lateral','parede lateral'],['domo','domo'],['parede posterior','parede posterior'],['parede anterior','parede anterior']])}</div>` +
+        C('bexiga.massaDop','vascularizada ao Doppler','',true)) : ''))}
+  ${B('Volumes',
+      C('bexiga.preCitar','citar volume pré-miccional') +
+      (b.preCitar ? SUB(T3('bexiga.pre','medidas','cm') +
+         `<div class="inline-field" style="border:0;padding:6px 0 0">ou volume direto ${NI('bexiga.preMan',60)} mL</div><div class="hint" id="info-pre" style="padding:4px 0 0"></div>`) : '') +
+      R('bexiga.res','auto','citar volume pós-miccional (classificação automática)') +
+      (b.res === 'auto' ? SUB(T3('bexiga.res','medidas','cm') +
+         `<div class="inline-field" style="border:0;padding:6px 0 0">ou volume direto ${NI('bexiga.resMan',60)} mL</div><div class="hint" id="info-res" style="padding:4px 0 0"></div>`) : '') +
+      R('bexiga.res','sondado','paciente sondado / sem avaliação de resíduo') +
+      R('bexiga.res','nc','não citar volume pós-miccional'))}
+  ${B('Jatos ureterais',
+      R('bexiga.jatos','nc','não citar') + R('bexiga.jatos','presentes','presentes e simétricos') +
+      R('bexiga.jatos','reduzidos','reduzidos à', ` ${S('bexiga.jatosLado',LAT,'bexiga.jatos=reduzidos')}`) +
+      R('bexiga.jatos','ausentes','não caracterizados durante o período de observação'))}`}`;
+}
+
+// ── PRÓSTATA ──
+function renderProstata(){
+  const p = estado.prostata;
+  return `
+  ${B('Situação / padrão principal',
+      R('prostata.sit','habitual','próstata normal / habitual') +
+      R('prostata.sit','het','parênquima heterogêneo') +
+      R('prostata.sit','hetcalc','parênquima heterogêneo com calcificações') +
+      R('prostata.sit','hpb','hiperplasia prostática benigna (HPB) / dimensões aumentadas') +
+      (p.sit === 'hpb' ? SUB(
+        `<div class="inline-field" style="border:0;padding:0 0 6px">padrão ${S('prostata.hpbTipo',[['tipo1','tipo 1 - bilateral'],['tipo2','tipo 2 - bilateral + mediano'],['tipo3','tipo 3 - mediano isolado']])}</div>` +
+        C('prostata.hpbCalc','calcificações grosseiras em cápsula / parênquima') +
+        C('prostata.hpbCisto','cistos de degeneração') +
+        C('prostata.hpbComp','compressão e desvio da uretra prostática') +
+        C('prostata.citarAumento','citar aumento volumétrico na impressão (senão cita só o volume)')) : '') +
+      R('prostata.sit','ausente','ausente / status pós-prostatectomia'))}
+  ${p.sit === 'ausente' ? '' : `
+  ${B('Medidas e cálculos',
+      T3('prostata.d','medidas','mm') +
+      `<div class="hint" id="info-prostata"></div>` +
+      C('prostata.manterNormal','manter próstata normal mesmo com volume acima da referência') +
+      C('prostata.citarVol','citar também o volume (cm³) no laudo'))}
+  ${B('Variações da normalidade / achados incidentais',
+      C('prostata.calc','calcificações prostáticas / corpos amiláceos') +
+      C('prostata.rtu','pós-operatório / sinais de RTU prévia'))}
+  ${B('Lobo mediano / protrusão prostática intravesical (IPP)',
+      R('prostata.ipp','ausente','ausente') + R('prostata.ipp','nc','não citar') +
+      R('prostata.ipp','protusao','protrusão presente, IPP medindo', ` ${NI('prostata.ippMed',54,'prostata.ipp=protusao')} mm`) +
+      (p.ipp === 'protusao' ? SUB(
+        `<div class="hint" id="info-ipp" style="padding:0 0 4px"></div>` +
+        C('prostata.ippGrau','citar grau da IPP no laudo e na impressão') +
+        C('prostata.ippValvula','efeito de massa / ball-valve') +
+        C('prostata.ippTrigono','assimetria do trígono vesical')) : ''))}
+  ${B('Cistos prostáticos e periprostáticos',
+      R('prostata.cisto','aus','ausente / não citar') + R('prostata.cisto','pres','formação cística') +
+      (p.cisto === 'pres' ? SUB(
+        T3('prostata.cisto','medindo','mm') +
+        `<div class="inline-field" style="border:0;padding:6px 0 4px">topografia ${S('prostata.cistoTopo',[['linha_media','linha média'],['paramediano','paramediano'],['lateral','lateral / zona de transição'],['extra','extra-prostático']])}</div>` +
+        C('prostata.cistoDebris','conteúdo espesso / hemorrágico com ecos internos') +
+        C('prostata.cistoCranial','extensão cranial / ducto de Müller') +
+        C('prostata.cistoUretra','comunicação uretral / utrículo')) : ''))}
+  ${B('Prostatite / abscesso',
+      R('prostata.prost','aus','ausente / não citar') + R('prostata.prost','pres','sinais de prostatite') +
+      (p.prost === 'pres' ? SUB(
+        C('prostata.prostEdema','edema', ` ${S('prostata.prostEdemaTipo',[['focal','área focal'],['difuso','padrão difuso']],'prostata.prostEdema=true')}`) +
+        C('prostata.prostDop','hiperemia ao Doppler') +
+        C('prostata.prostAbs','abscesso') +
+        (p.prostAbs ? T3('prostata.abs','medindo','mm') : '')) : ''))}
+  ${B('Nódulo prostático suspeito',
+      R('prostata.nod','aus','ausente / não citar') + R('prostata.nod','pres','nódulo suspeito') +
+      (p.nod === 'pres' ? SUB(
+        T3('prostata.nod','medindo','mm',2) +
+        `<div class="inline-field" style="border:0;padding:6px 0 4px">localização ${S('prostata.nodLoc',[['posterior','posterior'],['periférica','periférica'],['da base','da base'],['do ápice','do ápice']])} à ${S('prostata.nodLado',LAT)}</div>` +
+        C('prostata.nodCaps','abaulamento / irregularidade capsular') +
+        C('prostata.nodDop','vascularização interna anômala / assimétrica ao Doppler')) : ''))}`}`;
+}
+
+// ── VESÍCULAS SEMINAIS ──
+function renderVS(){
+  const v = estado.vs;
+  return `
+  ${B('Situação',
+      R('vs.sit','habitual','sem alterações ultrassonográficas') +
+      R('vs.sit','assim','presentes e assimétricas, com proeminência à', ` ${S('vs.lado',LAT,'vs.sit=assim')}`) +
+      R('vs.sit','ausentes','ausentes') +
+      R('vs.sit','nc','não visibilizadas / limitação técnica'))}
+  ${B('Vesiculite / obstrução',
+      C('vs.alt','alteração das vesículas seminais') +
+      (v.alt ? SUB(
+        `<div class="inline-field" style="border:0;padding:0 0 6px">padrão ${S('vs.altTipo',[['vesiculite','vesiculite'],['obstrucao','dilatação / obstrução']])}
+          lateralidade ${S('vs.altLado',[['bilateral','bilateral'],['direita','direita'],['esquerda','esquerda']])}</div>` +
+        (v.altTipo === 'vesiculite' ? `<div class="inline-field" style="border:0;padding:0 0 6px">Doppler ${S('vs.altDop',[['aumento','aumento da vascularização'],['sem_aumento','ausência de aumento da vascularização']])}</div>` : '') +
+        C('vs.altProst','associação com prostatite') +
+        C('vs.altCalc','cálculo seminal à', ` ${S('vs.altCalcLado',LAT,'vs.altCalc=true')} medindo ${NI('vs.altCalcMed',54,'vs.altCalc=true')} mm`)) : ''))}`;
+}
+
+// ── EXAMES COMPARATIVOS ──
+function renderComparativo(){
+  const c = estado.cmp;
+  const comp = (v, l) => R('cmp.comp', v, l);
+  return `
+  ${B('Comparação', R('cmp.modo','nc','não citar') + R('cmp.modo','indisp','exames anteriores não disponíveis para comparação') + R('cmp.modo','citar','citar exame anterior'))}
+  ${c.modo !== 'citar' ? '' : `
+  ${B('Dados do exame anterior',
+      `<div class="inline-field"><label>método</label>${S('cmp.metodo',[['us','ultrassonografia'],['tc','tomografia computadorizada'],['rm','ressonância magnética'],['rmmp','ressonância magnética multiparamétrica de próstata']])}</div>
+       <div class="inline-field"><label>data</label><input type="date" class="sel-tag" style="margin-left:0" data-in="cmp.data" value="${esc(c.data)}"></div>` +
+      C('cmp.outro','exame realizado em outro serviço'))}
+  ${B('Achado prévio',
+      R('cmp.achado','sem','sem achados relevantes') + R('cmp.achado','com','achado descrito no exame anterior') +
+      (c.achado === 'com' ? `<div style="padding:10px 14px">${TA('cmp.achDesc',70,'Descrição do achado prévio...')}</div>` : ''))}
+  ${B('Comparação com o exame atual',
+      comp('estavel','estável, sem alterações significativas') + comp('aumento','aumento do achado prévio') + comp('reducao','redução do achado prévio') +
+      comp('surgimento','surgimento de novo achado') + comp('resolucao','resolução do achado prévio') + comp('naoident','achado prévio não identificado no exame atual') +
+      `<div style="padding:10px 14px">${TA('cmp.detalhe',60,'Detalhar (opcional)...')}</div>`)}
+  ${B('Variação dimensional (opcional)',
+      `<div class="inline-field">anterior: ${NI('cmp.varAnt',60)} atual: ${NI('cmp.varAtual',60)} ${S('cmp.varUn',[['mm','mm'],['cm','cm']])}</div>` +
+      C('cmp.concl','citar a comparação na impressão diagnóstica'))}`}`;
+}
+
+// ── ACHADOS ADICIONAIS ──
+function renderAchados(){
+  const a = estado.ach;
+  const LQ = [['pelve','na escavação pélvica'],['hepatorrenal','no espaço hepatorrenal'],['difuso','difuso na cavidade abdominal']];
+  return `
+  ${B('Achados incidentais mais comuns',
+      C('ach.hn','hidronefrose no rim', ` ${S('ach.hnLado',[['direita','direito'],['esquerda','esquerdo']],'ach.hn=true')} · pelve AP ${NI('ach.hnAP',54,'ach.hn=true')} cm`) +
+      C('ach.cr','cálculo renal no rim', ` ${S('ach.crLado',[['direita','direito'],['esquerda','esquerdo']],'ach.cr=true')} · medindo ${NI('ach.crMed',54,'ach.cr=true')} cm`) +
+      C('ach.ure','dilatação do ureter distal', ` ${S('ach.ureLado',[['direita','direito'],['esquerda','esquerdo']],'ach.ure=true')} · calibre ${NI('ach.ureCal',54,'ach.ure=true')} cm`) +
+      C('ach.her','hérnia inguinal à', ` ${S('ach.herLado',LAT,'ach.her=true')}`) +
+      (a.her ? SUB(`<div class="inline-field" style="border:0;padding:0 0 6px">conteúdo ${S('ach.herCont',[['intestinal','intestinal'],['adiposo','adiposo']])} · colo ${NI('ach.herColo',54)} cm</div>` + C('ach.herRed','redutível à compressão')) : '') +
+      C('ach.lin','linfonodomegalia na cadeia ilíaca', ` ${S('ach.linLado',LAT,'ach.lin=true')} · medindo ${NI('ach.linMed',54,'ach.lin=true')} cm`) +
+      C('ach.liq','líquido livre', ` ${S('ach.liqLocal',LQ,'ach.liq=true')} em ${S('ach.liqQtd',[['pequena','pequena'],['moderada','moderada'],['grande','grande']],'ach.liq=true')} quantidade`))}
+  ${B('Texto livre', `<div style="padding:10px 14px">${TA('ach.texto',140,'Descreva achados adicionais aqui...')}</div>`)}
+  ${B('Nota sobre o método', C('ach.nota','incluir a nota sobre as limitações do método ao final do laudo'))}`;
+}
+
+// ── RECOMENDAÇÕES ──
+function sugestoesRec(){
+  const s = {}, p = estado.prostata, b = estado.bexiga;
+  if (p.sit !== 'ausente'){
+    if (p.nod === 'pres'){ s.rmmp = true; s.psa = true; }
+    if (p.sit === 'hpb') s.psa = true;
+    if (p.prost === 'pres' && p.prostAbs){ s.clin = true; s.tc = true; }
+  }
+  if (b.sit !== 'nc'){
+    if (b.massa){ s.cisto = true; s.clin = true; }
+    if (b.sit === 'bexigoma') s.clin = true;
+  }
+  return s;
+}
+function autoRec(){
+  const r = estado.rec, s = sugestoesRec();
+  REC_ITENS.forEach(([id]) => { if (!r.tocadas[id]) r[id] = !!s[id]; });
+}
+function renderRecomendacoes(){
+  const s = sugestoesRec(), ids = Object.keys(s);
+  const sug = ids.length ? `<div class="rec-sug"><b>Sugeridas pelos achados:</b> ${ids.map(id => REC_ITENS.find(x => x[0] === id)[1]).join('; ')}.<br><span>Marque ou desmarque manualmente para sobrescrever a sugestão.</span></div>` : '';
+  return `
+  ${B('Bloco no laudo', C('rec.incluir','incluir bloco de RECOMENDAÇÕES no laudo final') + sug)}
+  ${B('Complementares', REC_ITENS.map(([id,l]) => C('rec.' + id, l)).join(''))}
+  ${B('Recomendações adicionais', `<div style="padding:10px 14px">${TA('rec.custom',120,'Uma recomendação por linha...')}</div>`)}`;
+}
+
+// ═══════════════ INTERAÇÃO ═══════════════
+function hooks(path){
+  let mudou = false;
+  if (path.startsWith('ind.')){
+    const i = estado.ind, k = path.slice(4);
+    if (k === 'nc' && i.nc){ Object.keys(i).forEach(x => { if (x !== 'nc' && x !== 'outroTxt') i[x] = false; }); mudou = true; }
+    else if (k !== 'nc' && k !== 'outroTxt' && i[k]){ i.nc = false; mudou = true; }
+    if (!Object.keys(i).some(x => x !== 'nc' && x !== 'outroTxt' && i[x])){ if (!i.nc){ i.nc = true; mudou = true; } }
+  }
+  if (path === 'tecnica.reple'){ sincPreparoBexiga('prep'); mudou = true; }
+  if (path === 'bexiga.sit'){ sincPreparoBexiga('bex'); mudou = true; }
+  if (path === 'prostata.sit'){
+    estado.prostata.autoHPB = false;
+    if (estado.prostata.sit === 'hpb') estado.prostata.manterNormal = false;
+    mudou = true;
+  }
+  if (path === 'prostata.manterNormal'){
+    if (estado.prostata.manterNormal && estado.prostata.sit === 'hpb'){ estado.prostata.sit = 'habitual'; estado.prostata.autoHPB = false; }
+    mudou = true;
+  }
+  if (/^prostata\.d[123]$/.test(path)) mudou = autoHPB() || mudou;
+  if (path.startsWith('rec.')){ const id = path.slice(4); if (REC_ITENS.some(x => x[0] === id)) estado.rec.tocadas[id] = true; }
+  return mudou;
+}
+// volume acima da referência → HPB automaticamente (a menos que "manter normal")
+function autoHPB(){
+  const p = estado.prostata;
+  if (p.sit === 'ausente' || p.sit === 'het' || p.sit === 'hetcalc'){ p.autoHPB = false; return false; }
+  if (p.manterNormal){
+    if (p.sit === 'hpb' && p.autoHPB){ p.sit = 'habitual'; p.autoHPB = false; return true; }
+    return false;
+  }
+  const v = volProst();
+  if (v === null) return false;
+  if (v > 30 && p.sit !== 'hpb'){ p.sit = 'hpb'; p.autoHPB = true; return true; }
+  if (v <= 30 && p.sit === 'hpb' && p.autoHPB){ p.sit = 'habitual'; p.autoHPB = false; return true; }
+  return false;
+}
+// repleção na Técnica x situação da bexiga: só se corrigem quando se contradizem
+const GRUPOS_PREPARO = [
+  { prep:['adequada','excessiva'], bex:['normo','bexigoma'], prepPadrao:'adequada', bexPadrao:'normo' },
+  { prep:['parcial'],              bex:['parcial'],          prepPadrao:'parcial',  bexPadrao:'parcial' },
+  { prep:['ausente'],              bex:['vazia'],            prepPadrao:'ausente',  bexPadrao:'vazia' }
+];
+function sincPreparoBexiga(origem){
+  const prep = estado.tecnica.reple, bex = estado.bexiga.sit;
+  if (bex === 'nc') return;
+  const g = GRUPOS_PREPARO.find(g => origem === 'prep' ? g.prep.includes(prep) : g.bex.includes(bex));
+  if (!g) return;
+  if (origem === 'prep'){ if (!g.bex.includes(bex)) estado.bexiga.sit = g.bexPadrao; }
+  else { if (!g.prep.includes(prep)) estado.tecnica.reple = g.prepPadrao; }
+}
+function aplicarAlso(str){
+  let mudou = false;
+  str.split(';').forEach(par => {
+    const i = par.indexOf('='); if (i < 0) return;
+    const p = par.slice(0,i), raw = par.slice(i+1);
+    const val = raw === 'true' ? true : raw === 'false' ? false : raw;
+    if (getP(p) !== val){ setP(p, val); hooks(p); mudou = true; }
+  });
+  return mudou;
+}
+function aplicar(path, val){
+  setP(path, val);
+  hooks(path);
+  rerender(false);
+  updateLaudo();
+}
+
+(function ligarEventos(){
+  const panel = document.getElementById('main-panel');
+  panel.addEventListener('click', e => {
+    if (e.target.closest('select,input,textarea')) return;
+    const r = e.target.closest('[data-set]');
+    if (r){ aplicar(r.dataset.set, r.dataset.val); return; }
+    const t = e.target.closest('[data-tog]');
+    if (t) aplicar(t.dataset.tog, !getP(t.dataset.tog));
+  });
+  panel.addEventListener('keydown', e => {
+    if ((e.key === ' ' || e.key === 'Enter') && e.target.matches('[data-set],[data-tog]')){ e.preventDefault(); e.target.click(); }
+  });
+  panel.addEventListener('input', e => {
+    const el = e.target, path = el.dataset && el.dataset.in;
+    if (!path) return;
+    if (el.dataset.num !== undefined){
+      const v = el.value.replace(/[^0-9.,]/g,'');
+      if (v !== el.value) el.value = v;
+    }
+    setP(path, el.value);
+    let render = el.tagName === 'SELECT';
+    if (el.dataset.also && aplicarAlso(el.dataset.also)) render = true;
+    if (hooks(path)) render = true;
+    if (render) rerender(true);
+    updateLaudo();
+  });
+})();
+
+// ═══════════════ GERAÇÃO DO LAUDO ═══════════════
+function updateInfos(){
+  const set = (id, h) => { const el = document.getElementById(id); if (el) el.innerHTML = h; };
+  const v = volProst();
+  set('info-prostata', v === null
+    ? 'Preencha as três medidas para calcular volume e peso. Referência: volume até 30,0 cm³ ou peso até 31,5 g.'
+    : `Volume: <b>${fF(v)} cm³</b> · Peso estimado: <b>${fF(v*1.05)} g</b> (referência: até 30,0 cm³ / 31,5 g)${v > 30 ? ' · <b style="color:var(--red)">acima da referência</b>' : ''}`);
+  const vp = volBex('pre');
+  set('info-pre', vp === null ? '' : `Volume: <b>${Math.round(vp)} mL</b>`);
+  const vr = volBex('res');
+  set('info-res', vr === null ? 'Sem valor informado: o laudo cita volume desprezível.' : `Volume: <b>${Math.round(vr)} mL</b> · classificação: <b>${classeRes(vr)}</b>`);
+  set('info-ipp', n(estado.prostata.ippMed) === null ? 'Grau 1 (até 5 mm) · grau 2 (5 a 10 mm) · grau 3 (acima de 10 mm).' : `Grau calculado: <b>${grauIPP()}</b>`);
+  const d = n(estado.bexiga.dwt);
+  set('info-dwt', d !== null && d > 3 ? '<span style="color:var(--red)">Acima da referência (até 3,0 mm com bexiga repleta).</span>' : 'Referência normal: até 3,0 mm com bexiga repleta.');
+}
+
+function txtTecnica(){
+  const t = estado.tecnica;
+  const sonda = t.sonda === 'convexa' ? 'com transdutor convexo por via transabdominal' : '';
+  let frase = '';
+  if (t.aparelho === 'citar'){
+    frase = `Exame realizado em aparelho dinâmico marca ${esc(t.marca.trim() || '_')}, modelo ${esc(t.modelo.trim() || '_')}` + (sonda ? `, ${sonda}` : '');
+  } else if (sonda){
+    frase = `Exame realizado ${sonda}`;
+  }
+  const lim = [];
+  if (t.met) lim.push('por distensão gasosa intestinal');
+  if (t.bio) lim.push('pela atenuação do feixe acústico inerente ao biotipo');
+  if (t.pos) lim.push('devido a restrições de posicionamento e cooperação');
+  if (lim.length) frase = frase ? `${frase}, limitado parcialmente ${juntar(lim)}` : `Exame limitado parcialmente ${juntar(lim)}`;
+  if (t.reple !== 'adequada'){
+    const c = 'avaliação vesical prejudicada devido ao preparo inadequado';
+    frase = frase ? `${frase}, com ${c}` : `Exame realizado com ${c}`;
+  }
+  return frase ? frase + '.' : '';
+}
+
+function txtIndicacao(){
+  const i = estado.ind;
+  if (i.nc) return '';
+  const m = [['rotina','rotina'],['hpb','hiperplasia prostática benigna'],['itu','infecções urinárias de repetição'],['psa','PSA elevado'],
+             ['luts','sintomas do trato urinário inferior (LUTS)'],['neo','suspeita de neoplasia prostática'],['pos','avaliação pós-tratamento oncológico'],['calc','cálculos prostáticos']];
+  const itens = m.filter(([k]) => i[k]).map(([,l]) => l);
+  if (i.outro && i.outroTxt.trim()) itens.push(esc(semPonto(i.outroTxt).replace(/^./, c => c.toLowerCase())));
+  return itens.length ? cap(juntar(itens)) + '.' : '';
+}
+
+function txtBexiga(hd, hdRes){
+  const b = estado.bexiga, L = [];
+  if (b.sit === 'nc') return L;
+
+  // 1) base (padrão: "Bexiga urinária normodistendida, com conteúdo anecóide e não apresentando litíase.")
+  const conteudos = [];
+  if (b.debris) conteudos.push('debris em suspensão');
+  if (b.coagulo) conteudos.push('coágulo');
+  const conteudo = conteudos.length ? `com conteúdo heterogêneo à custa de ${juntar(conteudos)}` : 'com conteúdo anecóide';
+  const med = n(b.calcMed);
+  const lit = b.calculo ? `apresentando cálculo${med !== null ? ` medindo ${fN(med)} cm` : ''}` : 'não apresentando litíase';
+  if (b.sit === 'normo') L.push(`Bexiga urinária normodistendida, ${conteudo} e ${lit}.`);
+  else if (b.sit === 'parcial') L.push(`Bexiga urinária parcialmente repleta, ${conteudo} e ${lit}.`);
+  else if (b.sit === 'bexigoma') L.push(`Bexiga urinária acentuadamente distendida, ${conteudo} e ${lit}, com aspecto compatível com retenção urinária (bexigoma).`);
+  else L.push('Bexiga urinária vazia, com avaliação limitada.');
+
+  // 2) parede (padrão: "Parede vesical regular e de espessura normal.")
+  const dwt = n(b.dwt);
+  const dwtTxt = dwt !== null ? `, medindo ${fF(dwt)} mm` : '';
+  if (b.sit !== 'vazia'){
+    const lim = b.sit === 'parcial' ? ', com avaliação limitada pela repleção parcial' : '';
+    if (b.parede === 'normal') L.push(`Parede vesical regular e de espessura normal${dwtTxt}${lim}.`);
+    else if (b.parede === 'esforco') L.push(`Parede vesical espessada, com irregularidades da superfície mucosa e múltiplas trabeculações (aspecto de bexiga de esforço)${dwtTxt}${dwt !== null ? ' (referência normal até 3,0 mm com bexiga repleta)' : ''}${lim}.`);
+    else L.push(`Parede vesical com espessamento difuso e irregular${dwtTxt}${lim}.`);
+  }
+
+  // 3) volumes (padrão: "Volume vesical pré-miccional: mL." / "Volume vesical pós-miccional desprezível: mL.")
+  if (b.preCitar){
+    const vp = volBex('pre');
+    L.push(`Volume vesical pré-miccional: ${vp === null ? '_' : Math.round(vp)} mL.`);
+  }
+  let vr = null;
+  if (b.res === 'auto'){
+    vr = volBex('res');
+    L.push(`Volume vesical pós-miccional ${classeRes(vr)}: ${vr === null ? '_' : Math.round(vr)} mL.`);
+  } else if (b.res === 'sondado'){
+    L.push('Resíduo pós-miccional não avaliável em razão da sonda vesical de demora.');
+  }
+
+  // 4) jatos e achados
+  if (b.jatos === 'presentes') L.push('Jatos ureterais presentes e simétricos ao estudo Doppler colorido.');
+  if (b.jatos === 'reduzidos'){
+    L.push(`Jatos ureterais presentes bilateralmente, porém com redução do jato ureteral à ${b.jatosLado}.`);
+    hd.push(`Redução do jato ureteral à ${b.jatosLado}, achado que pode estar relacionado a fator obstrutivo ipsilateral.`);
+  }
+  if (b.jatos === 'ausentes'){
+    L.push('Jatos ureterais não caracterizados bilateralmente durante o período de observação.');
+    hd.push('Jatos ureterais não caracterizados bilateralmente durante o período de observação.');
+  }
+  if (b.sonda){
+    L.push('Presença de sonda vesical de demora, com o balão de fixação insuflado no interior da luz vesical.');
+    hd.push('Sonda vesical in situ.');
+  }
+  if (b.div){
+    const m = dims('bexiga.div', 3, false), colo = n(b.divColo);
+    const v = (() => { const x = n(b.div1), y = n(b.div2), z = n(b.div3); return (x !== null && y !== null && z !== null) ? x*y*z*0.52 : null; })();
+    L.push(`Formação sacular anecoica que se projeta para fora dos limites da parede vesical${m ? `, medindo ${m} cm` : ''}${v !== null ? `, com volume de ${fF(v)} cm³` : ''}, comunicando-se com a luz vesical${colo !== null ? ` por meio de colo de ${fN(colo)} cm` : ''}.`);
+    hd.push('Divertículo vesical.');
+  }
+  if (b.massa){
+    const m = dims('bexiga.massa', 3, false);
+    const topo = { 'trígono':'do trígono', 'base':'da base', 'parede lateral':'da parede lateral', 'domo':'do domo', 'parede posterior':'da parede posterior', 'parede anterior':'da parede anterior' }[b.massaTopo] || 'da base';
+    let fm = `Lesão tecidual sólida vesical, fixamente aderida à parede, sem mobilidade às mudanças de decúbito${m ? `, medindo ${m} cm` : ''}, localizada na região ${topo}.`;
+    if (b.massaDop) fm += ' Ao estudo com Doppler colorido, observa-se sinal de fluxo vascular no interior da lesão.';
+    L.push(fm);
+    hd.push('Massa sólida vesical. O aspecto impõe o diagnóstico diferencial com processo neoplásico primário (ex.: tumor urotelial).');
+  }
+
+  // 5) impressão (exceto o resíduo, que fecha a lista como no padrão)
+  if (b.sit === 'bexigoma') hd.unshift('Bexigoma / retenção urinária.');
+  if (b.sit === 'parcial' || b.sit === 'vazia') hd.unshift('Repleção vesical insuficiente, o que limita a avaliação das paredes.');
+  if (b.debris) hd.push('Bexiga contendo debris em seu interior.');
+  if (b.coagulo) hd.push('Coágulo vesical.');
+  if (b.calculo) hd.push('Cálculo vesical.');
+  if (b.parede === 'esforco') hd.push('Sinais de bexiga de esforço.');
+  if (b.parede === 'espessada') hd.push(b.cistite ? 'Espessamento parietal vesical difuso, compatível com cistite.' : 'Espessamento parietal vesical difuso, achado inespecífico ao método.');
+  if (b.res === 'auto'){
+    const c = classeRes(vr);
+    hdRes.push(`Volume pós-miccional ${c}${c !== 'desprezível' && vr !== null ? ` (${Math.round(vr)} mL)` : ''}.`);
+  }
+  return L;
+}
+
+function txtProstata(hd){
+  const p = estado.prostata, L = [];
+  if (p.sit === 'ausente'){
+    L.push('Próstata não caracterizada (status pós-cirúrgico).');
+    hd.push('Status pós-prostatectomia.');
+    return { linhas:L, ipp:'', ausente:true };
+  }
+  const v = volProst(), peso = v === null ? null : v * 1.05;
+  const hpb = p.sit === 'hpb', prost = p.prost === 'pres';
+
+  // morfologia (padrão: "Próstata de morfologia e contornos normais.")
+  if (hpb){
+    const tipo = { tipo1:'crescimento simétrico e predominante dos lobos laterais',
+                   tipo2:'crescimento dos lobos laterais associado a hipertrofia do lobo mediano, com abaulamento em direção ao assoalho vesical',
+                   tipo3:'crescimento predominante às custas da hipertrofia do lobo mediano' }[p.hpbTipo];
+    L.push(`Próstata de dimensões aumentadas e contornos lobulados, com crescimento da glândula interna caracterizado por ${tipo}.`);
+  } else if (prost){
+    L.push('Próstata de dimensões aumentadas e contornos globosos.');
+  } else {
+    L.push('Próstata de morfologia e contornos normais.');
+  }
+  // dimensões e peso (padrão: "Dimensões prostáticas: a x b x c mm." / "Peso prostático estimado em x gramas.")
+  L.push(`Dimensões prostáticas: ${dims('prostata.d', 3, true)} mm.`);
+  L.push(`Peso prostático estimado em ${peso === null ? '_' : fF(peso)} gramas${p.citarVol ? `, com volume de ${v === null ? '_' : fF(v)} cm³` : ''}.`);
+  // parênquima (padrão: "Parênquima prostático com ecotextura habitual em avaliação por via transabdominal.")
+  const het = p.sit === 'het', hetcalc = p.sit === 'hetcalc';
+  const aum = !p.manterNormal && v !== null && v > 30;   // dimensões normais x aumentadas pelo volume
+  const eco = prost ? 'difusamente heterogênea' : hpb ? 'heterogênea' : 'habitual';
+  let par = `Parênquima prostático com ecotextura ${eco} em avaliação por via transabdominal`;
+  if (het) par = 'Parênquima prostático com ecotextura heterogênea em avaliação por via transabdominal';
+  if (hetcalc) par = 'Parênquima prostático com ecotextura heterogênea, apresentando algumas calcificações de permeio em avaliação por via transabdominal';
+  const assoc = [];
+  if (hpb && p.hpbCalc) assoc.push('calcificações grosseiras de permeio ao parênquima e ao longo da cápsula cirúrgica');
+  if (hpb && p.hpbCisto) assoc.push('pequenas formações císticas de permeio à glândula interna, compatíveis com degeneração cística da HPB');
+  if (assoc.length) par += `, com ${juntar(assoc)}`;
+  L.push(par + '.');
+  if (hpb && p.hpbComp) L.push('Observa-se compressão e desvio do trajeto da uretra prostática.');
+  if (p.calc) L.push('Há diminutos focos hiperecogênicos esparsos pelo parênquima glandular, compatíveis com calcificações prostáticas / corpos amiláceos, achado de aspecto benigno frequente na faixa etária.');
+  if (p.rtu) L.push('Observa-se aspecto de ressecção transuretral prévia, caracterizado por defeito central periuretral preenchido por líquido.');
+
+  // impressão: dimensões, peso, depois os achados
+  if (hpb) hd.push(p.citarAumento ? 'Aumento volumétrico da próstata, compatível com hiperplasia prostática benigna (HPB).' : (v !== null ? `Próstata com volume de ${fF(v)} cm³.` : 'Próstata de dimensões aumentadas.'));
+  else if (het || hetcalc) hd.push(`Próstata de dimensões ${aum ? 'aumentadas' : 'normais'}, com alteração ecotextural do parênquima.`);
+  else if (!prost) hd.push('Próstata de dimensões normais.');
+  hd.push(`Peso da próstata de ${peso === null ? '_' : fF(peso)} gramas.`);
+  if (p.rtu) hd.push('Próstata com alterações anatômicas secundárias a ressecção transuretral prévia.');
+
+  // IPP
+  let ipp = '';
+  if (p.ipp === 'ausente') ipp = 'Índice de Protuberância Prostática (IPP): ausente.';
+  if (p.ipp === 'protusao'){
+    const m = n(p.ippMed), g = grauIPP();
+    const ext = [];
+    if (p.ippValvula) ext.push('com configuração globosa e projeção sobre a topografia do colo vesical, potencialmente relacionada a efeito de válvula / obstrução dinâmica');
+    if (p.ippTrigono) ext.push('com elevação e deslocamento assimétrico do trígono vesical');
+    ipp = `Índice de Protuberância Prostática (IPP): protrusão prostática intravesical de ${fN(m)} mm${p.ippGrau ? ` (grau ${g})` : ''}${ext.length ? ', ' + juntar(ext) : ''}.`;
+    if (p.ippGrau) hd.push(g === 1 ? 'Hipertrofia do lobo mediano (protrusão prostática intravesical leve, IPP grau 1).'
+                       : g === 2 ? 'Hipertrofia do lobo mediano (protrusão prostática intravesical moderada, IPP grau 2).'
+                                 : 'Acentuada hipertrofia do lobo mediano (protrusão prostática intravesical severa, IPP grau 3).');
+    else hd.push('Hipertrofia do lobo mediano com protrusão prostática intravesical.');
+  }
+
+  // cisto
+  if (p.cisto === 'pres'){
+    const m = dims('prostata.cisto', 3, false), vc = volMm('prostata.cisto');
+    let f = `Formação cística anecoica, de limites bem definidos${m ? `, medindo ${m} mm` : ''}${vc !== null ? `, com volume estimado de ${fF(vc)} cm³` : ''}.`;
+    if (p.cistoTopo === 'linha_media'){ f += ' A lesão localiza-se na linha média da base prostática.'; hd.push('Formação cística na linha média prostática, tendo cisto de utrículo e cisto de ducto de Müller como diagnósticos diferenciais.'); }
+    else if (p.cistoTopo === 'paramediano'){ f += ' A lesão localiza-se em situação paramediana, na topografia do trajeto do ducto ejaculatório.'; hd.push('Formação cística paramediana (aspecto ecográfico compatível com cisto de ducto ejaculatório).'); }
+    else if (p.cistoTopo === 'lateral'){ f += ' A lesão localiza-se lateralmente na glândula (zona de transição).'; hd.push('Formação cística prostática (provável natureza retencional ou degeneração cística da HPB).'); }
+    else { f += ' A formação tem origem extra-prostática, localizada adjacente à base prostática / vesículas seminais.'; hd.push('Formação cística extraprostática, tendo cisto de vesícula seminal, de ducto deferente e da glândula de Cowper como diagnósticos diferenciais.'); }
+    if (p.cistoDebris) f += ' O cisto apresenta ecos internos em suspensão (debris / conteúdo espesso).';
+    if (p.cistoCranial) f += ' A lesão apresenta formato em gota e estende-se cranialmente acima do contorno prostático.';
+    if (p.cistoUretra) f += ' Observa-se aparente comunicação da lesão cística com a uretra prostática.';
+    L.push(f);
+  }
+  // prostatite
+  if (prost){
+    const c = [];
+    if (p.prostEdema) c.push(`${p.prostEdemaTipo === 'difuso' ? 'padrão difuso' : 'área focal'} de redução da ecogenicidade, de aspecto edematoso`);
+    if (p.prostDop) c.push('aumento da vascularização ao estudo Doppler colorido');
+    if (p.prostAbs){
+      const m = dims('prostata.abs', 3, false), va = volMm('prostata.abs');
+      c.push(`formação fluida / complexa de permeio, com margens mal definidas e conteúdo espesso com debris${m ? `, medindo ${m} mm` : ''}${va !== null ? `, com volume estimado de ${fF(va)} cm³` : ''}, compatível com abscesso`);
+      hd.push('Processo inflamatório/infeccioso prostático com coleção compatível com abscesso.');
+    } else hd.push('Processo inflamatório/infeccioso prostático.');
+    if (c.length) L.push(`Associam-se ${juntar(c)}.`);
+  }
+  // nódulo
+  if (p.nod === 'pres'){
+    const m = dims('prostata.nod', 2, false);
+    let f = `Formação nodular predominantemente sólida, de aspecto hipoecogênico${m ? `, medindo cerca de ${m} mm` : ''}, localizada na região ${p.nodLoc} da glândula, à ${p.nodLado}`;
+    if (p.nodCaps) f += ', com abaulamento focal e aparente irregularidade da cápsula prostática adjacente';
+    if (p.nodDop) f += ', com vascularização interna anômala / assimétrica ao Doppler';
+    L.push(f + '.');
+    hd.push('Nódulo sólido prostático.');
+  }
+  return { linhas:L, ipp, ausente:false };
+}
+
+function txtVS(hd){
+  const v = estado.vs;
+  if (v.alt){
+    const suj = v.altLado === 'direita' ? 'A vesícula seminal direita apresenta' : v.altLado === 'esquerda' ? 'A vesícula seminal esquerda apresenta' : 'As vesículas seminais apresentam';
+    const lado = v.altLado === 'direita' ? ' direita' : v.altLado === 'esquerda' ? ' esquerda' : ' bilateral';
+    let f;
+    if (v.altTipo === 'vesiculite'){
+      const dop = v.altDop === 'sem_aumento' ? 'sem aumento significativo da vascularização ao estudo Doppler colorido' : 'com aumento da vascularização ao estudo Doppler colorido';
+      f = `${suj} espessamento parietal e ecotextura interna heterogênea, aspecto em padrão de colmeia, ${dop}, achados compatíveis com processo inflamatório/infeccioso (vesiculite)`;
+      hd.push(`Vesiculite${lado}.`);
+    } else {
+      f = `${suj} acentuada dilatação e turgência, com conteúdo anecoico espesso, aspecto que pode estar relacionado a processo obstrutivo distal`;
+      hd.push(`Dilatação/obstrução das vesículas seminais${lado}.`);
+    }
+    if (v.altProst) f += ', associada aos sinais de processo inflamatório na glândula prostática descritos acima';
+    if (v.altCalc){
+      const m = n(v.altCalcMed);
+      f += `. Identifica-se imagem hiperecogênica com sombra acústica posterior no interior da vesícula seminal ${v.altCalcLado}${m !== null ? `, medindo ${fN(m)} mm` : ''}, compatível com cálculo`;
+      hd.push('Cálculo em vesícula seminal.');
+    }
+    return f + '.';
+  }
+  if (v.sit === 'habitual') return 'Vesículas seminais sem alterações ultrassonográficas.';
+  if (v.sit === 'assim'){ hd.push('Assimetria das vesículas seminais.'); return `Vesículas seminais presentes, notando-se assimetria volumétrica entre elas, com proeminência à ${v.lado}.`; }
+  if (v.sit === 'ausentes'){ hd.push('Ausência das vesículas seminais (achado relacionável a agenesia congênita ou status pós-cirúrgico).'); return 'Vesículas seminais ausentes.'; }
+  hd.push('Limitação técnica na avaliação ecográfica das vesículas seminais.');
+  return 'Vesículas seminais não adequadamente visibilizadas neste estudo, devido às limitações inerentes à via abdominal.';
+}
+
+function txtComparativo(hd){
+  const c = estado.cmp;
+  if (c.modo === 'indisp') return 'Exames anteriores não disponíveis para comparação, o que limita a caracterização de estabilidade dos achados.';
+  if (c.modo !== 'citar') return '';
+  const met = { us:'ultrassonografia', tc:'tomografia computadorizada', rm:'ressonância magnética', rmmp:'ressonância magnética multiparamétrica da próstata' }[c.metodo];
+  let data = '';
+  if (c.data){ const [y,m,d] = c.data.split('-'); data = ` de ${d}/${m}/${y}`; }
+  let intro = `Comparação com ${met} prévia${data}`;
+  if (c.outro) intro += ', proveniente de outro serviço';
+  const com = c.achado === 'com';
+  const desc = semPonto(c.achDesc);
+  const achado = !com ? 'que não evidenciava achados relevantes' : desc ? `que evidenciava ${esc(desc)}` : 'que evidenciava achado previamente descrito';
+  const comp = {
+    aumento:'com aumento dimensional do achado previamente descrito',
+    reducao:'com redução dimensional do achado previamente descrito',
+    surgimento:'com identificação de novo achado no exame atual',
+    resolucao:'com resolução do achado previamente descrito',
+    naoident:'não se identificando, no exame atual, correspondência com o achado previamente descrito'
+  }[c.comp] || (com ? 'mantendo-se a estabilidade dimensional e morfológica dos achados descritos' : 'sem alterações em relação ao exame anterior');
+  let txt = comp;
+  const a = n(c.varAnt), b = n(c.varAtual);
+  if (a !== null && b !== null){
+    txt += `, medindo ${fN(a)} ${c.varUn} no exame anterior e ${fN(b)} ${c.varUn} no atual`;
+    if (a !== 0){ const pct = Math.round((b - a) / a * 100); if (pct !== 0) txt += ` (${pct > 0 ? '+' : ''}${pct}%)`; }
+  }
+  const det = semPonto(c.detalhe);
+  if (det) txt += `, ${esc(det)}`;
+  if (c.concl){
+    hd.push({ aumento:'Aumento dimensional do achado em relação ao exame prévio.', reducao:'Redução dimensional do achado em relação ao exame prévio.',
+              surgimento:'Surgimento de novo achado em relação ao exame prévio.', resolucao:'Resolução do achado previamente descrito.',
+              naoident:'Não caracterizado, no exame atual, o achado previamente descrito.' }[c.comp] || (com ? 'Achado estável em relação ao exame prévio.' : 'Sem alterações em relação ao exame prévio.'));
+  }
+  return `${intro}, ${achado}, ${txt}.`;
+}
+
+function txtAchados(hd){
+  const a = estado.ach, L = [];
+  const lado = (v, f) => v === 'esquerda' ? (f ? 'esquerda' : 'esquerdo') : (f ? 'direita' : 'direito');
+  if (a.hn){ const ap = n(a.hnAP); L.push(`Rim ${lado(a.hnLado)} com dilatação pielocalicial${ap !== null ? ` (diâmetro anteroposterior da pelve renal de ${fN(ap)} cm)` : ''}, compatível com hidronefrose.`); hd.push(`Hidronefrose no rim ${lado(a.hnLado)}.`); }
+  if (a.cr){ const m = n(a.crMed); L.push(`Rim ${lado(a.crLado)} com imagem ecogênica que produz sombra acústica posterior${m !== null ? `, medindo ${fN(m)} cm` : ''}, compatível com cálculo renal.`); hd.push(`Cálculo renal no rim ${lado(a.crLado)}.`); }
+  if (a.ure){ const c = n(a.ureCal); L.push(`Dilatação do ureter distal ${lado(a.ureLado)}${c !== null ? `, com calibre de ${fN(c)} cm` : ''}.`); hd.push(`Dilatação do ureter distal ${lado(a.ureLado)}.`); }
+  if (a.her){ const c = n(a.herColo); L.push(`Hérnia inguinal à ${a.herLado}, de conteúdo ${a.herCont}${c !== null ? `, com colo de ${fN(c)} cm` : ''}${a.herRed ? ', redutível à compressão' : ', não redutível à compressão'}.`); hd.push(`Hérnia inguinal à ${a.herLado}.`); }
+  if (a.lin){ const m = n(a.linMed); L.push(`Linfonodomegalia na cadeia ilíaca ${lado(a.linLado, true)}${m !== null ? `, medindo ${fN(m)} cm` : ''}.`); hd.push(`Linfonodomegalia na cadeia ilíaca ${lado(a.linLado, true)}.`); }
+  if (a.liq){ const loc = { pelve:'na escavação pélvica', hepatorrenal:'no espaço hepatorrenal', difuso:'difuso na cavidade abdominal' }[a.liqLocal]; L.push(`Líquido livre ${loc}, em ${a.liqQtd} quantidade.`); hd.push(`Líquido livre ${loc}.`); }
+  if (a.texto.trim()) L.push(escBr(a.texto.trim()));
+  return L;
+}
+
+// Formatação do laudo = a do modelo em Word: Helvetica 11 pt, justificado, espaçamento simples,
+// sem espaço entre linhas do mesmo grupo e uma linha em branco entre os grupos.
+const FONTE = 'font-family:Helvetica,Arial,sans-serif;font-size:11pt;';
+const P  = (t, x = '') => `<p style="margin:0;text-align:justify;line-height:1.2;${FONTE}${x}">${t}</p>`;
+const BL = () => P('&nbsp;');
+const LB = t => P(`<b>${t}</b>`);
+const LISTA = itens => `<p style="margin:0;text-align:left;line-height:1.2;${FONTE}">${itens.map(x => '- ' + x).join('<br>')}</p>`;
+
+function updateLaudo(){
+  autoRec();
+  const blocos = [];   // cada bloco = lista de parágrafos; entre blocos vai uma linha em branco
+
+  const tec = txtTecnica(); if (tec) blocos.push([LB('TÉCNICA:'), P(tec)]);
+  const ind = txtIndicacao(); if (ind) blocos.push([LB('INDICAÇÃO:'), P(ind)]);
+
+  const hdP = [], hdV = [], hdB = [], hdR = [], hdC = [], hdA = [];
+  const bex = txtBexiga(hdB, hdR);
+  const pro = txtProstata(hdP);
+  const grupos = [];
+  if (bex.length) grupos.push(bex);
+  grupos.push(pro.linhas);
+  if (!pro.ausente){ grupos.push([txtVS(hdV)]); if (pro.ipp) grupos.push([pro.ipp]); }
+  const analise = [LB('ANÁLISE:')];
+  grupos.forEach((g, i) => { if (i) analise.push(BL()); g.forEach(x => analise.push(P(x))); });
+  blocos.push(analise);
+
+  const cmp = txtComparativo(hdC);
+  if (cmp) blocos.push([LB('EXAMES COMPARATIVOS:'), P(cmp)]);
+
+  const achados = txtAchados(hdA);
+  const hd = [...hdP, ...hdV, ...hdB, ...hdR, ...hdC, ...hdA].filter((x, i, arr) => arr.indexOf(x) === i);
+  blocos.push([LB('IMPRESSÃO DIAGNÓSTICA:'), LISTA(hd)]);
+
+  if (achados.length) blocos.push([LB('ACHADOS ADICIONAIS:'), ...achados.map(x => P(x))]);
+
+  const r = estado.rec;
+  if (r.incluir){
+    const itens = REC_ITENS.filter(([id]) => r[id]).map(([,,t]) => t);
+    r.custom.split(/\r?\n/).map(x => x.trim()).filter(Boolean).forEach(x => itens.push(esc(x)));
+    if (itens.length) blocos.push([LB('RECOMENDAÇÕES:'), LISTA(itens)]);
+  }
+
+  let h = `<p style="margin:0 0 8pt 0;text-align:center;line-height:1.2;${FONTE}font-weight:bold">ULTRASSONOGRAFIA DA PRÓSTATA</p>`;
+  h += blocos.map(b => b.join('')).join(BL());
+  if (estado.ach.nota) h += BL() + BL() + P(`<span style="font-size:9pt;font-style:italic">${NOTA_METODO}</span>`);
+
+  document.getElementById('laudo-doc').innerHTML = h;
+  updateInfos();
+}
+
+// ═══════════════ BARRA SUPERIOR ═══════════════
+function toggleDark(){
+  const isDark = document.body.classList.toggle('dark');
+  const btn = document.getElementById('btn-dark-toggle');
+  if (isDark){
+    btn.innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 8.5A5.5 5.5 0 0 1 6 3c0-.18.01-.36.03-.53A6 6 0 1 0 13.97 9.5c-.15.01-.31.01-.47 0z"/></svg>Modo claro';
+  } else {
+    btn.innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro';
+  }
+  try { localStorage.setItem('darkMode', isDark ? '1' : '0'); } catch(_){}
+}
+(function(){ try { if (localStorage.getItem('darkMode') === '1') toggleDark(); } catch(_){} })();
+
+// Cópia limpa: mantém a formatação do laudo (fonte, tamanho, justificado, negrito, itálico)
+// e descarta o fundo e as cores do tema (claro/escuro) do site.
+function htmlLimpo(raiz){
+  const c = raiz.cloneNode(true);
+  c.querySelectorAll('*').forEach(e => {
+    e.style.color = '#000000';
+    e.style.backgroundColor = '';
+    e.style.background = '';
+    e.removeAttribute('class');
+    e.removeAttribute('contenteditable');
+  });
+  return c.innerHTML;
+}
+function textoPlano(raiz){
+  return Array.from(raiz.children)
+    .map(p => (p.innerText || '').replace(/\u00a0/g, ' ').replace(/\s+$/, ''))
+    .join('\n');
+}
+function gravarNaAreaDeTransferencia(html, texto, cb){
+  const doc = '<meta charset="utf-8">' + html;
+  if (navigator.clipboard && window.ClipboardItem){
+    navigator.clipboard.write([new ClipboardItem({
+      'text/html': new Blob([doc], {type:'text/html'}),
+      'text/plain': new Blob([texto], {type:'text/plain'})
+    })]).then(() => cb(true), () => copiaAlternativa(doc, texto, cb));
+  } else copiaAlternativa(doc, texto, cb);
+}
+function copiaAlternativa(doc, texto, cb){
+  const tmp = document.createElement('div');
+  tmp.style.cssText = 'position:fixed;left:-9999px;top:0;';
+  tmp.innerHTML = doc;
+  document.body.appendChild(tmp);
+  const onCopy = e => { e.clipboardData.setData('text/html', doc); e.clipboardData.setData('text/plain', texto); e.preventDefault(); };
+  document.addEventListener('copy', onCopy, {once:true});
+  let ok = false;
+  try {
+    const r = document.createRange(); r.selectNodeContents(tmp);
+    const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    ok = document.execCommand('copy');
+    s.removeAllRanges();
+  } catch(_){}
+  document.removeEventListener('copy', onCopy);
+  tmp.remove();
+  cb(ok);
+}
+function copiar(){
+  const el = document.getElementById('laudo-doc');
+  if (!el) return;
+  gravarNaAreaDeTransferencia(htmlLimpo(el), textoPlano(el),
+    ok => showToast(ok ? 'Laudo copiado com a formatação do modelo!' : 'Falha ao copiar. Use Ctrl+A e Ctrl+C no texto do laudo.'));
+}
+// Ctrl+C manual dentro da pré-visualização também sai limpo (sem fundo, sem cores do tema)
+document.getElementById('laudo-doc').addEventListener('copy', function(e){
+  const sel = window.getSelection();
+  if (!sel || !sel.rangeCount || sel.isCollapsed) return;
+  const d = document.createElement('div');
+  d.appendChild(sel.getRangeAt(0).cloneContents());
+  e.clipboardData.setData('text/html', '<meta charset="utf-8">' + htmlLimpo(d));
+  e.clipboardData.setData('text/plain', sel.toString());
+  e.preventDefault();
+});
+function showToast(msg){
+  const t = document.getElementById('toast-notification');
+  t.innerText = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+function imprimir(){
+  const h = htmlLimpo(document.getElementById('laudo-doc'));
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Laudo</title><style>@page{size:A4;margin:2.5cm 3cm;}body{margin:0;background:#fff;}</style></head><body>${h}</body></html>`);
+  w.document.close();
+  w.print();
+}
+function reiniciar(){
+  estado = novoEstado();
+  showSection('bexiga');
+}
+
+showSection('bexiga');
+
+</script>
+
+<div id="toast-notification" class="toast-notification">Laudo copiado!</div>
+<script src="../js/copy-pacs.js"></script>
+</body>
+</html>
