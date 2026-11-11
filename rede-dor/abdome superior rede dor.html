@@ -867,7 +867,7 @@ function _laudoLimpar(root){
     Array.from(node.childNodes).forEach(c=>{
       if(c.nodeType===3){ buf+=esc(c.nodeValue.replace(/\s+/g,' ')); return; }
       if(c.nodeType!==1) return;
-      if(c.classList.contains('doc-titulo')){ flush(); P(inl(c),'text-align:center;font-weight:bold;'); if(proximo(c)) BLANK(); }
+      if(c.classList.contains('doc-titulo')){ flush(); P('<b style="font-weight:bold;">'+inl(c)+'</b>','text-align:center;font-weight:bold;'); if(proximo(c)) BLANK(); }
       else if(c.classList.contains('doc-secao')){ flush(); emit(c); if(proximo(c)) BLANK(); }
       else if(blockSpan(c)){ flush(); P(inl(c),'margin-left:12pt;','  '); }
       else if(c.tagName==='DIV'||c.tagName==='P'){ flush(); emit(c); }
@@ -919,7 +919,10 @@ document.getElementById('laudo-doc').addEventListener('copy', function(e) {
   const rg=sel.getRangeAt(0);
   if(!this.contains(rg.commonAncestorContainer)) return;
   const holder=document.createElement('div');
-  holder.appendChild(rg.cloneContents());
+  const ancEl=rg.commonAncestorContainer.nodeType===1?rg.commonAncestorContainer:rg.commonAncestorContainer.parentElement;
+  const tit=ancEl&&ancEl.closest?ancEl.closest('.doc-titulo'):null;
+  if(tit){ const d=document.createElement('div'); d.className='doc-titulo'; d.appendChild(rg.cloneContents()); holder.appendChild(d); }
+  else holder.appendChild(rg.cloneContents());
   const r=_laudoLimpar(holder);
   e.clipboardData.setData('text/html',r.html);
   e.clipboardData.setData('text/plain',r.text);

@@ -1127,20 +1127,20 @@ function updateLaudo() {
     <div class="doc-titulo">ULTRASSONOGRAFIA COM DOPPLER VENOSO PROFUNDO ${titulo}</div>
     ${urgHtml}
     <div class="doc-secao">
-      <span class="doc-label">INDICAÇÃO:</span>
+      <span class="doc-label">Indicação:</span>
       <div class="doc-p">Exame direcionado para pesquisa de trombose venosa profunda.</div>
     </div>
     <div class="doc-secao">
-      <span class="doc-label">TÉCNICA:</span>
+      <span class="doc-label">Técnica:</span>
       <div class="doc-p">Exame realizado com transdutor linear de alta frequência, utilizando modo B, Doppler colorido e Doppler espectral.</div>
       ${limHtml}
     </div>
     <div class="doc-secao">
-      <span class="doc-label">ANÁLISE:</span>
+      <span class="doc-label">Análise:</span>
       ${p(linhas)}${p(frasesVsup)}${p(frasesDop)}${fraseAchados ? p([fraseAchados]) : ''}
     </div>
     <div class="doc-secao">
-      <span class="doc-label">CONCLUSÃO:</span>
+      <span class="doc-label">Conclusão:</span>
       ${p(conclusao.map(c => '- ' + c))}
     </div>`;
 }
@@ -1166,23 +1166,59 @@ function toggleDark() {
 function copiar() {
   var el = document.getElementById('laudo-doc');
   if (!el) return;
-  _copyLaudoRichText(el, function(ok) {
-    if (ok) {
-      showToast('Laudo copiado para a área de transferência!');
-    } else {
-      showToast('Falha ao copiar. Use Ctrl+A e Ctrl+C no texto do laudo.');
-    }
-  });
+  function resultado(ok) {
+    showToast(ok ? 'Laudo copiado para a área de transferência!' : 'Falha ao copiar. Use Ctrl+A e Ctrl+C no texto do laudo.');
+  }
+  // usa o copiador do projeto (../js/copy-pacs.js) quando disponível; senão, o copiador interno
+  if (typeof _copyLaudoRichText === 'function') {
+    try {
+      _copyLaudoRichText(el, function(ok) { if (ok) resultado(true); else _copiarLocal(el, resultado); });
+      return;
+    } catch (e) { /* cai no copiador interno */ }
+  }
+  _copiarLocal(el, resultado);
 }
 
-// Intercepta copy manual no dark mode para remover fundo escuro
+function _copiarLocal(el, cb) {
+  var clone = el.cloneNode(true);
+  _estilizarLaudo(clone);
+  var html = '<div style="font-family:Arial,Helvetica,sans-serif;font-size:10pt;color:#000;background:#fff">' + clone.innerHTML + '</div>';
+  var texto = el.innerText;
+  function legado() {
+    try {
+      var r = document.createRange(); r.selectNodeContents(el);
+      var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      var ok = document.execCommand('copy');
+      sel.removeAllRanges();
+      cb(ok);
+    } catch (e) { cb(false); }
+  }
+  if (navigator.clipboard && window.ClipboardItem) {
+    navigator.clipboard.write([new ClipboardItem({
+      'text/html': new Blob([html], { type: 'text/html' }),
+      'text/plain': new Blob([texto], { type: 'text/plain' })
+    })]).then(function(){ cb(true); }, legado);
+  } else {
+    legado();
+  }
+}
+
+// Cópia manual (selecionar + Ctrl+C): entrega o texto sem cor de fundo, em qualquer modo
+function _estilizarLaudo(raiz) {
+  raiz.querySelectorAll('.doc-titulo').forEach(function(n){ n.style.textAlign='center'; n.style.fontWeight='bold'; });
+  raiz.querySelectorAll('.doc-label').forEach(function(n){ n.style.fontWeight='bold'; });
+  raiz.querySelectorAll('.doc-p, .doc-secao').forEach(function(n){ n.style.margin='0 0 8px 0'; });
+}
 document.getElementById('laudo-doc').addEventListener('copy', function(e) {
-  if (!document.body.classList.contains('dark')) return;
-  document.body.classList.remove('dark');
-  document.body.offsetHeight;
-  setTimeout(function() {
-    document.body.classList.add('dark');
-  }, 0);
+  var sel = window.getSelection();
+  if (!sel || sel.isCollapsed || !sel.rangeCount || !e.clipboardData) return;
+  var box = document.createElement('div');
+  for (var i = 0; i < sel.rangeCount; i++) box.appendChild(sel.getRangeAt(i).cloneContents());
+  _estilizarLaudo(box);
+  var html = '<div style="font-family:Arial,Helvetica,sans-serif;font-size:10pt;color:#000;background:none">' + box.innerHTML + '</div>';
+  e.clipboardData.setData('text/html', html);
+  e.clipboardData.setData('text/plain', sel.toString());
+  e.preventDefault();
 });
 
 function showToast(msg) {

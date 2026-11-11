@@ -190,8 +190,8 @@ body.dark textarea { background: var(--white); color: var(--text); border-color:
 <body>
 
 <div class="toolbar">
-  <div class="logo" style="cursor:pointer" onclick="window.location.href='../laudo-rede-dor.html'"><span class="logo-name">THI-RADS</span><span class="logo-sub">laudo estruturado</span></div>
-  <button class="btn" onclick="window.location.href='../laudo-rede-dor.html'"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 2L4 8l6 6"/></svg>Voltar</button>
+  <div class="logo" style="cursor:pointer" onclick="window.location.href='../laudo-thirads.html'"><span class="logo-name">THI-RADS</span><span class="logo-sub">laudo estruturado</span></div>
+  <button class="btn" onclick="window.location.href='../laudo-thirads.html'"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 2L4 8l6 6"/></svg>Voltar</button>
   <div class="tb-sep"></div>
   <button class="btn" onclick="copiar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>Copiar laudo</button>
   <button class="btn btn-primary" onclick="imprimir()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6V2h8v4M4 12H2V7h12v5h-2M4 9h8M4 12v2h8v-2"/></svg>Imprimir</button>
@@ -1804,22 +1804,102 @@ function toggleDark() {
 function copiar() {
   var el = document.getElementById('laudo-doc');
   if (!el) return;
-  if (typeof _copyLaudoRichText === 'function') {
-    _copyLaudoRichText(el, function(ok) {
-      showToast(ok ? 'Laudo copiado para a área de transferência!' : 'Falha ao copiar. Use Ctrl+A e Ctrl+C no texto do laudo.');
-    });
-    return;
-  }
-  // Fallback (quando ../js/copy-pacs.js não está disponível)
-  try {
-    var r = document.createRange(); r.selectNodeContents(el);
-    var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
-    var ok = document.execCommand('copy'); s.removeAllRanges();
-    showToast(ok ? 'Laudo copiado para a área de transferência!' : 'Falha ao copiar. Use Ctrl+A e Ctrl+C no texto do laudo.');
-  } catch (err) {
-    showToast('Falha ao copiar. Use Ctrl+A e Ctrl+C no texto do laudo.');
-  }
+  copiarLaudoFormatado(el, function(ok) {
+    if (ok) {
+      showToast('Laudo copiado para a área de transferência!');
+    } else {
+      showToast('Falha ao copiar. Use Ctrl+A e Ctrl+C no texto do laudo.');
+    }
+  });
 }
+
+// ── CÓPIA DO LAUDO: HTML limpo (padrão da máscara Word) + texto simples ──
+// Converte o conteúdo da pré-visualização (ou da seleção) em HTML documental limpo:
+// Arial 11pt, texto preto, fundo branco, justificado, parágrafos sem espaçamento
+// (linhas em branco explícitas, como na máscara), sem classes nem estilos da interface.
+function _laudoLimpar(root){
+  const FONT='font-family:Arial,Helvetica,sans-serif;font-size:11pt;line-height:1.08;color:#000000;background-color:#ffffff;';
+  const out=[], lines=[];
+  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const paraTxt=(html,prefix)=>{ const t=document.createElement('div'); t.innerHTML=html.replace(/<br\s*\/?>/gi,'\n'); lines.push((prefix||'')+t.textContent.replace(/\u00a0/g,' ')); };
+  const P=(html,extra,prefix)=>{ html=html.replace(/^\s+|\s+$/g,''); if(!html) return; out.push(`<p style="margin:0;padding:0;${FONT}text-align:justify;${extra||''}">${html}</p>`); paraTxt(html,prefix); };
+  const BLANK=()=>{ out.push(`<p style="margin:0;padding:0;${FONT}">&nbsp;</p>`); lines.push(''); };
+  const bold=n=>n.nodeType===1&&(n.classList.contains('doc-label')||/^(B|STRONG)$/.test(n.tagName));
+  const inl=n=>{
+    if(n.nodeType===3) return esc(n.nodeValue.replace(/\s+/g,' '));
+    if(n.nodeType!==1) return '';
+    if(n.tagName==='BR') return '<br>';
+    const inner=Array.from(n.childNodes).map(inl).join('');
+    return bold(n)?`<b style="font-weight:bold;">${inner}</b>`:inner;
+  };
+  const blockSpan=n=>n.nodeType===1&&n.tagName==='SPAN'&&n.style&&n.style.display==='block';
+  const proximo=n=>{ let s=n.nextSibling; while(s&&s.nodeType!==1) s=s.nextSibling; return s; };
+  function emit(node){
+    let buf='';
+    const flush=()=>{ P(buf); buf=''; };
+    Array.from(node.childNodes).forEach(c=>{
+      if(c.nodeType===3){ buf+=esc(c.nodeValue.replace(/\s+/g,' ')); return; }
+      if(c.nodeType!==1) return;
+      if(c.classList.contains('doc-titulo')){ flush(); P(inl(c),'text-align:center;font-weight:bold;'); if(proximo(c)) BLANK(); }
+      else if(c.classList.contains('doc-secao')){ flush(); emit(c); if(proximo(c)) BLANK(); }
+      else if(blockSpan(c)){ flush(); P(inl(c),'margin-left:12pt;','  '); }
+      else if(c.tagName==='DIV'||c.tagName==='P'){ flush(); emit(c); }
+      else buf+=inl(c);
+    });
+    flush();
+  }
+  emit(root);
+  return {
+    html:'<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="margin:0;background-color:#ffffff;color:#000000;">'+out.join('')+'</body></html>',
+    text:lines.join('\n')
+  };
+}
+
+function _copiaLegado(r){
+  const ta=document.createElement('textarea');
+  ta.value=r.text; ta.setAttribute('readonly','');
+  ta.style.cssText='position:fixed;left:-9999px;top:0;opacity:0;';
+  document.body.appendChild(ta);
+  const sel=window.getSelection(); const salvo=[];
+  for(let i=0;i<sel.rangeCount;i++) salvo.push(sel.getRangeAt(i));
+  const h=e=>{ e.clipboardData.setData('text/html',r.html); e.clipboardData.setData('text/plain',r.text); e.preventDefault(); };
+  document.addEventListener('copy',h,true);
+  let ok=false;
+  try{ ta.select(); ok=document.execCommand('copy'); }catch(err){ ok=false; }
+  document.removeEventListener('copy',h,true);
+  document.body.removeChild(ta);
+  sel.removeAllRanges(); salvo.forEach(rg=>sel.addRange(rg));
+  return ok;
+}
+
+function copiarLaudoFormatado(el, cb){
+  const r=_laudoLimpar(el);
+  const legado=()=>cb(_copiaLegado(r));
+  if(navigator.clipboard && navigator.clipboard.write && window.ClipboardItem){
+    try{
+      navigator.clipboard.write([new ClipboardItem({
+        'text/html':new Blob([r.html],{type:'text/html'}),
+        'text/plain':new Blob([r.text],{type:'text/plain'})
+      })]).then(()=>cb(true),legado);
+    }catch(err){ legado(); }
+  } else legado();
+}
+
+// Ctrl+C / Ctrl+X manual na pré-visualização: entrega versão limpa, sem tocar no tema da página
+document.getElementById('laudo-doc').addEventListener('copy', function(e) {
+  const sel=window.getSelection();
+  if(!sel||sel.rangeCount===0||sel.isCollapsed) return;
+  const rg=sel.getRangeAt(0);
+  if(!this.contains(rg.commonAncestorContainer)) return;
+  const holder=document.createElement('div');
+  holder.appendChild(rg.cloneContents());
+  const r=_laudoLimpar(holder);
+  e.clipboardData.setData('text/html',r.html);
+  e.clipboardData.setData('text/plain',r.text);
+  e.preventDefault();
+  e.stopImmediatePropagation();
+});
+
 
 function showToast(msg) {
   let t = document.getElementById('toast-notification');
