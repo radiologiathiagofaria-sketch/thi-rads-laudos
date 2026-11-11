@@ -1,0 +1,896 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thi-Rads — Laudos estruturados</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===== Paleta alinhada ao app obstétrico (slate escuro + ciano) ===== */
+:root{
+  --blue:#0e6a83;--blue-dark:#0c566b;--blue-light:#d3e6ec;--blue-mid:#c0dce5;
+  --surface:#e1e6ee;--border:#c9d1de;--border-strong:#9eacc2;
+  --text:#1b2538;--text-2:#34425b;--text-3:#5c6a83;
+  --white:#f3f5f9;--green:#047857;--red:#c93a3a;--radius:10px;--radius-lg:14px;
+  --hover:#dfeaf0;--sel-bg:#cbe3ec;--focus-ring:rgba(14,106,131,.22);
+}
+body.dark{
+  --blue:#2fa9c2;--blue-dark:#2490a8;--blue-light:#12293d;--blue-mid:#12293d;
+  --surface:#090e19;--border:#1a263b;--border-strong:#33445f;
+  --text:#c9d2e0;--text-2:#a3afc4;--text-3:#7a879f;
+  --white:#0e1626;--green:#2fbf8c;--red:#e07a7a;
+  --hover:#13203a;--sel-bg:#12324a;--focus-ring:rgba(47,169,194,.28);
+}
+body.dark .laudo-doc{color:#e2e6f0;}
+body.dark .laudo-panel{background:var(--white);border-left-color:var(--border);}
+body.dark .laudo-body{background:var(--white);}
+body.dark .laudo-header{background:var(--white);border-bottom-color:var(--border);}
+@media print{
+  body.dark .laudo-doc,
+  body.dark .laudo-doc *{color:#111 !important;}
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',system-ui,sans-serif;font-size:14px;background:var(--surface);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+/* ----- Barra superior ----- */
+.toolbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 22px;display:flex;align-items:center;gap:10px;height:58px;flex-shrink:0;}
+.logo{display:flex;align-items:baseline;gap:8px;margin-right:14px;}
+.logo-name{font-size:20px;font-weight:600;color:var(--blue);letter-spacing:-.3px;}
+.logo-sub{font-size:13px;color:var(--text-3);font-weight:400;}
+.tb-sep{width:1px;height:24px;background:var(--border);margin:0 4px;}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid var(--border-strong);font-weight:500;transition:all .13s;background:var(--white);color:var(--text);}
+.btn:hover{background:var(--hover);border-color:var(--blue);color:var(--blue);}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600;}
+body.dark .btn-primary{color:#06202b;}
+.btn-primary:hover{background:var(--blue-dark);border-color:var(--blue-dark);color:#fff;}
+body.dark .btn-primary:hover{color:#06202b;}
+.btn-danger{background:#f6e6e8;color:var(--red);border-color:#e3a9ad;}
+body.dark .btn-danger{background:#2d1a1f;border-color:#7a3038;}
+.btn-danger:hover{background:#fee2e2;border-color:#f87171;color:var(--red);}
+body.dark .btn-danger:hover{background:#3a2026;}
+.btn svg{width:16px;height:16px;flex-shrink:0;}
+.btn-dark{margin-left:auto;}
+.btn:focus-visible,.nav-item:focus-visible{outline:2px solid var(--blue);outline-offset:2px;}
+
+.body{display:flex;flex:1;overflow:hidden;}
+
+/* ----- Coluna esquerda: navegação ----- */
+.sidebar{width:208px;background:var(--white);border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;}
+.sidebar-hd{padding:16px 16px 14px;border-bottom:1px solid var(--border);}
+.sidebar-tipo{font-size:12px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px;}
+.sidebar-titulo{font-size:19px;font-weight:600;color:var(--text);}
+.nav-group{padding:8px 0;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:15px;color:var(--text-2);cursor:pointer;transition:all .12s;border-left:3px solid transparent;line-height:1.25;}
+.nav-item:hover{background:var(--hover);color:var(--text);}
+.nav-item.active{background:var(--sel-bg);color:var(--blue);border-left-color:var(--blue);font-weight:600;}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.45;flex-shrink:0;}
+.nav-item.active .nav-dot{opacity:1;}
+
+/* ----- Coluna central: formulário ----- */
+.panel{width:560px;flex-shrink:0;overflow-y:auto;padding:18px 18px 26px;background:var(--surface);}
+.panel .doc-p{font-size:14px !important;}
+.sec-title{font-size:19px;font-weight:600;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:9px;}
+.sec-title::before{content:'';display:block;width:4px;height:22px;background:var(--blue);border-radius:2px;}
+.block{margin-bottom:14px;background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden;}
+.block-title{font-size:13px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.6px;padding:11px 16px 10px;border-bottom:1px solid var(--border);background:var(--white);}
+body.dark .block-title{border-bottom-color:var(--border);}
+
+.radio-opt{display:flex;align-items:flex-start;gap:0;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;position:relative;}
+.radio-opt:last-child{border-bottom:none;}
+.radio-opt:hover{background:var(--hover);}
+.radio-opt.selected{background:var(--sel-bg);}
+.radio-opt input[type=radio]{position:absolute;opacity:0;pointer-events:none;}
+.radio-label{display:flex;align-items:center;gap:12px;width:100%;padding:12px 16px;font-size:15px;color:var(--text);line-height:1.4;cursor:pointer;}
+.radio-opt.selected .radio-label{color:var(--blue);font-weight:600;}
+.radio-mark{width:20px;height:20px;border-radius:50%;border:2px solid var(--border-strong);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.radio-opt:hover .radio-mark{border-color:var(--blue);}
+.radio-opt.selected .radio-mark{border-color:var(--blue);background:var(--blue);}
+.radio-mark::after{content:'';width:8px;height:8px;border-radius:50%;background:#fff;opacity:0;transition:opacity .15s;}
+body.dark .radio-mark::after{background:#06202b;}
+.radio-opt.selected .radio-mark::after{opacity:1;}
+
+.check-row{display:flex;align-items:center;gap:0;border-bottom:1px solid var(--border);cursor:pointer;background:var(--surface);}
+.check-row:last-child{border-bottom:none;}
+.check-row:hover{background:var(--hover);}
+.check-row.selected{background:var(--sel-bg);}
+.check-row input[type=checkbox]{position:absolute;opacity:0;pointer-events:none;}
+.check-label{display:flex;align-items:center;gap:12px;width:100%;padding:11px 16px 11px 34px;font-size:14.5px;color:var(--text);cursor:pointer;}
+.check-row.selected .check-label{color:var(--blue);font-weight:600;}
+.check-box{width:19px;height:19px;border-radius:5px;border:2px solid var(--border-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.check-row:hover .check-box{border-color:var(--blue);}
+.check-row.selected .check-box{border-color:var(--blue);background:var(--blue);}
+.check-box svg{display:none;width:12px;height:12px;}
+.check-row.selected .check-box svg{display:block;}
+body.dark .check-box svg{stroke:#06202b;}
+.sel-tag{font-size:13px;border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);margin-left:6px;cursor:pointer;}
+
+.dim-rows{padding:12px 16px;display:flex;flex-direction:column;gap:9px;}
+.dim-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.dim-lbl{flex:1;font-size:14.5px;color:var(--text);}
+.dim-input{width:76px;padding:8px 10px;border:1px solid var(--border-strong);border-radius:8px;font-size:14.5px;font-family:'DM Sans',sans-serif;text-align:center;color:var(--text);background:var(--white);transition:border .12s;}
+.dim-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--focus-ring);}
+.dim-unit{font-size:14px;color:var(--text-3);}
+.nodulo-wrap{padding:12px 16px;display:flex;flex-direction:column;gap:10px;}
+
+.btn-add-lesao{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:600;transition:all .12s;border:1.5px dashed var(--blue);background:transparent;color:var(--blue);width:100%;justify-content:center;}
+.btn-add-lesao:hover{background:var(--sel-bg);}
+.lesao-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 14px;margin-bottom:10px;}
+.lesao-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;}
+.lesao-hd-title{font-size:13px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.5px;}
+.btn-rem{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:6px;font-size:12.5px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;border:1px solid #e3a9ad;background:#f6e6e8;color:var(--red);transition:all .12s;}
+body.dark .btn-rem{background:#2d1a1f;border-color:#7a3038;}
+.btn-rem:hover{background:#fee2e2;}
+body.dark .btn-rem:hover{background:#3a2026;}
+
+.ff-grid{display:flex;gap:11px;flex-wrap:wrap;margin-bottom:8px;}
+.ff{display:flex;flex-direction:column;gap:4px;}
+.ff label{font-size:12px;color:var(--text-2);font-weight:600;text-transform:uppercase;letter-spacing:.3px;}
+.ff select,.ff input[type=text],.ff input[type=number]{font-size:14px;padding:7px 9px;border:1px solid var(--border-strong);border-radius:7px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);}
+.ff select:focus,.ff input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--focus-ring);}
+.ff input[type=text],.ff input[type=number]{width:68px;text-align:center;}
+.inline-select{font-size:14px;padding:6px 9px;border:1px solid var(--border-strong);border-radius:7px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);margin-left:5px;}
+.inline-select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--focus-ring);}
+.inline-num{width:60px;font-size:14px;padding:6px 8px;border:1px solid var(--border-strong);border-radius:7px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);text-align:center;margin:0 2px;}
+.inline-num:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--focus-ring);}
+body.dark .sub-opts{background:var(--hover);border-bottom-color:var(--border);}
+.sub-opt-label{color:var(--text-2);}
+body.dark .sub-opt-label{background:var(--white);color:var(--text);}
+.panel select option{background:var(--white);color:var(--text);}
+
+/* ----- Coluna direita: LAUDO (fonte e estrutura preservadas) ----- */
+.laudo-panel{flex:1;min-width:0;background:var(--white);display:flex;flex-direction:column;border-left:1px solid var(--border);}
+.laudo-header{padding:9px 20px 8px;border-bottom:1px solid var(--border);background:var(--white);display:flex;align-items:center;}
+.laudo-header-title{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.6px;}
+.laudo-body{flex:1;overflow-y:auto;padding:22px 28px;}
+.laudo-doc{font-family:Helvetica,Arial,sans-serif;font-size:10pt;line-height:1.65;color:#111;max-width:720px;}
+.doc-titulo{text-align:center;font-weight:700;font-size:10pt;margin-bottom:0;text-transform:uppercase;letter-spacing:.3px;}
+.doc-label{font-weight:700;font-size:10pt;}
+.doc-p{margin-bottom:8px;font-size:10pt;}
+.doc-secao{margin-bottom:0;}
+.laudo-doc:focus { outline: none; }
+
+.toast-notification{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(12px);background:var(--text);color:var(--white);font-size:12.5px;font-weight:500;padding:10px 18px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.18);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;z-index:999;}
+.toast-notification.show{opacity:1;transform:translateX(-50%) translateY(0);}
+body.dark .toast-notification{background:#3a4155;color:#e2e6f0;}
+
+/* --- CUSTOM COMPONENTS RESTORED --- */
+body.dark .btn-dark {background:#2a2f3d;border-color:#3a4155;color:#e2e6f0;}
+body.dark .btn-dark:hover {background:#343a4d;color:#fff;}
+body.dark .dim-input,body.dark .ff select,body.dark .ff input[type=text],body.dark textarea {background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .lesao-card {background:#141820;border-color:var(--border);}
+body.dark .toolbar {background:var(--white);border-bottom-color:var(--border);}
+body.dark .sidebar {background:var(--white);border-right-color:var(--border);}
+body.dark .sidebar-hd {border-bottom-color:var(--border);}
+body.dark .radio-opt:hover {background:#1e2d4a;}
+body.dark .radio-opt.selected {background:#1e2d4a;}
+body.dark .check-row {background:#1a1f2e;}
+body.dark .check-row:hover {background:#1e2d4a;}
+body.dark .check-row.selected {background:#1e2d4a;}
+body.dark .btn-add-lesao {background:var(--white);color:var(--text-2);border-color:var(--border-strong);}
+body.dark .sel-tag {background:var(--white);color:var(--text);border-color:var(--border-strong);}
+.lesoes-wrap {padding:8px 14px;display:flex;flex-direction:column;gap:7px;}
+textarea.achados {width:100%;height:100px;padding:10px;border:1px solid var(--border-strong);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;resize:vertical;}
+textarea.achados:focus {outline:none;border-color:var(--blue);}
+
+
+/* --- FIX TEXTAREA --- */
+textarea { background: var(--white); color: var(--text); }
+body.dark textarea { background: var(--white); color: var(--text); border-color: var(--border-strong); }
+</style>
+
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="logo" style="cursor:pointer" onclick="window.location.href='../laudo-rede-dor.html'"><span class="logo-name">THI-RADS</span><span class="logo-sub">laudo estruturado</span></div>
+  <button class="btn" onclick="window.location.href='../laudo-rede-dor.html'"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2L4 8l6 6"/></svg>Voltar</button>
+  <div class="tb-sep"></div>
+  <button class="btn" onclick="copiar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>Copiar laudo</button>
+  <button class="btn btn-primary" onclick="imprimir()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6V2h8v4M4 12H2V7h12v5h-2M4 9h8M4 12v2h8v-2"/></svg>Imprimir</button>
+  <button class="btn btn-dark" id="btn-dark-toggle" onclick="toggleDark()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro</button>
+  <button class="btn btn-danger" onclick="reiniciar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8a6 6 0 1 0 1.5-3.9M2 4v4h4"/></svg>Reiniciar</button>
+</div>
+
+<div class="body">
+  <div class="sidebar">
+    <div class="sidebar-hd"><div class="sidebar-tipo">Ultrassonografia</div><div class="sidebar-titulo">Aparelho Urinário</div></div>
+    <div class="nav-group">
+      <div class="nav-item" id="nav-rins" onclick="showSection('rins')"><span class="nav-dot"></span>Rins e Ureteres</div>
+      <div class="nav-item" id="nav-bexiga" onclick="showSection('bexiga')"><span class="nav-dot"></span>Bexiga</div>
+      <div class="nav-item" id="nav-volume" onclick="showSection('volume')"><span class="nav-dot"></span>Volume Vesical</div>
+      <div class="nav-item" id="nav-adicionais" onclick="showSection('adicionais')"><span class="nav-dot"></span>Achados Adicionais</div>
+    </div>
+  </div>
+
+  <div class="panel" id="main-panel"></div>
+
+  <div class="laudo-panel">
+    <div class="laudo-header"><span class="laudo-header-title">Pré-visualização</span></div>
+    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc" contenteditable="true"></div></div>
+  </div>
+</div>
+
+<script>
+const estado = {
+  rins: {
+    sit: 'habitual',
+    ectopicoLado: 'direito',
+    ectopicoLoc: 'fossa ilíaca direita',
+    nefrecDir: false, nefrecEsq: false,
+    afeccaoLado: 'bilateral',
+    dimRD_L: '', espRD: '',
+    dimRE_L: '', espRE: '',
+    hidroDir: 'ausente', hidroEsq: 'ausente',
+    ureterDir: false, ureterEsq: false,
+    lesoes: []
+  },
+  bexiga: {
+    sit: 'habitual',
+    espParede: '',
+    diverticulos: false,
+    conteudoDebris: false,
+    conteudoCoaguloMovel: false,
+    conteudoCoaguloAderido: false, coaguloAderidoParede: 'parede posterior',
+    conteudoCalculo: false, calculoX: '', calculoY: '', calculoZ: '',
+    conteudoLesao: false, lesaoLoc: 'parede lateral direita', lesaoX: '', lesaoY: '', lesaoZ: '', lesaoFluxo: false, lesaoEco: 'hipoecogênica',
+    conteudoBalao: false,
+    jatos: 'nao_citar'
+  },
+  volume: {
+    preL: '', preAP: '', preT: '',
+    posL: '', posAP: '', posT: ''
+  },
+  adicionais: { texto: '' }
+};
+
+let secaoAtual = 'rins';
+let lesaoId = 0;
+
+function showSection(sec){
+  secaoAtual = sec;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('nav-'+sec).classList.add('active');
+  renderPanel();
+  updateLaudo();
+}
+
+function renderPanel(){
+  const p = document.getElementById('main-panel');
+  if(secaoAtual==='rins') p.innerHTML = renderRins();
+  else if(secaoAtual==='bexiga') p.innerHTML = renderBexiga();
+  else if(secaoAtual==='volume') p.innerHTML = renderVolume();
+  else if(secaoAtual==='adicionais') p.innerHTML = renderAdicionais();
+}
+
+function radio(id, val, label, name, extra=''){
+  const sel = estado[secaoAtual].sit === val ? 'selected' : '';
+  return `<div class="radio-opt ${sel}" onclick="setSit('${val}')"><input type="radio" name="${name}"><label class="radio-label"><span class="radio-mark"></span>${label}${extra}</label></div>`;
+}
+function radioVal(sec, field, val, label, name, extra=''){
+  const sel = estado[sec][field] === val ? 'selected' : '';
+  return `<div class="radio-opt ${sel}" onclick="setVal('${sec}','${field}','${val}')"><input type="radio" name="${name}"><label class="radio-label"><span class="radio-mark"></span>${label}${extra}</label></div>`;
+}
+function chk(sec, field, label){
+  const sel = estado[sec][field] ? 'selected' : '';
+  return `<div class="check-row ${sel}" onclick="toggleChk('${sec}','${field}')"><input type="checkbox" ${estado[sec][field]?'checked':''}><label class="check-label"><span class="check-box"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.8"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg></span>${label}</label></div>`;
+}
+function dimInput(sec, field, label, unit='cm'){
+  return `<div class="dim-row"><span class="dim-lbl">${label}</span><input class="dim-input" type="text" value="${esc(estado[sec][field])}" placeholder="—" oninput="setTextVal('${sec}','${field}',this.value)"><span class="dim-unit">${unit}</span></div>`;
+}
+function selTag(opts, val, onchangeStr){
+  return `<select class="sel-tag" onchange="${onchangeStr}" onclick="event.stopPropagation()">${opts.map(o=>`<option value="${o.v}" ${val===o.v?'selected':''}>${o.l}</option>`).join('')}</select>`;
+}
+
+// ── RINS ──
+function renderRins(){
+  const e = estado.rins;
+  const isSit = (v) => e.sit===v ? 'selected' : '';
+  const hdOpt = [{v:'ausente',l:'ausente'},{v:'discreta',l:'discreta'},{v:'moderada',l:'moderada'},{v:'acentuada',l:'acentuada'}];
+  return `
+  <div class="sec-title">Rins e Ureteres</div>
+  <div class="block"><div class="block-title">Nefrectomia</div>
+    ${chk('rins','nefrecDir','Nefrectomia Direita')}
+    ${chk('rins','nefrecEsq','Nefrectomia Esquerda')}
+  </div>
+  <div class="block"><div class="block-title">Situação Geral</div>
+    <div class="radio-opt ${isSit('habitual')}" onclick="setSit('habitual')"><label class="radio-label"><span class="radio-mark"></span>Habituais</label></div>
+    <div class="radio-opt ${isSit('ectopico')}" onclick="setSit('ectopico')"><label class="radio-label"><span class="radio-mark"></span>Ectópico ${selTag([{v:'direito',l:'direito'},{v:'esquerdo',l:'esquerdo'}],e.ectopicoLado,"setVal('rins','ectopicoLado',this.value)")} em ${selTag([{v:'fossa ilíaca direita',l:'fossa ilíaca direita'},{v:'fossa ilíaca esquerda',l:'fossa ilíaca esquerda'},{v:'pelve',l:'pelve'}],e.ectopicoLoc,"setVal('rins','ectopicoLoc',this.value)")}</label></div>
+    <div class="radio-opt ${isSit('ferradura')}" onclick="setSit('ferradura')"><label class="radio-label"><span class="radio-mark"></span>Em ferradura</label></div>
+    <div class="radio-opt ${isSit('drpad')}" onclick="setSit('drpad')"><label class="radio-label"><span class="radio-mark"></span>Doença renal policística (DRPAD)</label></div>
+    <div class="radio-opt ${isSit('insuf')}" onclick="setSit('insuf')"><label class="radio-label"><span class="radio-mark"></span>Insuficiência renal incipiente ${selTag([{v:'bilateral',l:'bilateral'},{v:'à direita',l:'à direita'},{v:'à esquerda',l:'à esquerda'}],e.afeccaoLado,"setVal('rins','afeccaoLado',this.value)")}</label></div>
+    <div class="radio-opt ${isSit('aguda')}" onclick="setSit('aguda')"><label class="radio-label"><span class="radio-mark"></span>Nefropatia aguda ${selTag([{v:'bilateral',l:'bilateral'},{v:'à direita',l:'à direita'},{v:'à esquerda',l:'à esquerda'}],e.afeccaoLado,"setVal('rins','afeccaoLado',this.value)")}</label></div>
+    <div class="radio-opt ${isSit('cronica')}" onclick="setSit('cronica')"><label class="radio-label"><span class="radio-mark"></span>Nefropatia crônica ${selTag([{v:'bilateral',l:'bilateral'},{v:'à direita',l:'à direita'},{v:'à esquerda',l:'à esquerda'}],e.afeccaoLado,"setVal('rins','afeccaoLado',this.value)")}</label></div>
+  </div>
+  ${!e.nefrecDir ? `<div class="block"><div class="block-title">Dimensões Rim Direito</div><div class="dim-rows">
+    ${dimInput('rins','dimRD_L','Longitudinal')}
+    ${dimInput('rins','espRD','Espessura Parênquima')}
+  </div></div>` : ''}
+  ${!e.nefrecEsq ? `<div class="block"><div class="block-title">Dimensões Rim Esquerdo</div><div class="dim-rows">
+    ${dimInput('rins','dimRE_L','Longitudinal')}
+    ${dimInput('rins','espRE','Espessura Parênquima')}
+  </div></div>` : ''}
+  
+  <div class="block"><div class="block-title">Dilatação do Sistema Coletor (Hidronefrose)</div>
+    ${!e.nefrecDir ? `<div style="padding:8px 14px 4px;"><label style="font-size:12px;color:var(--text-2);">À Direita:</label> ${selTag(hdOpt,e.hidroDir,"setVal('rins','hidroDir',this.value)")}</div>`:''}
+    ${(!e.nefrecDir && e.hidroDir !== 'ausente') ? chk('rins','ureterDir','Dilatação ureteral à direita') : ''}
+    ${!e.nefrecEsq ? `<div style="padding:8px 14px 4px;"><label style="font-size:12px;color:var(--text-2);">À Esquerda:</label> ${selTag(hdOpt,e.hidroEsq,"setVal('rins','hidroEsq',this.value)")}</div>`:''}
+    ${(!e.nefrecEsq && e.hidroEsq !== 'ausente') ? chk('rins','ureterEsq','Dilatação ureteral à esquerda') : ''}
+  </div>
+
+  <div class="block"><div class="block-title">Lesões Renais</div><div class="lesoes-wrap">
+    <div id="lesoes-renais-list">${renderLesoesRenais()}</div>
+    <div style="display:flex;gap:6px;margin-top:4px;">
+      <button class="btn-add-lesao" onclick="addLesaoRim('calculo')">+ Cálculo</button>
+      ${e.sit!=='drpad' ? `<button class="btn-add-lesao" onclick="addLesaoRim('cisto')">+ Cisto</button>`:''}
+      <button class="btn-add-lesao" onclick="addLesaoRim('nodulo')">+ Nódulo</button>
+    </div>
+  </div></div>
+  `;
+}
+
+function renderLesoesRenais(){
+  return estado.rins.lesoes.map(l => {
+    let extra = '';
+    const lados = [{v:'direito',l:'direito'},{v:'esquerdo',l:'esquerdo'},{v:'bilateral',l:'bilateral'}];
+    const locs = [{v:'terço superior',l:'terço superior'},{v:'terço médio',l:'terço médio'},{v:'terço inferior',l:'terço inferior'},{v:'junção ureteropiélica',l:'junção ureteropiélica'},{v:'junção ureterovesical',l:'junção ureterovesical'},{v:'ureter proximal',l:'ureter proximal'},{v:'ureter médio',l:'ureter médio'},{v:'ureter distal',l:'ureter distal'}];
+    
+    if(l.tipo==='calculo'){
+      extra = `<div class="ff"><label>Lado</label><select onchange="updLesaoRim(${l.id},'lado',this.value)">${lados.map(o=>`<option value="${o.v}" ${l.lado===o.v?'selected':''}>${o.l}</option>`).join('')}</select></div>
+               <div class="ff"><label>Localização</label><select onchange="updLesaoRim(${l.id},'loc',this.value)">${locs.map(o=>`<option value="${o.v}" ${l.loc===o.v?'selected':''}>${o.l}</option>`).join('')}</select></div>
+               <div class="ff"><label>Agrupamento</label><select onchange="updLesaoRim(${l.id},'agrup',this.value)"><option value="unico" ${l.agrup==='unico'?'selected':''}>único</option><option value="varios" ${l.agrup==='varios'?'selected':''}>vários (maior)</option></select></div>`;
+    }else if(l.tipo==='cisto'){
+      extra = `<div class="ff"><label>Lado</label><select onchange="updLesaoRim(${l.id},'lado',this.value)">${lados.map(o=>`<option value="${o.v}" ${l.lado===o.v?'selected':''}>${o.l}</option>`).join('')}</select></div>
+               <div class="ff"><label>Localização</label><select onchange="updLesaoRim(${l.id},'loc',this.value)">${locs.slice(0,3).map(o=>`<option value="${o.v}" ${l.loc===o.v?'selected':''}>${o.l}</option>`).join('')}</select></div>
+               <div class="ff"><label>Agrupamento</label><select onchange="updLesaoRim(${l.id},'agrup',this.value)"><option value="unico" ${l.agrup==='unico'?'selected':''}>único</option><option value="varios" ${l.agrup==='varios'?'selected':''}>múltiplos (maior)</option></select></div>
+               <div class="ff"><label>Composição</label><select onchange="updLesaoRim(${l.id},'comp',this.value)"><option value="simples" ${l.comp==='simples'?'selected':''}>simples</option><option value="complexo" ${l.comp==='complexo'?'selected':''}>complexo</option></select></div>
+               <div class="ff"><label>Topografia</label><select onchange="updLesaoRim(${l.id},'topo',this.value)"><option value="cortical" ${l.topo==='cortical'?'selected':''}>cortical</option><option value="seio renal" ${l.topo==='seio renal'?'selected':''}>seio renal</option></select></div>`;
+    }else if(l.tipo==='nodulo'){
+      extra = `<div class="ff"><label>Lado</label><select onchange="updLesaoRim(${l.id},'lado',this.value)">${lados.map(o=>`<option value="${o.v}" ${l.lado===o.v?'selected':''}>${o.l}</option>`).join('')}</select></div>
+               <div class="ff"><label>Localização</label><select onchange="updLesaoRim(${l.id},'loc',this.value)">${locs.slice(0,3).map(o=>`<option value="${o.v}" ${l.loc===o.v?'selected':''}>${o.l}</option>`).join('')}</select></div>
+               <div class="ff"><label>Agrupamento</label><select onchange="updLesaoRim(${l.id},'agrup',this.value)"><option value="unico" ${l.agrup==='unico'?'selected':''}>único</option><option value="varios" ${l.agrup==='varios'?'selected':''}>múltiplos (maior)</option></select></div>
+               <div class="ff"><label>Ecogenicidade</label><select onchange="updLesaoRim(${l.id},'eco',this.value)"><option value="hipoecoico" ${l.eco==='hipoecoico'?'selected':''}>hipoecoico</option><option value="hiperecoico" ${l.eco==='hiperecoico'?'selected':''}>hiperecoico</option><option value="isoecoico" ${l.eco==='isoecoico'?'selected':''}>isoecoico</option></select></div>`;
+    }
+    
+    return `
+    <div class="lesao-card">
+      <div class="lesao-hd"><span class="lesao-hd-title">${l.tipo.toUpperCase()}</span><button class="btn-rem" onclick="remLesaoRim(${l.id})">✕ remover</button></div>
+      <div class="ff-grid">${extra}</div>
+      <div class="ff-grid">
+        <div class="ff"><label>Med.1 (cm)</label><input type="text" value="${l.m1}" oninput="updLesaoRim(${l.id},'m1',this.value)"></div>
+        <div class="ff"><label>Med.2 (cm)</label><input type="text" value="${l.m2}" oninput="updLesaoRim(${l.id},'m2',this.value)"></div>
+        <div class="ff"><label>Med.3 (cm)</label><input type="text" value="${l.m3}" oninput="updLesaoRim(${l.id},'m3',this.value)"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── BEXIGA ──
+function renderBexiga(){
+  const e = estado.bexiga;
+  return `
+  <div class="sec-title">Bexiga</div>
+  <div class="block"><div class="block-title">Situação</div>
+    ${radioVal('bexiga','sit','habitual','Habitual (distensão adequada, paredes finas)','sit_bex')}
+    ${radioVal('bexiga','sit','parcial','Distensão parcial','sit_bex')}
+    ${radioVal('bexiga','sit','espessada','Paredes espessadas','sit_bex')}
+    ${radioVal('bexiga','sit','vazia','Vazia','sit_bex')}
+    ${radioVal('bexiga','sit','baixa_replecao','Baixa repleção','sit_bex')}
+  </div>
+  ${e.sit==='espessada' ? `
+  <div class="block"><div class="block-title">Paredes</div>
+    ${dimInput('bexiga','espParede','Espessura parietal')}
+    ${chk('bexiga','diverticulos','Presença de divertículos')}
+  </div>` : ''}
+  
+  ${(e.sit!=='vazia' && e.sit!=='baixa_replecao') ? `
+  <div class="block"><div class="block-title">Conteúdo</div>
+    ${chk('bexiga','conteudoDebris','Ecos em suspensão (debris)')}
+    ${chk('bexiga','conteudoCoaguloMovel','Coágulo Móvel')}
+    ${chk('bexiga','conteudoCoaguloAderido','Coágulo Aderido')}
+    ${e.conteudoCoaguloAderido ? `<div class="dim-rows" style="background:#fafbff;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+      <div class="dim-row"><span class="dim-lbl">Parede</span>${selTag([{v:'parede lateral direita',l:'parede lateral direita'},{v:'parede lateral esquerda',l:'parede lateral esquerda'},{v:'parede anterior',l:'parede anterior'},{v:'parede posterior',l:'parede posterior'},{v:'assoalho vesical',l:'assoalho vesical'}],e.coaguloAderidoParede,"setVal('bexiga','coaguloAderidoParede',this.value)")}</div></div>`:''}
+    ${chk('bexiga','conteudoCalculo','Cálculo')}
+    ${e.conteudoCalculo ? `<div class="dim-rows" style="background:#fafbff;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+      ${dimInput('bexiga','calculoX','Med 1')} ${dimInput('bexiga','calculoY','Med 2')} ${dimInput('bexiga','calculoZ','Med 3')}</div>`:''}
+    ${chk('bexiga','conteudoLesao','Lesão vegetante / exofítica')}
+    ${e.conteudoLesao ? `<div class="dim-rows" style="background:#fafbff;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+      <div class="dim-row"><span class="dim-lbl">Localização</span>${selTag([{v:'parede lateral direita',l:'parede lateral direita'},{v:'parede lateral esquerda',l:'parede lateral esquerda'},{v:'parede anterior',l:'parede anterior'},{v:'parede posterior',l:'parede posterior'},{v:'assoalho vesical',l:'assoalho vesical'}],e.lesaoLoc,"setVal('bexiga','lesaoLoc',this.value)")}</div>
+      <div class="dim-row"><span class="dim-lbl">Ecogenicidade</span>${selTag([{v:'hipoecogênica',l:'hipoecogênica'},{v:'hiperecogênica',l:'hiperecogênica'}],e.lesaoEco,"setVal('bexiga','lesaoEco',this.value)")}</div>
+      ${dimInput('bexiga','lesaoX','Med 1')} ${dimInput('bexiga','lesaoY','Med 2')} ${dimInput('bexiga','lesaoZ','Med 3')}
+      ${chk('bexiga','lesaoFluxo','Com fluxo ao Doppler')}</div>`:''}
+    ${chk('bexiga','conteudoBalao','Balão de sonda vesical')}
+  </div>
+  <div class="block"><div class="block-title">Jatos Ureterais</div>
+    ${radioVal('bexiga','jatos','nao_citar','Não citar','jat')}
+    ${radioVal('bexiga','jatos','simetricos','Presentes e simétricos','jat')}
+    ${radioVal('bexiga','jatos','reduzido_d','Presentes, reduzidos à direita','jat')}
+    ${radioVal('bexiga','jatos','reduzido_e','Presentes, reduzidos à esquerda','jat')}
+    ${radioVal('bexiga','jatos','nao_caracterizados','Não caracterizados','jat')}
+  </div>` : ''}
+  `;
+}
+
+// ── VOLUME VESICAL ──
+function renderVolume(){
+  const e = estado.volume;
+  const volPre = volMl(e.preL,e.preAP,e.preT);
+  const volPos = volMl(e.posL,e.posAP,e.posT);
+  
+  return `
+  <div class="sec-title">Volume Vesical (Opcional)</div>
+  <div class="block"><div class="block-title">Pré-miccional <span id="vol-pre-res">${volPre>0?`(${volPre} mL)`:''}</span></div><div class="dim-rows">
+    ${dimInput('volume','preL','Longitudinal')}
+    ${dimInput('volume','preAP','Antero-posterior')}
+    ${dimInput('volume','preT','Transverso')}
+  </div></div>
+  <div class="block"><div class="block-title">Pós-miccional <span id="vol-pos-res">${volPos>0?`(${volPos} mL)`:''}</span></div><div class="dim-rows">
+    ${dimInput('volume','posL','Longitudinal')}
+    ${dimInput('volume','posAP','Antero-posterior')}
+    ${dimInput('volume','posT','Transverso')}
+  </div></div>
+  `;
+}
+
+// ── ACHADOS ADICIONAIS ──
+function renderAdicionais(){
+  return `
+  <div class="sec-title">Achados Adicionais</div>
+  <div class="block"><div class="block-title">Texto Livre</div>
+    <div style="padding:14px;">
+      <textarea class="achados" id="txt-adicionais" oninput="setTextVal('adicionais','texto',this.value)" placeholder="Digite aqui...">${esc(estado.adicionais.texto)}</textarea>
+    </div>
+  </div>
+  `;
+}
+
+// ── CONTROLES ──
+function setSit(val){ estado.rins.sit = val; if(val==='drpad')estado.rins.lesoes=estado.rins.lesoes.filter(l=>l.tipo!=='cisto'); renderPanel(); updateLaudo(); }
+function setVal(sec, field, val){ estado[sec][field] = val; renderPanel(); updateLaudo(); }
+function setTextVal(sec, field, val){ estado[sec][field] = val; if(sec==='volume') atualizarTitulosVolume(); updateLaudo(); }
+function toggleChk(sec, field){ estado[sec][field] = !estado[sec][field]; renderPanel(); updateLaudo(); }
+
+function addLesaoRim(tipo){
+  estado.rins.lesoes.push({
+    id: ++lesaoId, tipo, lado: 'direito', loc: 'terço médio', agrup: 'unico',
+    comp: 'simples', eco: 'hipoecoico', topo: 'cortical',
+    m1: '', m2: '', m3: ''
+  });
+  renderPanel(); updateLaudo();
+}
+function remLesaoRim(id){ estado.rins.lesoes = estado.rins.lesoes.filter(l=>l.id!==id); renderPanel(); updateLaudo(); }
+function updLesaoRim(id, field, val){ const l = estado.rins.lesoes.find(l=>l.id===id); if(l){l[field]=val; updateLaudo();} }
+
+function medStr(l){
+  const p = [l.m1,l.m2,l.m3].filter(m=>m&&m.trim()!=='');
+  return p.length ? `medindo ${p.join(' x ')} cm` : '';
+}
+function medStrAprox(l){
+  const p = [l.m1,l.m2,l.m3].filter(m=>m&&m.trim()!=='');
+  return p.length ? `medindo cerca de ${p.join(' x ')} cm` : '';
+}
+
+// ── AUXILIARES ──
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+// aceita vírgula ou ponto como separador decimal
+function num(s){ const n = parseFloat(String(s==null?'':s).replace(',', '.')); return isNaN(n) ? NaN : n; }
+// volume de elipsoide em cm³ (= mL): L × AP × T × 0,52; null se faltar alguma medida
+function calcVol(l, ap, t){ const a=num(l), b=num(ap), c=num(t); return (isNaN(a)||isNaN(b)||isNaN(c)) ? null : a*b*c*0.52; }
+function volMl(l, ap, t){ const v = calcVol(l, ap, t); return v===null ? null : Math.round(v); }
+function atualizarTitulosVolume(){
+  const e = estado.volume;
+  const pre = volMl(e.preL,e.preAP,e.preT), pos = volMl(e.posL,e.posAP,e.posT);
+  const a = document.getElementById('vol-pre-res'), b = document.getElementById('vol-pos-res');
+  if(a) a.textContent = pre>0 ? `(${pre} mL)` : '';
+  if(b) b.textContent = pos>0 ? `(${pos} mL)` : '';
+}
+
+// ── GERADOR DE LAUDO ──
+function updateLaudo(){
+  const eR = estado.rins;
+  const eB = estado.bexiga;
+  const eV = estado.volume;
+  const eA = estado.adicionais;
+
+  let analise = [];
+  let opinioes = [];
+
+  // ── RINS ──
+  const fmtN = v => (v==null ? '' : String(v)).trim();
+  // Medidas no padrão "RD = XX cm; RE = XX cm". marcador=true mantém "XX" quando o campo está vazio.
+  const parMedidas = (dRD, dRE, marcador) => {
+    const p = [];
+    if(!eR.nefrecDir){ const v = fmtN(dRD); if(v || marcador) p.push(`RD = ${v || 'XX'} cm`); }
+    if(!eR.nefrecEsq){ const v = fmtN(dRE); if(v || marcador) p.push(`RE = ${v || 'XX'} cm`); }
+    return p.join('; ');
+  };
+  const LADO = {D:'à direita', E:'à esquerda'};
+  const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+  let linhasRins = [];
+  let opRins = '';
+
+  if(eR.nefrecDir && eR.nefrecEsq){
+    linhasRins.push('Rins direito e esquerdo não caracterizados (status pós-operatório).');
+    opRins = 'Status pós-nefrectomia bilateral.';
+  } else {
+    // Combinações incoerentes com a nefrectomia caem no texto habitual
+    let sit = eR.sit;
+    if(sit==='ectopico' && ((eR.ectopicoLado==='direito'&&eR.nefrecDir)||(eR.ectopicoLado==='esquerdo'&&eR.nefrecEsq))) sit = 'habitual';
+    if(sit==='ferradura' && (eR.nefrecDir||eR.nefrecEsq)) sit = 'habitual';
+
+    const dimNorm = parMedidas(eR.dimRD_L, eR.dimRE_L, true);
+    const dimOpc  = parMedidas(eR.dimRD_L, eR.dimRE_L, false);
+    const espOpc  = parMedidas(eR.espRD, eR.espRE, false);
+    const parenqPreservado = `Espessura e ecogenicidade parenquimatosas preservadas${espOpc ? ` (espessura: ${espOpc})` : ''}.`;
+    let topo = '', parenq = '';
+
+    if(sit==='habitual'){
+      if(eR.nefrecDir){ topo = `Rim direito não caracterizado (status pós-operatório). Rim esquerdo tópico, de dimensões normais (${dimNorm}).`; opRins = 'Status pós-nefrectomia direita.'; }
+      else if(eR.nefrecEsq){ topo = `Rim esquerdo não caracterizado (status pós-operatório). Rim direito tópico, de dimensões normais (${dimNorm}).`; opRins = 'Status pós-nefrectomia esquerda.'; }
+      else topo = `tópicos, de dimensões normais (${dimNorm}).`;
+      parenq = parenqPreservado;
+    } else if(sit==='ectopico'){
+      const outroLado = eR.ectopicoLado==='direito'?'esquerdo':'direito';
+      if((eR.ectopicoLado==='direito'&&eR.nefrecEsq)||(eR.ectopicoLado==='esquerdo'&&eR.nefrecDir)){
+        topo = `Rim ${outroLado} não caracterizado (status pós-operatório). Rim ${eR.ectopicoLado} localizado em ${eR.ectopicoLoc}, de dimensões normais (${dimNorm}).`;
+        opRins = `Rim ${eR.ectopicoLado} ectópico. Status pós-nefrectomia ${outroLado === 'direito' ? 'direita' : 'esquerda'}.`;
+      } else {
+        topo = `Rim ${eR.ectopicoLado} localizado em ${eR.ectopicoLoc}. Rim ${outroLado} em topografia habitual. Rins de dimensões normais (${dimNorm}).`;
+        opRins = `Rim ${eR.ectopicoLado} ectópico.`;
+      }
+      parenq = parenqPreservado;
+    } else if(sit==='ferradura'){
+      topo = 'Rins apresentando desvio anterior do seu eixo de rotação assim como fusão de seus polos inferiores em topografia de linha média, anteriormente à aorta abdominal.';
+      opRins = 'Rins em ferradura.';
+      parenq = parenqPreservado;
+    } else if(sit==='drpad'){
+      topo = 'Rins em topografia habitual, com dimensões aumentadas e contornos lobulados. Presença de alteração ecotextural caracterizada por distorção arquitetural difusa à custa de múltiplos cistos dispersos por todo o parênquima renal bilateralmente, predominantemente corticais.';
+      opRins = 'Achados ecográficos compatíveis com doença renal policística autossômica dominante.';
+    } else if(sit==='insuf'){
+      topo = 'Rins em topografia habitual, com dimensões habituais e contornos lobulados.';
+      opRins = `Achados ecográficos sugestivos de insuficiência renal incipiente ${eR.afeccaoLado}.`;
+      parenq = 'Parênquima com espessura discretamente reduzida e diferenciação corticomedular mantida.';
+    } else if(sit==='aguda'){
+      if(eR.afeccaoLado==='bilateral') topo = 'Rins em topografia habitual, com dimensões aumentadas e contornos regulares.';
+      else topo = `Rins em topografia habitual, com contornos regulares. Rim ${eR.afeccaoLado.replace('à ','')} encontra-se com dimensões aumentadas, enquanto que o rim contralateral conserva dimensões.`;
+      opRins = `Achados ecográficos compatíveis com nefropatia parenquimatosa aguda ${eR.afeccaoLado}.`;
+      parenq = `Parênquima com espessura preservada e diferenciação corticomedular mantida. Observa-se aumento difuso da ecogenicidade cortical renal ${eR.afeccaoLado}.`;
+    } else if(sit==='cronica'){
+      if(eR.afeccaoLado==='bilateral') topo = 'Rins em topografia habitual, com dimensões reduzidas e contornos regulares.';
+      else topo = `Rins em topografia habitual, com contornos regulares. Rim ${eR.afeccaoLado.replace('à ','')} encontra-se com dimensões reduzidas, enquanto que o rim contralateral conserva dimensões.`;
+      opRins = `Achados ecográficos compatíveis com nefropatia crônica ${eR.afeccaoLado}.`;
+      if(eR.afeccaoLado==='bilateral') parenq = 'Parênquima com espessura reduzida e perda da diferenciação corticomedular. Observa-se aumento difuso da ecogenicidade cortical renal bilateralmente.';
+      else parenq = `Parênquima com espessura reduzida e perda da diferenciação corticomedular, associado a aumento difuso da ecogenicidade cortical renal ${eR.afeccaoLado}.`;
+    }
+
+    // Medidas opcionais nas situações em que o texto não traz o padrão RD/RE embutido
+    if(sit!=='habitual' && sit!=='ectopico' && dimOpc) topo += ` Dimensões longitudinais: ${dimOpc}.`;
+    if(!['habitual','ectopico','ferradura'].includes(sit) && espOpc) parenq = (parenq + ` Espessura parenquimatosa: ${espOpc}.`).trim();
+
+    linhasRins.push(topo);
+    if(parenq) linhasRins.push(parenq);
+
+    // Lateralidade efetiva das lesões (descarta o lado nefrectomizado)
+    const ladoEfetivo = (lado) => {
+      if(eR.nefrecDir) return (lado==='esquerdo'||lado==='bilateral') ? 'esquerdo' : null;
+      if(eR.nefrecEsq) return (lado==='direito'||lado==='bilateral') ? 'direito' : null;
+      return lado;
+    };
+
+    // Lesões
+    let calculosObstrutivosDir = false;
+    let calculosObstrutivosEsq = false;
+    let temCalculo = false;
+    const descCalc = []; const descCisto = []; const descNod = [];
+    eR.lesoes.forEach(l => {
+      const lado = ladoEfetivo(l.lado);
+      if(!lado) return;
+      const ladoTxt = lado==='bilateral'?'bilateralmente':(lado==='direito'?'à direita':'à esquerda');
+      if(l.tipo==='calculo'){
+        temCalculo = true;
+        const obs = ['junção ureteropiélica','junção ureterovesical','ureter proximal','ureter médio','ureter distal'].includes(l.loc);
+        if(obs && ['direito','bilateral'].includes(lado)) calculosObstrutivosDir = true;
+        if(obs && ['esquerdo','bilateral'].includes(lado)) calculosObstrutivosEsq = true;
+
+        if(l.agrup==='unico'){
+          descCalc.push(`cálculo ${obs?'obstrutivo':'não obstrutivo'} em ${l.loc} ${ladoTxt}${medStrAprox(l)?', '+medStrAprox(l):''}`);
+          opinioes.push(obs ? `Cálculo obstrutivo em ${l.loc} ${ladoTxt}.` : `Nefrolitíase não obstrutiva ${ladoTxt}.`);
+        } else {
+          descCalc.push(`múltiplos cálculos${obs?'':' não obstrutivos'}, ${obs?'sendo o maior obstrutivo':'o maior localizado'} em ${l.loc} ${ladoTxt}${medStrAprox(l)?', '+medStrAprox(l):''}`);
+          opinioes.push(obs ? `Múltiplos cálculos, o maior obstrutivo em ${l.loc} ${ladoTxt}.` : `Nefrolitíase não obstrutiva ${ladoTxt}.`);
+        }
+      }
+      else if(l.tipo==='cisto'){
+        const locCisto = l.topo==='seio renal' ? `em seio renal (${l.loc})` : `em ${l.loc} cortical`;
+        if(l.agrup==='unico'){
+          descCisto.push(`cisto ${l.comp} ${locCisto} ${ladoTxt}${medStrAprox(l)?', '+medStrAprox(l):''}`);
+          opinioes.push(`Cisto renal ${l.comp==='complexo'?'complexo ':''}${ladoTxt}.`);
+        } else {
+          descCisto.push(`múltiplos cistos ${l.comp === 'simples' ? 'simples' : 'complexos'}, o maior localizado ${locCisto} ${ladoTxt}${medStrAprox(l)?', '+medStrAprox(l):''}`);
+          opinioes.push(`Cistos renais${l.comp==='complexo'?' complexos':''} ${ladoTxt}.`);
+        }
+      }
+      else if(l.tipo==='nodulo'){
+        if(l.agrup==='unico'){
+          descNod.push(`nódulo sólido, ${l.eco}, em ${l.loc} ${ladoTxt}${medStrAprox(l)?', '+medStrAprox(l):''}`);
+          opinioes.push(`Nódulo renal sólido ${ladoTxt}. Sugere-se, a critério clínico, prosseguimento da investigação com tomografia computadorizada ou ressonância magnética com contraste.`);
+        } else {
+          descNod.push(`múltiplos nódulos sólidos, o maior ${l.eco} em ${l.loc} ${ladoTxt}${medStrAprox(l)?', '+medStrAprox(l):''}`);
+          opinioes.push(`Múltiplos nódulos renais sólidos ${ladoTxt}. Sugere-se, a critério clínico, prosseguimento da investigação.`);
+        }
+      }
+    });
+    const tds = [...descCalc, ...descCisto, ...descNod];
+    if(tds.length === 1) linhasRins.push('Destaca-se: ' + tds[0] + '.');
+    else if(tds.length > 1) linhasRins.push('Destaca-se:<br>- ' + tds.join('<br>- ') + '.');
+
+    // Hidronefrose / ausência de cálculos
+    const present = [];
+    if(!eR.nefrecDir) present.push('D');
+    if(!eR.nefrecEsq) present.push('E');
+    const hid = {D:eR.hidroDir, E:eR.hidroEsq};
+    const ure = {D:eR.ureterDir, E:eR.ureterEsq};
+    const obsLado = {D:calculosObstrutivosDir, E:calculosObstrutivosEsq};
+    const afet = present.filter(s => hid[s] !== 'ausente');
+    let hidroTxt = '';
+
+    if(afet.length === 0){
+      hidroTxt = temCalculo ? 'Ausência de hidronefrose.' : 'Ausência de hidronefrose ou cálculos detectáveis ao método.';
+    } else {
+      let corpo;
+      if(afet.length === 2) corpo = hid.D===hid.E ? `${cap(hid.D)} dilatação do sistema coletor bilateralmente` : `Dilatação do sistema coletor bilateralmente, sendo ${hid.D} à direita e ${hid.E} à esquerda`;
+      else corpo = `${cap(hid[afet[0]])} dilatação do sistema coletor ${LADO[afet[0]]}`;
+
+      const afObs = afet.filter(s => obsLado[s]);
+      let fator;
+      if(afObs.length === 0) fator = 'sem caracterização de fator obstrutivo ao presente método';
+      else if(afObs.length === afet.length) fator = 'em associação a cálculo obstrutivo';
+      else {
+        const sem = afet.find(s => !obsLado[s]);
+        fator = `em associação a cálculo obstrutivo ${LADO[afObs[0]]}, sem caracterização de fator obstrutivo ${LADO[sem]} ao presente método`;
+      }
+
+      const afUre = afet.filter(s => ure[s]);
+      let ureTxt = '';
+      if(afUre.length === 2) ureTxt = ', associado a dilatação ureteral bilateral';
+      else if(afUre.length === 1) ureTxt = `, associado a dilatação do ureter ${LADO[afUre[0]]}`;
+
+      hidroTxt = `${corpo}, ${fator}${ureTxt}.`;
+      if(present.length === 2 && afet.length === 1){
+        const outro = present.find(s => s !== afet[0]);
+        hidroTxt += ` Ausência de hidronefrose ${LADO[outro]}.`;
+      }
+      if(!temCalculo) hidroTxt += ' Ausência de cálculos detectáveis ao método.';
+
+      // Conclusão: lados com dilatação sem cálculo obstrutivo correspondente
+      const semObs = afet.filter(s => !obsLado[s]);
+      if(semObs.length){
+        const lab = semObs.length === 2 ? 'bilateralmente' : LADO[semObs[0]];
+        const uTxt = semObs.some(s => ure[s]) ? ' e ureteral' : '';
+        opinioes.push(`Dilatação do sistema coletor${uTxt} ${lab}.`);
+      }
+    }
+    linhasRins.push(hidroTxt);
+  }
+
+  if(opRins) opinioes.unshift(opRins); // coloca no topo das opiniões
+
+  // Remove o sujeito inicial já contemplado pelo rótulo "- Rins:"
+  let corpoRins = linhasRins.filter(Boolean).join('<br>').replace(/^Rins /, '');
+  let fraseRins = `<span class="doc-label">- Rins:</span> ${corpoRins}`;
+
+  // ── BEXIGA ──
+  let partesBexiga = [];
+  if(eB.sit==='vazia'){
+    partesBexiga.push('Bexiga vazia, limitando a sua adequada avaliação ecográfica.');
+  } else if (eB.sit==='baixa_replecao') {
+    partesBexiga.push('Bexiga urinária com conteúdo anecóide de baixa repleção, limitando a sua adequada avaliação ecográfica.');
+  } else {
+    const espessada = eB.sit==='espessada';
+    const repl = eB.sit==='parcial' ? 'repleção parcial' : 'repleção satisfatória';
+    const espP = fmtN(eB.espParede);
+    const temCoagulo = eB.conteudoCoaguloMovel || eB.conteudoCoaguloAderido;
+    const hasEspecial = temCoagulo || eB.conteudoLesao || eB.conteudoCalculo;
+    const txtParedeEsp = `paredes com espessura aumentada${espP ? ` (até ${espP} cm)` : ''}`;
+
+    if(espessada) opinioes.push(eB.diverticulos ? 'Espessamento parietal vesical difuso (associado a divertículos).' : 'Espessamento parietal vesical difuso.');
+    if(eB.conteudoDebris) opinioes.push('Bexiga contendo debris em seu interior.');
+
+    if(!temCoagulo){
+      const parStr = espessada ? txtParedeEsp : 'paredes regulares';
+      const contStr = eB.conteudoDebris ? 'conteúdo com ecos em suspensão' : 'conteúdo anecogênico';
+      let s = `Bexiga com ${repl}, ${parStr} e ${contStr}.`;
+      if(espessada && eB.diverticulos) s += ' Presença de divertículos parietais.';
+      partesBexiga.push(s);
+    } else {
+      if (eB.conteudoCoaguloMovel) {
+        partesBexiga.push('Bexiga urinária de forma e capacidade conservadas, com presença de conteúdo hipoecogênico e amorfo no seu interior, móvel à mudança de decúbito, sem fluxo ao estudo complementar com Doppler, que pode corresponder a coágulos sanguíneos ou a sedimento de outra natureza.');
+        opinioes.push('Achados sugestivos de coágulo vesical e/ou sedimento de outra natureza.');
+      }
+      if (eB.conteudoCoaguloAderido) {
+        let paredeCoagulo = eB.coaguloAderidoParede === 'assoalho vesical' ? 'ao seu assoalho vesical' : `à sua ${eB.coaguloAderidoParede || 'parede'}`;
+        partesBexiga.push(`${espessada ? 'Bexiga apresentando' : 'Bexiga de paredes levemente espessadas, apresentando'} material amorfo e heterogêneo, aderido ${paredeCoagulo}, imóvel a mudança de decúbito, sem fluxo ao estudo complementar com Doppler, sugestivo de coágulo aderido, na dependência de dados clínicos e laboratoriais. A critério correlacionar com cistoscopia.`);
+        opinioes.push('Achados sugestivos de coágulo vesical aderido à parede vesical.');
+      }
+      if (espessada) partesBexiga.push(`${cap(txtParedeEsp)}.${eB.diverticulos ? ' Presença de divertículos parietais.' : ''}`);
+      if (eB.conteudoDebris) partesBexiga.push('Observam-se ecos em suspensão no conteúdo vesical.');
+    }
+
+    if (eB.conteudoCalculo) {
+      let medCalc = [eB.calculoX, eB.calculoY, eB.calculoZ].filter(m=>m).join(' x ');
+      let medStrCalc = medCalc ? `medindo ${medCalc} cm` : 'medindo * cm';
+      partesBexiga.push(`Caracteriza-se no interior da bexiga formação arredondada, de limites precisos, contornos regulares, hiperecogênica, com sombra acústica posterior, móvel com a mudança de decúbito, ${medStrCalc}, sugestiva de cálculo.`);
+      opinioes.push('Litíase vesical.');
+    }
+    if (eB.conteudoLesao) {
+      const vL = calcVol(eB.lesaoX, eB.lesaoY, eB.lesaoZ);
+      const volLesao = vL===null ? null : vL.toFixed(1).replace('.',',');
+      const fluxo = eB.lesaoFluxo ? 'com fluxo' : 'sem fluxo';
+      let locLesao = eB.lesaoLoc === 'assoalho vesical' ? 'No assoalho vesical' : `Na ${eB.lesaoLoc || 'parede lateral direita'}`;
+      partesBexiga.push(`${locLesao}, caracteriza-se formação nodular sólida, ${eB.lesaoEco}, de contornos arredondados, ${fluxo} ao estudo complementar com Doppler, imóvel às mudanças de decúbito, medindo ${eB.lesaoX || 'A'} x ${eB.lesaoY || 'B'} x ${eB.lesaoZ || 'C'} cm e volume de ${volLesao || 'x'} cm³.`);
+      opinioes.push('Achados sugestivos de massa/pólipo vesical, sendo conveniente prosseguir investigação diagnóstica.');
+    }
+    if (eB.conteudoBalao) {
+      partesBexiga.push(hasEspecial ? 'Destaca-se também: balonete de sonda vesical.' : 'Destaca-se em seu interior: balonete de sonda vesical.');
+      opinioes.push('Bexiga contendo balonete de sonda em seu interior.');
+    }
+
+    // Jatos
+    if(eB.jatos==='simetricos') partesBexiga.push('Jatos ureterais presentes e simétricos.');
+    else if(eB.jatos==='reduzido_d') { partesBexiga.push('Jatos ureterais presentes, assimétricos, reduzidos à direita.'); opinioes.push('Jatos ureterais reduzidos à direita.'); }
+    else if(eB.jatos==='reduzido_e') { partesBexiga.push('Jatos ureterais presentes, assimétricos, reduzidos à esquerda.'); opinioes.push('Jatos ureterais reduzidos à esquerda.'); }
+    else if(eB.jatos==='nao_caracterizados') { partesBexiga.push('Jatos ureterais não caracterizados.'); }
+  }
+  // Remove o sujeito inicial já contemplado pelo rótulo "- Bexiga:"
+  let corpoBexiga = partesBexiga.join(' ').trim().replace(/^Bexiga( urinária)? /, '');
+  let fraseBexiga = `<span class="doc-label">- Bexiga:</span> ${corpoBexiga}`;
+
+  // VOLUMES (cm × cm × cm × 0,52 = mL). Só entram no laudo quando as três medidas estão preenchidas.
+  const vPre = volMl(eV.preL, eV.preAP, eV.preT);
+  const vPos = volMl(eV.posL, eV.posAP, eV.posT);
+  let fraseVol = '';
+
+  if(vPre!==null && vPre>0) fraseVol += `Volume vesical pré-miccional estimado em ${vPre} mL. `;
+
+  if(vPos!==null){
+    if(vPos===0) fraseVol += 'Resíduo vesical pós-miccional ausente.';
+    else if(vPos<=30) fraseVol += `Resíduo vesical pós-miccional desprezível (${vPos} mL).`;
+    else if(vPos<=80) { fraseVol += `Resíduo vesical pós-miccional pequeno (${vPos} mL).`; opinioes.push('Resíduo pós-miccional pequeno.'); }
+    else if(vPos<=150) { fraseVol += `Resíduo vesical pós-miccional moderado (${vPos} mL).`; opinioes.push('Resíduo pós-miccional moderado.'); }
+    else if(vPos<=300) { fraseVol += `Resíduo vesical pós-miccional acentuado (${vPos} mL).`; opinioes.push('Resíduo pós-miccional acentuado.'); }
+    else { fraseVol += `Resíduo vesical pós-miccional muito acentuado (${vPos} mL).`; opinioes.push('Resíduo pós-miccional muito acentuado.'); }
+  }
+  fraseVol = fraseVol.trim();
+
+  // ADICIONAIS (texto livre escapado; quebras de linha preservadas; sem duplicar o prefixo)
+  const txtAdic = eA.texto.trim().replace(/^achados adicionais\s*:\s*/i, '');
+  let adic = txtAdic ? `<div class="doc-p">Achados adicionais: ${esc(txtAdic).replace(/\r?\n/g,'<br>')}</div>` : '';
+
+  // CONCLUSÃO FINAL
+  let opFinal = '';
+  if(opinioes.length===0){
+    opFinal = 'Exame sem alterações significativas evidentes.';
+  } else {
+    // Unique
+    opinioes = [...new Set(opinioes)];
+    opFinal = opinioes.join('<br>') + '<br>Demais estruturas sem evidentes anormalidades apreciáveis ao método.';
+  }
+
+  document.getElementById('laudo-doc').innerHTML=`
+    <div class="doc-titulo">ULTRASSONOGRAFIA DO APARELHO URINÁRIO</div>
+    <div><br></div>
+    <div class="doc-secao">
+      <span class="doc-label">Técnica:</span>
+      <div class="doc-p">Exame realizado em aparelho dinâmico com transdutor convexo por via abdominal.</div>
+    </div>
+    <div><br></div>
+    <div class="doc-secao">
+      <span class="doc-label">Análise:</span>
+      <div class="doc-p">${fraseRins}</div>
+      <div class="doc-p">${fraseBexiga}</div>
+      ${fraseVol ? `<div class="doc-p">${fraseVol}</div>` : ''}
+      ${adic}
+    </div>
+    <div><br></div>
+    <div class="doc-secao">
+      <span class="doc-label">Conclusão:</span>
+      <div class="doc-p">${opFinal}</div>
+    </div>`;
+}
+
+function toggleDark(){
+  const isDark = document.body.classList.toggle('dark');
+  const btn = document.getElementById('btn-dark-toggle');
+  if(isDark) btn.innerHTML='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 8.5A5.5 5.5 0 0 1 6 3c0-.18.01-.36.03-.53A6 6 0 1 0 13.97 9.5c-.15.01-.31.01-.47 0z"/></svg>Modo claro';
+  else btn.innerHTML='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro';
+  localStorage.setItem('darkMode', isDark ? '1' : '0');
+}
+(function(){ if(localStorage.getItem('darkMode')==='1') toggleDark(); })();
+
+// Fallback de cópia (HTML limpo com estilos inline, sem cores do tema) usado se _copyLaudoRichText não estiver disponível
+function _copiarLaudoFallback(el, cb){
+  const html = '<div style="font-family:Arial,Helvetica,sans-serif;font-size:10pt;color:#000;">' + el.innerHTML
+    .replace(/class="doc-titulo"/g,'style="text-align:center;font-weight:bold;margin-bottom:0;"')
+    .replace(/class="doc-label"/g,'style="font-weight:bold;"')
+    .replace(/class="doc-p"/g,'style="margin:0 0 6px 0;"')
+    .replace(/class="doc-secao"/g,'style="margin-bottom:0;"') + '</div>';
+  const txt = el.innerText;
+  try{
+    if(navigator.clipboard && window.ClipboardItem){
+      navigator.clipboard.write([new ClipboardItem({
+        'text/html': new Blob([html],{type:'text/html'}),
+        'text/plain': new Blob([txt],{type:'text/plain'})
+      })]).then(function(){cb(true);}, function(){cb(false);});
+      return;
+    }
+  }catch(e){}
+  let ok = false;
+  const h = function(ev){ ev.clipboardData.setData('text/html',html); ev.clipboardData.setData('text/plain',txt); ev.preventDefault(); };
+  document.addEventListener('copy', h);
+  try{ ok = document.execCommand('copy'); }catch(e){}
+  document.removeEventListener('copy', h);
+  cb(ok);
+}
+
+function copiar() {
+  var el = document.getElementById('laudo-doc');
+  if (!el) return;
+  // Copia sempre com o tema claro, para não levar fundo escuro nem cores claras do modo escuro
+  var eraDark = document.body.classList.contains('dark');
+  if (eraDark) document.body.classList.remove('dark');
+  var restaurado = false;
+  function restaurar(){ if(!restaurado){ restaurado = true; if(eraDark) document.body.classList.add('dark'); } }
+  var fn = (typeof _copyLaudoRichText === 'function') ? _copyLaudoRichText : _copiarLaudoFallback;
+  setTimeout(restaurar, 2000);
+  try {
+    fn(el, function(ok) {
+      restaurar();
+      showToast(ok ? 'Laudo copiado para a área de transferência!' : 'Falha ao copiar. Use Ctrl+A e Ctrl+C no texto do laudo.');
+    });
+  } catch (err) {
+    restaurar();
+    showToast('Falha ao copiar. Use Ctrl+A e Ctrl+C no texto do laudo.');
+  }
+}
+
+// Intercepta copy manual no dark mode para remover fundo escuro
+document.getElementById('laudo-doc').addEventListener('copy', function(e) {
+  if (!document.body.classList.contains('dark')) return;
+  document.body.classList.remove('dark');
+  document.body.offsetHeight;
+  setTimeout(function() {
+    document.body.classList.add('dark');
+  }, 0);
+});
+
+function showToast(msg) {
+  let t = document.getElementById('toast-notification');
+  t.innerText = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+function imprimir(){ 
+  const h=document.getElementById('laudo-doc').innerHTML; 
+  const w=window.open('','_blank'); 
+  if(!w){ showToast('Permita pop-ups para imprimir o laudo.'); return; }
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Helvetica,Arial,sans-serif;font-size:10pt;padding:32px;color:#111;line-height:1.65;}.doc-titulo{text-align:center;font-weight:700;text-transform:uppercase;margin-bottom:0;}.doc-label{font-weight:700;}.doc-p{margin-bottom:8px;}.doc-secao{margin-bottom:0;}*{color:#111 !important;}.laudo-doc:focus { outline: none; }
+</style></head><body>${h}
+</body></html>`); 
+  w.document.close(); 
+  setTimeout(function(){ w.focus(); w.print(); }, 250); 
+}
+function reiniciar(){
+  estado.rins = { sit: 'habitual', ectopicoLado: 'direito', ectopicoLoc: 'fossa ilíaca direita', nefrecDir: false, nefrecEsq: false, afeccaoLado: 'bilateral', dimRD_L: '', espRD: '', dimRE_L: '', espRE: '', hidroDir: 'ausente', hidroEsq: 'ausente', ureterDir: false, ureterEsq: false, lesoes: [] };
+  estado.bexiga = { sit: 'habitual', espParede: '', diverticulos: false, conteudoDebris: false, conteudoCoaguloMovel: false, conteudoCoaguloAderido: false, coaguloAderidoParede: 'parede posterior', conteudoCalculo: false, calculoX: '', calculoY: '', calculoZ: '', conteudoLesao: false, lesaoLoc: 'parede lateral direita', lesaoX: '', lesaoY: '', lesaoZ: '', lesaoFluxo: false, lesaoEco: 'hipoecogênica', conteudoBalao: false, jatos: 'nao_citar' };
+  estado.volume = { preL: '', preAP: '', preT: '', posL: '', posAP: '', posT: '' };
+  estado.adicionais = { texto: '' };
+  showSection('rins');
+}
+
+showSection('rins');
+</script>
+
+<div id="toast-notification" class="toast-notification">Laudo copiado!</div>
+<script src="../js/copy-pacs.js"></script>
+</body>
+</html>

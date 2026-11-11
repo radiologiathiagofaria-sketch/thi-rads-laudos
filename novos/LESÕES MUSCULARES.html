@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thi-Rads — US Partes Moles</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===== Paleta alinhada ao app obstétrico (slate escuro + ciano) ===== */
+:root{
+  --blue:#0e6a83;--blue-dark:#0c566b;--blue-light:#d3e6ec;--blue-mid:#c0dce5;
+  --surface:#e1e6ee;--border:#c9d1de;--border-strong:#9eacc2;
+  --text:#1b2538;--text-2:#34425b;--text-3:#5c6a83;
+  --white:#f3f5f9;--green:#047857;--red:#c93a3a;--radius:10px;--radius-lg:14px;
+  --hover:#dfeaf0;--sel-bg:#cbe3ec;--focus-ring:rgba(14,106,131,.22);
+}
+body.dark{
+  --blue:#2fa9c2;--blue-dark:#2490a8;--blue-light:#12293d;--blue-mid:#12293d;
+  --surface:#090e19;--border:#1a263b;--border-strong:#33445f;
+  --text:#c9d2e0;--text-2:#a3afc4;--text-3:#7a879f;
+  --white:#0e1626;--green:#2fbf8c;--red:#e07a7a;
+  --hover:#13203a;--sel-bg:#12324a;--focus-ring:rgba(47,169,194,.28);
+}
+body.dark .laudo-doc{color:#e2e6f0;}
+body.dark .laudo-panel{background:var(--white);border-left-color:var(--border);}
+body.dark .laudo-body{background:var(--white);}
+body.dark .laudo-header{background:var(--white);border-bottom-color:var(--border);}
+@media print{
+  body.dark .laudo-doc,
+  body.dark .laudo-doc *{color:#111 !important;}
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',system-ui,sans-serif;font-size:14px;background:var(--surface);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+/* ----- Barra superior ----- */
+.toolbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 22px;display:flex;align-items:center;gap:10px;height:58px;flex-shrink:0;}
+.logo{display:flex;align-items:baseline;gap:8px;margin-right:14px;}
+.logo-name{font-size:20px;font-weight:600;color:var(--blue);letter-spacing:-.3px;}
+.logo-sub{font-size:13px;color:var(--text-3);font-weight:400;}
+.tb-sep{width:1px;height:24px;background:var(--border);margin:0 4px;}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid var(--border-strong);font-weight:500;transition:all .13s;background:var(--white);color:var(--text);}
+.btn:hover{background:var(--hover);border-color:var(--blue);color:var(--blue);}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600;}
+body.dark .btn-primary{color:#06202b;}
+.btn-primary:hover{background:var(--blue-dark);border-color:var(--blue-dark);color:#fff;}
+body.dark .btn-primary:hover{color:#06202b;}
+.btn-danger{background:#f6e6e8;color:var(--red);border-color:#e3a9ad;}
+body.dark .btn-danger{background:#2d1a1f;border-color:#7a3038;}
+.btn-danger:hover{background:#fee2e2;border-color:#f87171;color:var(--red);}
+body.dark .btn-danger:hover{background:#3a2026;}
+.btn svg{width:16px;height:16px;flex-shrink:0;}
+.btn-dark{margin-left:auto;}
+.btn:focus-visible,.nav-item:focus-visible{outline:2px solid var(--blue);outline-offset:2px;}
+
+.body{display:flex;flex:1;overflow:hidden;}
+
+/* ----- Coluna esquerda: navegação ----- */
+.sidebar{width:208px;background:var(--white);border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;}
+.sidebar-hd{padding:16px 16px 14px;border-bottom:1px solid var(--border);}
+.sidebar-tipo{font-size:12px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px;}
+.sidebar-titulo{font-size:19px;font-weight:600;color:var(--text);}
+.nav-group{padding:8px 0;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:15px;color:var(--text-2);cursor:pointer;transition:all .12s;border-left:3px solid transparent;line-height:1.25;}
+.nav-item:hover{background:var(--hover);color:var(--text);}
+.nav-item.active{background:var(--sel-bg);color:var(--blue);border-left-color:var(--blue);font-weight:600;}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.45;flex-shrink:0;}
+.nav-item.active .nav-dot{opacity:1;}
+
+/* ----- Coluna central: formulário ----- */
+.panel{width:560px;flex-shrink:0;overflow-y:auto;padding:18px 18px 26px;background:var(--surface);}
+.panel .doc-p{font-size:14px !important;}
+.sec-title{font-size:19px;font-weight:600;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:9px;}
+.sec-title::before{content:'';display:block;width:4px;height:22px;background:var(--blue);border-radius:2px;}
+.block{margin-bottom:14px;background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden;}
+.block-title{font-size:13px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.6px;padding:11px 16px 10px;border-bottom:1px solid var(--border);background:var(--white);}
+body.dark .block-title{border-bottom-color:var(--border);}
+
+.radio-opt{display:flex;align-items:flex-start;gap:0;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;position:relative;}
+.radio-opt:last-child{border-bottom:none;}
+.radio-opt:hover{background:var(--hover);}
+.radio-opt.selected{background:var(--sel-bg);}
+.radio-opt input[type=radio]{position:absolute;opacity:0;pointer-events:none;}
+.radio-label{display:flex;align-items:center;gap:12px;width:100%;padding:12px 16px;font-size:15px;color:var(--text);line-height:1.4;cursor:pointer;}
+.radio-opt.selected .radio-label{color:var(--blue);font-weight:600;}
+.radio-mark{width:20px;height:20px;border-radius:50%;border:2px solid var(--border-strong);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.radio-opt:hover .radio-mark{border-color:var(--blue);}
+.radio-opt.selected .radio-mark{border-color:var(--blue);background:var(--blue);}
+.radio-mark::after{content:'';width:8px;height:8px;border-radius:50%;background:#fff;opacity:0;transition:opacity .15s;}
+body.dark .radio-mark::after{background:#06202b;}
+.radio-opt.selected .radio-mark::after{opacity:1;}
+
+.check-row{display:flex;align-items:center;gap:0;border-bottom:1px solid var(--border);cursor:pointer;background:var(--surface);}
+.check-row:last-child{border-bottom:none;}
+.check-row:hover{background:var(--hover);}
+.check-row.selected{background:var(--sel-bg);}
+.check-row input[type=checkbox]{position:absolute;opacity:0;pointer-events:none;}
+.check-label{display:flex;align-items:center;gap:12px;width:100%;padding:11px 16px 11px 34px;font-size:14.5px;color:var(--text);cursor:pointer;}
+.check-row.selected .check-label{color:var(--blue);font-weight:600;}
+.check-box{width:19px;height:19px;border-radius:5px;border:2px solid var(--border-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.check-row:hover .check-box{border-color:var(--blue);}
+.check-row.selected .check-box{border-color:var(--blue);background:var(--blue);}
+.check-box svg{display:none;width:12px;height:12px;}
+.check-row.selected .check-box svg{display:block;}
+body.dark .check-box svg{stroke:#06202b;}
+.sel-tag{font-size:13px;border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);margin-left:6px;cursor:pointer;}
+
+.dim-rows{padding:12px 16px;display:flex;flex-direction:column;gap:9px;}
+.dim-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.dim-lbl{flex:1;font-size:14.5px;color:var(--text);}
+.dim-input{width:76px;padding:8px 10px;border:1px solid var(--border-strong);border-radius:8px;font-size:14.5px;font-family:'DM Sans',sans-serif;text-align:center;color:var(--text);background:var(--white);transition:border .12s;}
+.dim-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--focus-ring);}
+.dim-unit{font-size:14px;color:var(--text-3);}
+.nodulo-wrap{padding:12px 16px;display:flex;flex-direction:column;gap:10px;}
+
+.btn-add-lesao{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:600;transition:all .12s;border:1.5px dashed var(--blue);background:transparent;color:var(--blue);width:100%;justify-content:center;}
+.btn-add-lesao:hover{background:var(--sel-bg);}
+.lesao-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 14px;margin-bottom:10px;}
+.lesao-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;}
+.lesao-hd-title{font-size:13px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.5px;}
+.btn-rem{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:6px;font-size:12.5px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;border:1px solid #e3a9ad;background:#f6e6e8;color:var(--red);transition:all .12s;}
+body.dark .btn-rem{background:#2d1a1f;border-color:#7a3038;}
+.btn-rem:hover{background:#fee2e2;}
+body.dark .btn-rem:hover{background:#3a2026;}
+
+.ff-grid{display:flex;gap:11px;flex-wrap:wrap;margin-bottom:8px;}
+.ff{display:flex;flex-direction:column;gap:4px;}
+.ff label{font-size:12px;color:var(--text-2);font-weight:600;text-transform:uppercase;letter-spacing:.3px;}
+.ff select,.ff input[type=text],.ff input[type=number]{font-size:14px;padding:7px 9px;border:1px solid var(--border-strong);border-radius:7px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);}
+.ff select:focus,.ff input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--focus-ring);}
+.ff input[type=text],.ff input[type=number]{width:68px;text-align:center;}
+.inline-select{font-size:14px;padding:6px 9px;border:1px solid var(--border-strong);border-radius:7px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);margin-left:5px;}
+.inline-select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--focus-ring);}
+.inline-num{width:60px;font-size:14px;padding:6px 8px;border:1px solid var(--border-strong);border-radius:7px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);text-align:center;margin:0 2px;}
+.inline-num:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--focus-ring);}
+body.dark .sub-opts{background:var(--hover);border-bottom-color:var(--border);}
+.sub-opt-label{color:var(--text-2);}
+body.dark .sub-opt-label{background:var(--white);color:var(--text);}
+.panel select option{background:var(--white);color:var(--text);}
+
+/* ----- Coluna direita: LAUDO (fonte e estrutura preservadas) ----- */
+.laudo-panel{flex:1;min-width:0;background:var(--white);display:flex;flex-direction:column;border-left:1px solid var(--border);}
+.laudo-header{padding:9px 20px 8px;border-bottom:1px solid var(--border);background:var(--white);display:flex;align-items:center;}
+.laudo-header-title{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.6px;}
+.laudo-body{flex:1;overflow-y:auto;padding:22px 28px;}
+.laudo-doc{font-family:Helvetica,Arial,sans-serif;font-size:10pt;line-height:1.65;color:#111;max-width:720px;}
+.doc-titulo{text-align:center;font-weight:700;font-size:10pt;margin-bottom:16px;text-transform:uppercase;letter-spacing:.3px;}
+.doc-label{font-weight:700;font-size:10pt;}
+.doc-p{margin-bottom:8px;font-size:10pt;}
+.doc-secao{margin-bottom:14px;}
+.laudo-doc:focus { outline: none; }
+
+.toast-notification{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(12px);background:var(--text);color:var(--white);font-size:12.5px;font-weight:500;padding:10px 18px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.18);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;z-index:999;}
+.toast-notification.show{opacity:1;transform:translateX(-50%) translateY(0);}
+body.dark .toast-notification{background:#3a4155;color:#e2e6f0;}
+
+/* --- CUSTOM COMPONENTS RESTORED --- */
+body.dark .btn-dark {background:#2a2f3d;border-color:#3a4155;color:#e2e6f0;}
+body.dark .btn-dark:hover {background:#343a4d;color:#fff;}
+body.dark .dim-input,body.dark .ff select,body.dark .ff input[type=text],body.dark textarea {background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .lesao-card {background:#141820;border-color:var(--border);}
+body.dark .toolbar {background:var(--white);border-bottom-color:var(--border);}
+body.dark .sidebar {background:var(--white);border-right-color:var(--border);}
+body.dark .sidebar-hd {border-bottom-color:var(--border);}
+body.dark .radio-opt:hover {background:#1e2d4a;}
+body.dark .radio-opt.selected {background:#1e2d4a;}
+body.dark .check-row {background:#1a1f2e;}
+body.dark .check-row:hover {background:#1e2d4a;}
+body.dark .check-row.selected {background:#1e2d4a;}
+body.dark .btn-add-lesao {background:var(--white);color:var(--text-2);border-color:var(--border-strong);}
+body.dark .sel-tag {background:var(--white);color:var(--text);border-color:var(--border-strong);}
+.lesoes-wrap {padding:8px 14px;display:flex;flex-direction:column;gap:7px;}
+textarea.achados {width:100%;height:100px;padding:10px;border:1px solid var(--border-strong);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;resize:vertical;}
+textarea.achados:focus {outline:none;border-color:var(--blue);}
+
+
+/* --- FIX TEXTAREA --- */
+textarea { background: var(--white); color: var(--text); }
+body.dark textarea { background: var(--white); color: var(--text); border-color: var(--border-strong); }
+</style>
+
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="logo" style="cursor:pointer" onclick="window.location.href='../laudo-thirads.html'"><span class="logo-name">THI-RADS</span><span class="logo-sub">laudo estruturado</span></div>
+  <button class="btn" onclick="window.location.href='../laudo-thirads.html'"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2L4 8l6 6"/></svg>Voltar</button>
+  <div class="tb-sep"></div>
+  <button class="btn" onclick="copiar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>Copiar laudo</button>
+  <button class="btn btn-primary" onclick="imprimir()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6V2h8v4M4 12H2V7h12v5h-2M4 9h8M4 12v2h8v-2"/></svg>Imprimir</button>
+  <button class="btn btn-dark" id="btn-dark-toggle" onclick="toggleDark()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro</button>
+  <button class="btn btn-danger" onclick="reiniciar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8a6 6 0 1 0 1.5-3.9M2 4v4h4"/></svg>Reiniciar</button>
+</div>
+
+<div class="body">
+  <div class="sidebar">
+    <div class="sidebar-hd"><div class="sidebar-tipo">Ultrassonografia</div><div class="sidebar-titulo">Partes Moles</div></div>
+    <div class="nav-group" id="nav-group"></div>
+  </div>
+  <div class="panel" id="main-panel"></div>
+  <div class="laudo-panel">
+    <div class="laudo-header"><span class="laudo-header-title">Pré-visualização</span></div>
+    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc" contenteditable="true"></div></div>
+  </div>
+</div>
+
+<script>
+const gp=p=>p.split('.').reduce((o,k)=>o[k],estado);
+const sp=(p,v)=>{const a=p.split('.'),k=a.pop();a.reduce((o,x)=>o[x],estado)[k]=v;};
+const n=v=>{const x=parseFloat(String(v).replace(',','.'));return isNaN(x)?0:x;};
+const f=(v,d)=>n(v).toFixed(d).replace('.',',');
+const CK='<svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.8"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg>';
+const sec_=(t,c)=>`<div class="sec-title">${t}</div>${c}`;
+const blk=(t,c)=>`<div class="block"><div class="block-title">${t}</div>${c}</div>`;
+const rad=(p,v,l)=>`<div class="radio-opt ${gp(p)===v?'selected':''}" onclick="setVal('${p}','${v}')"><label class="radio-label"><span class="radio-mark"></span>${l}</label></div>`;
+const chk=(p,l)=>`<div class="check-row ${gp(p)?'selected':''}" onclick="toggleChk('${p}')"><label class="check-label"><span class="check-box">${CK}</span>${l}</label></div>`;
+const chkL=(p,v,l)=>`<div class="check-row ${gp(p).includes(v)?'selected':''}" onclick="toggleLista('${p}','${v}')"><label class="check-label"><span class="check-box">${CK}</span>${l}</label></div>`;
+function setVal(p,v){sp(p,v);renderPanel();updateLaudo();}
+function setTextVal(p,v){sp(p,v);updateLaudo();}
+function toggleChk(p){sp(p,!gp(p));renderPanel();updateLaudo();}
+function toggleLista(p,v){const a=gp(p),i=a.indexOf(v);i<0?a.push(v):a.splice(i,1);renderPanel();updateLaudo();}
+function showSection(s){secao=s;document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));document.getElementById('nav-'+s).classList.add('active');renderPanel();updateLaudo();}
+
+/* ── regiões e músculos de cada região ── */
+const RG=[['ombro','Ombro','o','Supraespinhal;Infraespinhal;Redondo menor;Subescapular;Deltoide;Redondo maior;Grande dorsal;Trapézio;Peitoral maior;Peitoral menor;Serrátil anterior'],
+['braco','Braço','o','Bíceps braquial;Braquial;Coracobraquial;Tríceps braquial'],
+['cotovelo','Cotovelo','o','Bíceps braquial;Braquial;Tríceps braquial;Ancôneo;Braquiorradial;Pronador redondo;Supinador;Extensor radial curto do carpo'],
+['antebraco','Antebraço','o','Pronador redondo;Flexor radial do carpo;Palmar longo;Flexor ulnar do carpo;Flexor superficial dos dedos;Flexor profundo dos dedos;Flexor longo do polegar;Pronador quadrado;Braquiorradial;Extensor radial longo do carpo;Extensor radial curto do carpo;Extensor dos dedos;Extensor ulnar do carpo;Supinador;Abdutor longo do polegar;Extensor curto do polegar;Extensor longo do polegar;Ancôneo'],
+['punho','Punho','o','Abdutor longo do polegar;Extensor curto do polegar;Extensor longo do polegar;Flexor longo do polegar;Pronador quadrado'],
+['mao','Mão','a','Abdutor curto do polegar;Oponente do polegar;Abdutor do dedo mínimo'],
+['quadril','Quadril','o','Iliopsoas;Sartório;Reto femoral;Pectíneo;Tensor da fáscia lata;Adutor longo'],
+['gluteo','Região glútea','a','Glúteo máximo;Glúteo médio;Glúteo mínimo;Piriforme'],
+['coxa','Coxa','a','Sartório;Reto femoral;Vasto lateral;Vasto medial;Vasto intermédio;Tensor da fáscia lata;Pectíneo;Grácil;Adutor longo;Adutor curto;Adutor magno;Bíceps femoral (cabeça longa);Bíceps femoral (cabeça curta);Semitendíneo;Semimembranáceo'],
+['joelho','Joelho','o','Reto femoral;Vasto medial;Vasto lateral;Bíceps femoral (cabeça longa);Bíceps femoral (cabeça curta);Semitendíneo;Semimembranáceo;Grácil;Sartório;Poplíteo;Gastrocnêmio medial;Gastrocnêmio lateral;Plantar'],
+['perna','Perna','a','Gastrocnêmio medial;Gastrocnêmio lateral;Sóleo;Plantar;Poplíteo;Tibial posterior;Flexor longo dos dedos;Flexor longo do hálux;Tibial anterior;Extensor longo dos dedos;Extensor longo do hálux;Fibular longo;Fibular curto'],
+['tornozelo','Tornozelo','o','Tibial anterior;Tibial posterior;Fibular longo;Fibular curto;Flexor longo do hálux;Flexor longo dos dedos;Extensor longo do hálux;Extensor longo dos dedos;Sóleo;Plantar'],
+['pe','Pé','o','Abdutor do hálux;Flexor curto do hálux;Flexor curto dos dedos;Quadrado plantar;Extensor curto dos dedos']];
+const SN=['não','sim'];
+const FD={loc:['Localização','sel',['no terço proximal do ventre muscular','no terço médio do ventre muscular','no terço distal do ventre muscular','na região central do ventre muscular','na origem muscular','na inserção muscular']],
+juncao:['Junção miotendínea','sel',['proximal','distal','intramuscular (tendão central)']],grau:['Grau','sel',['I','II','III']],
+perc:['Fibras acometidas','sel',['menos de 50%','mais de 50%']],retr:['Retração dos cotos','sel',['discreta','moderada','acentuada']],
+gap:['Gap entre os cotos (cm)','num'],d1:['Maior eixo (cm)','num'],d2:['Eixo transverso (cm)','num'],d3:['Eixo AP (cm)','num'],hem:['Hematoma associado','sel',SN],
+dop:['Doppler','sel',['sem hiperemia','com hiperemia periférica','com hiperemia difusa']],hloc:['Topografia','sel',['intramuscular','intermuscular (planos fasciais)','intra e intermuscular']],
+fase:['Fase','sel',['aguda','subaguda','crônica (organizado)']],sitio:['Sítio ósseo','txt'],fase2:['Fase','sel',['inicial','madura']],
+dinh:['Protrusão','sel',['à contração muscular','em ortostatismo','à contração e em ortostatismo']],heck:['Heckmatt','sel',['2','3','4']],esp:['Redução da espessura','sel',SN],
+eco:['Ecogenicidade','sel',['hipoecogênica','isoecogênica','hiperecogênica','heterogênea']]};
+const TIPOS={estir:['Estiramento (lesão de grau I)',['loc','d1','dop']],miot:['Lesão da junção miotendínea',['grau','juncao','d1','hem','dop']],
+parcial:['Rotura parcial (grau II)',['loc','perc','d1','d2','hem','dop']],total:['Rotura total (grau III)',['loc','gap','retr']],
+hemat:['Hematoma (intra/intermuscular)',['hloc','fase','d1','d2','d3']],avuls:['Avulsão / arrancamento ósseo',['sitio','d1','gap']],
+cicatriz:['Cicatriz fibrosa (sequela de lesão prévia)',['loc','d1']],ossif:['Miosite ossificante / calcificação heterotópica',['fase2','loc','d1','d2']],
+hernia:['Hérnia muscular',['loc','d1','dinh']],atrof:['Atrofia / infiltração gordurosa',['heck','esp']],miosite:['Miosite / edema muscular difuso',['loc','dop']],
+absc:['Abscesso intramuscular (piomiosite)',['loc','d1','d2','d3']],nodulo:['Lesão focal sólida (nodular)',['loc','eco','d1','d2','d3','dop']]};
+const REC={lesao2:'Controle ultrassonográfico evolutivo e acompanhamento com especialista em ortopedia ou medicina do esporte, para orientação do tratamento e do retorno às atividades.',
+total:'Avaliação ortopédica para definição de conduta; ressonância magnética a critério clínico.',hemat:'Controle ultrassonográfico evolutivo do hematoma, a critério clínico.',
+avuls:'Avaliação ortopédica; radiografia e/ou ressonância magnética para melhor avaliação do fragmento ósseo, a critério clínico.',
+ossif:'Correlação com radiografia e história de trauma; acompanhamento evolutivo. Ressonância magnética se houver dúvida com lesão neoplásica.',
+nodulo:'Ressonância magnética com contraste para caracterização da lesão focal intramuscular e avaliação em serviço de referência.',
+absc:'Correlação clínico-laboratorial e avaliação para drenagem; ressonância magnética se houver suspeita de extensão profunda.',
+miosite:'Correlação clínico-laboratorial (CPK e marcadores inflamatórios); ressonância magnética se houver dúvida diagnóstica.',
+atrof:'Correlação clínica e neurológica (eletroneuromiografia, conforme o caso).',hernia:'Correlação clínica; avaliação cirúrgica se sintomática.'};
+
+/* ── estado ── */
+const novo=()=>({tec:{sonda:'linear',contra:false,din:false,dop:false},loc:{reg:[],lado:'D'},resumo:false,ad:{texto:''},rec:{inc:true,texto:''},ach:[]});
+let estado=novo(),secao='tec',lid=0,hd=[],rc=new Set();
+const NAV=[['tec','Técnica'],['loc','Localização'],['les','Lesão Muscular'],['ad','Achados Adicionais'],['rec','Recomendações']];
+document.getElementById('nav-group').innerHTML=NAV.map(x=>`<div class="nav-item" id="nav-${x[0]}" onclick="showSection('${x[0]}')"><span class="nav-dot"></span>${x[1]}</div>`).join('');
+const lista=a=>a.length<2?(a[0]||''):a.slice(0,-1).join(', ')+' e '+a[a.length-1];
+const P=h=>`<div class="doc-p">${h}</div>`;
+const LD=l=>l==='D'?'direito':'esquerdo';
+const Cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+const esc=s=>s.replace(/</g,'&lt;').replace(/\n/g,'<br>');
+const musReg=()=>[...new Set(estado.loc.reg.flatMap(id=>RG.find(r=>r[0]===id)[3].split(';')))];
+function renderPanel(){const R={tec:rTec,loc:rLoc,les:rLes,ad:rAd,rec:rRec};document.getElementById('main-panel').innerHTML=R[secao]();}
+function rLoc(){return sec_('Localização',blk('Região avaliada',RG.map(r=>chkL('loc.reg',r[0],r[1])).join(''))+blk('Lado',rad('loc.lado','D','Direito')+rad('loc.lado','E','Esquerdo')+rad('loc.lado','B','Bilateral')));}
+function setResumo(){estado.resumo=!estado.resumo;estado.ach.forEach(c=>c.resumo=estado.resumo?'sim':'não');renderPanel();updateLaudo();}
+function rLes(){const ms=musReg();return sec_('Lesão Muscular',ms.length?blk('Descrição',`<div class="check-row ${estado.resumo?'selected':''}" onclick="setResumo()"><label class="check-label"><span class="check-box">${CK}</span>Descrição resumida (todos os achados)</label></div>`)+blk('Alterações descritas',`<div class="lesoes-wrap"><div>${estado.ach.map(card).join('')}</div><button class="btn-add-lesao" onclick="addAch()">+ Adicionar alteração</button></div>`):blk('Alterações descritas','<div class="radio-label" style="color:var(--text-3);padding:12px 16px">Selecione a região na aba <b>Localização</b> para listar os músculos.</div>'));}
+function rTec(){return sec_('Técnica',blk('Transdutor',rad('tec.sonda','linear','Linear de alta frequência')+rad('tec.sonda','convexo','Convexo (grandes volumes musculares ou planos profundos)')+rad('tec.sonda','nc','Não citar'))+
+ blk('Opções',chk('tec.contra','Estudo comparativo com o lado contralateral')+chk('tec.din','Avaliação dinâmica (contração e relaxamento muscular)')+chk('tec.dop','Doppler colorido')));}
+function rAd(){return sec_('Achados Adicionais',blk('Texto Livre',`<div style="padding:14px"><textarea class="achados" oninput="setTextVal('ad.texto',this.value)" placeholder="Digite aqui...">${estado.ad.texto}</textarea></div>`));}
+function rRec(){const g=gerar();return sec_('Recomendações',blk('Bloco no laudo',chk('rec.inc','Incluir bloco de RECOMENDAÇÕES no laudo final'))+
+ blk('Sugeridas conforme os achados',g.recs.length?g.recs.map(x=>`<div class="radio-label" style="cursor:default;font-size:14px;padding:10px 16px">${x}</div>`).join(''):'<div class="radio-label" style="color:var(--text-3);padding:10px 16px">Nenhuma recomendação específica gerada.</div>')+
+ blk('Recomendação adicional',`<div style="padding:14px"><textarea class="achados" oninput="setTextVal('rec.texto',this.value)" placeholder="Digite aqui...">${estado.rec.texto}</textarea></div>`));}
+
+/* ── cartões de alteração ── */
+const V=(c,k)=>c[k]!==undefined?c[k]:(FD[k]&&FD[k][1]==='sel'?FD[k][2][0]:'');
+const ff=(l,h)=>`<div class="ff"><label>${l}</label>${h}</div>`;
+const fs=(c,k,o)=>`<select onchange="upd(${c.id},'${k}',this.value)">${o.map(x=>{x=[].concat(x);return `<option value="${x[0]}" ${V(c,k)===x[0]?'selected':''}>${x[1]||x[0]}</option>`;}).join('')}</select>`;
+const fld=(c,k)=>{const d=FD[k];return ff(d[0],d[1]==='sel'?fs(c,k,d[2]):`<input type="text" value="${V(c,k)}" oninput="upd(${c.id},'${k}',this.value)">`);};
+function card(c){const msel=musReg().map(m=>`<option ${c.m===m?'selected':''}>${m}</option>`).join('');
+ const tsel=Object.keys(TIPOS).map(k=>`<option value="${k}" ${c.tipo===k?'selected':''}>${TIPOS[k][0]}</option>`).join('');
+ return `<div class="lesao-card"><div class="lesao-hd"><span class="lesao-hd-title">Alteração</span><button class="btn-rem" onclick="remAch(${c.id})">✕ remover</button></div>
+ <div class="ff-grid" style="grid-template-columns:1fr">${ff('Músculo',`<select onchange="upd(${c.id},'m',this.value)">${msel}</select>`)}${ff('Alteração',`<select onchange="upd(${c.id},'tipo',this.value,1)">${tsel}</select>`)}</div>
+ <div class="ff-grid" style="grid-template-columns:1fr 1fr">${ff('Lado',fs(c,'lado',[['D','direito'],['E','esquerdo']]))}${ff('Descrição resumida',fs(c,'resumo',SN))}${TIPOS[c.tipo][1].map(k=>fld(c,k)).join('')}</div></div>`;}
+function addAch(){const ms=musReg();if(!ms.length)return;estado.ach.push({id:++lid,m:ms[0],lado:estado.loc.lado==='E'?'E':'D',tipo:'estir',resumo:estado.resumo?'sim':'não'});renderPanel();updateLaudo();}
+function remAch(id){estado.ach=estado.ach.filter(c=>c.id!==id);renderPanel();updateLaudo();}
+function upd(id,k,v,rr){const c=estado.ach.find(x=>x.id===id);if(c){c[k]=v;if(rr)renderPanel();updateLaudo();}}
+
+/* ── gerador de laudo ── */
+const medS=c=>{const d=['d1','d2','d3'].map(k=>n(c[k])?f(c[k],1):null).filter(Boolean);return d.length?`, medindo ${d.join(' x ')} cm`:'';};
+const dopT=c=>({'sem hiperemia':', sem hiperemia ao Doppler colorido','com hiperemia periférica':', com hiperemia periférica ao Doppler colorido','com hiperemia difusa':', com hiperemia difusa ao Doppler colorido'})[V(c,'dop')]||'';
+function txtLes(c){const X=`músculo ${c.m.toLowerCase()} ${LD(c.lado)}`,DE='do '+X,A=Cap(X),T=c.tipo,R=V(c,'resumo')==='sim',md=medS(c),dp=dopT(c),loc=V(c,'loc'),hm=V(c,'hem')==='sim';
+ if(T==='estir'){hd.push(`Estiramento muscular (lesão de grau I) ${DE}.`);
+  return R?`${A}: área hiperecogênica mal delimitada ${loc}${md}, sem descontinuidade fibrilar, compatível com estiramento (grau I).`
+  :`${A} com área focal de hiperecogenicidade mal delimitada ${loc}${md}, por edema e hemorragia interfibrilar, com distorção do padrão fibrilar habitual, sem solução de continuidade das fibras (comprometimento de menos de 5% das fibras) e sem coleção organizada${dp}. Achados compatíveis com estiramento muscular (lesão de grau I).`;}
+ if(T==='miot'){const g=V(c,'grau'),ju=V(c,'juncao'),d={I:'alteração focal da ecotextura, com hiperecogenicidade mal delimitada por edema e hemorragia perifascicular, sem descontinuidade fibrilar',II:'descontinuidade parcial das fibras junto à junção miotendínea, com pequena coleção líquido-hemática interposta',III:'descontinuidade completa das fibras na junção miotendínea, com retração do ventre muscular e coleção hemática no gap'}[g];
+  hd.push(g==='I'?`Estiramento da junção miotendínea ${ju} (lesão de grau I) ${DE}.`:`Rotura miotendínea de grau ${g} (junção ${ju}) ${DE}.`);rc.add(g==='III'?'total':g==='II'?'lesao2':'x');
+  return R?`${A}: lesão da junção miotendínea ${ju} (grau ${g})${md}${hm&&g==='I'?', com pequena coleção hemática':''}.`
+  :`${A} com ${d}, na junção miotendínea ${ju}${md}${hm&&g==='I'?', com pequena coleção hemática adjacente':''}${dp}. Achados compatíveis com ${g==='I'?'lesão miotendínea de grau I (estiramento)':'rotura miotendínea de grau '+g}.`;}
+ if(T==='parcial'){const pc=V(c,'perc');hd.push(`Rotura muscular parcial (grau II)${pc==='mais de 50%'?', com acometimento de mais de 50% das fibras,':''} ${DE}${hm?', com hematoma intersticial associado':''}.`);rc.add('lesao2');
+  return R?`${A}: rotura parcial (grau II) ${loc}, com descontinuidade de ${pc} das fibras e coleção interposta${md}${hm?', com hematoma intersticial':''}.`
+  :`${A} com descontinuidade parcial das fibras ${loc}, acometendo ${pc} das fibras, com coleção hipoecoica a anecoica interposta (edema e hemorragia)${md}${hm?', associada a hematoma intersticial'+(hm?'':''):''}, sem retração significativa dos cotos musculares${dp}. Achados compatíveis com rotura muscular parcial (lesão de grau II).`;}
+ if(T==='total'){const rt=V(c,'retr'),gp_=n(c.gap)?'de cerca de '+f(c.gap,1)+' cm':'entre os cotos';hd.push(`Rotura muscular total (grau III) ${DE}, com retração ${rt} dos cotos.`);rc.add('total');
+  return R?`${A}: rotura total (grau III) ${loc}, com retração ${rt} dos cotos e gap ${gp_}.`
+  :`${A} com descontinuidade completa das fibras ${loc}, com retração ${rt} dos cotos musculares e afastamento (gap) ${gp_}, ocupado por coleção hipoecoica a anecoica heterogênea (hematoma), observando-se coto retraído de aspecto arredondado, circundado por hematoma (sinal do badalo). Achados compatíveis com rotura muscular total (lesão de grau III).`;}
+ if(T==='hemat'){const hl=V(c,'hloc'),fa=V(c,'fase'),a=n(c.d1),b=n(c.d2),e=n(c.d3),vl=a&&b&&e?` (volume estimado de ${f(a*b*e*0.523,1)} cm³)`:'',
+  ft={aguda:'hiperecogênico, heterogêneo, de limites imprecisos',subaguda:'hipoecogênico a anecoico, heterogêneo, com finos septos e debris em organização','crônica (organizado)':'predominantemente anecoico, com septações e coágulos organizados, delimitado por paredes definidas'}[fa];
+  hd.push(`Hematoma ${hl}, em fase ${fa}, relacionado ao ${X}.`);rc.add('hemat');
+  return R?`Hematoma ${hl} no ${X}${md}${vl}, em fase ${fa}, sem fluxo ao Doppler colorido.`
+  :`Coleção ${hl} relacionada ao ${X}${md}${vl}, de conteúdo ${ft}, sem fluxo interno ao Doppler colorido. Achados compatíveis com hematoma ${hl}, em fase ${fa}.`;}
+ if(T==='avuls'){const s=(c.sitio||'').trim();hd.push(`Avulsão óssea (arrancamento) na fixação ${DE}${s?' ('+s+')':''}.`);rc.add('avuls');
+  return R?`Avulsão óssea na fixação ${DE} (${s||'sítio não especificado'}), com fragmento${n(c.d1)?' de '+f(c.d1,1)+' cm':''} deslocado${n(c.gap)?' cerca de '+f(c.gap,1)+' cm':''} e hematoma adjacente.`
+  :`Irregularidade cortical com fragmento ósseo hiperecogênico e sombra acústica posterior${n(c.d1)?', de '+f(c.d1,1)+' cm':''}, deslocado${n(c.gap)?' cerca de '+f(c.gap,1)+' cm':''} do sítio de fixação (${s||'sítio ósseo não especificado'}), mantendo continuidade com as fibras ${DE}, com coleção hemática adjacente. Achados compatíveis com lesão por avulsão.`;}
+ if(T==='cicatriz'){hd.push(`Cicatriz fibrosa (sequela de lesão muscular prévia) ${DE}.`);
+  return R?`${A}: cicatriz fibrosa hiperecogênica ${loc}${md}, sem hiperemia ao Doppler.`
+  :`${A} com área focal hiperecogênica ${loc}, de contornos irregulares, com distorção do padrão fibrilar e discreta retração do contorno muscular${md}, sem hiperemia ao Doppler colorido, compatível com cicatriz fibrosa (sequela de lesão prévia).`;}
+ if(T==='ossif'){const fa=V(c,'fase2'),d=fa==='inicial'?'massa heterogênea, predominantemente hipoecogênica, com calcificações periféricas incipientes e hiperemia ao Doppler colorido':'calcificação periférica em casca (padrão zonal), com sombra acústica posterior e sem hiperemia ao Doppler colorido';
+  hd.push(`Miosite ossificante (fase ${fa}) ${DE}.`);rc.add('ossif');
+  return R?`${A}: miosite ossificante em fase ${fa} ${loc}${md}.`:`${A} com lesão focal ${loc}${md}, caracterizada por ${d}. Achados compatíveis com miosite ossificante em fase ${fa}.`;}
+ if(T==='hernia'){hd.push(`Hérnia muscular ${DE}.`);rc.add('hernia');
+  return R?`Hérnia muscular ${DE} ${loc}${n(c.d1)?', com defeito fascial de '+f(c.d1,1)+' cm':''}, com protrusão ${V(c,'dinh')}.`
+  :`Defeito da fáscia muscular ${loc}${n(c.d1)?', de '+f(c.d1,1)+' cm':''}, com protrusão do ventre ${DE} através do defeito ${V(c,'dinh')} ao estudo dinâmico, com redução ao repouso. Achados compatíveis com hérnia muscular.`;}
+ if(T==='atrof'){const h=V(c,'heck'),d={2:'aumento da ecogenicidade muscular, com eco ósseo preservado',3:'acentuado aumento da ecogenicidade muscular, com redução do eco ósseo',4:'intenso aumento da ecogenicidade muscular, com ausência do eco ósseo'}[h],es=V(c,'esp')==='sim';
+  hd.push(`Atrofia muscular com infiltração gordurosa (Heckmatt grau ${h}) ${DE}.`);rc.add('atrof');
+  return R?`${A}: atrofia com infiltração gordurosa (Heckmatt ${h})${es?', com redução da espessura':''}.`
+  :`${A} com ${d}${es?', associado a redução da espessura do ventre muscular':''}. Achados compatíveis com atrofia com infiltração gordurosa (Heckmatt grau ${h}).`;}
+ if(T==='miosite'){hd.push(`Alteração difusa da ecotextura com edema (miosite / edema muscular) ${DE}.`);rc.add('miosite');
+  return R?`${A}: edema muscular com perda do padrão fibrilar ${loc}${dp}.`
+  :`${A} com aumento do volume e perda do padrão fibrilar habitual ${loc}, com ecogenicidade heterogênea por edema${dp}, sem coleção organizada. Achados sugestivos de miosite ou edema muscular.`;}
+ if(T==='absc'){hd.push(`Abscesso intramuscular (piomiosite) ${DE}.`);rc.add('absc');
+  return R?`Coleção heterogênea com debris e paredes espessadas ${loc} ${DE}${md}, com hiperemia periférica, compatível com abscesso (piomiosite).`
+  :`Coleção heterogênea, predominantemente hipoecogênica, com debris e paredes espessadas, ${loc} ${DE}${md}, com hiperemia periférica e ausência de fluxo interno ao Doppler colorido. Achados compatíveis com abscesso intramuscular (piomiosite), a correlacionar com dados clínicos e laboratoriais.`;}
+ hd.push(`Lesão focal sólida intramuscular ${DE}.`);rc.add('nodulo');
+ return R?`Lesão focal sólida ${V(c,'eco')} ${loc} ${DE}${md}${dp}.`:`Lesão focal sólida, ${V(c,'eco')}, ${loc} ${DE}${md}${dp}. Achados inespecíficos ao método, a esclarecer.`;}
+function gerar(){hd=[];rc=new Set();const t=estado.tec,pt=[];
+ if(t.contra)pt.push('com estudo comparativo do lado contralateral');if(t.din)pt.push('com avaliação dinâmica sob contração e relaxamento muscular');if(t.dop)pt.push('com Doppler colorido');
+ let tec=t.sonda==='nc'?'':`Exame realizado com transdutor ${t.sonda==='linear'?'linear de alta frequência':'convexo'}`;
+ if(pt.length)tec=(tec?tec+', ':'Exame realizado ')+lista(pt)+'.';
+ const rs=RG.filter(r=>estado.loc.reg.includes(r[0])),ld={D:'à direita',E:'à esquerda',B:'bilateralmente'}[estado.loc.lado];
+ const l1=rs.length?`Exame orientado para avaliação ${lista(rs.map(r=>'d'+r[2]+' '+r[1].toLowerCase()))}, ${ld}, região de queixa do paciente.`:'Exame orientado para avaliação da região de queixa do paciente.';
+ const lesT=estado.ach.map(txtLes),sem=new Set(['estir','cicatriz','hernia','atrof','miosite']);
+ const coll=estado.ach.some(c=>!(sem.has(c.tipo)||(c.tipo==='miot'&&V(c,'grau')==='I')));
+ const base=[l1,'Pele e tecido subcutâneo sem anormalidades detectáveis.'];if(!coll)base.push('Ausência de nódulos, massas ou coleções.');
+ const an=lesT.length?[...base.map(P),...lesT.map(P),P('Demais planos musculares de aspecto preservado.')]:[...base,'Planos musculares de aspecto preservado.'].map(P);
+ return {tec,an,hd:[...new Set(hd)],recs:Object.keys(REC).filter(k=>rc.has(k)).map(k=>REC[k])};}
+function updateLaudo(){const g=gerar(),r=estado.rec,ad=estado.ad.texto.trim();
+ const op=g.hd.length?g.hd.join('<br>')+'<br>Demais estruturas da região avaliada sem alterações significativas.':'Estudo ultrassonográfico da região avaliada sem alterações significativas.';
+ const rcs=r.inc?[...g.recs]:[];if(r.inc&&r.texto.trim())rcs.push(esc(r.texto.trim()));
+ document.getElementById('laudo-doc').innerHTML=`<div class="doc-titulo">ULTRASSONOGRAFIA DE PARTES MOLES</div>`+
+ (g.tec?`<div class="doc-secao"><span class="doc-label">TÉCNICA:</span>${P(g.tec)}</div>`:'')+
+ `<div class="doc-secao"><span class="doc-label">ANÁLISE:</span>${g.an.join('')}${ad?P('Achados adicionais: '+esc(ad)):''}</div>`+
+ `<div class="doc-secao"><span class="doc-label">IMPRESSÃO DIAGNÓSTICA:</span>${P(op)}</div>`+
+ (rcs.length?`<div class="doc-secao"><span class="doc-label">RECOMENDAÇÕES:</span>${P(rcs.join('<br>'))}</div>`:'');}
+
+function toggleDark(){
+  const isDark = document.body.classList.toggle('dark');
+  const btn = document.getElementById('btn-dark-toggle');
+  if(isDark) btn.innerHTML='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 8.5A5.5 5.5 0 0 1 6 3c0-.18.01-.36.03-.53A6 6 0 1 0 13.97 9.5c-.15.01-.31.01-.47 0z"/></svg>Modo claro';
+  else btn.innerHTML='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro';
+  localStorage.setItem('darkMode', isDark ? '1' : '0');
+}
+(function(){ if(localStorage.getItem('darkMode')==='1') toggleDark(); })();
+
+function copiar() {
+  var el = document.getElementById('laudo-doc');
+  if (!el) return;
+  _copyLaudoRichText(el, function(ok) {
+    if (ok) {
+      showToast('Laudo copiado para a área de transferência!');
+    } else {
+      showToast('Falha ao copiar. Use Ctrl+A e Ctrl+C no texto do laudo.');
+    }
+  });
+}
+
+// Intercepta copy manual no dark mode para remover fundo escuro
+document.getElementById('laudo-doc').addEventListener('copy', function(e) {
+  if (!document.body.classList.contains('dark')) return;
+  document.body.classList.remove('dark');
+  document.body.offsetHeight;
+  setTimeout(function() {
+    document.body.classList.add('dark');
+  }, 0);
+});
+
+function showToast(msg) {
+  let t = document.getElementById('toast-notification');
+  t.innerText = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+function imprimir(){ 
+  const h=document.getElementById('laudo-doc').innerHTML; 
+  const w=window.open('','_blank'); 
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Helvetica,Arial,sans-serif;font-size:10pt;padding:32px;color:#111;line-height:1.65;}.doc-titulo{text-align:center;font-weight:700;text-transform:uppercase;margin-bottom:16px;}.doc-label{font-weight:700;}.doc-p{margin-bottom:8px;}.doc-secao{margin-bottom:14px;}*{color:#111 !important;}.laudo-doc:focus { outline: none; }
+</style></head><body>${h}
+<div id="toast-notification" class="toast-notification">Laudo copiado!</div>
+</body></html>`); 
+  w.document.close(); 
+  w.print(); 
+}
+function reiniciar(){ estado=novo(); showSection('tec'); }
+showSection('tec');
+</script>
+<div id="toast-notification" class="toast-notification">Laudo copiado!</div>
+<script src="../js/copy-pacs.js"></script>
+<script>
+if(typeof _copyLaudoRichText!=='function'){window._copyLaudoRichText=function(el,cb){try{navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([el.innerHTML],{type:'text/html'}),'text/plain':new Blob([el.innerText],{type:'text/plain'})})]).then(function(){cb(true)},function(){cb(false)});}catch(e){cb(false);}};}
+</script>
+</body>
+</html>

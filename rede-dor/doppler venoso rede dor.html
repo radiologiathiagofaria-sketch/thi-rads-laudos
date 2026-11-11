@@ -1,0 +1,1221 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THI-RADS — Laudos estruturados</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===== Paleta alinhada ao app obstétrico (slate escuro + ciano) ===== */
+:root{
+  --blue:#0e6a83;--blue-dark:#0c566b;--blue-light:#d3e6ec;--blue-mid:#c0dce5;
+  --surface:#e1e6ee;--border:#c9d1de;--border-strong:#9eacc2;
+  --text:#1b2538;--text-2:#34425b;--text-3:#5c6a83;
+  --white:#f3f5f9;--green:#047857;--red:#c93a3a;--radius:10px;--radius-lg:14px;
+  --hover:#dfeaf0;--sel-bg:#cbe3ec;--focus-ring:rgba(14,106,131,.22);
+}
+body.dark{
+  --blue:#2fa9c2;--blue-dark:#2490a8;--blue-light:#12293d;--blue-mid:#12293d;
+  --surface:#090e19;--border:#1a263b;--border-strong:#33445f;
+  --text:#c9d2e0;--text-2:#a3afc4;--text-3:#7a879f;
+  --white:#0e1626;--green:#2fbf8c;--red:#e07a7a;
+  --hover:#13203a;--sel-bg:#12324a;--focus-ring:rgba(47,169,194,.28);
+}
+body.dark .laudo-doc{color:#e2e6f0;}
+body.dark .laudo-panel{background:var(--white);border-left-color:var(--border);}
+body.dark .laudo-body{background:var(--white);}
+body.dark .laudo-header{background:var(--white);border-bottom-color:var(--border);}
+@media print{
+  body.dark .laudo-doc,
+  body.dark .laudo-doc *{color:#111 !important;}
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',system-ui,sans-serif;font-size:14px;background:var(--surface);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+/* ----- Barra superior ----- */
+.toolbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 22px;display:flex;align-items:center;gap:10px;height:58px;flex-shrink:0;}
+.logo{display:flex;align-items:baseline;gap:8px;margin-right:14px;}
+.logo-name{font-size:20px;font-weight:600;color:var(--blue);letter-spacing:-.3px;}
+.logo-sub{font-size:13px;color:var(--text-3);font-weight:400;}
+.tb-sep{width:1px;height:24px;background:var(--border);margin:0 4px;}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid var(--border-strong);font-weight:500;transition:all .13s;background:var(--white);color:var(--text);}
+.btn:hover{background:var(--hover);border-color:var(--blue);color:var(--blue);}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600;}
+body.dark .btn-primary{color:#06202b;}
+.btn-primary:hover{background:var(--blue-dark);border-color:var(--blue-dark);color:#fff;}
+body.dark .btn-primary:hover{color:#06202b;}
+.btn-danger{background:#f6e6e8;color:var(--red);border-color:#e3a9ad;}
+body.dark .btn-danger{background:#2d1a1f;border-color:#7a3038;}
+.btn-danger:hover{background:#fee2e2;border-color:#f87171;color:var(--red);}
+body.dark .btn-danger:hover{background:#3a2026;}
+.btn svg{width:16px;height:16px;flex-shrink:0;}
+.btn-dark{margin-left:auto;}
+.btn:focus-visible,.nav-item:focus-visible{outline:2px solid var(--blue);outline-offset:2px;}
+
+.body{display:flex;flex:1;overflow:hidden;}
+
+/* ----- Coluna esquerda: navegação ----- */
+.sidebar{width:208px;background:var(--white);border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;}
+.sidebar-hd{padding:16px 16px 14px;border-bottom:1px solid var(--border);}
+.sidebar-tipo{font-size:12px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px;}
+.sidebar-titulo{font-size:19px;font-weight:600;color:var(--text);}
+.nav-group{padding:8px 0;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:15px;color:var(--text-2);cursor:pointer;transition:all .12s;border-left:3px solid transparent;line-height:1.25;}
+.nav-item:hover{background:var(--hover);color:var(--text);}
+.nav-item.active{background:var(--sel-bg);color:var(--blue);border-left-color:var(--blue);font-weight:600;}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.45;flex-shrink:0;}
+.nav-item.active .nav-dot{opacity:1;}
+
+/* ----- Coluna central: formulário ----- */
+.panel{width:560px;flex-shrink:0;overflow-y:auto;padding:18px 18px 26px;background:var(--surface);}
+.panel .doc-p{font-size:14px !important;}
+.sec-title{font-size:19px;font-weight:600;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:9px;}
+.sec-title::before{content:'';display:block;width:4px;height:22px;background:var(--blue);border-radius:2px;}
+.block{margin-bottom:14px;background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden;}
+.block-title{font-size:13px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.6px;padding:11px 16px 10px;border-bottom:1px solid var(--border);background:var(--white);}
+body.dark .block-title{border-bottom-color:var(--border);}
+
+.radio-opt{display:flex;align-items:flex-start;gap:0;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;position:relative;}
+.radio-opt:last-child{border-bottom:none;}
+.radio-opt:hover{background:var(--hover);}
+.radio-opt.selected{background:var(--sel-bg);}
+.radio-opt input[type=radio]{position:absolute;opacity:0;pointer-events:none;}
+.radio-label{display:flex;align-items:center;gap:12px;width:100%;padding:12px 16px;font-size:15px;color:var(--text);line-height:1.4;cursor:pointer;}
+.radio-opt.selected .radio-label{color:var(--blue);font-weight:600;}
+.radio-mark{width:20px;height:20px;border-radius:50%;border:2px solid var(--border-strong);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.radio-opt:hover .radio-mark{border-color:var(--blue);}
+.radio-opt.selected .radio-mark{border-color:var(--blue);background:var(--blue);}
+.radio-mark::after{content:'';width:8px;height:8px;border-radius:50%;background:#fff;opacity:0;transition:opacity .15s;}
+body.dark .radio-mark::after{background:#06202b;}
+.radio-opt.selected .radio-mark::after{opacity:1;}
+
+.check-row{display:flex;align-items:center;gap:0;border-bottom:1px solid var(--border);cursor:pointer;background:var(--surface);}
+.check-row:last-child{border-bottom:none;}
+.check-row:hover{background:var(--hover);}
+.check-row.selected{background:var(--sel-bg);}
+.check-row input[type=checkbox]{position:absolute;opacity:0;pointer-events:none;}
+.check-label{display:flex;align-items:center;gap:12px;width:100%;padding:11px 16px 11px 34px;font-size:14.5px;color:var(--text);cursor:pointer;}
+.check-row.selected .check-label{color:var(--blue);font-weight:600;}
+.check-box{width:19px;height:19px;border-radius:5px;border:2px solid var(--border-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white);}
+.check-row:hover .check-box{border-color:var(--blue);}
+.check-row.selected .check-box{border-color:var(--blue);background:var(--blue);}
+.check-box svg{display:none;width:12px;height:12px;}
+.check-row.selected .check-box svg{display:block;}
+body.dark .check-box svg{stroke:#06202b;}
+.sel-tag{font-size:13px;border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);margin-left:6px;cursor:pointer;}
+
+.dim-rows{padding:12px 16px;display:flex;flex-direction:column;gap:9px;}
+.dim-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.dim-lbl{flex:1;font-size:14.5px;color:var(--text);}
+.dim-input{width:76px;padding:8px 10px;border:1px solid var(--border-strong);border-radius:8px;font-size:14.5px;font-family:'DM Sans',sans-serif;text-align:center;color:var(--text);background:var(--white);transition:border .12s;}
+.dim-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--focus-ring);}
+.dim-unit{font-size:14px;color:var(--text-3);}
+.nodulo-wrap{padding:12px 16px;display:flex;flex-direction:column;gap:10px;}
+
+.btn-add-lesao{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:600;transition:all .12s;border:1.5px dashed var(--blue);background:transparent;color:var(--blue);width:100%;justify-content:center;}
+.btn-add-lesao:hover{background:var(--sel-bg);}
+.lesao-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 14px;margin-bottom:10px;}
+.lesao-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;}
+.lesao-hd-title{font-size:13px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.5px;}
+.btn-rem{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:6px;font-size:12.5px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;border:1px solid #e3a9ad;background:#f6e6e8;color:var(--red);transition:all .12s;}
+body.dark .btn-rem{background:#2d1a1f;border-color:#7a3038;}
+.btn-rem:hover{background:#fee2e2;}
+body.dark .btn-rem:hover{background:#3a2026;}
+
+.ff-grid{display:flex;gap:11px;flex-wrap:wrap;margin-bottom:8px;}
+.ff{display:flex;flex-direction:column;gap:4px;}
+.ff label{font-size:12px;color:var(--text-2);font-weight:600;text-transform:uppercase;letter-spacing:.3px;}
+.ff select,.ff input[type=text],.ff input[type=number]{font-size:14px;padding:7px 9px;border:1px solid var(--border-strong);border-radius:7px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);}
+.ff select:focus,.ff input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--focus-ring);}
+.ff input[type=text],.ff input[type=number]{width:68px;text-align:center;}
+.inline-select{font-size:14px;padding:6px 9px;border:1px solid var(--border-strong);border-radius:7px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);margin-left:5px;}
+.inline-select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--focus-ring);}
+.inline-num{width:60px;font-size:14px;padding:6px 8px;border:1px solid var(--border-strong);border-radius:7px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);text-align:center;margin:0 2px;}
+.inline-num:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--focus-ring);}
+body.dark .sub-opts{background:var(--hover);border-bottom-color:var(--border);}
+.sub-opt-label{color:var(--text-2);}
+body.dark .sub-opt-label{background:var(--white);color:var(--text);}
+.panel select option{background:var(--white);color:var(--text);}
+
+/* ----- Coluna direita: LAUDO (fonte e estrutura preservadas) ----- */
+.laudo-panel{flex:1;min-width:0;background:var(--white);display:flex;flex-direction:column;border-left:1px solid var(--border);}
+.laudo-header{padding:9px 20px 8px;border-bottom:1px solid var(--border);background:var(--white);display:flex;align-items:center;}
+.laudo-header-title{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.6px;}
+.laudo-body{flex:1;overflow-y:auto;padding:22px 28px;}
+.laudo-doc{font-family:Helvetica,Arial,sans-serif;font-size:10pt;line-height:1.65;color:#111;max-width:720px;}
+.doc-titulo{text-align:center;font-weight:700;font-size:10pt;margin-bottom:16px;text-transform:uppercase;letter-spacing:.3px;}
+.doc-label{font-weight:700;font-size:10pt;}
+.doc-p{margin-bottom:8px;font-size:10pt;}
+.doc-secao{margin-bottom:14px;}
+.laudo-doc:focus { outline: none; }
+
+.toast-notification{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(12px);background:var(--text);color:var(--white);font-size:12.5px;font-weight:500;padding:10px 18px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.18);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;z-index:999;}
+.toast-notification.show{opacity:1;transform:translateX(-50%) translateY(0);}
+body.dark .toast-notification{background:#3a4155;color:#e2e6f0;}
+
+/* --- CUSTOM COMPONENTS --- */
+body.dark .btn-dark {background:#2a2f3d;border-color:#3a4155;color:#e2e6f0;}
+body.dark .btn-dark:hover {background:#343a4d;color:#fff;}
+body.dark .dim-input,body.dark .ff select,body.dark .ff input {background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .toolbar {background:var(--white);border-bottom-color:var(--border);}
+body.dark .sidebar {background:var(--white);border-right-color:var(--border);}
+body.dark .sidebar-hd {border-bottom-color:var(--border);}
+body.dark .radio-opt:hover {background:#1e2d4a;}
+body.dark .radio-opt.selected {background:#1e2d4a;}
+body.dark .radio-opt.tvp-active {background:#2d1a1a;}
+body.dark .sel-tag {background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .sub-fields {background:#1a2040;border-top:1px solid #2a3460;}
+body.dark .textarea-field {background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .lat-btn {background:var(--white);border-color:var(--border-strong);color:var(--text-2);}
+body.dark .lat-btn.active {background:var(--blue);border-color:var(--blue);color:#fff;}
+body.dark .vein-badge {background:#1e2d4a;}
+body.dark .vein-badge.tvp {background:#2d1a1a;color:var(--red);}
+body.dark .vein-badge.nc {background:#2d2a1a;color:var(--amber);}
+.nav-dot.tvp {background:var(--red);opacity:1;}
+.nav-dot.nc {background:var(--amber);opacity:1;}
+.radio-opt.tvp-active {background:#fff5f5;}
+.radio-opt.tvp-active .radio-label {color:var(--red);font-weight:500;}
+.radio-opt.tvp-active .radio-mark {border-color:var(--red);background:var(--red);}
+.radio-opt.selected .radio-mark::after,.radio-opt.tvp-active .radio-mark::after {opacity:1;}
+.sub-fields {display:none;padding:8px 14px 10px 40px;background:#eef3ff;border-top:1px solid #d0dcff;gap:8px;flex-direction:column;}
+.sub-fields.red-sub {background:#fff5f5;border-top-color:#fecaca;}
+.radio-opt.selected .sub-fields,.radio-opt.tvp-active .sub-fields {display:flex;}
+.sub-row {display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.sub-lbl {font-size:11px;color:var(--text-2);}
+.sel-tag:focus {outline:none;border-color:var(--blue);}
+.ext-checks {display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+.ext-chk-label {display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--text-2);cursor:pointer;padding:3px 8px;border-radius:20px;border:1px solid var(--border);background:var(--white);transition:all .12s;}
+.ext-chk-label:has(input:checked) {background:var(--red);color:#fff;border-color:var(--red);}
+.ext-chk-label input {position:absolute;opacity:0;pointer-events:none;}
+/* Lateralidade */
+.lat-wrap {display:flex;gap:10px;padding:12px 14px;}
+.lat-btn {flex:1;padding:10px 0;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid var(--border-strong);background:var(--white);color:var(--text-2);transition:all .15s;text-align:center;}
+.lat-btn.active {background:var(--blue);border-color:var(--blue);color:#fff;}
+.lat-btn:hover:not(.active) {background:var(--blue-light);border-color:var(--blue);color:var(--blue);}
+/* Vein badge em nav */
+.vein-badge {display:inline-block;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px;background:var(--blue-light);color:var(--blue);margin-left:4px;letter-spacing:.3px;text-transform:uppercase;}
+.vein-badge.tvp {background:#fee2e2;color:var(--red);}
+.vein-badge.nc {background:#fef3c7;color:var(--amber);}
+/* Laudo */
+.laudo-panel {flex:1;min-width:0;background:var(--white);display:flex;flex-direction:column;border-left:1px solid var(--border);}
+.doc-paciente {margin-bottom:16px;padding:10px 14px;background:#f4f6fb;border-radius:8px;border:1px solid #e2e6ef;font-size:9.5pt;line-height:1.7;}
+.doc-pac-label {font-weight:700;}
+body.dark .doc-paciente {background:#1a2040;border-color:#2a3460;color:#c8cfe0;}
+.doc-paciente {background:#f8f8f8;border:1px solid #ccc;color:#111 !important;}
+.textarea-field {width:100%;padding:8px 10px;border:1px solid var(--border-strong);border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--white);resize:none;height:90px;line-height:1.5;}
+.textarea-field:focus {outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,.08);}
+.ta-wrap {padding:10px 14px;}
+/* Dados Paciente / Técnica */
+.dim-input {width:100%;padding:6px 10px;border:1px solid var(--border-strong);border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--white);}
+.ff input,.ff select {padding:6px 9px;border:1px solid var(--border-strong);border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--white);}
+.ff input:focus,.ff select:focus {outline:none;border-color:var(--blue);}
+.form-grid {display:flex;flex-direction:column;gap:8px;padding:10px 14px;}
+.check-row.on .check-box {border-color:var(--blue);background:var(--blue);}
+.badge-indicacao {display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;background:var(--blue-light);color:var(--blue);margin-left:4px;}
+
+
+/* --- CUSTOM COMPONENTS RESTORED --- */
+body.dark .btn-dark {background:#2a2f3d;border-color:#3a4155;color:#e2e6f0;}
+body.dark .btn-dark:hover {background:#343a4d;color:#fff;}
+body.dark .dim-input,body.dark .ff select,body.dark .ff input {background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .toolbar {background:var(--white);border-bottom-color:var(--border);}
+body.dark .sidebar {background:var(--white);border-right-color:var(--border);}
+body.dark .sidebar-hd {border-bottom-color:var(--border);}
+body.dark .radio-opt:hover {background:#1e2d4a;}
+body.dark .radio-opt.selected {background:#1e2d4a;}
+body.dark .radio-opt.tvp-active {background:#2d1a1a;}
+body.dark .sel-tag {background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .sub-fields {background:#1a2040;border-top:1px solid #2a3460;}
+body.dark .textarea-field {background:var(--white);color:var(--text);border-color:var(--border-strong);}
+body.dark .lat-btn {background:var(--white);border-color:var(--border-strong);color:var(--text-2);}
+body.dark .lat-btn.active {background:var(--blue);border-color:var(--blue);color:#fff;}
+body.dark .vein-badge {background:#1e2d4a;}
+body.dark .vein-badge.tvp {background:#2d1a1a;color:var(--red);}
+body.dark .vein-badge.nc {background:#2d2a1a;color:var(--amber);}
+.nav-dot.tvp {background:var(--red);opacity:1;}
+.nav-dot.nc {background:var(--amber);opacity:1;}
+.radio-opt.tvp-active {background:#fff5f5;}
+.radio-opt.tvp-active .radio-label {color:var(--red);font-weight:500;}
+.radio-opt.tvp-active .radio-mark {border-color:var(--red);background:var(--red);}
+.radio-opt.selected .radio-mark::after,.radio-opt.tvp-active .radio-mark::after {opacity:1;}
+.sub-fields {display:none;padding:8px 14px 10px 40px;background:#eef3ff;border-top:1px solid #d0dcff;gap:8px;flex-direction:column;}
+.sub-fields.red-sub {background:#fff5f5;border-top-color:#fecaca;}
+.radio-opt.selected .sub-fields,.radio-opt.tvp-active .sub-fields {display:flex;}
+.sub-row {display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.sub-lbl {font-size:11px;color:var(--text-2);}
+.sel-tag:focus {outline:none;border-color:var(--blue);}
+.ext-checks {display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+.ext-chk-label {display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--text-2);cursor:pointer;padding:3px 8px;border-radius:20px;border:1px solid var(--border);background:var(--white);transition:all .12s;}
+.ext-chk-label:has(input:checked) {background:var(--red);color:#fff;border-color:var(--red);}
+.ext-chk-label input {position:absolute;opacity:0;pointer-events:none;}
+/* Lateralidade */
+.lat-wrap {display:flex;gap:10px;padding:12px 14px;}
+.lat-btn {flex:1;padding:10px 0;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid var(--border-strong);background:var(--white);color:var(--text-2);transition:all .15s;text-align:center;}
+.lat-btn.active {background:var(--blue);border-color:var(--blue);color:#fff;}
+.lat-btn:hover:not(.active) {background:var(--blue-light);border-color:var(--blue);color:var(--blue);}
+/* Vein badge em nav */
+.vein-badge {display:inline-block;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px;background:var(--blue-light);color:var(--blue);margin-left:4px;letter-spacing:.3px;text-transform:uppercase;}
+.vein-badge.tvp {background:#fee2e2;color:var(--red);}
+.vein-badge.nc {background:#fef3c7;color:var(--amber);}
+/* Laudo */
+.laudo-panel {flex:1;min-width:0;background:var(--white);display:flex;flex-direction:column;border-left:1px solid var(--border);}
+.doc-paciente {margin-bottom:16px;padding:10px 14px;background:#f4f6fb;border-radius:8px;border:1px solid #e2e6ef;font-size:9.5pt;line-height:1.7;}
+.doc-pac-label {font-weight:700;}
+body.dark .doc-paciente {background:#1a2040;border-color:#2a3460;color:#c8cfe0;}
+.doc-paciente {background:#f8f8f8;border:1px solid #ccc;color:#111 !important;}
+.textarea-field {width:100%;padding:8px 10px;border:1px solid var(--border-strong);border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--white);resize:none;height:90px;line-height:1.5;}
+.textarea-field:focus {outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--focus-ring);}
+.ta-wrap {padding:10px 14px;}
+/* Dados Paciente / Técnica */
+.dim-input {width:100%;padding:6px 10px;border:1px solid var(--border-strong);border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--white);}
+.ff input,.ff select {padding:6px 9px;border:1px solid var(--border-strong);border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--white);}
+.ff input:focus,.ff select:focus {outline:none;border-color:var(--blue);}
+.form-grid {display:flex;flex-direction:column;gap:8px;padding:10px 14px;}
+.check-row.on .check-box {border-color:var(--blue);background:var(--blue);}
+.badge-indicacao {display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;background:var(--blue-light);color:var(--blue);margin-left:4px;}
+
+
+/* --- FIX TEXTAREA --- */
+textarea { background: var(--white); color: var(--text); }
+body.dark textarea { background: var(--white); color: var(--text); border-color: var(--border-strong); }
+
+/* --- REFINO DA COLUNA DE ESTRUTURADOS (proporção e harmonia) --- */
+:root{--tvp-bg:#fbeeee;--tvp-bd:#efc4c4;--sub-bg:#e6f0f4;--sub-bd:#c3d8e0;}
+body.dark{--tvp-bg:#271a21;--tvp-bd:#4a2830;--sub-bg:#0f2234;--sub-bd:#1f3a52;}
+.panel{width:clamp(500px,36vw,580px);padding:22px 22px 32px;}
+.sec-title{font-size:20px;margin-bottom:18px;letter-spacing:-.2px;}
+.sec-title::before{height:24px;}
+.block{margin-bottom:16px;border-radius:var(--radius-lg);box-shadow:0 1px 2px rgba(20,35,60,.06);}
+body.dark .block{box-shadow:none;}
+.block-title{font-size:12px;letter-spacing:.8px;padding:12px 18px 11px;color:var(--text-3);}
+.radio-label{padding:13px 18px;gap:13px;font-size:15px;}
+.radio-mark{width:20px;height:20px;margin-top:0;}
+.check-row{padding:13px 18px;gap:13px;font-size:15px;color:var(--text);background:var(--white);transition:background .1s;}
+.check-row:hover{background:var(--hover);}
+.check-row.on{background:var(--sel-bg);color:var(--blue);font-weight:600;}
+.check-box{width:20px;height:20px;}
+.radio-opt{flex-wrap:wrap;}
+.radio-opt .sub-fields{flex-basis:100%;width:100%;}
+.sub-fields{padding:12px 18px 14px 51px;gap:10px;background:var(--sub-bg);border-top:1px solid var(--sub-bd);}
+.sub-fields.red-sub{background:var(--tvp-bg);border-top-color:var(--tvp-bd);}
+body.dark .sub-fields{background:var(--sub-bg);border-top-color:var(--sub-bd);}
+body.dark .sub-fields.red-sub{background:var(--tvp-bg);border-top-color:var(--tvp-bd);}
+.radio-opt.tvp-active,body.dark .radio-opt.tvp-active{background:var(--tvp-bg);}
+.sub-row{gap:10px;}
+.sub-lbl{font-size:12px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.5px;}
+.sel-tag{margin-left:0;font-size:14px;padding:7px 10px;border-radius:8px;min-height:34px;}
+.sel-tag:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--focus-ring);}
+.ext-checks{gap:8px;margin-top:6px;}
+.ext-chk-label{font-size:13px;padding:6px 13px;border-radius:20px;border-color:var(--border-strong);color:var(--text-2);}
+.ext-chk-label:hover{border-color:var(--blue);color:var(--blue);}
+.ext-chk-label:has(input:checked){background:var(--red);color:#fff;border-color:var(--red);font-weight:600;}
+.lat-wrap{gap:12px;padding:16px 18px;}
+.lat-btn{padding:14px 0;font-size:15px;border-radius:10px;}
+.dim-input{font-size:14px;padding:8px 11px;border-radius:8px;}
+.sub-row .dim-input{flex:1;min-width:150px;width:auto;text-align:left;}
+.textarea-field{font-size:14px;padding:10px 12px;border-radius:8px;height:110px;}
+.ta-wrap{padding:14px 18px;}
+
+/* --- Escolha de lado dentro das alterações (exame bilateral) --- */
+.side-chip{display:inline-flex;align-items:center;padding:6px 16px;border-radius:20px;border:1.5px solid var(--border-strong);background:var(--white);font-size:13px;font-weight:600;color:var(--text-2);cursor:pointer;transition:all .12s;}
+.side-chip:hover{border-color:var(--blue);color:var(--blue);}
+.side-chip.on{background:var(--blue);border-color:var(--blue);color:#fff;}
+body.dark .side-chip.on{color:#06202b;}
+.side-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:10px 12px 12px;display:flex;flex-direction:column;gap:8px;}
+.side-card-hd{font-size:12px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.6px;}
+</style>
+
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="logo" style="cursor:pointer" onclick="window.location.href='../laudo-rede-dor.html'"><span class="logo-name">THI-RADS</span><span class="logo-sub">laudo estruturado</span></div>
+  <button class="btn" onclick="window.location.href='../laudo-rede-dor.html'"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 2L4 8l6 6"/></svg>Voltar</button>
+  <div class="tb-sep"></div>
+  <button class="btn" onclick="copiar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>Copiar laudo</button>
+  <button class="btn btn-primary" onclick="imprimir()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6V2h8v4M4 12H2V7h12v5h-2M4 9h8M4 12v2h8v-2"/></svg>Imprimir</button>
+  <button class="btn btn-dark" id="btn-dark-toggle" onclick="toggleDark()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro</button>
+  <button class="btn btn-danger" onclick="reiniciar()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8a6 6 0 1 0 1.5-3.9M2 4v4h4"/></svg>Reiniciar</button>
+</div>
+
+<div class="body">
+  <div class="sidebar">
+    <div class="sidebar-hd">
+      <div class="sidebar-tipo">Doppler Venoso</div>
+      <div class="sidebar-titulo">TVP — Membros Inferiores</div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-item" id="nav-lateralidade" onclick="showSection('lateralidade')"><span class="nav-dot"></span>Lateralidade</div>
+      <div class="nav-item" id="nav-tecnica" onclick="showSection('tecnica')"><span class="nav-dot"></span>Técnica</div>
+      <div class="nav-item" id="nav-vfc" onclick="showSection('vfc')"><span class="nav-dot" id="dot-vfc"></span>V. Femoral Comum</div>
+      <div class="nav-item" id="nav-vfem" onclick="showSection('vfem')"><span class="nav-dot" id="dot-vfem"></span>V. Femoral</div>
+      <div class="nav-item" id="nav-vfp" onclick="showSection('vfp')"><span class="nav-dot" id="dot-vfp"></span>V. Femoral Prof.</div>
+      <div class="nav-item" id="nav-vp" onclick="showSection('vp')"><span class="nav-dot" id="dot-vp"></span>V. Poplítea</div>
+      <div class="nav-item" id="nav-vta" onclick="showSection('vta')"><span class="nav-dot" id="dot-vta"></span>VV. Tibiais Ant.</div>
+      <div class="nav-item" id="nav-vtp" onclick="showSection('vtp')"><span class="nav-dot" id="dot-vtp"></span>VV. Tibiais Post.</div>
+      <div class="nav-item" id="nav-vf" onclick="showSection('vf')"><span class="nav-dot" id="dot-vf"></span>VV. Fibulares</div>
+      <div class="nav-item" id="nav-vmp" onclick="showSection('vmp')"><span class="nav-dot" id="dot-vmp"></span>VV. Gastrocnêmias</div>
+      <div class="nav-item" id="nav-sm" onclick="showSection('sm')"><span class="nav-dot" id="dot-sm"></span>Safena Magna</div>
+      <div class="nav-item" id="nav-sp" onclick="showSection('sp')"><span class="nav-dot" id="dot-sp"></span>Safena Parva</div>
+      <div class="nav-item" id="nav-vsup" onclick="showSection('vsup')"><span class="nav-dot" id="dot-vsup"></span>VV. Superficiais</div>
+      <div class="nav-item" id="nav-dop" onclick="showSection('dop')"><span class="nav-dot" id="dot-dop"></span>Doppler Espectral</div>
+      <div class="nav-item" id="nav-achados" onclick="showSection('achados')"><span class="nav-dot"></span>Achados Adicionais</div>
+    </div>
+  </div>
+
+  <div class="panel" id="main-panel"></div>
+
+  <div class="laudo-panel">
+    <div class="laudo-header"><span class="laudo-header-title">Pré-visualização</span></div>
+    <div class="laudo-body"><div class="laudo-doc" id="laudo-doc" contenteditable="true"></div></div>
+  </div>
+</div>
+
+<script>
+// ── ESTADO GLOBAL ──
+function veiaDefault(plural) {
+  return { sit:'habitual', motivoNC:'edema', cro:'aguda', cal:'aumentado', ocl:'total', tod:false, pro:false, med:false, dis:false, rec:false, plural };
+}
+function safenaDefault() {
+  return { sit:'habitual', crossa:false, tod:false, pro:false, med:false, dis:false };
+}
+function vsupDefault() {
+  return { sitCoxa:'habitual', tvpCoxaAnt:false, tvpCoxaPos:false, tvpCoxaMed:false, tvpCoxaLat:false,
+           sitPerna:'habitual', tvpPernaAnt:false, tvpPernaPos:false, tvpPernaMed:false, tvpPernaLat:false };
+}
+
+const estado = {
+  lateralidade: 'DIREITO',
+  tecnica: { limEdema:false, limBiotipo:false, carater:false },
+  vfc:  veiaDefault(false),
+  vfem: veiaDefault(false),
+  vfp:  veiaDefault(false),
+  vp:   veiaDefault(false),
+  vta:  veiaDefault(true),
+  vtp:  veiaDefault(true),
+  vf:   veiaDefault(true),
+  vmp:  veiaDefault(true),
+  sm:   safenaDefault(),
+  sp:   safenaDefault(),
+  vsup: vsupDefault(),
+  achados: { edema:false, edeLocalFace:'anterior', edeLocalSeg:'coxa', baker:false, bakerInt:'integro', texto:'' },
+  doppler: { sit:'preservado', fasic:false, aug:false, refluxo:false, velred:false, seg:'' },
+};
+
+const VEIAS = {
+  vfc:  { label:'Veia femoral comum', plural:false },
+  vfem: { label:'Veia femoral', plural:false },
+  vfp:  { label:'Veia femoral profunda', plural:false },
+  vp:   { label:'Veia poplítea', plural:false },
+  vta:  { label:'Veias tibiais anteriores', plural:true },
+  vtp:  { label:'Veias tibiais posteriores', plural:true },
+  vf:   { label:'Veias fibulares', plural:true },
+  vmp:  { label:'Veias gastrocnêmias', plural:true },
+};
+
+// ── DADOS POR MEMBRO (permite exame bilateral) ──
+const CAMPOS_LADO = ['vfc','vfem','vfp','vp','vta','vtp','vf','vmp','sm','sp','vsup','achados','doppler'];
+function novoLado() {
+  return {
+    vfc: veiaDefault(false), vfem: veiaDefault(false), vfp: veiaDefault(false), vp: veiaDefault(false),
+    vta: veiaDefault(true), vtp: veiaDefault(true), vf: veiaDefault(true), vmp: veiaDefault(true),
+    sm: safenaDefault(), sp: safenaDefault(), vsup: vsupDefault(),
+    achados: { edema:false, edeLocalFace:'anterior', edeLocalSeg:'coxa', baker:false, bakerInt:'integro', texto:'' },
+    doppler: { sit:'preservado', fasic:false, aug:false, refluxo:false, velred:false, seg:'' },
+  };
+}
+const lados = { DIREITO: novoLado(), ESQUERDO: novoLado() };
+let ladoAtivo = 'DIREITO';
+// "estado" aponta (por referência) para os dados do membro em edição
+function aplicarLado(l) { CAMPOS_LADO.forEach(k => { estado[k] = lados[l][k]; }); }
+aplicarLado('DIREITO');
+function selLado(l) { ladoAtivo = l; aplicarLado(l); }
+function comLado(l, fn) {
+  const ant = ladoAtivo;
+  aplicarLado(l);
+  try { return fn(); } finally { aplicarLado(ant); }
+}
+const LADOS = ['DIREITO','ESQUERDO'];
+const LADO_LBL = { DIREITO:'Direito', ESQUERDO:'Esquerdo' };
+function sidesAtivos() { return estado.lateralidade === 'BILATERAL' ? LADOS : [estado.lateralidade]; }
+function isBil() { return estado.lateralidade === 'BILATERAL'; }
+function sufLado(l, pl) { return isBil() ? ' ' + (l === 'DIREITO' ? 'direit' : 'esquerd') + (pl ? 'as' : 'a') : ''; }
+
+// ── Bloco de situação com escolha de lado (exame bilateral) ──
+const BIL = {};
+const uiAberto = {};
+function checkMarkHtml(on) {
+  return `<span class="check-box-inline" style="width:15px;height:15px;border-radius:4px;border:2px solid ${on?'var(--blue)':'var(--border-strong)'};background:${on?'var(--blue)':'var(--white)'};display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">${on?'<svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="2" width="9" height="9"><polyline points="1.5,5 4,7.5 8.5,2.5"/></svg>':''}</span>`;
+}
+function blocoSituacaoBil(cfg) {
+  BIL[cfg.id] = cfg;
+  const aberto = x => uiAberto[cfg.id + '|' + x.k] || LADOS.some(l => x.isOn(l));
+  const hab = !cfg.kinds.some(aberto);
+  let h = `<div class="block"><div class="block-title">${cfg.title}</div>`;
+  if (cfg.habLabel) h += `<div class="radio-opt ${hab?'selected':''}" onclick="bilHab('${cfg.id}')"><input type="radio"><label class="radio-label"><span class="radio-mark"></span>${cfg.habLabel}</label></div>`;
+  cfg.kinds.forEach(x => {
+    const ab = aberto(x);
+    const chips = LADOS.map(l => `<span class="side-chip ${x.isOn(l)?'on':''}" onclick="event.stopPropagation();bilToggle('${cfg.id}','${l}','${x.k}')">${LADO_LBL[l]}</span>`).join('');
+    const cards = LADOS.filter(l => x.isOn(l)).map(l => `<div class="side-card" onclick="event.stopPropagation()"><div class="side-card-hd">${LADO_LBL[l]}</div>${comLado(l, () => x.detail(`selLado('${l}');`))}</div>`).join('');
+    const mark = cfg.check ? checkMarkHtml(ab) : '<span class="radio-mark"></span>';
+    h += `<div class="radio-opt ${ab?x.cls:''}" onclick="bilAbrir('${cfg.id}','${x.k}')"><input type="radio"><label class="radio-label">${mark}${x.label}</label>
+      <div class="sub-fields ${x.sub||''}" onclick="event.stopPropagation()"><div class="sub-row"><span class="sub-lbl">Membro</span>${chips}</div>${cards}</div></div>`;
+  });
+  return h + '</div>';
+}
+function bilHab(id) { const c = BIL[id]; c.kinds.forEach(x => { uiAberto[id + '|' + x.k] = false; LADOS.forEach(l => x.setOn(l, false)); }); renderPanel(); }
+function bilAbrir(id, k) { uiAberto[id + '|' + k] = true; renderPanel(); }
+function bilToggle(id, l, k) { const x = BIL[id].kinds.find(z => z.k === k); x.setOn(l, !x.isOn(l)); uiAberto[id + '|' + k] = true; renderPanel(); }
+
+let secaoAtual = 'lateralidade';
+
+// ── NAV STATUS DOTS ──
+function updateNavDots() {
+  const S = sidesAtivos();
+  ['vfc','vfem','vfp','vp','vta','vtp','vf','vmp'].forEach(k => {
+    const dot = document.getElementById('dot-' + k);
+    if (!dot) return;
+    const sits = S.map(l => lados[l][k].sit);
+    dot.className = sits.includes('tvp') ? 'nav-dot tvp' : sits.includes('nc') ? 'nav-dot nc' : 'nav-dot';
+  });
+  ['sm','sp'].forEach(k => {
+    const dot = document.getElementById('dot-' + k);
+    if (dot) dot.className = S.some(l => lados[l][k].sit === 'tvp') ? 'nav-dot tvp' : 'nav-dot';
+  });
+  const dotDop = document.getElementById('dot-dop');
+  if (dotDop) dotDop.className = S.some(l => lados[l].doppler.sit === 'alterado') ? 'nav-dot tvp' : 'nav-dot';
+  const dotVsup = document.getElementById('dot-vsup');
+  if (dotVsup) dotVsup.className = S.some(l => lados[l].vsup.sitCoxa === 'tvp' || lados[l].vsup.sitPerna === 'tvp') ? 'nav-dot tvp' : 'nav-dot';
+}
+
+// ── SECTION RENDER ──
+function showSection(sec) {
+  secaoAtual = sec;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const nav = document.getElementById('nav-' + sec);
+  if (nav) nav.classList.add('active');
+  renderPanel();
+}
+
+function renderPanel() {
+  const panel = document.getElementById('main-panel');
+  switch(secaoAtual) {
+    case 'tecnica':  panel.innerHTML = renderTecnicaHtml();  break;
+    case 'lateralidade': panel.innerHTML = renderLateralidadeHtml(); break;
+    case 'vfc':  panel.innerHTML = renderVeiaHtml('vfc');  break;
+    case 'vfem': panel.innerHTML = renderVeiaHtml('vfem'); break;
+    case 'vfp':  panel.innerHTML = renderVeiaHtml('vfp');  break;
+    case 'vp':   panel.innerHTML = renderVeiaHtml('vp');   break;
+    case 'vta':  panel.innerHTML = renderVeiaHtml('vta');  break;
+    case 'vtp':  panel.innerHTML = renderVeiaHtml('vtp');  break;
+    case 'vf':   panel.innerHTML = renderVeiaHtml('vf');   break;
+    case 'vmp':  panel.innerHTML = renderVeiaHtml('vmp');  break;
+    case 'sm':   panel.innerHTML = renderSafenaHtml('sm','Safena Magna','tromboflebite em safena magna'); break;
+    case 'sp':   panel.innerHTML = renderSafenaHtml('sp','Safena Parva','tromboflebite em safena parva'); break;
+    case 'vsup': panel.innerHTML = renderVsupHtml(); break;
+    case 'dop': panel.innerHTML = renderDopplerHtml(); break;
+    case 'achados': panel.innerHTML = renderAchadosHtml(); break;
+  }
+  updateNavDots();
+  updateLaudo();
+}
+
+// ── TÉCNICA ──
+function renderTecnicaHtml() {
+  const t = estado.tecnica;
+  const chk = (v) => `<svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="2" width="9" height="9"><polyline points="1.5,5 4,7.5 8.5,2.5"/></svg>`;
+  return `
+  <div class="sec-title">Técnica</div>
+  <div class="block">
+    <div class="block-title">Caráter de urgência</div>
+    <div class="check-row ${t.carater?'on':''}" onclick="toggleTec('carater')">
+      <span class="check-box">${t.carater?chk():''}</span>
+      exame realizado em caráter de urgência
+    </div>
+  </div>
+  <div class="block">
+    <div class="block-title">Limitações do exame</div>
+    <div class="check-row ${t.limEdema?'on':''}" onclick="toggleTec('limEdema')">
+      <span class="check-box">${t.limEdema?chk():''}</span>
+      acentuado edema
+    </div>
+    <div class="check-row ${t.limBiotipo?'on':''}" onclick="toggleTec('limBiotipo')">
+      <span class="check-box">${t.limBiotipo?chk():''}</span>
+      biotipo (obesidade) — intensa atenuação do feixe acústico
+    </div>
+  </div>`;
+}
+function toggleTec(key) { estado.tecnica[key] = !estado.tecnica[key]; renderPanel(); }
+
+// ── LATERALIDADE ──
+function renderLateralidadeHtml() {
+  const lat = estado.lateralidade;
+  return `
+  <div class="sec-title">Lateralidade</div>
+  <div class="block">
+    <div class="block-title">Selecione o membro a ser examinado</div>
+    <div class="lat-wrap">
+      <div class="lat-btn ${lat==='DIREITO'?'active':''}" onclick="setLat('DIREITO')">Direito</div>
+      <div class="lat-btn ${lat==='ESQUERDO'?'active':''}" onclick="setLat('ESQUERDO')">Esquerdo</div>
+      <div class="lat-btn ${lat==='BILATERAL'?'active':''}" onclick="setLat('BILATERAL')">Bilateral</div>
+    </div>
+  </div>`;
+}
+
+function setLat(v) {
+  const ant = estado.lateralidade;
+  if (ant !== 'BILATERAL' && v !== 'BILATERAL' && ant !== v) {
+    // exame unilateral: os achados acompanham a troca de lado
+    lados[v] = lados[ant];
+    lados[ant] = novoLado();
+  }
+  estado.lateralidade = v;
+  ladoAtivo = (v === 'BILATERAL') ? (ant === 'ESQUERDO' ? 'ESQUERDO' : 'DIREITO') : v;
+  aplicarLado(ladoAtivo);
+  renderPanel();
+}
+
+// ── RENDER VEIA PROFUNDA ──
+function veiaNcDetalhe(key, px) {
+  const v = estado[key];
+  return `<div class="sub-row">
+    <span class="sub-lbl">motivo</span>
+    <select class="sel-tag" onclick="event.stopPropagation()" onchange="${px}setVeiaVal('${key}','motivoNC',this.value);updateLaudo()">
+      <option value="edema" ${v.motivoNC==='edema'?'selected':''}>acentuado edema</option>
+      <option value="atenuacao" ${v.motivoNC==='atenuacao'?'selected':''}>atenuação do feixe acústico</option>
+    </select>
+  </div>`;
+}
+function veiaTvpDetalhe(key, px) {
+  const v = estado[key];
+  const sp = `onclick="event.stopPropagation()"`;
+  const chk = (f, lbl) => `<label class="ext-chk-label" ${sp}><input type="checkbox" ${v[f]?'checked':''} onchange="${px}setVeiaExt('${key}','${f}',this.checked)" onclick="event.stopPropagation()"> ${lbl}</label>`;
+  return `
+    <div class="sub-row">
+      <span class="sub-lbl">fase</span>
+      <select class="sel-tag" onclick="event.stopPropagation()" onchange="${px}setVeiaVal('${key}','cro',this.value);renderPanel()">
+        <option value="aguda" ${v.cro==='aguda'?'selected':''}>aguda</option>
+        <option value="cronica" ${v.cro==='cronica'?'selected':''}>crônica</option>
+      </select>
+      ${v.cro==='cronica'?`<select class="sel-tag" onclick="event.stopPropagation()" onchange="${px}setVeiaVal('${key}','cal',this.value);updateLaudo()">
+        <option value="aumentado" ${v.cal==='aumentado'?'selected':''}>calibre aumentado</option>
+        <option value="reduzido" ${v.cal==='reduzido'?'selected':''}>calibre reduzido</option>
+      </select>`:''}
+    </div>
+    <div class="sub-row" style="margin-top:4px">
+      <span class="sub-lbl">oclusão</span>
+      <select class="sel-tag" onclick="event.stopPropagation()" onchange="${px}setVeiaVal('${key}','ocl',this.value)">
+        <option value="total" ${v.ocl==='total'?'selected':''}>oclusiva (não compressível, sem fluxo)</option>
+        <option value="parcial" ${v.ocl==='parcial'?'selected':''}>não oclusiva (compressibilidade parcial, fluxo residual)</option>
+      </select>
+    </div>
+    <div class="sub-lbl" style="margin-top:4px">Extensão:</div>
+    <div class="ext-checks" ${sp}>${chk('tod','toda extensão')}${chk('pro','terço proximal')}${chk('med','terço médio')}${chk('dis','terço distal')}</div>
+    ${v.cro==='cronica'?`<label class="ext-chk-label" style="margin-top:4px" ${sp}><input type="checkbox" ${v.rec?'checked':''} onchange="${px}setVeiaExt('${key}','rec',this.checked)" onclick="event.stopPropagation()"> em recanalização</label>`:''}`;
+}
+function renderVeiaHtml(key) {
+  const label = VEIAS[key].label;
+  const HAB = 'habitual (pérvia, compressível, fluxo preservado)';
+  if (isBil()) {
+    const mk = (k) => ({ isOn: l => lados[l][key].sit === k, setOn: (l, b) => { const v = lados[l][key]; if (b) v.sit = k; else if (v.sit === k) v.sit = 'habitual'; } });
+    return `<div class="sec-title">${label}</div>` + blocoSituacaoBil({
+      id: key, title: 'Situação', habLabel: HAB,
+      kinds: [
+        Object.assign({ k:'nc', label:'não caracterizada', cls:'selected', sub:'', detail: px => veiaNcDetalhe(key, px) }, mk('nc')),
+        Object.assign({ k:'tvp', label:'trombose venosa profunda', cls:'tvp-active', sub:'red-sub', detail: px => veiaTvpDetalhe(key, px) }, mk('tvp')),
+      ],
+    });
+  }
+  const v = estado[key];
+  const isSit = s => v.sit === s;
+  const sp = `onclick="event.stopPropagation()"`;
+  return `
+  <div class="sec-title">${label}</div>
+  <div class="block">
+    <div class="block-title">Situação</div>
+    <div class="radio-opt ${isSit('habitual')?'selected':''}" onclick="setVeiaSit('${key}','habitual')">
+      <input type="radio" name="sit_${key}">
+      <label class="radio-label"><span class="radio-mark"></span>${HAB}</label>
+    </div>
+    <div class="radio-opt ${isSit('nc')?'selected':''}" onclick="setVeiaSit('${key}','nc')">
+      <input type="radio" name="sit_${key}">
+      <label class="radio-label"><span class="radio-mark"></span>não caracterizada</label>
+      <div class="sub-fields" ${sp}>${veiaNcDetalhe(key,'')}</div>
+    </div>
+    <div class="radio-opt ${isSit('tvp')?'tvp-active':''}" onclick="setVeiaSit('${key}','tvp')">
+      <input type="radio" name="sit_${key}">
+      <label class="radio-label"><span class="radio-mark"></span>trombose venosa profunda</label>
+      <div class="sub-fields red-sub" ${sp}>${veiaTvpDetalhe(key,'')}</div>
+    </div>
+  </div>`;
+}
+
+function setVeiaSit(key, sit) {
+  estado[key].sit = sit;
+  renderPanel();
+}
+
+function setVeiaVal(key, field, val) {
+  estado[key][field] = val;
+  updateLaudo();
+}
+
+function setVeiaExt(key, field, val) {
+  if (field === 'tod' && val) {
+    estado[key].pro = false;
+    estado[key].med = false;
+    estado[key].dis = false;
+  } else if (['pro','med','dis'].includes(field) && val) {
+    estado[key].tod = false;
+  }
+  estado[key][field] = val;
+  renderPanel();
+}
+
+// ── RENDER SAFENA ──
+function safenaDetalhe(key, px) {
+  const v = estado[key];
+  const sp = `onclick="event.stopPropagation()"`;
+  const chk = (f, lbl) => `<label class="ext-chk-label" ${sp}><input type="checkbox" ${v[f]?'checked':''} onchange="${px}setSafenaExt('${key}','${f}',this.checked)" onclick="event.stopPropagation()"> ${lbl}</label>`;
+  return `<div class="sub-lbl">Extensão:</div>
+    <div class="ext-checks" ${sp}>${chk('tod','toda extensão')}${chk('crossa','crossa')}${chk('pro','terço proximal')}${chk('med','terço médio')}${chk('dis','terço distal')}</div>`;
+}
+function renderSafenaHtml(key, titulo, hdLabel) {
+  const HAB = 'habitual (pérvia, compressível, fluxo preservado)';
+  if (isBil()) {
+    return `<div class="sec-title">${titulo}</div>` + blocoSituacaoBil({
+      id: key, title: 'Situação', habLabel: HAB,
+      kinds: [{ k:'tvp', label:'tromboflebite', cls:'tvp-active', sub:'red-sub',
+        isOn: l => lados[l][key].sit === 'tvp',
+        setOn: (l, b) => { const v = lados[l][key]; if (b) v.sit = 'tvp'; else if (v.sit === 'tvp') v.sit = 'habitual'; },
+        detail: px => safenaDetalhe(key, px) }],
+    });
+  }
+  const isTVP = estado[key].sit === 'tvp';
+  const sp = `onclick="event.stopPropagation()"`;
+  return `
+  <div class="sec-title">${titulo}</div>
+  <div class="block">
+    <div class="block-title">Situação</div>
+    <div class="radio-opt ${!isTVP?'selected':''}" onclick="setSafenaSit('${key}','habitual')">
+      <input type="radio" name="sit_${key}">
+      <label class="radio-label"><span class="radio-mark"></span>${HAB}</label>
+    </div>
+    <div class="radio-opt ${isTVP?'tvp-active':''}" onclick="setSafenaSit('${key}','tvp')">
+      <input type="radio" name="sit_${key}">
+      <label class="radio-label"><span class="radio-mark"></span>tromboflebite</label>
+      <div class="sub-fields red-sub" ${sp}>${safenaDetalhe(key,'')}</div>
+    </div>
+  </div>`;
+}
+
+function setSafenaSit(key, sit) {
+  estado[key].sit = sit;
+  renderPanel();
+}
+
+function setSafenaExt(key, field, val) {
+  if (field === 'tod' && val) { estado[key].crossa=false; estado[key].pro=false; estado[key].med=false; estado[key].dis=false; }
+  else if (['crossa','pro','med','dis'].includes(field) && val) { estado[key].tod=false; }
+  estado[key][field] = val;
+  renderPanel();
+}
+
+// ── RENDER VV SUPERFICIAIS ──
+const FACES_VSUP = {
+  Coxa:  [['tvpCoxaAnt','face anterior'],['tvpCoxaPos','face posterior'],['tvpCoxaMed','face medial'],['tvpCoxaLat','face lateral']],
+  Perna: [['tvpPernaAnt','face anterior'],['tvpPernaPos','face posterior'],['tvpPernaMed','face medial'],['tvpPernaLat','face lateral']],
+};
+function vsupFacesDetalhe(seg, px) {
+  const vs = estado.vsup;
+  return `<div class="sub-lbl">Faces acometidas:</div>
+    <div class="ext-checks" onclick="event.stopPropagation()">
+      ${FACES_VSUP[seg].map(([k,lbl]) => `<label class="ext-chk-label" onclick="event.stopPropagation()"><input type="checkbox" ${vs[k]?'checked':''} onchange="${px}setVsupFace('${k}',this.checked)" onclick="event.stopPropagation()"> ${lbl}</label>`).join('')}
+    </div>`;
+}
+function renderVsupHtml() {
+  if (isBil()) {
+    const bloco = seg => blocoSituacaoBil({
+      id: 'vsup' + seg, title: seg, habLabel: 'habitual',
+      kinds: [{ k:'tvp', label:'tromboflebite', cls:'tvp-active', sub:'red-sub',
+        isOn: l => lados[l].vsup['sit' + seg] === 'tvp',
+        setOn: (l, b) => { const vs = lados[l].vsup; if (b) vs['sit' + seg] = 'tvp'; else if (vs['sit' + seg] === 'tvp') vs['sit' + seg] = 'habitual'; },
+        detail: px => vsupFacesDetalhe(seg, px) }],
+    });
+    return `<div class="sec-title">Veias Superficiais</div>` + bloco('Coxa') + bloco('Perna');
+  }
+  const vs = estado.vsup;
+  const unil = seg => {
+    const tvp = vs['sit' + seg] === 'tvp';
+    return `
+  <div class="block">
+    <div class="block-title">${seg}</div>
+    <div class="radio-opt ${!tvp?'selected':''}" onclick="setVsupSit('${seg}','habitual')">
+      <input type="radio" name="sit_vsup_${seg.toLowerCase()}">
+      <label class="radio-label"><span class="radio-mark"></span>habitual</label>
+    </div>
+    <div class="radio-opt ${tvp?'tvp-active':''}" onclick="setVsupSit('${seg}','tvp')">
+      <input type="radio" name="sit_vsup_${seg.toLowerCase()}">
+      <label class="radio-label"><span class="radio-mark"></span>tromboflebite</label>
+      <div class="sub-fields red-sub" onclick="event.stopPropagation()">${vsupFacesDetalhe(seg,'')}</div>
+    </div>
+  </div>`;
+  };
+  return `<div class="sec-title">Veias Superficiais</div>` + unil('Coxa') + unil('Perna');
+}
+
+function setVsupSit(seg, sit) {
+  estado.vsup['sit' + seg] = sit;
+  renderPanel();
+}
+function setVsupFace(key, val) {
+  estado.vsup[key] = val;
+  updateNavDots();
+  updateLaudo();
+}
+
+// ── RENDER DOPPLER ESPECTRAL ──
+const OPTS_DOP = [['fasic','perda da fasicidade respiratória'],['aug','resposta diminuída/ausente à manobra de compressão distal'],['refluxo','refluxo venoso patológico'],['velred','redução das velocidades de fluxo']];
+function dopDetalhe(px) {
+  const d = estado.doppler;
+  return `<div class="sub-lbl">Alterações:</div>
+    <div class="ext-checks" onclick="event.stopPropagation()">
+      ${OPTS_DOP.map(([k,lbl]) => `<label class="ext-chk-label" onclick="event.stopPropagation()"><input type="checkbox" ${d[k]?'checked':''} onchange="${px}setDopVal('${k}',this.checked)" onclick="event.stopPropagation()"> ${lbl}</label>`).join('')}
+    </div>
+    <div class="sub-row" style="margin-top:6px">
+      <span class="sub-lbl">segmento(s)</span>
+      <input class="dim-input" type="text" value="${d.seg}" placeholder="ex.: veia femoral" onclick="event.stopPropagation()" oninput="${px}setDopVal('seg',this.value);updateLaudo()">
+    </div>`;
+}
+function renderDopplerHtml() {
+  if (isBil()) {
+    return `<div class="sec-title">Doppler Espectral</div>` + blocoSituacaoBil({
+      id: 'dop', title: 'Padrão espectral e velocidades', habLabel: 'preservados',
+      kinds: [{ k:'alt', label:'alterados', cls:'tvp-active', sub:'red-sub',
+        isOn: l => lados[l].doppler.sit === 'alterado',
+        setOn: (l, b) => { lados[l].doppler.sit = b ? 'alterado' : 'preservado'; },
+        detail: px => dopDetalhe(px) }],
+    });
+  }
+  const alt = estado.doppler.sit === 'alterado';
+  return `
+  <div class="sec-title">Doppler Espectral</div>
+  <div class="block">
+    <div class="block-title">Padrão espectral e velocidades</div>
+    <div class="radio-opt ${!alt?'selected':''}" onclick="setDopSit('preservado')">
+      <input type="radio" name="sit_dop">
+      <label class="radio-label"><span class="radio-mark"></span>preservados</label>
+    </div>
+    <div class="radio-opt ${alt?'tvp-active':''}" onclick="setDopSit('alterado')">
+      <input type="radio" name="sit_dop">
+      <label class="radio-label"><span class="radio-mark"></span>alterados</label>
+      <div class="sub-fields red-sub" onclick="event.stopPropagation()">${dopDetalhe('')}</div>
+    </div>
+  </div>`;
+}
+function setDopSit(v) { estado.doppler.sit = v; renderPanel(); }
+function setDopVal(k, v) { estado.doppler[k] = v; if (k !== 'seg') renderPanel(); }
+
+// ── RENDER ACHADOS ──
+function edemaDetalhe(px) {
+  const a = estado.achados;
+  return `<div class="sub-row">
+    <span class="sub-lbl">face</span>
+    <select class="sel-tag" onclick="event.stopPropagation()" onchange="${px}setAchVal('edeLocalFace',this.value);updateLaudo()">
+      <option value="anterior" ${a.edeLocalFace==='anterior'?'selected':''}>anterior</option>
+      <option value="posterior" ${a.edeLocalFace==='posterior'?'selected':''}>posterior</option>
+      <option value="medial" ${a.edeLocalFace==='medial'?'selected':''}>medial</option>
+      <option value="lateral" ${a.edeLocalFace==='lateral'?'selected':''}>lateral</option>
+    </select>
+    <span class="sub-lbl">da</span>
+    <select class="sel-tag" onclick="event.stopPropagation()" onchange="${px}setAchVal('edeLocalSeg',this.value);updateLaudo()">
+      <option value="coxa" ${a.edeLocalSeg==='coxa'?'selected':''}>coxa</option>
+      <option value="perna" ${a.edeLocalSeg==='perna'?'selected':''}>perna</option>
+    </select>
+  </div>`;
+}
+function bakerDetalhe(px) {
+  const a = estado.achados;
+  return `<div class="sub-row">
+    <select class="sel-tag" onclick="event.stopPropagation()" onchange="${px}setAchVal('bakerInt',this.value);updateLaudo()">
+      <option value="integro" ${a.bakerInt==='integro'?'selected':''}>íntegro</option>
+      <option value="roto" ${a.bakerInt==='roto'?'selected':''}>roto</option>
+    </select>
+  </div>`;
+}
+function renderAchadosHtml() {
+  if (isBil()) {
+    const flag = f => ({ isOn: l => lados[l].achados[f], setOn: (l, b) => { lados[l].achados[f] = b; } });
+    const taLado = l => `<div class="ta-wrap" style="padding-top:${l==='DIREITO'?'14px':'0'}"><div class="sub-lbl" style="margin-bottom:6px">${LADO_LBL[l]}</div>
+      <textarea class="textarea-field" placeholder="Descreva outros achados adicionais (${LADO_LBL[l].toLowerCase()})..." oninput="selLado('${l}');setAchVal('texto',this.value);updateLaudo()">${lados[l].achados.texto}</textarea></div>`;
+    return `<div class="sec-title">Achados Adicionais</div>` + blocoSituacaoBil({
+      id: 'ach', title: 'Achados Comuns', habLabel: null, check: true,
+      kinds: [
+        Object.assign({ k:'edema', label:'edema', cls:'selected', sub:'', detail: px => edemaDetalhe(px) }, flag('edema')),
+        Object.assign({ k:'baker', label:'cisto de Baker', cls:'selected', sub:'', detail: px => bakerDetalhe(px) }, flag('baker')),
+      ],
+    }) + `<div class="block"><div class="block-title">Outros achados</div>${taLado('DIREITO')}${taLado('ESQUERDO')}</div>`;
+  }
+  const a = estado.achados;
+  return `
+  <div class="sec-title">Achados Adicionais</div>
+  <div class="block">
+    <div class="block-title">Achados Comuns</div>
+    <div class="radio-opt ${a.edema?'selected':''}" onclick="toggleAch('edema')">
+      <label class="radio-label" style="cursor:pointer">${checkMarkHtml(a.edema)}edema</label>
+      <div class="sub-fields" style="${a.edema?'display:flex':'display:none'}">${edemaDetalhe('')}</div>
+    </div>
+    <div class="radio-opt ${a.baker?'selected':''}" onclick="toggleAch('baker')">
+      <label class="radio-label" style="cursor:pointer">${checkMarkHtml(a.baker)}cisto de Baker</label>
+      <div class="sub-fields" style="${a.baker?'display:flex':'display:none'}">${bakerDetalhe('')}</div>
+    </div>
+  </div>
+  <div class="block">
+    <div class="block-title">Outros achados</div>
+    <div class="ta-wrap">
+      <textarea class="textarea-field" placeholder="Descreva outros achados adicionais..." oninput="setAchVal('texto',this.value);updateLaudo()">${a.texto}</textarea>
+    </div>
+  </div>`;
+}
+
+function toggleAch(key) {
+  estado.achados[key] = !estado.achados[key];
+  renderPanel();
+}
+function setAchVal(key, val) {
+  estado.achados[key] = val;
+  updateLaudo();
+}
+
+// ── GERAÇÃO DE FRASES ──
+function getExtensao(v) {
+  if (v.tod) return ' em toda sua extensão';
+  const parts = [];
+  if (v.pro) parts.push('terço proximal');
+  if (v.med) parts.push('terço médio');
+  if (v.dis) parts.push('terço distal');
+  if (parts.length === 0) return '';
+  if (parts.length === 1) return ` em seu ${parts[0]}`;
+  return ` em seu ${parts.slice(0,-1).join(', ')} e ${parts[parts.length-1]}`;
+}
+
+function getExtensaoSafena(v) {
+  if (v.tod) return ' em toda sua extensão';
+  const parts = [];
+  if (v.pro) parts.push('terço proximal');
+  if (v.med) parts.push('terço médio');
+  if (v.dis) parts.push('terço distal');
+  let txt = '';
+  if (parts.length === 1) txt = `em seu ${parts[0]}`;
+  else if (parts.length > 1) txt = `em seu ${parts.slice(0,-1).join(', ')} e ${parts[parts.length-1]}`;
+  if (v.crossa) txt = txt ? `em sua crossa e ${txt.replace(/^em /,'')}`.replace('e seu','e em seu') : 'em sua crossa';
+  return txt ? ' ' + txt : '';
+}
+
+function fraseVeia(key, label, plural) {
+  const v = estado[key];
+  const perv = plural ? 'pérvias' : 'pérvia';
+  const ncar = plural ? 'não caracterizadas' : 'não caracterizada';
+
+  if (v.sit === 'habitual') {
+    return `${label} ${perv}, de calibre habitual e compressível, com fluxo vascular preservado ao estudo Doppler.`;
+  } else if (v.sit === 'nc') {
+    const motivo = v.motivoNC === 'edema' ? 'acentuado edema' : 'intensa atenuação do feixe acústico';
+    return `${label} ${ncar} devido ${motivo}.`;
+  } else if (v.sit === 'tvp') {
+    const ext = getExtensao(v);
+    if (v.ocl === 'parcial') {
+      if (v.cro === 'aguda') return `${label} de calibre aumentado, apresentando material hipoecoico preenchendo parcialmente a sua luz${ext}, com compressibilidade parcial e fluxo vascular residual ao Doppler colorido.`;
+      return `${label} de calibre ${v.cal}, apresentando material hiperecoico preenchendo parcialmente a sua luz${ext}, com compressibilidade parcial e fluxo vascular residual ao Doppler colorido${v.rec?', com sinais de recanalização':''}.`;
+    }
+    if (v.cro === 'aguda') {
+      return `${label} de calibre aumentado, apresentando material hipoecoico preenchendo a sua luz${ext}, não compressível e sem fluxo vascular caracterizado ao Doppler colorido.`;
+    } else {
+      const rec = v.rec ? 'com sinais de recanalização' : 'sem sinais de recanalização';
+      return `${label} de calibre ${v.cal}, apresentando material hiperecoico preenchendo a sua luz${ext}, não compressível e ${rec} caracterizado ao Doppler colorido.`;
+    }
+  }
+  return '';
+}
+
+function fraseSafena(key, label) {
+  const v = estado[key];
+  if (v.sit === 'habitual') {
+    return `${label} pérvia, de calibre habitual e compressível, com fluxo vascular preservado ao estudo Doppler.`;
+  }
+  const ext = getExtensaoSafena(v);
+  return `${label} de calibre aumentado, apresentando material hiperecoico preenchendo a sua luz${ext}, não compressível e sem fluxo vascular ao Doppler colorido.`;
+}
+
+// ── ATUALIZAR LAUDO ──
+function listaE(arr) {
+  if (arr.length <= 1) return arr.join('');
+  return arr.slice(0,-1).join(', ') + ' e ' + arr[arr.length-1];
+}
+
+const GRUPOS_VEIAS = [
+  { nome:'femorais',   partes:{ vfc:{t:'femoral comum',pl:false}, vfem:{t:'femoral',pl:false}, vfp:{t:'femoral profunda',pl:false} } },
+  { nome:'poplíteas',  partes:{ vp:{t:'poplíteas',pl:true} } },
+  { nome:'tibiais',    partes:{ vta:{t:'tibiais anteriores',pl:true}, vtp:{t:'tibiais posteriores',pl:true} } },
+  { nome:'fibulares',  partes:{ vf:{t:'fibulares',pl:true} } },
+];
+const KEYS_PROFUNDAS = ['vfc','vfem','vfp','vp','vta','vtp','vf','vmp'];
+const TRONCOS_SAFENA = [['sm','magna'],['sp','parva']];
+
+function updateLaudo() {
+  const S = sidesAtivos();
+  const bil = S.length > 1;
+  const linhas = [];
+  const hd = [];
+  const okVeia = (k, l) => lados[l][k].sit === 'habitual';
+
+  // ── ANÁLISE: veias profundas (frase das normais) ──
+  const nomes = [];
+  GRUPOS_VEIAS.forEach(g => {
+    const keys = Object.keys(g.partes);
+    if (S.every(l => keys.every(k => okVeia(k, l)))) { nomes.push(g.nome); return; }
+    keys.forEach(k => {
+      const p = g.partes[k];
+      const oks = S.filter(l => okVeia(k, l));
+      if (oks.length === S.length) nomes.push(p.t);
+      else oks.forEach(l => nomes.push(p.t + sufLado(l, p.pl)));
+    });
+  });
+  if (nomes.length) linhas.push(`Veias ${listaE(nomes)} pérvias, com calibres normais e parede e compressibilidade preservadas, sem tromboses.`);
+
+  // ── ANÁLISE: veias profundas alteradas (lateralidade junto ao achado) ──
+  const ordem = [];
+  GRUPOS_VEIAS.forEach(g => ordem.push(...Object.keys(g.partes)));
+  ordem.push('vmp');
+  ordem.forEach(k => S.forEach(l => {
+    if (lados[l][k].sit !== 'habitual') {
+      const pl = VEIAS[k].plural;
+      linhas.push(comLado(l, () => fraseVeia(k, VEIAS[k].label + sufLado(l, pl), pl)));
+    }
+  }));
+
+  // ── ANÁLISE: safenas (crossas) ──
+  const crossaOk = (k, l) => {
+    const v = lados[l][k];
+    if (v.sit === 'habitual') return true;
+    if (v.tod || v.crossa) return false;
+    return v.pro || v.med || v.dis;
+  };
+  const okItems = [];
+  TRONCOS_SAFENA.forEach(([k, n]) => S.forEach(l => { if (crossaOk(k, l)) okItems.push({ k, n, l }); }));
+  if (okItems.length === TRONCOS_SAFENA.length * S.length) linhas.push('Crossas das veias safenas magnas e parvas pérvias, sem tromboses.');
+  else if (okItems.length === 1) linhas.push(`Crossa da veia safena ${okItems[0].n}${sufLado(okItems[0].l, false)} pérvia, sem trombose.`);
+  else if (okItems.length > 1) {
+    const nm = [];
+    TRONCOS_SAFENA.forEach(([k, n]) => {
+      const oks = okItems.filter(i => i.k === k);
+      if (oks.length === S.length) nm.push(`safenas ${n}s`);
+      else oks.forEach(i => nm.push(`safena ${n}${sufLado(i.l, false)}`));
+    });
+    linhas.push(`Crossas das veias ${listaE(nm)} pérvias, sem tromboses.`);
+  }
+  TRONCOS_SAFENA.forEach(([k, n]) => S.forEach(l => {
+    if (lados[l][k].sit === 'tvp') linhas.push(comLado(l, () => fraseSafena(k, `Veia safena ${n}${sufLado(l, false)}`)));
+  }));
+
+  // ── CONCLUSÃO: veias profundas ──
+  let temTVPProf = false, temNCProf = false;
+  const ncLabels = [];
+  const gruposTVP = [];
+  KEYS_PROFUNDAS.forEach(key => S.forEach(l => {
+    const v = lados[l][key];
+    const pl = VEIAS[key].plural;
+    const label = VEIAS[key].label.toLowerCase() + sufLado(l, pl);
+    if (v.sit === 'tvp') {
+      temTVPProf = true;
+      const nao = v.ocl === 'parcial' ? ' não oclusiva' : '';
+      const fase = v.cro === 'aguda' ? '' : `, em fase crônica ${v.rec?'com sinais de recanalização':'sem recanalização'}`;
+      const chave = nao + '|' + fase;
+      let g = gruposTVP.find(x => x.chave === chave);
+      if (!g) { g = { chave, nao, fase, itens: [] }; gruposTVP.push(g); }
+      g.itens.push((pl ? 'nas ' : 'na ') + label);
+    } else if (v.sit === 'nc') {
+      temNCProf = true;
+      ncLabels.push(label);
+    }
+  }));
+  gruposTVP.forEach(g => hd.push(`Sinais de trombose venosa profunda${g.nao} ${listaE(g.itens)}${g.fase}.`));
+  if (ncLabels.length) hd.push(`Segmentos venosos não caracterizados (${listaE(ncLabels)}), sem possibilidade de excluir trombose nesses segmentos.`);
+
+  // safenas
+  const safTVP = [];
+  TRONCOS_SAFENA.forEach(([k, n]) => S.forEach(l => { if (lados[l][k].sit === 'tvp') safTVP.push(`na veia safena ${n}${sufLado(l, false)}`); }));
+  if (safTVP.length) hd.push(`Sinais de tromboflebite ${listaE(safTVP)}.`);
+
+  // ── veias superficiais ──
+  const frasesVsup = [];
+  S.forEach(l => {
+    const vs = lados[l].vsup;
+    [['Coxa','coxa'],['Perna','perna']].forEach(([seg, nome]) => {
+      if (vs['sit' + seg] !== 'tvp') return;
+      const faces = FACES_VSUP[seg].filter(([k]) => vs[k]).map(([,t]) => t);
+      const ext = faces.length > 0 ? ' ' + listaFaces(faces) : '';
+      frasesVsup.push(`Veias superficiais da ${nome}${sufLado(l, false)} de calibre aumentado, apresentando material ecogênico preenchendo a sua luz${ext}, não compressível e sem fluxo vascular caracterizado ao Doppler colorido.`);
+      hd.push(`Sinais de tromboflebite de veias superficiais da ${nome}${sufLado(l, false)}.`);
+    });
+  });
+
+  // ── Doppler espectral ──
+  const algumaAlteracaoProf = S.some(l => KEYS_PROFUNDAS.some(k => lados[l][k].sit !== 'habitual'));
+  const algumDopAlt = S.some(l => lados[l].doppler.sit === 'alterado');
+  const frasesDop = [];
+  if (algumDopAlt) {
+    S.forEach(l => {
+      const dop = lados[l].doppler;
+      const ladoTxt = bil ? ` do membro inferior ${l === 'DIREITO' ? 'direito' : 'esquerdo'}` : '';
+      if (dop.sit === 'alterado') {
+        const alts = [];
+        if (dop.fasic) alts.push('perda da fasicidade respiratória');
+        if (dop.aug) alts.push('resposta diminuída ou ausente à manobra de compressão distal');
+        if (dop.refluxo) alts.push('refluxo venoso patológico');
+        if (dop.velred) alts.push('redução das velocidades de fluxo');
+        const segTxt = dop.seg.trim() ? ` em ${dop.seg.trim()}` : '';
+        frasesDop.push(`Ao estudo Doppler${ladoTxt}, observa-se alteração do padrão espectral e das velocidades${segTxt}${alts.length ? ', com ' + listaE(alts) : ''}.`);
+        hd.push(`Alteração do padrão espectral ao estudo Doppler${ladoTxt}${segTxt}.`);
+      } else if (bil) {
+        frasesDop.push(`Ao estudo Doppler${ladoTxt}, o padrão espectral e as velocidades estão preservados.`);
+      }
+    });
+  } else if (algumaAlteracaoProf) {
+    frasesDop.push('Nos demais segmentos, ao estudo Doppler, o padrão espectral e as velocidades estão preservados.');
+  } else {
+    frasesDop.push('Ao estudo Doppler, o padrão espectral e as velocidades estão preservados.');
+  }
+
+  // ── Achados adicionais ──
+  const partsAch = [];
+  S.forEach(l => {
+    const a = lados[l].achados;
+    const suf = sufLado(l, false);
+    if (a.edema) partsAch.push(`Caracteriza-se discreto espessamento, hiperecogenicidade e heterogeneidade da pele e tecido celular subcutâneo na face ${a.edeLocalFace} da ${a.edeLocalSeg}${suf}, sugestivo de edema.`);
+    if (a.baker) {
+      if (a.bakerInt === 'integro') partsAch.push(`Caracteriza-se na fossa poplítea${suf}, formação cística de paredes finas e lobuladas, com conteúdo líquido, anecoico e homogêneo, com colo de comunicação articular entre o tendão do semimembranoso e o músculo gastrocnêmio medial.`);
+      else partsAch.push(`Caracteriza-se na fossa poplítea${suf}, formação cística de limites parcialmente definidos e conteúdo anecoico, apresentando extensão aos planos adiposos e perifasciais adjacentes, no recesso entre o tendão do semimembranoso e o músculo gastrocnêmio, podendo estar relacionado a cisto de Baker roto.`);
+    }
+    if (a.texto) partsAch.push(bil ? `Membro inferior ${l === 'DIREITO' ? 'direito' : 'esquerdo'}: ${a.texto}` : a.texto);
+  });
+  const fraseAchados = partsAch.length ? 'Achados adicionais: ' + partsAch.join(' ') : '';
+
+  // ── CONCLUSÃO: achados adicionais ──
+  S.forEach(l => {
+    const a = lados[l].achados;
+    const ladoC = bil ? (l === 'DIREITO' ? ' à direita' : ' à esquerda') : '';
+    if (a.baker) hd.push(`Cisto de Baker ${a.bakerInt === 'integro' ? 'íntegro' : 'roto'}${ladoC}.`);
+    if (a.edema) hd.push(`Edema de partes moles na face ${a.edeLocalFace} da ${a.edeLocalSeg}${sufLado(l, false)}.`);
+  });
+
+  const conclusao = [];
+  if (!temTVPProf && !temNCProf) conclusao.push('Exame negativo para trombose venosa profunda.');
+  hd.forEach(h => conclusao.push(h));
+
+  // ── técnica ──
+  const tec = estado.tecnica;
+  const lims = [];
+  if (tec.limEdema) lims.push('por acentuado edema');
+  if (tec.limBiotipo) lims.push('pela intensa atenuação do feixe acústico inerente ao biotipo');
+  const limHtml = lims.length ? `<div class="doc-p">Exame limitado parcialmente ${lims.join(' e ')}.</div>` : '';
+  const urgHtml = tec.carater ? `<div class="doc-p" style="font-style:italic">Exame realizado em caráter de urgência.</div>` : '';
+  const p = arr => arr.map(f => `<div class="doc-p">${f}</div>`).join('');
+  const titulo = bil ? 'DOS MEMBROS INFERIORES' : `DO MEMBRO INFERIOR ${estado.lateralidade}`;
+
+  document.getElementById('laudo-doc').innerHTML = `
+    <div class="doc-titulo">ULTRASSONOGRAFIA COM DOPPLER VENOSO PROFUNDO ${titulo}</div>
+    ${urgHtml}
+    <div class="doc-secao">
+      <span class="doc-label">INDICAÇÃO:</span>
+      <div class="doc-p">Exame direcionado para pesquisa de trombose venosa profunda.</div>
+    </div>
+    <div class="doc-secao">
+      <span class="doc-label">TÉCNICA:</span>
+      <div class="doc-p">Exame realizado com transdutor linear de alta frequência, utilizando modo B, Doppler colorido e Doppler espectral.</div>
+      ${limHtml}
+    </div>
+    <div class="doc-secao">
+      <span class="doc-label">ANÁLISE:</span>
+      ${p(linhas)}${p(frasesVsup)}${p(frasesDop)}${fraseAchados ? p([fraseAchados]) : ''}
+    </div>
+    <div class="doc-secao">
+      <span class="doc-label">CONCLUSÃO:</span>
+      ${p(conclusao.map(c => '- ' + c))}
+    </div>`;
+}
+
+function listaFaces(faces) {
+  if (faces.length === 0) return '';
+  if (faces.length === 1) return 'na ' + faces[0];
+  return 'na ' + faces.slice(0,-1).join(', na ') + ' e na ' + faces[faces.length-1];
+}
+
+// ── DARK MODE ──
+function toggleDark() {
+  const isDark = document.body.classList.toggle('dark');
+  const btn = document.getElementById('btn-dark-toggle');
+  btn.innerHTML = isDark
+    ? '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 8.5A5.5 5.5 0 0 1 6 3c0-.18.01-.36.03-.53A6 6 0 1 0 13.97 9.5c-.15.01-.31.01-.47 0z"/></svg>Modo claro'
+    : '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>Modo escuro';
+  localStorage.setItem('darkMode', isDark ? '1' : '0');
+}
+(function(){ if(localStorage.getItem('darkMode')==='1') toggleDark(); })();
+
+// ── COPIAR / IMPRIMIR ──
+function copiar() {
+  var el = document.getElementById('laudo-doc');
+  if (!el) return;
+  _copyLaudoRichText(el, function(ok) {
+    if (ok) {
+      showToast('Laudo copiado para a área de transferência!');
+    } else {
+      showToast('Falha ao copiar. Use Ctrl+A e Ctrl+C no texto do laudo.');
+    }
+  });
+}
+
+// Intercepta copy manual no dark mode para remover fundo escuro
+document.getElementById('laudo-doc').addEventListener('copy', function(e) {
+  if (!document.body.classList.contains('dark')) return;
+  document.body.classList.remove('dark');
+  document.body.offsetHeight;
+  setTimeout(function() {
+    document.body.classList.add('dark');
+  }, 0);
+});
+
+function showToast(msg) {
+  let t = document.getElementById('toast-notification');
+  t.innerText = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+function imprimir() {
+  const h = document.getElementById('laudo-doc').innerHTML;
+  const w = window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Helvetica,Arial,sans-serif;font-size:10pt;padding:32px;color:#111;line-height:1.65;}.doc-titulo{text-align:center;font-weight:700;text-transform:uppercase;margin-bottom:16px;}.doc-label{font-weight:700;}.doc-p{margin-bottom:8px;}.doc-secao{margin-bottom:14px;}.doc-paciente{margin-bottom:16px;padding:10px 14px;background:#f8f8f8;border:1px solid #ccc;border-radius:4px;font-size:9.5pt;line-height:1.7;}.doc-pac-label{font-weight:700;}*{color:#111 !important;}.laudo-doc:focus { outline: none; }
+</style></head><body>${h}
+<div id="toast-notification" class="toast-notification">Laudo copiado!</div>
+</body></html>`);
+  w.document.close(); w.print();
+}
+
+// ── REINICIAR ──
+function reiniciar() {
+  estado.lateralidade = 'DIREITO';
+  estado.tecnica = { limEdema:false, limBiotipo:false, carater:false };
+  lados.DIREITO = novoLado();
+  lados.ESQUERDO = novoLado();
+  ladoAtivo = 'DIREITO';
+  aplicarLado('DIREITO');
+  showSection('lateralidade');
+}
+
+showSection('lateralidade');
+</script>
+
+<div id="toast-notification" class="toast-notification">Laudo copiado!</div>
+<script src="../js/copy-pacs.js"></script>
+</body>
+</html>

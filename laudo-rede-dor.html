@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESTRUTURADOS REDE DOR - Laudos Estruturados</title>
+    <style>
+        :root {
+            --bg: #0a0f1e;
+            --card-bg: rgba(255,255,255,0.06);
+            --card-border: rgba(255,255,255,0.1);
+            --text-color: #e0e6f0;
+            --subtext-color: #b0b8c8;
+            --search-bg: rgba(255,255,255,0.08);
+            --search-border: rgba(255,255,255,0.15);
+            --glow: #4fc3f7;
+            --accent: #29b6f6;
+            --bar-bg: rgba(10,15,30,0.8);
+            --bar-text: #e0e6f0;
+            --bar-subtext: #b0b8c8;
+            --categoria-bg: rgba(79,195,247,0.1);
+            --categoria-text: #4fc3f7;
+        }
+        body.light-mode {
+            --bg: #f0f4f8;
+            --card-bg: rgba(255,255,255,0.7);
+            --card-border: rgba(0,0,0,0.1);
+            --text-color: #1a2a3a;
+            --subtext-color: #4a5568;
+            --search-bg: white;
+            --search-border: #cbd5e0;
+            --glow: #0288d1;
+            --accent: #0277bd;
+            --bar-bg: rgba(255,255,255,0.8);
+            --bar-text: #1a2a3a;
+            --bar-subtext: #4a5568;
+            --categoria-bg: rgba(2,136,209,0.08);
+            --categoria-text: #0288d1;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            background-image: 
+                radial-gradient(ellipse at 20% 50%, rgba(79,195,247,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(2,136,209,0.06) 0%, transparent 50%);
+            min-height: 100vh;
+            transition: background 0.5s, color 0.5s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            padding-top: 110px;
+            color: var(--text-color);
+        }
+
+        .top-logo {
+            position: fixed; top: 0; left: 0; width: 100%; height: 60px;
+            background: var(--bar-bg); backdrop-filter: blur(15px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            display: flex; justify-content: center; align-items: center; z-index: 1000;
+            gap: 6px; transition: background 0.5s;
+            border-bottom: 1px solid var(--card-border);
+        }
+        .logo-texto { font-size: 1.8em; font-weight: 700; color: var(--bar-text); letter-spacing: 2px; transition: color 0.5s; }
+        .logo-sub { font-size: 0.85em; font-weight: 400; color: var(--bar-subtext); margin-left: 4px; transition: color 0.5s; white-space: nowrap; }
+
+        .top-bar {
+            position: fixed; top: 80px; right: 20px; display: flex; gap: 12px; z-index: 1001;
+        }
+        .icon-btn {
+            background: var(--card-bg); backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border); border-radius: 50%;
+            width: 45px; height: 45px; font-size: 20px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-color); transition: all 0.3s;
+        }
+        .icon-btn:hover { background: var(--accent); color: white; border-color: var(--accent); transform: scale(1.08); }
+
+        .container { max-width: 1300px; width: 100%; }
+
+        h1 {
+            text-align: center; font-size: 2.5em; font-weight: 700;
+            background: linear-gradient(135deg, var(--glow), var(--accent));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; margin-bottom: 5px;
+        }
+        .subtitulo { text-align: center; color: var(--subtext-color); font-size: 1.1em; margin-bottom: 35px; }
+
+        .search-wrapper { display: flex; justify-content: center; margin-bottom: 45px; }
+        .search-input {
+            width: 100%; max-width: 550px; padding: 14px 24px;
+            font-size: 1.05em; border: 2px solid var(--search-border);
+            border-radius: 40px; background: var(--search-bg);
+            backdrop-filter: blur(10px); color: var(--text-color); outline: none;
+            transition: all 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .search-input:focus { border-color: var(--glow); box-shadow: 0 0 20px rgba(79,195,247,0.3); }
+        .search-input::placeholder { color: var(--subtext-color); opacity: 0.7; }
+
+        /* Categorias */
+        .categoria-secao { margin-bottom: 40px; }
+        .categoria-titulo {
+            font-size: 1.4em; font-weight: 700;
+            color: var(--categoria-text);
+            background: var(--categoria-bg);
+            padding: 8px 20px; border-radius: 30px;
+            display: inline-block; margin-bottom: 20px;
+            border: 1px solid var(--glow);
+            letter-spacing: 1px;
+        }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 25px;
+            justify-items: center;
+        }
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px; padding: 35px 20px;
+            width: 100%; cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+            text-align: center;
+            position: relative; overflow: hidden;
+            color: var(--text-color);
+        }
+        .card::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle at 50% 0%, var(--glow), transparent 70%);
+            opacity: 0; transition: opacity 0.4s;
+        }
+        .card:hover::before { opacity: 0.08; }
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: var(--glow);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 30px rgba(79,195,247,0.2);
+        }
+        .card-icone {
+            width: 64px; height: 64px; margin: 0 auto 15px auto;
+            position: relative; z-index: 1;
+            color: var(--glow);
+            filter: drop-shadow(0 0 8px rgba(79,195,247,0.5));
+            display: flex; align-items: center; justify-content: center;
+        }
+        .card-icone svg {
+            width: 100%; height: 100%;
+            stroke: currentColor; fill: none;
+            stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+        }
+        .card h3 {
+            font-size: 1.1em; font-weight: 600; margin: 0;
+            position: relative; z-index: 1;
+        }
+        .hidden { display: none; }
+
+        .logout-btn {
+            background: none; border: 2px solid var(--accent); color: var(--accent);
+            padding: 10px 24px; border-radius: 30px; cursor: pointer; font-weight: 600;
+            margin-top: 30px; transition: all 0.3s; display: inline-block;
+        }
+        .logout-btn:hover { background: var(--accent); color: white; }
+
+        @media (max-width: 600px) {
+            .cards-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 1.8em; }
+        }
+    </style>
+</head>
+<body>
+    <header class="top-logo" style="gap: 24px;">
+        <svg viewBox="0 0 24 24" width="46" height="46" fill="none" stroke="var(--glow)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 8px rgba(79,195,247,0.4));">
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+            <line x1="12" y1="11" x2="12" y2="17"/>
+            <line x1="9" y1="14" x2="15" y2="14"/>
+        </svg>
+        <div style="width: 2px; height: 42px; background: var(--glow); opacity: 0.6; filter: drop-shadow(0 0 4px rgba(79,195,247,0.5)); border-radius: 2px;"></div>
+        <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center; line-height: 1;">
+            <div style="font-family: 'Segoe UI', system-ui, sans-serif; font-size: 2em; font-weight: 300; letter-spacing: 5px; margin-bottom: 4px;">
+                <span style="color: var(--bar-text);">REDE</span><span style="color: var(--glow);"> DOR</span>
+            </div>
+            <div style="font-size: 0.7em; font-weight: 400; letter-spacing: 2.5px; color: var(--bar-subtext); text-transform: uppercase;">
+                Laudos Estruturados em Ultrassonografia
+            </div>
+        </div>
+    </header>
+    <div class="top-bar">
+        <button class="icon-btn" id="themeBtn" onclick="alternarTema()" title="Alternar tema">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+        <button class="icon-btn" onclick="window.location.href='selecao.html'" title="Voltar">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </button>
+        <button class="icon-btn" onclick="window.location.href='index.html'" title="Sair">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+    </div>
+
+    <div class="container">
+        <h1 style="font-weight: 300; letter-spacing: 2px;">ESTRUTURADOS REDE DOR</h1>
+        <p class="subtitulo" style="text-transform: uppercase; font-size: 0.9em; letter-spacing: 2px; opacity: 0.8;">Laudos Estruturados em Ultrassonografia</p>
+
+        <div class="search-wrapper">
+            <div style="position: relative; width: 100%; max-width: 550px; display: flex; align-items: center;">
+                <svg style="position: absolute; left: 18px; color: var(--subtext-color);" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="searchInput" class="search-input" style="padding-left: 50px; width: 100%; max-width: none;" placeholder="Buscar exame..." oninput="filtrarCards()">
+            </div>
+        </div>
+
+        <div id="categoriasContainer">
+            <!-- Categorias geradas dinamicamente -->
+        </div>
+
+        <div style="text-align:center;">
+            <button class="logout-btn" onclick="window.location.href='selecao.html'" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Voltar para seleção
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Categorias exclusivas da REDE DOR
+        const categorias = [
+            {
+                nome: "Abdome",
+                exames: [
+                    { 
+                        nome: "ABDOME SUPERIOR", 
+                        arquivo: "rede-dor/abdome superior rede dor.html",
+                        icone: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M12 38 C 10 20, 26 12, 42 16 C 52 18, 56 26, 54 36 C 52 42, 46 42, 40 38 C 34 34, 20 40, 12 38 Z"/><path d="M30 37 C 32 47, 24 53, 21 49 C 18 45, 26 36, 30 37 Z"/><path d="M22 28 C 28 24, 38 26, 44 30"/></svg>` 
+                    },
+                    { 
+                        nome: "ABDOME TOTAL", 
+                        arquivo: "rede-dor/abdome total rede dor.html",
+                        icone: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M14 20 C 14 10, 50 10, 50 20 C 50 40, 46 54, 32 54 C 18 54, 14 40, 14 20 Z"/><path d="M18 26 C 20 18, 34 16, 44 20 C 48 22, 48 26, 46 30 C 42 26, 26 32, 18 26 Z"/><path d="M22 36 C 24 32, 30 32, 32 36 C 34 40, 40 40, 42 36"/><path d="M24 44 C 28 40, 36 40, 40 44"/><circle cx="32" cy="48" r="3"/></svg>` 
+                    }
+                ]
+            },
+            {
+                nome: "Aparelho Urinário",
+                exames: [
+                    { 
+                        nome: "APARELHO URINÁRIO", 
+                        arquivo: "rede-dor/aparelho urinario rede dor.html",
+                        icone: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M24 16 C 18 10, 8 16, 12 28 C 14 34, 20 36, 24 32 C 20 28, 20 20, 24 16 Z"/><path d="M40 16 C 46 10, 56 16, 52 28 C 50 34, 44 36, 40 32 C 44 28, 44 20, 40 16 Z"/><path d="M22 24 C 28 34, 30 42, 30 46"/><path d="M42 24 C 36 34, 34 42, 34 46"/><path d="M22 50 C 22 44, 42 44, 42 50 C 42 56, 36 60, 32 60 C 28 60, 22 56, 22 50 Z"/></svg>` 
+                    }
+                ]
+            },
+            {
+                nome: "Vascular",
+                exames: [
+                    { 
+                        nome: "DOPPLER VENOSO", 
+                        arquivo: "rede-dor/doppler venoso rede dor.html",
+                        icone: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M24 10 C 14 16, 16 36, 20 54 C 22 62, 42 62, 44 54 C 48 36, 50 16, 40 10"/><path d="M32 14 C 32 20, 26 24, 32 30 C 32 36, 38 40, 32 46 C 32 52, 26 56, 32 60"/><path d="M28 22 L 32 26 L 36 22"/><path d="M28 38 L 32 42 L 36 38"/></svg>` 
+                    }
+                ]
+            },
+            {
+                nome: "Partes Moles",
+                exames: [
+                    { 
+                        nome: "PARTES MOLES", 
+                        arquivo: "rede-dor/partes moles rede dor.html",
+                        icone: `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M12 24 C 24 16, 40 16, 52 24"/><path d="M12 34 C 24 26, 40 26, 52 34"/><path d="M12 44 C 24 36, 40 36, 52 44"/><path d="M22 20 L 16 42 M 32 20 L 26 42 M 42 20 L 36 42"/><path d="M26 12 C 30 8, 34 8, 38 12"/></svg>` 
+                    }
+                ]
+            }
+        ];
+
+        const container = document.getElementById("categoriasContainer");
+
+        function criarCategorias() {
+            container.innerHTML = "";
+            categorias.forEach(categoria => {
+                const secao = document.createElement("div");
+                secao.className = "categoria-secao";
+                secao.innerHTML = `<div class="categoria-titulo">${categoria.nome}</div>`;
+
+                const grid = document.createElement("div");
+                grid.className = "cards-grid";
+
+                categoria.exames.forEach(exame => {
+                    const card = document.createElement("div");
+                    card.className = "card";
+                    card.setAttribute("data-exame", exame.nome);
+                    card.innerHTML = `
+                        <div class="card-icone">${exame.icone}</div>
+                        <h3>${exame.nome}</h3>
+                    `;
+                    card.onclick = () => abrirLaudo(exame.arquivo || exame.nome);
+                    grid.appendChild(card);
+                });
+
+                secao.appendChild(grid);
+                container.appendChild(secao);
+            });
+        }
+
+        function abrirLaudo(destino) {
+            const pos = window.scrollY;
+            if ('scrollRestoration' in history) history.replaceState({ posRolagem: pos }, "");
+            sessionStorage.setItem('rededor_scroll_pos', pos);
+            
+            if (destino.endsWith('.html')) {
+                window.location.href = destino;
+            } else if (destino === 'ABDOME SUPERIOR') {
+                window.location.href = 'rede-dor/abdome superior rede dor.html';
+            } else if (destino === 'ABDOME TOTAL') {
+                window.location.href = 'rede-dor/abdome total rede dor.html';
+            } else if (destino === 'APARELHO URINÁRIO') {
+                window.location.href = 'rede-dor/aparelho urinario rede dor.html';
+            } else if (destino === 'DOPPLER VENOSO') {
+                window.location.href = 'rede-dor/doppler venoso rede dor.html';
+            } else if (destino === 'PARTES MOLES') {
+                window.location.href = 'rede-dor/partes moles rede dor.html';
+            } else {
+                alert('O módulo para "' + destino + '" está em desenvolvimento e estará disponível em breve!');
+            }
+        }
+
+        function removerAcentos(str) {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        }
+
+        function filtrarCards() {
+            const termo = removerAcentos(document.getElementById("searchInput").value.toLowerCase().trim());
+            const secoes = document.querySelectorAll(".categoria-secao");
+            secoes.forEach(secao => {
+                const cards = secao.querySelectorAll(".card");
+                let algumVisivel = false;
+                cards.forEach(card => {
+                    const nomeExame = removerAcentos(card.getAttribute("data-exame").toLowerCase());
+                    if (nomeExame.includes(termo)) {
+                        card.classList.remove("hidden");
+                        algumVisivel = true;
+                    } else {
+                        card.classList.add("hidden");
+                    }
+                });
+                secao.classList.toggle("hidden", !algumVisivel);
+            });
+        }
+
+        // Tema (padrão escuro)
+        const body = document.body;
+        const themeBtn = document.getElementById("themeBtn");
+        const temaSalvo = localStorage.getItem("tema-rededor") || localStorage.getItem("tema-thirads") || "dark";
+        
+        const iconeSol = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+        const iconeLua = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+
+        if (temaSalvo === "light") {
+            body.classList.add("light-mode");
+            themeBtn.innerHTML = iconeLua;
+        } else {
+            themeBtn.innerHTML = iconeSol;
+        }
+        function alternarTema() {
+            body.classList.toggle("light-mode");
+            if (body.classList.contains("light-mode")) {
+                localStorage.setItem("tema-rededor", "light");
+                themeBtn.innerHTML = iconeLua;
+            } else {
+                localStorage.setItem("tema-rededor", "dark");
+                themeBtn.innerHTML = iconeSol;
+            }
+        }
+
+        criarCategorias();
+
+        // --- RESTAURAÇÃO DE ROLAGEM ---
+        let posRestaurar = null;
+        const savedScroll = sessionStorage.getItem('rededor_scroll_pos');
+        
+        if (savedScroll !== null) {
+            posRestaurar = parseInt(savedScroll, 10);
+            sessionStorage.removeItem('rededor_scroll_pos');
+            if ('scrollRestoration' in history) history.replaceState({ posRolagem: posRestaurar }, "");
+        } else if (history.state && history.state.posRolagem !== undefined) {
+            posRestaurar = history.state.posRolagem;
+        }
+
+        if (posRestaurar !== null) {
+            setTimeout(() => {
+                window.scrollTo(0, posRestaurar);
+            }, 50);
+        }
+
+        // --- PRESERVAÇÃO CONTÍNUA (Browser Back Button) ---
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        
+        let timeoutRolagem;
+        window.addEventListener('scroll', () => {
+            clearTimeout(timeoutRolagem);
+            timeoutRolagem = setTimeout(() => {
+                if ('scrollRestoration' in history) {
+                    history.replaceState({ posRolagem: window.scrollY }, "");
+                }
+            }, 150);
+        });
+    </script>
+</body>
+</html>
